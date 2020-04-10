@@ -26,4 +26,22 @@ public class OrderCostContext {
      */
     private OrderCostDetailContext costDetailContext;
 
+
+    public OrderCostContext() {
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext) {
+        this.reqContext = reqContext;
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext, OrderCostDetailContext costDetailContext) {
+        this.reqContext = reqContext;
+        this.costDetailContext = costDetailContext;
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext, OrderCostResContext resContext, OrderCostDetailContext costDetailContext) {
+        this.reqContext = reqContext;
+        this.resContext = resContext;
+        this.costDetailContext = costDetailContext;
+    }
 }

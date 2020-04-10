@@ -20,4 +20,12 @@ public class LongOrderOwnerCouponReqDTO {
      * 车主券编码
      */
     private String couponCode;
+
+    public LongOrderOwnerCouponReqDTO() {
+    }
+
+    public LongOrderOwnerCouponReqDTO(String carNo, String couponCode) {
+        this.carNo = carNo;
+        this.couponCode = couponCode;
+    }
 }

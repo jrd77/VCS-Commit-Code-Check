@@ -3,10 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -20,7 +17,6 @@ import com.atzuche.order.commons.vo.res.coupon.DisCoupon;
 import com.atzuche.order.commons.vo.res.coupon.OwnerDisCoupon;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -128,7 +124,7 @@ public class SubmitOrderBeforeCostCalService {
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
         //租车费用处理
-        CarRentTimeRangeResVO carRentTimeRangeResVO =
+        CarRentTimeRangeDTO carRentTimeRangeResVO =
                 carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
 
         RenterOrderReqVO renterOrderReqVO = orderCommonConver.buildRenterOrderReqVO(null, null, reqContext,

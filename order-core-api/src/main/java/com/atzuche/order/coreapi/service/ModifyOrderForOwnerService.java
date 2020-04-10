@@ -2,14 +2,13 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.RenterChildStatusEnum;
-import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParameterException;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
@@ -23,13 +22,11 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -474,7 +471,7 @@ public class ModifyOrderForOwnerService {
 	 */
 	public OwnerOrderEntity convertToOwnerOrderEntity(ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerOrderEntity ownerOrderEntity, OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
 		// 获取提前延后时间
-		CarRentTimeRangeResVO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
+		CarRentTimeRangeDTO carRentTimeRangeResVO = getCarRentTimeRangeResVO(modifyOrderOwnerDTO);
 		// 封装新的车主子订单
 		OwnerOrderEntity ownerOrderEntityEffective = new OwnerOrderEntity();
 		// 数据拷贝
@@ -520,7 +517,7 @@ public class ModifyOrderForOwnerService {
 	 * @param modifyOrderDTO
 	 * @return CarRentTimeRangeResVO
 	 */
-	public CarRentTimeRangeResVO getCarRentTimeRangeResVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+	public CarRentTimeRangeDTO getCarRentTimeRangeResVO(ModifyOrderOwnerDTO modifyOrderDTO) {
 		if (modifyOrderDTO == null) {
 			return null;
 		}

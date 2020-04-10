@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -13,7 +15,11 @@ import com.atzuche.order.commons.vo.res.order.DepositAmtVO;
 import com.atzuche.order.commons.vo.res.order.IllegalDepositVO;
 import com.atzuche.order.commons.vo.res.order.TotalCostVO;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostReqContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostResContext;
+import com.atzuche.order.coreapi.entity.dto.cost.req.*;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -54,7 +60,7 @@ public class OrderCommonConver {
      * @return RenterOrderReqVO 租客订单请求参数
      */
     public RenterOrderReqVO buildRenterOrderReqVO(String orderNo, String renterOrderNo, OrderReqContext reqContext,
-                                                  CarRentTimeRangeResVO carRentTimeRangeResVO) {
+                                                  CarRentTimeRangeDTO carRentTimeRangeResVO) {
 
         RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
         renterOrderReqVO.setOrderNo(orderNo);
@@ -165,9 +171,9 @@ public class OrderCommonConver {
     /**
      * 获取平台保障费费用项
      *
-     * @param renterOrderCostRespDTO
-     * @param insureDiscount
-     * @return
+     * @param renterOrderCostRespDTO XX
+     * @param insureDiscount         XX
+     * @return CostItemVO
      */
     private CostItemVO getInsurCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
         if (renterOrderCostRespDTO == null) {
@@ -201,9 +207,9 @@ public class OrderCommonConver {
     /**
      * 获取全面保障费费用项
      *
-     * @param renterOrderCostRespDTO
-     * @param insureDiscount
-     * @return
+     * @param renterOrderCostRespDTO XX
+     * @param insureDiscount         XX
+     * @return CostItemVO
      */
     private CostItemVO getAbatementCostItemVO(RenterOrderCostRespDTO renterOrderCostRespDTO, Double insureDiscount) {
         if (renterOrderCostRespDTO == null) {
@@ -376,5 +382,324 @@ public class OrderCommonConver {
     }
 
 
+    /**
+     * 初始化订单费用计算参数
+     *
+     * @param orderNo       订单号
+     * @param renterOrderNo 租客订单号
+     * @param ownerOrderNo  车主订单号
+     * @param context       请求参数
+     * @return OrderCostContext
+     */
+    public OrderCostContext initOrderCostContext(String orderNo, String renterOrderNo, String ownerOrderNo,
+                                                 OrderReqContext context) {
+        //请求参数
+        OrderCostReqContext reqContext = new OrderCostReqContext();
+        //基础参数
+        reqContext.setBaseReqDTO(initOrderCostBaseReqDTO(orderNo, renterOrderNo, ownerOrderNo, context));
+        //租金参数
+        reqContext.setRentAmtReqDTO(initOrderCostRentAmtReqDTO(context));
+        //基础保障服务费参数
+        reqContext.setInsurAmtReqDTO(initOrderCostInsurAmtReqDTO(context));
+        //全面保障服务参数
+        reqContext.setAbatementAmtReqDTO(initOrderCostAbatementAmtReqDTO(context));
+        //附加驾驶人参数
+        reqContext.setExtraDriverReqDTO(initOrderCostExtraDriverReqDTO(context));
+        //取还车服务费参数
+        reqContext.setGetReturnCarCostReqDTO(initOrderCostGetReturnCarCostReqDTO(context));
+        //取还车超运能溢价参数
+        reqContext.setGetReturnCarOverCostReqDTO(initOrderCostGetReturnCarOverCostReqDTO(context));
+        //长租订单租金折扣参数
+        reqContext.setLongOrderOwnerCouponReqDTO(initLongOrderOwnerCouponReqDTO(context));
+        //送取服务券参数
+        reqContext.setOrderCostGetCarFeeCouponReqDTO(initOrderCostGetCarFeeCouponReqDTO(context));
+        //车主券参数
+        reqContext.setOwnerCouponReqDTO(initOrderCostOwnerCouponReqDTO(context));
+        //平台优惠券参数
+        reqContext.setCostCouponReqDTO(initOrderCostPlatformCouponReqDTO(context));
+        //限时红包参数
+        reqContext.setLimitRedReqDTO(initOrderCostLimitRedReqDTO(context));
+        //凹凸币参数
+        reqContext.setAutoCoinReqDTO(initOrderCostAutoCoinReqDTO(context));
+        //车辆押金
+        reqContext.setCostCarDepositAmtReqDTO(initOrderCostCarDepositAmtReqDTO(context));
+        //违章押金
+        reqContext.setViolationDepositAmtReqDTO(initOrderCostViolationDepositAmtReqDTO(context));
+        //费用清单
+        OrderCostResContext resContext = new OrderCostResContext();
+        //公共参数(用于费用迭代变更)
+        OrderCostDetailContext orderCostDetailContext = new OrderCostDetailContext();
+        return new OrderCostContext(reqContext, resContext, orderCostDetailContext);
+    }
+
+    /**
+     * 初始化基础参数
+     *
+     * @param orderNo       订单号
+     * @param renterOrderNo 租客订单号
+     * @param ownerOrderNo  车主订单号
+     * @param context       请求参数
+     * @return OrderCostBaseReqDTO
+     */
+    public OrderCostBaseReqDTO initOrderCostBaseReqDTO(String orderNo, String renterOrderNo,
+                                                       String ownerOrderNo, OrderReqContext context) {
+        OrderCostBaseReqDTO baseReqDTO = new OrderCostBaseReqDTO();
+        baseReqDTO.setOrderNo(orderNo);
+        baseReqDTO.setRenterOrderNo(renterOrderNo);
+        baseReqDTO.setOwnerOrderNo(ownerOrderNo);
+        baseReqDTO.setMemNo(context.getRenterMemberDto().getMemNo());
+        baseReqDTO.setOwnerMemNo(context.getOwnerMemberDto().getMemNo());
+        baseReqDTO.setStartTime(context.getOrderReqVO().getRentTime());
+        baseReqDTO.setEndTime(context.getOrderReqVO().getRevertTime());
+        logger.info("Init OrderCostBaseReqDTO.result is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
+        return baseReqDTO;
+    }
+
+
+    /**
+     * 初始化计算租金参数
+     *
+     * @param context 请求参数
+     * @return OrderCostRentAmtReqDTO
+     */
+    public OrderCostRentAmtReqDTO initOrderCostRentAmtReqDTO(OrderReqContext context) {
+        OrderCostRentAmtReqDTO orderCostRentAmtReqDTO = new OrderCostRentAmtReqDTO();
+        orderCostRentAmtReqDTO.setRenterGoodsPriceDetailDTOList(context.getRenterGoodsDetailDto().getRenterGoodsPriceDetailDTOList());
+        logger.info("Init OrderCostRentAmtReqDTO.result is,orderCostRentAmtReqDTO:[{}]", JSON.toJSONString(orderCostRentAmtReqDTO));
+        return orderCostRentAmtReqDTO;
+    }
+
+    /**
+     * 初始化计算基础保险费参数
+     *
+     * @param context 请求参数
+     * @return OrderCostInsurAmtReqDTO
+     */
+    public OrderCostInsurAmtReqDTO initOrderCostInsurAmtReqDTO(OrderReqContext context) {
+
+        OrderCostInsurAmtReqDTO orderCostInsurAmtReqDTO = new OrderCostInsurAmtReqDTO();
+        orderCostInsurAmtReqDTO.setCertificationTime(context.getRenterMemberDto().getCertificationTime());
+        orderCostInsurAmtReqDTO.setGetCarBeforeTime(null == context.getCarRentTimeRangeDTO() || null == context.getCarRentTimeRangeDTO().getGetMinutes() ? OrderConstant.ZERO :
+                context.getCarRentTimeRangeDTO().getGetMinutes());
+        orderCostInsurAmtReqDTO.setReturnCarAfterTime(null == context.getCarRentTimeRangeDTO() || null == context.getCarRentTimeRangeDTO().getReturnMinutes() ? OrderConstant.ZERO :
+                context.getCarRentTimeRangeDTO().getReturnMinutes());
+        orderCostInsurAmtReqDTO.setCarLabelIds(context.getRenterGoodsDetailDto().getLabelIds());
+        orderCostInsurAmtReqDTO.setGuidPrice(context.getRenterGoodsDetailDto().getCarGuidePrice());
+        orderCostInsurAmtReqDTO.setInmsrp(context.getRenterGoodsDetailDto().getCarInmsrp());
+        logger.info("Init OrderCostInsurAmtReqDTO.result is,orderCostInsurAmtReqDTO:[{}]", JSON.toJSONString(orderCostInsurAmtReqDTO));
+        return orderCostInsurAmtReqDTO;
+    }
+
+    /**
+     * 初始化计算全面保障服务参数
+     *
+     * @param context 请求参数
+     * @return OrderCostAbatementAmtReqDTO
+     */
+    public OrderCostAbatementAmtReqDTO initOrderCostAbatementAmtReqDTO(OrderReqContext context) {
+        OrderCostAbatementAmtReqDTO orderCostAbatementAmtReqDTO = new OrderCostAbatementAmtReqDTO();
+        orderCostAbatementAmtReqDTO.setCertificationTime(context.getRenterMemberDto().getCertificationTime());
+        orderCostAbatementAmtReqDTO.setGetCarBeforeTime(null == context.getCarRentTimeRangeDTO() || null == context.getCarRentTimeRangeDTO().getGetMinutes() ? OrderConstant.ZERO :
+                context.getCarRentTimeRangeDTO().getGetMinutes());
+        orderCostAbatementAmtReqDTO.setReturnCarAfterTime(null == context.getCarRentTimeRangeDTO() || null == context.getCarRentTimeRangeDTO().getReturnMinutes() ? OrderConstant.ZERO :
+                context.getCarRentTimeRangeDTO().getReturnMinutes());
+        orderCostAbatementAmtReqDTO.setCarLabelIds(context.getRenterGoodsDetailDto().getLabelIds());
+        orderCostAbatementAmtReqDTO.setGuidPrice(context.getRenterGoodsDetailDto().getCarGuidePrice());
+        orderCostAbatementAmtReqDTO.setInmsrp(context.getRenterGoodsDetailDto().getCarInmsrp());
+        orderCostAbatementAmtReqDTO.setIsAbatement(null != context.getOrderReqVO().getAbatement() && context.getOrderReqVO().getAbatement() == OrderConstant.YES);
+        logger.info("Init OrderCostAbatementAmtReqDTO.result is,orderCostAbatementAmtReqDTO:[{}]", JSON.toJSONString(orderCostAbatementAmtReqDTO));
+        return orderCostAbatementAmtReqDTO;
+    }
+
+    /**
+     * 初始化计算附加驾驶人保险参数
+     *
+     * @param context 请求参数
+     * @return OrderCostExtraDriverReqDTO
+     */
+    public OrderCostExtraDriverReqDTO initOrderCostExtraDriverReqDTO(OrderReqContext context) {
+        OrderCostExtraDriverReqDTO orderCostExtraDriverReqDTO = new OrderCostExtraDriverReqDTO();
+        if (StringUtils.isNotBlank(context.getOrderReqVO().getDriverIds())) {
+            orderCostExtraDriverReqDTO.setDriverIds(ListUtil.parseString(context.getOrderReqVO().getDriverIds(), ","));
+        }
+        logger.info("Init OrderCostExtraDriverReqDTO.result is,orderCostExtraDriverReqDTO:[{}]", JSON.toJSONString(orderCostExtraDriverReqDTO));
+        return orderCostExtraDriverReqDTO;
+    }
+
+    /**
+     * 初始化计算取还车服务费参数
+     *
+     * @param context 请求参数
+     * @return OrderCostGetReturnCarCostReqDTO
+     */
+    public OrderCostGetReturnCarCostReqDTO initOrderCostGetReturnCarCostReqDTO(OrderReqContext context) {
+        OrderCostGetReturnCarCostReqDTO orderCostGetReturnCarCostReqDTO = new OrderCostGetReturnCarCostReqDTO();
+        orderCostGetReturnCarCostReqDTO.setCarShowLat(context.getRenterGoodsDetailDto().getCarShowLat());
+        orderCostGetReturnCarCostReqDTO.setCarShowLon(context.getRenterGoodsDetailDto().getCarShowLon());
+        orderCostGetReturnCarCostReqDTO.setCarRealLat(context.getRenterGoodsDetailDto().getCarRealLat());
+        orderCostGetReturnCarCostReqDTO.setCarRealLon(context.getRenterGoodsDetailDto().getCarRealLon());
+        orderCostGetReturnCarCostReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostGetReturnCarCostReqDTO.setEntryCode(context.getOrderReqVO().getSceneCode());
+        orderCostGetReturnCarCostReqDTO.setSource(Integer.valueOf(context.getOrderReqVO().getSource()));
+        orderCostGetReturnCarCostReqDTO.setSrvGetLat(context.getOrderReqVO().getSrvGetLat());
+        orderCostGetReturnCarCostReqDTO.setSrvGetLon(context.getOrderReqVO().getSrvGetLon());
+        orderCostGetReturnCarCostReqDTO.setSrvReturnLon(context.getOrderReqVO().getSrvReturnLon());
+        orderCostGetReturnCarCostReqDTO.setSrvReturnLat(context.getOrderReqVO().getSrvReturnLat());
+        orderCostGetReturnCarCostReqDTO.setIsPackageOrder(StringUtils.equals("2", context.getOrderReqVO().getOrderCategory()));
+        orderCostGetReturnCarCostReqDTO.setIsGetCarCost(null != context.getOrderReqVO().getSrvGetFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvGetFlag());
+        orderCostGetReturnCarCostReqDTO.setIsReturnCarCost(null != context.getOrderReqVO().getSrvReturnFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvReturnFlag());
+        logger.info("Init OrderCostGetReturnCarCostReqDTO.result is,orderCostGetReturnCarCostReqDTO:[{}]", JSON.toJSONString(orderCostGetReturnCarCostReqDTO));
+        return orderCostGetReturnCarCostReqDTO;
+    }
+
+
+    /**
+     * 初始化计算取还车超运能溢价参数
+     *
+     * @param context 请求参数
+     * @return OrderCostGetReturnCarOverCostReqDTO
+     */
+    public OrderCostGetReturnCarOverCostReqDTO initOrderCostGetReturnCarOverCostReqDTO(OrderReqContext context) {
+        OrderCostGetReturnCarOverCostReqDTO orderCostGetReturnCarOverCostReqDTO =
+                new OrderCostGetReturnCarOverCostReqDTO();
+
+        orderCostGetReturnCarOverCostReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostGetReturnCarOverCostReqDTO.setIsGetCarCost(null != context.getOrderReqVO().getSrvGetFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvGetFlag());
+        orderCostGetReturnCarOverCostReqDTO.setIsReturnCarCost(null != context.getOrderReqVO().getSrvReturnFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvReturnFlag());
+        if (StringUtils.isNotBlank(context.getOrderReqVO().getOrderCategory())) {
+            orderCostGetReturnCarOverCostReqDTO.setOrderCategory(Integer.valueOf(context.getOrderReqVO().getOrderCategory()));
+        }
+        logger.info("Init OrderCostGetReturnCarOverCostReqDTO.result is,orderCostGetReturnCarOverCostReqDTO:[{}]", JSON.toJSONString(orderCostGetReturnCarOverCostReqDTO));
+        return orderCostGetReturnCarOverCostReqDTO;
+    }
+
+    /**
+     * 初始化计算长租租金折扣参数
+     *
+     * @param context 请求参数
+     * @return LongOrderOwnerCouponReqDTO
+     */
+    public LongOrderOwnerCouponReqDTO initLongOrderOwnerCouponReqDTO(OrderReqContext context) {
+        LongOrderOwnerCouponReqDTO longOrderOwnerCouponReqDTO = new LongOrderOwnerCouponReqDTO();
+        longOrderOwnerCouponReqDTO.setCarNo(context.getOrderReqVO().getCarNo());
+        longOrderOwnerCouponReqDTO.setCouponCode(context.getOrderReqVO().getLongOwnerCouponNo());
+        logger.info("Init LongOrderOwnerCouponReqDTO.result is,longOrderOwnerCouponReqDTO:[{}]", JSON.toJSONString(longOrderOwnerCouponReqDTO));
+        return longOrderOwnerCouponReqDTO;
+    }
+
+    /**
+     * 初始化计算取送服务券参数
+     *
+     * @param context 请求参数
+     * @return OrderCostGetCarFeeCouponReqDTO
+     */
+    public OrderCostGetCarFeeCouponReqDTO initOrderCostGetCarFeeCouponReqDTO(OrderReqContext context) {
+        OrderCostGetCarFeeCouponReqDTO orderCostGetCarFeeCouponReqDTO = new OrderCostGetCarFeeCouponReqDTO();
+        orderCostGetCarFeeCouponReqDTO.setCarNo(Integer.valueOf(context.getOrderReqVO().getCarNo()));
+        orderCostGetCarFeeCouponReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostGetCarFeeCouponReqDTO.setGetCarFreeCouponId(context.getOrderReqVO().getGetCarFreeCouponId());
+        orderCostGetCarFeeCouponReqDTO.setIsNew(null == context.getRenterMemberDto().getIsNew() || context.getRenterMemberDto().getIsNew() == OrderConstant.NO);
+        orderCostGetCarFeeCouponReqDTO.setLabelIds(context.getRenterGoodsDetailDto().getLabelIds());
+        logger.info("Init OrderCostGetCarFeeCouponReqDTO.result is,orderCostGetCarFeeCouponReqDTO:[{}]", JSON.toJSONString(orderCostGetCarFeeCouponReqDTO));
+        return orderCostGetCarFeeCouponReqDTO;
+    }
+
+    /**
+     * 初始化计算车主券参数
+     *
+     * @param context 请求参数
+     * @return OrderCostOwnerCouponReqDTO
+     */
+    public OrderCostOwnerCouponReqDTO initOrderCostOwnerCouponReqDTO(OrderReqContext context) {
+        OrderCostOwnerCouponReqDTO orderCostOwnerCouponReqDTO = new OrderCostOwnerCouponReqDTO();
+        orderCostOwnerCouponReqDTO.setCarNo(Integer.valueOf(context.getOrderReqVO().getCarNo()));
+        orderCostOwnerCouponReqDTO.setCouponNo(context.getOrderReqVO().getCarOwnerCouponNo());
+        orderCostOwnerCouponReqDTO.setMark(OrderConstant.ONE);
+
+        logger.info("Init OrderCostOwnerCouponReqDTO.result is,orderCostOwnerCouponReqDTO:[{}]", JSON.toJSONString(orderCostOwnerCouponReqDTO));
+        return orderCostOwnerCouponReqDTO;
+    }
+
+    /**
+     * 初始化计算平台优惠券参数
+     *
+     * @param context 请求参数
+     * @return OrderCostPlatformCouponReqDTO
+     */
+    public OrderCostPlatformCouponReqDTO initOrderCostPlatformCouponReqDTO(OrderReqContext context) {
+        OrderCostPlatformCouponReqDTO orderCostPlatformCouponReqDTO = new OrderCostPlatformCouponReqDTO();
+        orderCostPlatformCouponReqDTO.setCarNo(Integer.valueOf(context.getOrderReqVO().getCarNo()));
+        orderCostPlatformCouponReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostPlatformCouponReqDTO.setDisCouponId(context.getOrderReqVO().getDisCouponIds());
+        orderCostPlatformCouponReqDTO.setIsNew(null == context.getRenterMemberDto().getIsNew() || context.getRenterMemberDto().getIsNew() == OrderConstant.NO);
+        orderCostPlatformCouponReqDTO.setLabelIds(context.getRenterGoodsDetailDto().getLabelIds());
+        logger.info("Init OrderCostPlatformCouponReqDTO.result is,orderCostPlatformCouponReqDTO:[{}]", JSON.toJSONString(orderCostPlatformCouponReqDTO));
+        return orderCostPlatformCouponReqDTO;
+    }
+
+    /**
+     * 初始化计算限时红包参数
+     *
+     * @param context 请求参数
+     * @return OrderCostLimitRedReqDTO
+     */
+    public OrderCostLimitRedReqDTO initOrderCostLimitRedReqDTO(OrderReqContext context) {
+        OrderCostLimitRedReqDTO orderCostLimitRedReqDTO = new OrderCostLimitRedReqDTO();
+        if (StringUtils.isNotBlank(context.getOrderReqVO().getReductiAmt())) {
+            orderCostLimitRedReqDTO.setReductiAmt(Integer.valueOf(context.getOrderReqVO().getReductiAmt()));
+        }
+        logger.info("Init OrderCostLimitRedReqDTO.result is,orderCostLimitRedReqDTO:[{}]", JSON.toJSONString(orderCostLimitRedReqDTO));
+        return orderCostLimitRedReqDTO;
+    }
+
+    /**
+     * 初始化计算凹凸币参数
+     *
+     * @param context 请求参数
+     * @return OrderCostAutoCoinReqDTO
+     */
+    public OrderCostAutoCoinReqDTO initOrderCostAutoCoinReqDTO(OrderReqContext context) {
+        OrderCostAutoCoinReqDTO orderCostAutoCoinReqDTO = new OrderCostAutoCoinReqDTO();
+        orderCostAutoCoinReqDTO.setUseAutoCoin(context.getOrderReqVO().getUseAutoCoin());
+        logger.info("Init OrderCostAutoCoinReqDTO.result is,orderCostAutoCoinReqDTO:[{}]", JSON.toJSONString(orderCostAutoCoinReqDTO));
+        return orderCostAutoCoinReqDTO;
+    }
+
+    /**
+     * 初始化计算车辆押金参数
+     *
+     * @param context 请求参数
+     * @return OrderCostCarDepositAmtReqDTO
+     */
+    public OrderCostCarDepositAmtReqDTO initOrderCostCarDepositAmtReqDTO(OrderReqContext context) {
+        OrderCostCarDepositAmtReqDTO orderCostCarDepositAmtReqDTO = new OrderCostCarDepositAmtReqDTO();
+        orderCostCarDepositAmtReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        orderCostCarDepositAmtReqDTO.setFreeDoubleTypeId(StringUtils.isBlank(context.getOrderReqVO().getFreeDoubleTypeId()) ? null : Integer.valueOf(context.getOrderReqVO().getFreeDoubleTypeId()));
+        orderCostCarDepositAmtReqDTO.setGuidPrice(context.getRenterGoodsDetailDto().getCarGuidePrice());
+        orderCostCarDepositAmtReqDTO.setSurplusPrice(context.getRenterGoodsDetailDto().getCarSurplusPrice());
+        orderCostCarDepositAmtReqDTO.setBrand(context.getRenterGoodsDetailDto().getBrand());
+        orderCostCarDepositAmtReqDTO.setType(context.getRenterGoodsDetailDto().getType());
+        orderCostCarDepositAmtReqDTO.setLicenseDay(context.getRenterGoodsDetailDto().getLicenseDay());
+        orderCostCarDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
+        logger.info("Init OrderCostCarDepositAmtReqDTO.result is,orderCostCarDepositAmtReqDTO:[{}]", JSON.toJSONString(orderCostCarDepositAmtReqDTO));
+        return orderCostCarDepositAmtReqDTO;
+    }
+
+    /**
+     * 初始化计算违章押金参数
+     *
+     * @param context 请求参数
+     * @return OrderCostViolationDepositAmtReqDTO
+     */
+    public OrderCostViolationDepositAmtReqDTO initOrderCostViolationDepositAmtReqDTO(OrderReqContext context) {
+        OrderCostViolationDepositAmtReqDTO violationDepositAmtReqDTO = new OrderCostViolationDepositAmtReqDTO();
+
+        violationDepositAmtReqDTO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        violationDepositAmtReqDTO.setFreeDoubleTypeId(StringUtils.isBlank(context.getOrderReqVO().getFreeDoubleTypeId()) ? null : Integer.valueOf(context.getOrderReqVO().getFreeDoubleTypeId()));
+        violationDepositAmtReqDTO.setCarPlateNum(context.getRenterGoodsDetailDto().getCarPlateNum());
+        violationDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
+        logger.info("Init OrderCostViolationDepositAmtReqDTO.result is,violationDepositAmtReqDTO:[{}]", JSON.toJSONString(violationDepositAmtReqDTO));
+        return violationDepositAmtReqDTO;
+    }
 
 }

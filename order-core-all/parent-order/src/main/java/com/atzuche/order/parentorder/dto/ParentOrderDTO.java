@@ -3,6 +3,8 @@ package com.atzuche.order.parentorder.dto;
 import lombok.Data;
 
 /**
+ * 主订单相关信息
+ *
  * @author pengcheng.fu
  * @date 2019/12/24 17:41
  */

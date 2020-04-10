@@ -41,6 +41,11 @@ public class OrderConstant {
     public static final int THREE = 3;
 
     /**
+     * 0.0
+     */
+    public static final double D_ZERO = 0.0;
+
+    /**
      * 1.0
      */
     public static final double D_ONE = 1.0;

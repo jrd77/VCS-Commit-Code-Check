@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +28,6 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.ChangeSourceEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
@@ -72,30 +70,26 @@ public class SubmitOrderController {
     private OrderRecordService orderRecordService;
     @Autowired
     private StockProxyService stockService;
-
     @Autowired
     private MemProxyService memberService;
     @Autowired
     private CarProxyService goodsService;
-
     @Autowired
     private OrderCommonConver orderCommonConver;
-
     @Autowired
     private RenterCommodityService renterCommodityService;
-
     @Autowired
     private OrderFilterChain orderFilterChain;
-
     @Autowired
     private OrderActionMqService orderActionMqService;
-
     @Autowired
     private OrderStatusMqService orderStatusMqService;
     @Autowired 
     private PayCallbackService payCallbackService;
     @Autowired
     private CashierPayService cashierPayService;
+    @Autowired
+    private CarRentalTimeApiProxyService carRentalTimeApiService;
     
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
@@ -157,7 +151,6 @@ public class SubmitOrderController {
             }
             String ownerMemNo = null != context.getOwnerMemberDto() ? context.getOwnerMemberDto().getMemNo() : null;
             orderStatusMqService.sendOrderStatusToCreate(orderResVO.getOrderNo(),ownerMemNo,orderResVO.getStatus(),orderReqVO,newOrderMQStatusEventEnum);
-            orderResVO.setReplyFlag(context.getOwnerGoodsDetailDto().getReplyFlag());
         }catch(OrderException orderException){
             String orderNo = orderResVO==null?"":orderResVO.getOrderNo();
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
@@ -320,6 +313,7 @@ public class SubmitOrderController {
     private OrderReqContext buildOrderReqContext(OrderReqVO orderReqVO){
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
+        orderReqVO.setReqTime(LocalDateTime.now());
         reqContext.setOrderReqVO(orderReqVO);
         //租客会员信息
         RenterMemberDTO renterMemberDTO =
@@ -341,6 +335,11 @@ public class SubmitOrderController {
         OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
         reqContext.setOwnerMemberDto(ownerMemberDTO);
 
+
+        //提前延后时间计算
+        CarRentTimeRangeDTO carRentTimeRangeResVO =
+                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
+        reqContext.setCarRentTimeRangeDTO(carRentTimeRangeResVO);
         return reqContext;
     }
 }

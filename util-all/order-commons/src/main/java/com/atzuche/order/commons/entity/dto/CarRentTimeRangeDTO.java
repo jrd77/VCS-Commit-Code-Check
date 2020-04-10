@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.entity.vo.res;
+package com.atzuche.order.commons.entity.dto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 
 @Data
-public class CarRentTimeRangeResVO {
+public class CarRentTimeRangeDTO {
 
     @AutoDocProperty(value = "提前分钟数")
     private Integer getMinutes;

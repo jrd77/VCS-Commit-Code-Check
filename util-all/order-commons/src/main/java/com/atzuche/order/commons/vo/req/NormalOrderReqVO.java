@@ -105,6 +105,9 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @AutoDocProperty(value = "车主优惠券编码")
     private String carOwnerCouponNo;
 
+    @AutoDocProperty(value = "长租订单车主折扣券编码")
+    private String longOwnerCouponNo;
+
     @AutoDocProperty(value = "是否使用凹凸币:0.否 1.是")
     private Integer useAutoCoin;
 
@@ -602,6 +605,14 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
 
     public void setSrcPort(Integer srcPort) {
         this.srcPort = srcPort;
+    }
+
+    public String getLongOwnerCouponNo() {
+        return longOwnerCouponNo;
+    }
+
+    public void setLongOwnerCouponNo(String longOwnerCouponNo) {
+        this.longOwnerCouponNo = longOwnerCouponNo;
     }
 
 }

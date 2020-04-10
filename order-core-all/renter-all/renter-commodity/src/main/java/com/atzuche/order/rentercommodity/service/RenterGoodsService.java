@@ -1,6 +1,7 @@
 package com.atzuche.order.rentercommodity.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterGoodsDTO;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -36,17 +38,41 @@ public class RenterGoodsService{
     @Autowired
     private RenterGoodsPriceDetailMapper renterGoodsPriceDetailMapper;
 
-    public void save(RenterGoodsDetailDTO renterGoodsDetailDto){
+    /**
+     * 租客商品信息(不包括订单号)保存
+     *
+     * @param orderNo 订单号
+     * @param renterOrderNo 租客订单号
+     * @param renterGoodsDetailDto 租客商品信息
+     */
+    public void save(String orderNo, String renterOrderNo, RenterGoodsDetailDTO renterGoodsDetailDto) {
+        logger.info("Save renter goods detail.param is,orderNo:[{}],renterOrderNo:[{}],renterGoodsDetailDto:[{}]",
+                orderNo, renterOrderNo, JSON.toJSONString(renterGoodsDetailDto));
+
+        if(Objects.isNull(renterGoodsDetailDto)) {
+            return ;
+        }
+        renterGoodsDetailDto.setOrderNo(orderNo);
+        renterGoodsDetailDto.setRenterOrderNo(renterOrderNo);
+        save(renterGoodsDetailDto);
+    }
+
+    /**
+     *  租客商品信息(包括订单号)保存
+     *
+     * @param renterGoodsDetailDto 租客商品信息
+     */
+    public void save(RenterGoodsDetailDTO renterGoodsDetailDto) {
         logger.info("Save renter goods detail.param is,renterGoodsDetailDto:[{}]", JSON.toJSONString(renterGoodsDetailDto));
 
         RenterGoodsEntity goodsEntity = new RenterGoodsEntity();
-        BeanUtils.copyProperties(renterGoodsDetailDto,goodsEntity);
-        goodsEntity.setChoiceCar(renterGoodsDetailDto.isChoiceCar() ? 1 : 0);
+        BeanUtils.copyProperties(renterGoodsDetailDto, goodsEntity);
+        goodsEntity.setChoiceCar(renterGoodsDetailDto.isChoiceCar() ? OrderConstant.YES : OrderConstant.NO);
         renterGoodsMapper.insert(goodsEntity);
 
         List<RenterGoodsPriceDetailDTO> goodsPriceDetailDtoList = renterGoodsDetailDto.getRenterGoodsPriceDetailDTOList();
         List<RenterGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
-        goodsPriceDetailDtoList.forEach(x->{
+        goodsPriceDetailDtoList.forEach(x -> {
             RenterGoodsPriceDetailEntity goodsPriceDetailEntity = new RenterGoodsPriceDetailEntity();
             goodsPriceDetailEntity.setOrderNo(renterGoodsDetailDto.getOrderNo());
             goodsPriceDetailEntity.setRenterOrderNo(renterGoodsDetailDto.getRenterOrderNo());

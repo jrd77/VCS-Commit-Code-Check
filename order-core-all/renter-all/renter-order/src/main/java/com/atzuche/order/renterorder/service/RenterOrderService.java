@@ -260,6 +260,22 @@ public class RenterOrderService {
 
 
     /**
+     * 创建租客订单
+     *
+     *
+     */
+    public void createRenterOrder(){
+
+    }
+
+
+
+
+
+
+
+
+    /**
      * 租车费用计算相关参数封装
      *
      * @param renterOrderReqVO 生成租客订单请求参数
@@ -549,4 +565,7 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo) {
         return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
     }
+
+
+
 }
