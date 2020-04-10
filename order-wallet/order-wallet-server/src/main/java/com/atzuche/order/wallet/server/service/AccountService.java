@@ -5,6 +5,8 @@ import com.atzuche.order.wallet.api.MemAccountStatVO;
 import com.atzuche.order.wallet.server.entity.AccountEntity;
 import com.atzuche.order.wallet.server.mapper.AccountMapper;
 import com.atzuche.order.wallet.server.util.AESEncrypter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import java.util.List;
  **/
 @Service
 public class AccountService {
+    private final static Logger logger = LoggerFactory.getLogger(AccountService.class);
+    
 
     @Autowired
     private AccountMapper accountMapper;
@@ -54,12 +58,19 @@ public class AccountService {
     }
 
     public static AccountVO convert(AccountEntity entity){
+        logger.info("entity is [{}]",entity);
         AccountVO accountVO = new AccountVO();
         BeanUtils.copyProperties(entity,accountVO);
         try {
-            accountVO.setCardNoPlain(AESEncrypter.decrypt(entity.getCardNo()));
-            accountVO.setCardHolderPlain(AESEncrypter.decrypt(entity.getCardHolder()));
-            accountVO.setCertNoPlain(AESEncrypter.decrypt(entity.getCertNo()));
+            if(entity.getCardNo()!=null) {
+                accountVO.setCardNoPlain(AESEncrypter.decrypt(entity.getCardNo()));
+            }
+            if(entity.getCardHolder()!=null) {
+                accountVO.setCardHolderPlain(AESEncrypter.decrypt(entity.getCardHolder()));
+            }
+            if(entity.getCardNo()!=null) {
+                accountVO.setCertNoPlain(AESEncrypter.decrypt(entity.getCertNo()));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
