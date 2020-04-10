@@ -22,7 +22,7 @@ public class SMSIcsocVoiceUtils {
     public  static Logger logger = LoggerFactory.getLogger(SMSIcsocVoiceUtils.class);
 
     //private static final String ICSOC_URL="http://180.168.109.174:2180";
-    private static final String ICSOC_URL="http://10.0.0.21";
+    private static final String ICSOC_URL="http://10.0.0.28";
     private static final String ICSOC_ACCOUNT="icsoc";
     private static final String ICSOC_PASSWORD="abc123456";
 

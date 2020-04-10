@@ -9,6 +9,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
+import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -51,6 +52,8 @@ public class OrderActionMqService {
     private RenterCostFacadeService facadeService;
     @Autowired
     OrderService orderService;
+    @Autowired
+    OrderCostService orderCostService;
     /**
      * 发送下单成功事件
      *
@@ -316,6 +319,7 @@ public class OrderActionMqService {
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             map.put("Owner2YouAdjust", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
+
         //优惠券抵扣金额
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             map.put("CouponOffset", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
