@@ -144,6 +144,7 @@ public class ViolationManageService {
         Date wzRenterLastTime = renterOrderWzStatusEntity.getWzRenterLastTime();
         Date wzPlatformLastTime = renterOrderWzStatusEntity.getWzPlatformLastTime();
         Date wzHandleCompleteTime = renterOrderWzStatusEntity.getWzHandleCompleteTime();
+        Integer managementMode = renterOrderWzStatusEntity.getManagementMode();
 
         if(!ObjectUtils.isEmpty(wzRenterLastTime)){
             //租客最晚处理时间
@@ -158,6 +159,10 @@ public class ViolationManageService {
         if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
             //办理完成时间
             violationHandleInformationResponseVO.setWzHandleCompleteTime(DateUtils.formate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE1));
+        }
+        if(!ObjectUtils.isEmpty(managementMode)){
+            //违章处理方
+            violationHandleInformationResponseVO.setManagementMode(String.valueOf(managementMode));
         }
 
         return violationHandleInformationResponseVO;
@@ -381,8 +386,11 @@ public class ViolationManageService {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
         renterOrderWzStatusEntity.setOrderNo(violationAlterationRequestVO.getOrderNo());
         renterOrderWzStatusEntity.setCarPlateNum(violationAlterationRequestVO.getPlateNum());
-        Integer managementMode = Integer.parseInt(violationAlterationRequestVO.getManagementMode());
-        renterOrderWzStatusEntity.setManagementMode(managementMode);
+        String managementMode = violationAlterationRequestVO.getManagementMode();
+        if(!ObjectUtils.isEmpty(managementMode)){
+            renterOrderWzStatusEntity.setManagementMode(Integer.parseInt(managementMode));
+        }
+
         String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
         String wzPlatformLastTime = violationAlterationRequestVO.getWzPlatformLastTime();
         String wzHandleCompleteTime = violationAlterationRequestVO.getWzHandleCompleteTime();
