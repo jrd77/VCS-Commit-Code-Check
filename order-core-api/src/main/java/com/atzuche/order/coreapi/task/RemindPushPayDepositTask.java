@@ -82,8 +82,14 @@ public class RemindPushPayDepositTask extends IJobHandler {
                         boolean result = CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(violateBO.getOrderNo()));
                         Map paraMap = Maps.newHashMap();
                         if (result) {
+                            if (!violateBO.getExpRentTime().isAfter(LocalDateTime.now()) || !LocalDateTime.now().plusHours(2).isAfter(violateBO.getExpRentTime())) {
+                                return SUCCESS;
+                            }
                             paraMap.put("leftHours", 2);
                         } else {
+                            if (!violateBO.getExpRentTime().isAfter(LocalDateTime.now()) || !LocalDateTime.now().plusHours(4).isAfter(violateBO.getExpRentTime())) {
+                                return SUCCESS;
+                            }
                             paraMap.put("leftHours", 4);
                         }
                         Map pushMap = SmsParamsMapUtil.getParamsMap(violateBO.getOrderNo(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL.getValue(), null, paraMap);
