@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -177,7 +178,7 @@ public class AccountOwnerIncomeExamineNoTService {
     }
 
     public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
-        List<Integer> status = statusList.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        List<Integer> status = Optional.ofNullable(statusList).orElseGet(ArrayList::new).stream().map(x -> x.getStatus()).collect(Collectors.toList());
         List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
         return accountOwnerIncomeExamineEntityList;
     }
