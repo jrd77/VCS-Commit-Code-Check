@@ -127,13 +127,10 @@ public class SupplementService {
 			}
 		}
 		// 获取收银记录
-		List<CashierEntity> cashierList = cashierService.getCashierRentCostsByOrderNo(orderNo);
-		if (cashierList == null || cashierList.isEmpty()) {
+		List<CashierEntity> afterList = cashierService.getCashierRentCostsByOrderNo(orderNo);
+		if (afterList == null || afterList.isEmpty()) {
 			return voList;
 		}
-		// 根据payMd5去重
-		List<CashierEntity> afterList = cashierList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
-                () -> new TreeSet<>(Comparator.comparing(CashierEntity::getPayMd5))), ArrayList::new));
 		int suppRentAmt = afterList.stream().filter(cash -> {return "12".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
 		int suppDebtAmt = afterList.stream().filter(cash -> {return "07".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
 		if (suppRentAmt > 0) {

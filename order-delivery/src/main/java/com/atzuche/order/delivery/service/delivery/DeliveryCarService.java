@@ -200,6 +200,11 @@ public class DeliveryCarService {
                 }
                 lastOrderDeliveryEntity.setIsDelete(1);
                 renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
+                //时间
+                if (Objects.isNull(orderDeliveryEntity.getRentTime()) || Objects.isNull(orderDeliveryEntity.getRevertTime())) {
+                    orderDeliveryEntity.setRentTime(lastOrderDeliveryEntity.getRentTime());
+                    orderDeliveryEntity.setRevertTime(lastOrderDeliveryEntity.getRevertTime());
+                }
                 CommonUtil.copyPropertiesIgnoreNull(orderDeliveryEntity, lastOrderDeliveryEntity);
                 lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
