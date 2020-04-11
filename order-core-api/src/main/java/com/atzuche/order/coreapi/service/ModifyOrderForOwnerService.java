@@ -275,18 +275,18 @@ public class ModifyOrderForOwnerService {
 		}
 		// gps费
 		String gpsSerialNumber = ownerGoodsDetailDTO.getGpsSerialNumber();
+		List<Integer> lsGpsSerialNumber = null;
 		if (StringUtils.isNotBlank(gpsSerialNumber)) {
 			String [] gpsSerials = gpsSerialNumber.split(",");
-			List<Integer> lsGpsSerialNumber = new ArrayList<Integer>();
+			lsGpsSerialNumber = new ArrayList<Integer>();
 			for (int i=0;i<gpsSerials.length;i++) {
 				lsGpsSerialNumber.add(Integer.valueOf(gpsSerials[i]));
 			}
-			List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
-			if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
-				incrementList.addAll(gpsFeeList);
-			}
 		}
-		
+		List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
+		if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
+			incrementList.addAll(gpsFeeList);
+		}
 		incrementList.add(srvGetFeeEntity);
 		incrementList.add(srvReturnFeeEntity);
 		return incrementList;
