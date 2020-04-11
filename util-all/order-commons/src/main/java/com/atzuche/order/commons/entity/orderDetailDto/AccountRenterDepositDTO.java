@@ -91,7 +91,7 @@ public class AccountRenterDepositDTO implements Serializable {
     	/**
          * 免押方式(1:绑卡减免,2:芝麻减免,3:消费)
          */
-        @AutoDocProperty(value="免押方式(1:绑卡减免,2:芝麻减免,3:消费)",required=true)
+        @AutoDocProperty(value="免押方式(1:绑卡减免,2:芝麻减免,3:支付押金)",required=true)
         private Integer freeDepositType;
     						
 }

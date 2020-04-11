@@ -1,14 +1,11 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
-import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
-import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -55,6 +52,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.AESSecurityUtils;
 import com.autoyol.autopay.gateway.util.MD5;
@@ -63,6 +61,7 @@ import com.autoyol.autopay.gateway.vo.req.BatchPayVo;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.req.PayVo;
 import com.autoyol.autopay.gateway.vo.req.RefundVo;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
@@ -534,11 +533,30 @@ public class CashierNoTService {
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
-        if(freeDepositType == 2) {
-        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
-        }else {
-        	vo.setPayType(orderPaySign.getPayType());
+//        if(freeDepositType == 2) {
+//        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+//        }else {
+        	vo.setPayType(orderPaySign.getPayType());  //默认
+//        }
+        
+        //只有押金才有预授权的情况
+        if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
+	        String sourceType = orderPaySign.getPaySource();
+	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
+				//只有押金的时候才有是预授权，其他的情况都是消费
+				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
+			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_MP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_H5.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else {
+				//默认
+				vo.setPayType(orderPaySign.getPayType());
+			}
         }
+        
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
@@ -564,11 +582,30 @@ public class CashierNoTService {
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
-        if(freeDepositType == 2) {
-        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
-        }else {
+//        if(freeDepositType == 2) {
+//        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+//        }else {
         	vo.setPayType(orderPaySign.getPayType());
+//        }
+        
+      //只有押金才有预授权的情况
+        if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
+	        String sourceType = orderPaySign.getPaySource();
+	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
+				//只有押金的时候才有是预授权，其他的情况都是消费
+				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
+			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_MP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_H5.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else {
+				//默认
+				vo.setPayType(orderPaySign.getPayType());
+			}
         }
+        
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
