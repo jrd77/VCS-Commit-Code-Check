@@ -7,7 +7,7 @@ package com.atzuche.order.mq.enums;
 public enum ShortMessageTypeEnum {
 
     /*##################################################################短信SMS信息模版数据（新订单）###################################################################################################################*/
-    CANCEL_ORDER_2_RENTER("CancelOrder2Renter", "由于您未在取车时间前支付$PayType$，您对“$carBrandTxt$”的订单(订单号：$orderNo$)已经自动取消。由于订单已经生效，平台将根据违约金规则进行处理。10100202"),
+    //CANCEL_ORDER_2_RENTER("CancelOrder2Renter", "由于您未在取车时间前支付$PayType$，您对“$carBrandTxt$”的订单(订单号：$orderNo$)已经自动取消。由于订单已经生效，平台将根据违约金规则进行处理。10100202"),
     CANCLE_ORDER_WARNINGF_OR_FREEDEPOSIT("CancleOrderWarningForFreeDeposit", "请您在30分钟内支付租车押金，否则订单(订单号:$orderNo$)将被系统自动取消。客服热线 10100202"),
     CAR_RENTALEND_2_RENTER("CarRentalEnd2Renter", "您租借的“$carBrandTxt$”(车牌$CarPlateNum$)(订单号：$orderNo$)行程已结束，感谢您选择凹凸共享租车。本次消费总计$TotalAmount$元，其中车辆租金$Rent$元，平台保障费$Insurance$元，全面保障费$AbatementAmt$元，取车费用$SrvGetCost$元，还车费用$SrvReturnCost$元，附加驾驶保险金额$ExtraDriverInsure$元，租客给车主的调价补贴$You2OwnerAdjust$元，车主给租客的调价补贴$Owner2YouAdjust$元，优惠券抵扣金额$CouponOffset$元，钱包抵扣金额$WalletPay$元，车主给租客的租金补贴金额$RenterPayPlatformContent$元。平台将在24小时内返还车辆押金。如果没有违章，你的违章押金将在15-20日内返还10100202"),
     COST_DETAIL_2_RENTERCPIC("CostDetail2RenterCpic", "您已顺利完成订单(订单号：$orderNo$)，如果没有违章，你的违章押金将在15-20日内返还。欢迎下载使用凹凸租车App（下载链接：dwz.cn/139meh），我们将全力为您提供最好的租车服务。4006080202"),
