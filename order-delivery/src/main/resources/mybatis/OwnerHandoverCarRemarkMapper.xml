@@ -180,7 +180,8 @@
 		select
 		<include refid="Base_Column_List"/>
 		from owner_handover_car_remark where order_no = #{orderNo}
-		and type = #{type} and is_delete = 0
+		and type = ${type} and is_delete = 0
+		order by id desc limit 1
 	</select>
 
     <select id="selectProIdByOrderNo" resultMap="BaseResultMap">
