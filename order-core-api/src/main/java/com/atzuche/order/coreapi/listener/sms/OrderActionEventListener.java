@@ -82,6 +82,8 @@ public class OrderActionEventListener extends OrderSendMessageManager {
                 Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
                 orderMessage.setPushMap(map);
             } else {
+                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
+                orderMessage.setMap(smsMap);
                 Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
                 orderMessage.setPushMap(map);
             }
