@@ -2,8 +2,10 @@ package com.atzuche.order.delivery.common;
 
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
+import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
@@ -40,6 +42,8 @@ public class DeliveryCarTask {
     CodeUtils codeUtils;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
+    @Autowired
+    DeliveryCarService deliveryCarService;
 
     /**
      * 添加订单到仁云流程系统
@@ -92,8 +96,11 @@ public class DeliveryCarTask {
         }
         orderDeliveryEntity.setStatus(3);
         orderDeliveryEntity.setIsNotifyRenyun(0);
+        orderDeliveryEntity.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
         cancelOtherDeliveryTypeInfo(renterOrderNo,serviceType,cancelOrderDeliveryVO);
+        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
        return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 

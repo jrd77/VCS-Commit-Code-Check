@@ -195,7 +195,7 @@ public class DeliveryCarInfoPriceService {
             oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
-            log.error("设置参数失败,目前没有值",e);
+            log.error("设置参数失败,目前没有值");
         }
         return ownerGetAndReturnCarDTO;
     }
@@ -294,7 +294,7 @@ public class DeliveryCarInfoPriceService {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败",e);
+            log.info("获取平台加油服务费失败");
         }
         return 0;
     }
@@ -320,7 +320,7 @@ public class DeliveryCarInfoPriceService {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败", e);
+            log.info("获取平台加油服务费失败，目前没有值");
         }
         return 0;
     }
