@@ -82,6 +82,7 @@ public class OrderSettleService{
      * 查询所以费用
      */
     public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,Integer renterCostAmtFinalForYingshou){
+    	log.info("getRenterCostByOrderNo params orderNo=[{}],renterOrderNo=[{}],renterNo=[{}],renterCostAmtFinalForYingshou=[{}]",orderNo,renterOrderNo,renterNo,renterCostAmtFinalForYingshou);
 //        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 //        Assert.notNull(renterOrder,"订单信息不存在");
 //        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
@@ -146,9 +147,12 @@ public class OrderSettleService{
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,orderNo,renterNo);
         
         //应扣取值
-        if(feeYingkouOri > feeShishou) {
-        	//费用不够的情况下从租车押金中扣除。
-        	depositYingkouOri = feeYingkouOri - feeShishou;
+        //结算前：默认按应收和应扣来处理，不干涉到车辆
+        if(accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0) {
+	        if(feeYingkouOri > feeShishou) {
+	        	//费用不够的情况下从租车押金中扣除。
+	        	depositYingkouOri = feeYingkouOri - feeShishou;
+	        }
         }
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,orderNo,renterNo);
         
