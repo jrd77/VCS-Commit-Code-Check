@@ -212,9 +212,9 @@ public class HandoverCarService {
     public void insertOrUpdateRenterHandoverCarInfo(HandoverCarInfoDTO handoverCarInfoDTO, HandoverCarRemarkDTO handoverCarRemarkDTO) {
         String type = String.valueOf(handoverCarInfoDTO.getType());
         if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
-            type = " 1 or 3";
+            type = " 1 or type = 3";
         } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
-            type = " 2 or 4";
+            type = " 2 or type = 4";
         }
         RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), type);
         RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), type);
@@ -249,9 +249,9 @@ public class HandoverCarService {
     public void insertOrUpdateOwnerHandoverCarInfo(HandoverCarInfoDTO handoverCarInfoDTO, HandoverCarRemarkDTO handoverCarRemarkDTO) {
         String type = String.valueOf(handoverCarInfoDTO.getType());
         if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
-            type = " 1 or 3 ";
+            type = " 1 or type = 3 ";
         } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
-            type = " 2 or 4 ";
+            type = " 2 or type = 4 ";
         }
         OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), type);
         OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(),type);
