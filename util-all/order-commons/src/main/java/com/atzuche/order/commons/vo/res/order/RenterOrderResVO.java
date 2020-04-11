@@ -148,6 +148,11 @@ public class RenterOrderResVO implements Serializable {
 	 */
 	private Integer isDelete;
 	
+	/**
+     * 需补付金额
+     */
+    private Integer supplementAmt;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -328,5 +333,10 @@ public class RenterOrderResVO implements Serializable {
 	public void setChangeReason(String changeReason) {
 		this.changeReason = changeReason;
 	}
-
+	public Integer getSupplementAmt() {
+		return supplementAmt;
+	}
+	public void setSupplementAmt(Integer supplementAmt) {
+		this.supplementAmt = supplementAmt;
+	}
 }

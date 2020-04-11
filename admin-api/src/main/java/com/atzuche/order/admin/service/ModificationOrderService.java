@@ -104,7 +104,8 @@ public class ModificationOrderService {
 							putRenterOrderFine(realVo,data,subData);
 							
 							//需补付金额   需补付金额
-							putPaymentAmount(realVo,data,subData);
+							//putPaymentAmount(realVo,data,subData);
+							realVo.setPaymentAmount(renterOrderResVO.getSupplementAmt() == null ? null:String.valueOf(renterOrderResVO.getSupplementAmt()));
 						}else {
 							//未找到修改记录
 							realVo.setOperatorStatus(convertAgreeFlag(null));
