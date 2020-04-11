@@ -107,8 +107,9 @@ public class RenterOrderSettleService {
 
     private void updateOrderStatus(OrderStatusDTO orderStatusDTO,String renterOrder){
         //1更新 订单流转状态
-        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         LocalDateTime now = LocalDateTime.now();
+        orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setSettleTime(now);
         orderStatusDTO.setCarDepositSettleStatus(SettleStatusEnum.SETTLED.getCode());
         orderStatusDTO.setCarDepositSettleTime(now);
         orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());

@@ -187,8 +187,13 @@ public class DeliveryCarService {
             RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
             BeanUtils.copyProperties(orderDeliveryVO.getOrderDeliveryDTO(), orderDeliveryEntity);
             if (type == DeliveryTypeEnum.ADD_TYPE.getValue().intValue()) {
+                RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
+                if (Objects.nonNull(lastOrderDeliveryEntity)) {
+                    lastOrderDeliveryEntity.setIsDelete(1);
+                    renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
+                }
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
-                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes,orderDeliveryVO);
+                orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes, orderDeliveryVO);
                 orderDeliveryEntity.setStatus(1);
                 renterOrderDeliveryService.insert(orderDeliveryEntity);
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
