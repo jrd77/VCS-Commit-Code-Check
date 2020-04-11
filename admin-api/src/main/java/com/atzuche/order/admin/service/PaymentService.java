@@ -83,14 +83,14 @@ public class PaymentService {
 		LocalDateTime settleTime = null;
 		
 		//租车费用结算状态:0,否 1,是 
-		if(orderStatus != null && orderStatus.getSettleStatus().intValue() == 1) {
+		if(orderStatus != null && orderStatus.getSettleStatus().intValue() != 0) {
 			settleTime = orderStatus.getSettleTime();
 		}
 //		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
 //			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
 //		}
 		
-		if(orderStatus != null && orderStatus.getWzSettleStatus().intValue() == 1) {  //违章结算状态:0,否 1,是
+		if(orderStatus != null && orderStatus.getWzSettleStatus().intValue() != 0) {  //违章结算状态:0,否 1,是
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
 		
