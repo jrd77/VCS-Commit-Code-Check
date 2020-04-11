@@ -2,10 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import static org.junit.Assert.fail;
 
-import com.atzuche.order.coreapi.task.PayPreCarCost4HoursTask;
-import com.atzuche.order.coreapi.task.RemindPayIllegalCrashWithHoursTask;
-import com.atzuche.order.coreapi.task.RemindVoicePayIllegalCrashWithHoursTask;
-import com.atzuche.order.coreapi.task.RevertCar4HoursAutoSettleTask;
+import com.atzuche.order.coreapi.task.*;
 import com.atzuche.order.mq.common.sms.ShortMessageSendService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -37,8 +34,12 @@ public class DeliveryCarInfoPriceServiceTest {
 //    RenterOrderService renterOrderService;
 //	@Autowired
 //    ShortMessageSendService shortMessageSendService;
-//	@Autowired
-//    RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
+	@Autowired
+    RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
+	@Autowired
+	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
+	@Autowired
+    RemindPushPayDepositTask remindPushPayDepositTask;
 //	@Autowired
 //	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
 	
@@ -93,16 +94,18 @@ public class DeliveryCarInfoPriceServiceTest {
 		fail("Not yet implemented");
 	}
 
-//	@Test
-//	public void testRevertCar4HoursAutoSettleTask() throws Exception{
+	@Test
+	public void testRevertCar4HoursAutoSettleTask() throws Exception{
 ////	    //测试定时任务
 ////        revertCar4HoursAutoSettleTask.execute("");
 ////        //测试起租时间
 ////        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective("59700170400299");
 ////        String fieldValue = shortMessageSendService.getFieldValueByFieldName("expRentTime",renterOrderEntity);
 //	   //测试违章相关的短信定时任务
-//        //remindPayIllegalCrashWithHoursTask.execute("");
+         // remindPayIllegalCrashWithHoursTask.execute("");
 //        //remindVoicePayIllegalCrashWithHoursTask.execute("");
-//	}
+        //remindVoicePayIllegalCrashWithHoursTask.execute("");
+        //remindPushPayDepositTask.execute("");
+	}
 
 }
