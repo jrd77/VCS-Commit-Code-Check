@@ -65,7 +65,7 @@ public interface RenterHandoverCarInfoMapper {
      * @param orderNo
      * @return
      */
-    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo, @Param("type") Integer type);
+    RenterHandoverCarInfoEntity selectObjectByOrderNo(@Param("orderNo") String orderNo, @Param("type") String type);
 
     /**
      * 根据租客订单查询

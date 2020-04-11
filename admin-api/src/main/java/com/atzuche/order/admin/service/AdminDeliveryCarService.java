@@ -163,12 +163,14 @@ public class AdminDeliveryCarService {
         ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
         if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
             logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
+            throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
         }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if(Objects.nonNull(ownerTransAddressReqVO)) {
             ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
-            if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
+            if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("510004")) {
                 logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
+                throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());
             }
         }
         if(Objects.nonNull(deliveryReqVO.getGetDeliveryReqDTO())){
@@ -226,7 +228,7 @@ public class AdminDeliveryCarService {
         if(Objects.nonNull(deliveryCarVO.getReturnHandoverCarDTO())) {
             ownerTransAddressReqVO.setReturnCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
             ownerTransAddressReqVO.setSrvReturnLat(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLat());
-            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
+            ownerTransAddressReqVO.setSrvReturnLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
         }
         return ownerTransAddressReqVO;
     }

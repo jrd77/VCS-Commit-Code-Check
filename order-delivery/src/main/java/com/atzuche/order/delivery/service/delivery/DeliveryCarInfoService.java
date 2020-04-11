@@ -139,27 +139,6 @@ public class DeliveryCarInfoService {
         String  tenancy = CommonUtils.getRentDays(renterOrderDelivery.getRentTime(), renterOrderDelivery.getRevertTime(), configHours).toString();
         ownerGetAndReturnCarDTO.setZuQi(tenancy);
         deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar, carEngineType, cityCode, renterGoodsDetailDTO);
-//        if (deliveryCarVO.getIsGetCar() == 0) {
-//            GetHandoverCarDTO getHandoverCarDO = new GetHandoverCarDTO();
-//            getHandoverCarDO.setOwnDefaultGetCarAddr(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarAddr());
-//            getHandoverCarDO.setOwnDefaultGetCarLat(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLat());
-//            getHandoverCarDO.setOwnDefaultGetCarLng(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLng());
-//            getHandoverCarDO.setOwnRealReturnAddr(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarAddr());
-//            getHandoverCarDO.setOwnRealReturnLat(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLat());
-//            getHandoverCarDO.setOwnRealReturnLng(deliveryCarVO.getGetHandoverCarDTO().getOwnDefaultGetCarLng());
-//            deliveryCarVO.setGetHandoverCarDTO(getHandoverCarDO);
-//        }
-//        if (deliveryCarVO.getIsReturnCar() == 0) {
-//            ReturnHandoverCarDTO returnHandoverCarDO = new ReturnHandoverCarDTO();
-//            returnHandoverCarDO.setOwnDefaultReturnCarAddr(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarAddr());
-//            returnHandoverCarDO.setOwnDefaultReturnCarLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLat());
-//            returnHandoverCarDO.setOwnDefaultReturnCarLng(deliveryCarVO.getReturnHandoverCarDTO().getOwnDefaultReturnCarLng());
-//            deliveryCarVO.setReturnHandoverCarDTO(returnHandoverCarDO);
-//        }
-//        if(deliveryCarVO.getIsGetCar() == 1 && deliveryCarVO.getIsReturnCar() == 0)
-//        {
-//
-//        }
         return deliveryCarVO;
     }
 
