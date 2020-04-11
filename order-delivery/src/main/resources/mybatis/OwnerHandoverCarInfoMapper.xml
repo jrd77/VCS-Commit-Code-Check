@@ -274,7 +274,8 @@
 
 	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List"/> from owner_handover_car_info where
-		order_no = #{orderNo} and type = #{type} and is_delete = 0
+		order_no = #{orderNo} and type = ${type} and is_delete = 0
+		order by id desc limit 1
 	</select>
 
 	<select id="selectOwnerByOrderNo" resultMap="BaseResultMap">
