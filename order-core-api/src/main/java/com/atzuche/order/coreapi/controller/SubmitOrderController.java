@@ -94,7 +94,7 @@ public class SubmitOrderController {
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
     @PostMapping("/normal/req")
-    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult) throws Exception {
+    public ResponseData<OrderResVO> submitOrder(@Valid @RequestBody NormalOrderReqVO normalOrderReqVO, BindingResult bindingResult){
         LOGGER.info("Submit order.param is,normalOrderReqVO:[{}]", JSON.toJSONString(normalOrderReqVO));
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
@@ -307,10 +307,11 @@ public class SubmitOrderController {
 
     /**
      * 构建请求参数上下文
-     * @param orderReqVO
-     * @return
+     *
+     * @param orderReqVO 下单请求参数
+     * @return OrderReqContext
      */
-    private OrderReqContext buildOrderReqContext(OrderReqVO orderReqVO){
+    private OrderReqContext buildOrderReqContext(OrderReqVO orderReqVO) {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         orderReqVO.setReqTime(LocalDateTime.now());

@@ -37,6 +37,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
+import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
@@ -102,7 +103,8 @@ public class SubmitOrderHandleService {
     public int save(OrderReqContext context, OrderCostContext costContext) {
         OrderCostBaseReqDTO baseReqDTO = costContext.getReqContext().getBaseReqDTO();
         //todo 租客订单处理
-        renterOrderService.createRenterOrder();
+        CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO = new CreateRenterOrderDataReqDTO();
+        renterOrderService.createRenterOrder(createRenterOrderDataReqDTO);
         // 租客商品处理
         renterGoodsService.save(baseReqDTO.getOrderNo(), baseReqDTO.getRenterOrderNo(), context.getRenterGoodsDetailDto());
         // 租客会员处理
