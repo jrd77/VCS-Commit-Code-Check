@@ -33,6 +33,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
@@ -1578,56 +1579,40 @@ public class OrderDetailService {
 
     public ResponseData<OrderHistoryListDTO> dispatchHistory(String orderNo) {
         List<OrderHistoryDTO> orderHistoryDTOS = new ArrayList<>();
-        List<RenterOrderEntity> renterOrderEntities = renterOrderService.queryHostiryRenterOrderByOrderNo(orderNo);
-        Map<String, RenterGoodsDetailDTO> rentergoodsMap = new HashMap<>();
-        Map<Integer,OwnerMemberDTO> ownerMemberMap = new HashMap<>();
-        Map<String,OrderSourceStatEntity> orderSourceStatMap = new HashMap<>();
-        Map<String,RenterOrderCostEntity> renterOrderCostEntityMap = new HashMap<>();
-        //主订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
-        Optional.ofNullable(renterOrderEntities)
+        String renterMemNo = orderEntity.getMemNoRenter();
+        List<OrderEntity> orderEntityList = orderService.getOrderByRenterMemNo(renterMemNo);
+        Optional.ofNullable(orderEntityList)
                 .orElseGet(ArrayList::new)
                 .stream()
                 .forEach(x->{
-                    OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
-                    String renterOrderNo = x.getRenterOrderNo();
-                    RenterGoodsDetailDTO renterGoodsDetail = null;
-                    //商品详情
-                    if(rentergoodsMap.get(x.getRenterOrderNo())!= null){
-                        renterGoodsDetail = rentergoodsMap.get(x.getRenterOrderNo());
-                    }else{
-                        renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, true);
-                        rentergoodsMap.put(renterGoodsDetail.getRenterOrderNo(),renterGoodsDetail);
+                    String curOrderNo = x.getOrderNo();
+                    OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+                    if(orderStatusEntity == null || orderStatusEntity.getSettleStatus()==null || orderStatusEntity.getSettleStatus() != SettleStatusEnum.SETTLED.getCode()){
+                        log.info("dispatchHistory 获取不到订单状态或者未车辆结算（租车费用结算），跳过查询 orderNo={}",curOrderNo);
+                        return;
+                    }
+                    RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(curOrderNo);
+                    if(renterOrderEntity == null || renterOrderEntity.getRenterOrderNo() == null){
+                        log.info("dispatchHistory 当前订单没有有效的子订单号,跳过查询 orderNo={}",curOrderNo);
+                        return;
                     }
 
                     //车主姓名、车主电话
-                    Integer carNo = renterGoodsDetail.getCarNo();
-                    OwnerMemberDTO ownerMemberDTO = null;
-                    if(ownerMemberMap.get(carNo)!=null){
-                        ownerMemberDTO = ownerMemberMap.get(carNo);
-                    }else{
-                        OwnerGoodsEntity ownerGoodsByCarNo = ownerGoodsService.getOwnerGoodsByCarNo(carNo);
-                        ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerGoodsByCarNo.getOwnerOrderNo(), false);
-                        ownerMemberMap.put(carNo,ownerMemberDTO);
-                    }
-                    //订单类型
-                    OrderSourceStatEntity orderSourceStatEntity = null;
-                    if(orderSourceStatMap.get(orderNo) != null){
-                        orderSourceStatEntity = orderSourceStatMap.get(orderNo);
-                    }else{
-                        orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
-                        orderSourceStatMap.put(orderNo,orderSourceStatEntity);
+                    OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+                    if(ownerOrderEntity == null || ownerOrderEntity.getOwnerOrderNo() == null){
+                        log.info("dispatchHistory 当前订单没有有效的车主子订单，跳过查询 orderNo={}",curOrderNo);
+                        return;
                     }
 
-                    //总租金、总保险
-                    RenterOrderCostEntity renterOrderCostEntity = null;
-                    if(renterOrderCostEntityMap.get(x.getRenterOrderNo()) != null){
-                        renterOrderCostEntityMap.get(renterOrderNo);
-                    }else{
-                        renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);
-                        renterOrderCostEntityMap.put(renterOrderNo,renterOrderCostEntity);
-                    }
+                    String renterOrderNo = renterOrderEntity.getRenterOrderNo();
+                    RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo,false);
+                    String ownerOrderNo = ownerOrderEntity.getOwnerOrderNo();
+                    OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerOrderNo,false);
+                    OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(curOrderNo);
+                    RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(curOrderNo,renterOrderNo);
 
+                    OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
                     orderHistoryDTO.orderNo = orderNo;
                     orderHistoryDTO.category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
                     orderHistoryDTO.ownerName = ownerMemberDTO.getRealName();
@@ -1640,7 +1625,7 @@ public class OrderDetailService {
 
                     //默认车辆显示地址,使用取车服务使用取车地址
                     orderHistoryDTO.addr = renterGoodsDetail.getCarShowAddr();
-                    RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNoHistory(x.getRenterOrderNo(),DeliveryOrderTypeEnum.GET_CAR.getCode());
+                    RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNoHistory(renterOrderNo,DeliveryOrderTypeEnum.GET_CAR.getCode());
                     if(null != renterOrderDeliveryEntity){
                         orderHistoryDTO.addr = renterOrderDeliveryEntity.getRenterGetReturnAddr();
                     }
@@ -1650,14 +1635,20 @@ public class OrderDetailService {
                     orderHistoryDTO.carGearboxType = GearboxTypeEnum.getNameByCode(renterGoodsDetail.getCarGearboxType());
                     orderHistoryDTO.carStatus = CarStatusEnum.getNameByCode(renterGoodsDetail.getCarStatus());
                     orderHistoryDTO.carDayMileage = renterGoodsDetail.getCarDayMileage();
-                    orderHistoryDTO.rentTotalAmt = Math.abs(renterOrderCostEntity.getRentCarAmount());
-                    orderHistoryDTO.totalInsurance = Math.abs(renterOrderCostEntity.getBasicEnsureAmount()+renterOrderCostEntity.getComprehensiveEnsureAmount());
                     orderHistoryDTO.avragePrice = renterGoodsDetail.getRenterGoodsPriceDetailDTOList()!=null&&renterGoodsDetail.getRenterGoodsPriceDetailDTOList().size()>0?renterGoodsDetail.getRenterGoodsPriceDetailDTOList().get(0).getCarUnitPrice():null;
-                    orderHistoryDTO.dispatchFailReason = "";
                     orderHistoryDTO.isLocal = IsLocalEnum.getNameByCode(renterGoodsDetail.getIsLocal())==null?null:IsLocalEnum.getNameByCode(renterGoodsDetail.getIsLocal())+"本地";
                     orderHistoryDTO.sucessRate = renterGoodsDetail.getSucessRate();
                     orderHistoryDTO.carAge = renterGoodsDetail.getCarAge();
                     orderHistoryDTO.choiceCar = ChoiceCarEnum.getNameByCode(renterGoodsDetail.isChoiceCar()==true?1:0);
+
+                    if(renterOrderCostEntity != null){
+                        orderHistoryDTO.rentTotalAmt = Math.abs(renterOrderCostEntity.getRentCarAmount()==null?0:renterOrderCostEntity.getRentCarAmount());
+                        orderHistoryDTO.totalInsurance = Math.abs( (renterOrderCostEntity.getBasicEnsureAmount()==null?0:renterOrderCostEntity.getBasicEnsureAmount())
+                                +(renterOrderCostEntity.getComprehensiveEnsureAmount()==null?0:renterOrderCostEntity.getComprehensiveEnsureAmount()));
+                    }else{
+                        orderHistoryDTO.rentTotalAmt = 0;
+                        orderHistoryDTO.totalInsurance = 0;
+                    }
                     orderHistoryDTOS.add(orderHistoryDTO);
                 });
         OrderHistoryListDTO orderHistoryListDTO = new OrderHistoryListDTO();

@@ -109,4 +109,9 @@ public class OrderService {
         List<String> orderNos = orderMapper.getorderNoAll();
         return orderNos;
     }
+
+    public List<OrderEntity> getOrderByRenterMemNo(String renterMemNo) {
+        List<OrderEntity> orderEntityList = orderMapper.getOrderByRenterMemNo(renterMemNo);
+        return orderEntityList;
+    }
 }
