@@ -105,7 +105,7 @@ public class OrderSettleService{
 	  	if(accountRenterCostSettleEntity != null) {
 	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt()!=null?accountRenterCostSettleEntity.getShifuAmt():0;
 	  		//结算前：租车费用应扣等于应收
-	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt() != null?Math.abs(accountRenterCostSettleEntity.getYingkouAmt()):Math.abs(renterCostAmtFinalForYingshou);  //取绝对值。
+	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0?Math.abs(accountRenterCostSettleEntity.getYingkouAmt()):Math.abs(renterCostAmtFinalForYingshou);  //取绝对值。
 	  	}
 	  	log.info("feeShishouOri=[{}],feeYingkouOri=[{}],orderNo=[{}],memNo=[{}]",feeShishouOri,feeYingkouOri,orderNo,renterNo);
 	  	
