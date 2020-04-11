@@ -122,13 +122,13 @@ public class RemindPayIllegalCrashService {
      * @param orderNo
      */
     public void sendNoPayShortMessageData(String orderNo,String typeName) {
-        Map paramsMap = Maps.newHashMap();
-        paramsMap.put("PayType", typeName);
-        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CANCEL_ORDER_2_RENTER.getValue(), null, paramsMap);
-        smsOrderBaseEventService.sendShortMessage(map);
-        //发送push
-        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
-        orderSendMessageFactory.sendPushMessage(pushMap);
+//        Map paramsMap = Maps.newHashMap();
+//        paramsMap.put("PayType", typeName);
+//        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CANCEL_ORDER_2_RENTER.getValue(), null, paramsMap);
+//        smsOrderBaseEventService.sendShortMessage(map);
+//        //发送push
+//        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
+//        orderSendMessageFactory.sendPushMessage(pushMap);
     }
 
     /**
@@ -159,6 +159,19 @@ public class RemindPayIllegalCrashService {
      */
     public void sendNoPayCarCostShortMessageData(String orderNo,Map paramsMap) {
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.NO_EXEMPT_PREORDER_REMIND_PAYRENT.getValue(), null, paramsMap);
+        smsOrderBaseEventService.sendShortMessage(map);
+    }
+
+    /**
+     * 發送語音短信
+     * @param orderNo
+     * @param paramsMap
+     */
+    public void sendVoiceRemindVoicePayIllegalCrashData(boolean condition,String orderNo,Map paramsMap) {
+        if (!condition) {
+            return;
+        }
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.REMIND_PAY_ILLEGAL_DEPOSITRENTER.getValue(), null, paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
     }
 
