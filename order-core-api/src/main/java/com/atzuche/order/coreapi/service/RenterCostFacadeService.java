@@ -12,6 +12,7 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.rentCost.*;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
@@ -435,10 +436,9 @@ public class RenterCostFacadeService {
         wzDepositDTO.costStatisticsDTO = wzCostStatisticsDTO;
 
         //4、租车费用结算后补付
-        int needIncrementAmt = cashierPayService.getRentCostBufuNew(orderNo, memNo);
         SettleMakeUpDTO settleMakeUpDTO = new SettleMakeUpDTO();
-        settleMakeUpDTO.shouldReveiveAmt = Math.abs(needIncrementAmt);
-        settleMakeUpDTO.realReveiveAmt = renterCostVO.getRenterCostBufuShishou();
+        settleMakeUpDTO.shouldReveiveAmt = renterCostVO.getRenterCostBufuYingshou()>=0?0:NumberUtils.convertNumberToZhengshu(renterCostVO.getRenterCostBufuYingshou());
+        settleMakeUpDTO.realReveiveAmt = Math.abs(renterCostVO.getRenterCostBufuShishou());
 
 
         //5、统计费用
