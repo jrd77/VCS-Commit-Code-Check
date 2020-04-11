@@ -328,7 +328,7 @@ public class RenterCostFacadeService {
             if(orderStatusEntity.getWzSettleStatus() == 1){//违章押金已经结算
                 wzExpAndActFlg = 2;
                 wzDeductionRentHistoricalAmt = AccountSettleUtils.getDepositSettleDeductionDebtAmt(accountRenterCostSettleDetailList,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
-                wzDeductionRentAmt = wzDeductionRentHistoricalAmt + renterCostVO.getDepositWzCostShikou();
+                wzDeductionRentAmt = Math.abs(renterCostVO.getDepositWzCostShikou()) - Math.abs(wzDeductionRentHistoricalAmt);
             }else{
                 wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou();
             }
@@ -414,7 +414,7 @@ public class RenterCostFacadeService {
         RenterWzCostVO wzCostVO = wzCostFacadeService.getRenterWzCostDetail(orderNo);
         WzDepositDTO wzDepositDTO = new WzDepositDTO();
         //3.1、基础费用
-        wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingshou();//abs(wzDepositDetailVO.getYingshouDeposit());
+        wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingshou();
         wzDepositDTO.wzFineAmt = wzCostVO.getWzFineAmt();
         wzDepositDTO.wzServiceCostAmt = wzCostVO.getWzServiceCostAmt();
         wzDepositDTO.wzDysFineAmt = wzCostVO.getWzDysFineAmt();
