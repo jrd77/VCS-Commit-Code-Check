@@ -186,10 +186,11 @@ public class DeliveryCarInfoPriceService {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference) + "L");
+            //ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference) + "L");
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
+            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilMiddleDataFee) + "L");
             log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
             oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));

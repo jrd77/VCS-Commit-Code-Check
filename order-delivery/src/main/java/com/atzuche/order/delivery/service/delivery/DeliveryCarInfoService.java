@@ -233,7 +233,7 @@ public class DeliveryCarInfoService {
         //车主取送信息
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode,2);
         int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
-        ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(overMileageAmt));
+        ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(overMileageAmt)));
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
         //租客取送信息
@@ -247,7 +247,7 @@ public class DeliveryCarInfoService {
         ownerHandoverCarInfoEntities = CommonUtil.copyList(ownerHandoverCarInfoList);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO,ownerHandoverCarInfoEntities,carEngineType,cityCode,1);
         int renterOverMileageAmt = getDeliveryCarOverMileageAmt(getAndReturnCarDTO, renterGoodsDetailDTO);
-        getAndReturnCarDTO.setOverKNCrash(String.valueOf(renterOverMileageAmt));
+        getAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(renterOverMileageAmt)));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
         try {
