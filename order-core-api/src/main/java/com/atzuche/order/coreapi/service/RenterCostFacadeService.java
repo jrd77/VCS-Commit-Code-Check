@@ -509,20 +509,4 @@ public class RenterCostFacadeService {
         }
         return -amt;
     }
-
-    /**
-     * 租车费用应扣
-     * @param rentCarCostStatics
-     * @return
-     */
-    private int  rentAmtShouldDeductionAmt(CostStatisticsDTO rentCarCostStatics){
-        if(rentCarCostStatics.getShouldReceiveAmt() < rentCarCostStatics.getRealReceiveAmt()){
-            return rentCarCostStatics.getShouldReceiveAmt();
-        }else{
-            return rentCarCostStatics.getRealReceiveAmt();
-        }
-    }
-
-
-
 }
