@@ -100,6 +100,10 @@ public class AdminDeliveryCarController extends BaseController {
         try {
             deliveryCarInfoService.updateDeliveryCarInfo(deliveryCarVO);
             return ResponseData.success();
+        } catch (DeliveryOrderException ex) {
+            log.error("配送取还车更新接口有問題", ex);
+            Cat.logError("配送取还车更新接口有問題", ex);
+            return ResponseData.createErrorCodeResponse(ex.getErrorCode(), ex.getMessage());
         } catch (Exception e) {
             log.error("配送取还车更新接口出现异常", e);
             Cat.logError("配送取还车更新出现异常", e);
