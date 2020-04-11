@@ -1361,6 +1361,7 @@ public class OrderDetailService {
             LocalDateTime createTime = renterOrderChangeApply.getCreateTime();
             String createTimeStr = LocalDateTimeUtils.localdateToString(createTime, GlobalConstant.FORMAT_DATE_STR1);
             renterOrderChangeApplyStatusDTO.setCreateTimeStr(createTimeStr);
+            renterOrderChangeApplyStatusDTO.setRenterOrderNo(renterOrderChangeApply.getRenterOrderNo());
         }
 
         orderStatusRespDTO.orderDTO = orderDTO;

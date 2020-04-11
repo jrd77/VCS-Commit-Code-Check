@@ -23,4 +23,7 @@ public class RenterOrderChangeApplyStatusDTO {
 
     @AutoDocProperty("创建时间 yyyy-Mm-dd HH:mm:ss")
     private String createTimeStr;
+
+    @AutoDocProperty("修改申请的子订单号")
+    private String renterOrderNo;
 }
