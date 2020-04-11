@@ -130,14 +130,14 @@ public class OrderCostService {
         	rentVoReal.setYingfuDepositAmt(0);
         }
         //封装减免金额
-        if(rentVoReal.getReductionAmt() == null) {
-        	RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
-        	if(entity != null) {
-        		rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
-                rentVoReal.setOriginalDepositAmt(entity.getOriginalDepositAmt());
-        	}
+
+        RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
+        if(entity != null) {
+            rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
+            rentVoReal.setOriginalDepositAmt(entity.getOriginalDepositAmt());
         }
-        
+
+
         resVo.setRentVo(rentVoReal);
         
         //钱包
