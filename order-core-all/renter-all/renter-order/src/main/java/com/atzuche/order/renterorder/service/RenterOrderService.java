@@ -13,6 +13,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
@@ -262,9 +263,9 @@ public class RenterOrderService {
     /**
      * 创建租客订单
      *
-     *
+     * @param createRenterOrderDataReqDTO 租客订单数据
      */
-    public void createRenterOrder(){
+    public void createRenterOrder(CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO){
 
     }
 
