@@ -22,6 +22,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
+import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
@@ -70,6 +71,8 @@ public class OrderSettleService{
     private AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired
     private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
+    @Autowired
+    private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     
     /**
      * 查询所以费用
@@ -141,10 +144,12 @@ public class OrderSettleService{
         
         //应扣取值
         //结算前：默认按应收和应扣来处理，不干涉到车辆
-        if(accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0) {
-	        if(feeYingkouOri > feeShishou) {
-	        	//费用不够的情况下从租车押金中扣除。
-	        	depositYingkouOri = feeYingkouOri - feeShishou;
+        if(accountRenterCostSettleEntity != null) {
+	        if(accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0) {
+		        if(feeYingkouOri > feeShishou) {
+		        	//费用不够的情况下从租车押金中扣除。
+		        	depositYingkouOri = feeYingkouOri - feeShishou;
+		        }
 	        }
         }
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,orderNo,renterNo);
@@ -185,6 +190,13 @@ public class OrderSettleService{
         if(wzEntity != null) {
         	//结算前：应扣等于0，应收等于应退，默认押金是要退的。
         	wzYingkouOri = wzEntity.getYingkouAmt() !=null?Math.abs(wzEntity.getYingkouAmt()):0;  //负数 取绝对值   wzYingshouOri
+        	//wzYingkouOri 为0，代表的是结算前，从renter_order_wz_cost_detail
+        	if(wzYingkouOri == 0) {
+        		Integer wzYingkouOriSum = renterOrderWzCostDetailService.sumQuerySettleInfoByOrder(orderNo);
+        		if(wzYingkouOriSum != null) {
+        			wzYingkouOri = wzYingkouOriSum.intValue();
+        		}
+        	}
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,orderNo,renterNo);
         
