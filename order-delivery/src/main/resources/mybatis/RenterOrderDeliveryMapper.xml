@@ -322,7 +322,7 @@
 		select
 		<include refid="Base_Column_List"/>
 		from renter_order_delivery where renter_order_no = #{renterOrderNo}
-		and type = #{type}
+		and type = #{type} limit 1
 	</select>
 	<select id="findRenterOrderByrOrderNo" resultMap="BaseResultMap">
 		select

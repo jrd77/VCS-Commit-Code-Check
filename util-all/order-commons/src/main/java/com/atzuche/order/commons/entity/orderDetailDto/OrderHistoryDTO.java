@@ -43,8 +43,8 @@ public class OrderHistoryDTO {
     @AutoDocProperty("日均价")
     public Integer avragePrice;
 
-    @AutoDocProperty("调度失败原因")
-    public String dispatchFailReason;
+  /*  @AutoDocProperty("调度失败原因")
+    public String dispatchFailReason;*/
 
     @AutoDocProperty(value="近10单成单率，存整数")
     public Integer sucessRate;
