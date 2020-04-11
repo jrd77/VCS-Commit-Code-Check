@@ -234,18 +234,17 @@ public class OrderSettleService{
                                 ;
                     }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
                     
-                    int renterCostBufuYingfu = orderSupplementDetails.stream().filter(obj ->{
+                    int renterCostBufuYingfu = orderSupplementDetails.stream()./*filter(obj ->{
                         return
                                 ( Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
                                 Objects.nonNull(obj.getCashType()) && obj.getCashType()==1)  &&
 
                                 (Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1 ||
                                 Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==0 ||
-//                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3&&
                                 Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4 ||
                                 Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5 )
                                 ;
-                    }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                    }).*/mapToInt(OrderSupplementDetailEntity::getAmt).sum();
                     
                     vo.setRenterCostBufuYingshou(renterCostBufuYingfu);
                     vo.setRenterCostBufuShishou(Math.abs(renterCostBufuShishou));
