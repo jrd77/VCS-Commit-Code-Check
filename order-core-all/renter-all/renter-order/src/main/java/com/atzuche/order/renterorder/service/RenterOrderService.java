@@ -14,6 +14,8 @@ import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
+import com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper;
+import com.atzuche.order.renterorder.mapper.RenterDepositDetailMapper;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
@@ -46,6 +48,10 @@ public class RenterOrderService {
 
     @Resource
     private RenterOrderMapper renterOrderMapper;
+    @Resource
+    private RenterDepositDetailMapper renterDepositDetailMapper;
+    @Resource
+    private OwnerCouponLongService ownerCouponLongService;
 
     @Resource
     private OrderCouponService orderCouponService;
@@ -266,18 +272,19 @@ public class RenterOrderService {
      * @param createRenterOrderDataReqDTO 租客订单数据
      */
     public void createRenterOrder(CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO){
-
-
-
-
-
+        //租客订单信息落库
+        renterOrderMapper.insertSelective(createRenterOrderDataReqDTO.getRenterOrderEntity());
+        //租客订单费用、费用明细、补贴明细等落库
+        renterOrderCalCostService.saveOrderCostAndDeailList(createRenterOrderDataReqDTO.getRenterOrderCostRespDTO());
+        //订单优惠券信息落库
+        orderCouponService.insertBatch(createRenterOrderDataReqDTO.getOrderCouponList());
+        //附加驾驶人信息落库
+        renterAdditionalDriverService.insertBatchAdditionalDriver(createRenterOrderDataReqDTO.getRenterAdditionalDriverEntities());
+        //车辆押金明细落库
+        renterDepositDetailMapper.insertSelective(createRenterOrderDataReqDTO.getRenterDepositDetailEntity());
+        //长租订单折扣信息落库
+        int result = ownerCouponLongService.saveOwnerCouponLong(createRenterOrderDataReqDTO.getOwnerCouponLongEntity());
     }
-
-
-
-
-
-
 
 
     /**

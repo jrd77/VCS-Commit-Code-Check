@@ -22,9 +22,11 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostReqContext;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostResContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.*;
+import com.atzuche.order.coreapi.utils.OrderCostDetailCalculationUtil;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
@@ -743,9 +745,7 @@ public class OrderCommonConver {
                             context.getRenterMemberDto().getCommUseDriverList(), driverIds));
         }
         //订单费用明细
-
-
-
+        createRenterOrderDataReqDTO.setRenterOrderCostRespDTO(buildRenterOrderCostRespDTO(costContext));
         return createRenterOrderDataReqDTO;
     }
 
@@ -839,11 +839,56 @@ public class OrderCommonConver {
         return list;
     }
 
-    public RenterOrderCostRespDTO buildRenterOrderCostRespDTO() {
-        RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
+    /**
+     * 构建租客订单费用明细
+     *
+     * @param costContext 订单费用明细
+     * @return RenterOrderCostRespDTO
+     */
+    public RenterOrderCostRespDTO buildRenterOrderCostRespDTO(OrderCostContext costContext) {
+        RenterOrderCostRespDTO respDTO = new RenterOrderCostRespDTO();
+        respDTO.setOrderNo(costContext.getReqContext().getBaseReqDTO().getOrderNo());
+        respDTO.setRenterOrderNo(costContext.getReqContext().getBaseReqDTO().getRenterOrderNo());
+        respDTO.setMemNo(costContext.getReqContext().getBaseReqDTO().getMemNo());
 
+        //费用明细列表
+        List<RenterOrderCostDetailEntity> costDetails = costContext.getCostDetailContext().getCostDetails();
+        //补贴明细列表
+        List<RenterOrderSubsidyDetailDTO> subsidyDetails = costContext.getCostDetailContext().getSubsidyDetails();
+        //租金
+        respDTO.setRentAmount(OrderCostDetailCalculationUtil.getOrderRentAmt(costDetails, subsidyDetails));
+        //基础保障费
+        respDTO.setBasicEnsureAmount(OrderCostDetailCalculationUtil.getInsuranceAmt(costDetails, subsidyDetails));
+        //全面保障费
+        respDTO.setComprehensiveEnsureAmount(OrderCostDetailCalculationUtil.getAbatementAmt(costDetails, subsidyDetails));
+        //手续费
+        respDTO.setCommissionAmount(OrderCostDetailCalculationUtil.getFeeAmt(costDetails).getAmt());
+        //附加驾驶人保障费用
+        respDTO.setAdditionalDrivingEnsureAmount(OrderCostDetailCalculationUtil.getExtraDriverInsureAmt(costDetails).getAmt());
+        //取车费用
+        respDTO.setGetRealAmt(OrderCostDetailCalculationUtil.getSrvGetCostAmt(costDetails, subsidyDetails));
+        //还车费用
+        respDTO.setReturnRealAmt(OrderCostDetailCalculationUtil.getSrvReturnCostAmt(costDetails, subsidyDetails));
+        //取车超运能溢价
+        respDTO.setGetOverAmt(OrderCostDetailCalculationUtil.getGetBlockedRaiseAmt(costDetails, subsidyDetails));
+        //还车超运能溢价
+        respDTO.setReturnOverAmt(OrderCostDetailCalculationUtil.getReturnBlockedRaiseAmt(costDetails, subsidyDetails));
+        //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
+        int rentCarAmount =
+                respDTO.getRentAmount() +
+                        respDTO.getBasicEnsureAmount() +
+                        respDTO.getComprehensiveEnsureAmount() +
+                        respDTO.getGetRealAmt() + respDTO.getGetOverAmt() +
+                        respDTO.getReturnRealAmt() + respDTO.getReturnOverAmt() +
+                        respDTO.getAdditionalDrivingEnsureAmount() + respDTO.getCommissionAmount();
+        respDTO.setRentCarAmount(rentCarAmount);
 
-        return renterOrderCostRespDTO;
+        respDTO.setRenterOrderCostDetailDTOList(costDetails);
+        respDTO.setRenterOrderSubsidyDetailDTOList(subsidyDetails);
+
+        logger.info("Build RenterOrderCostRespDTO.result is,respDTO:[{}]",
+                JSON.toJSONString(respDTO));
+        return respDTO;
     }
 
 }
