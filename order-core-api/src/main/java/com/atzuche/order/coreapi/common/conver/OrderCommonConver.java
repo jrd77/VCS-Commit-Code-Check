@@ -6,8 +6,10 @@ import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
+import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.order.CostItemVO;
@@ -23,8 +25,11 @@ import com.atzuche.order.coreapi.entity.dto.cost.req.*;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
@@ -37,8 +42,10 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author pengcheng.fu
@@ -700,6 +707,143 @@ public class OrderCommonConver {
         violationDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
         logger.info("Init OrderCostViolationDepositAmtReqDTO.result is,violationDepositAmtReqDTO:[{}]", JSON.toJSONString(violationDepositAmtReqDTO));
         return violationDepositAmtReqDTO;
+    }
+
+
+
+    /**
+     * 构建下单落库数据
+     *
+     * @param context     请求参数
+     * @param costContext 费用明细
+     * @return CreateRenterOrderDataReqDTO
+     */
+    public CreateRenterOrderDataReqDTO buildCreateRenterOrderDataReqDTO(OrderReqContext context, OrderCostContext costContext) {
+
+        CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO = new CreateRenterOrderDataReqDTO();
+        //租客订单信息
+        createRenterOrderDataReqDTO.setRenterOrderEntity(buildRenterOrderEntity(costContext.getReqContext().getBaseReqDTO().getOrderNo(), costContext.getReqContext().getBaseReqDTO().getRenterOrderNo(), context));
+        //优惠券列表
+        createRenterOrderDataReqDTO.setOrderCouponList(costContext.getCostDetailContext().getCoupons());
+        //长租订单折扣信息
+        if(Objects.nonNull(costContext.getResContext().getLongOrderOwnerCouponResDTO())) {
+            createRenterOrderDataReqDTO.setOwnerCouponLongEntity(costContext.getResContext().getLongOrderOwnerCouponResDTO().getOwnerCouponLongEntity());
+        }
+        //车辆押金详情
+        if(Objects.nonNull(costContext.getResContext().getOrderCarDepositAmtResDTO())) {
+            createRenterOrderDataReqDTO.setRenterDepositDetailEntity(costContext.getResContext().getOrderCarDepositAmtResDTO().getDepositDetailEntity());
+        }
+        //附加驾驶人信息
+        if (StringUtils.isNotBlank(context.getOrderReqVO().getDriverIds())) {
+            List<String> driverIds = ListUtil.parseString(context.getOrderReqVO().getDriverIds(), ",");
+            createRenterOrderDataReqDTO.setRenterAdditionalDriverEntities(
+                    buildRenterAdditionalDriverEntitys(
+                            costContext.getReqContext().getBaseReqDTO().getOrderNo(),
+                            costContext.getReqContext().getBaseReqDTO().getRenterOrderNo(),
+                            context.getRenterMemberDto().getCommUseDriverList(), driverIds));
+        }
+        //订单费用明细
+
+
+
+        return createRenterOrderDataReqDTO;
+    }
+
+
+    /**
+     * 构建租客订单信息
+     *
+     * @param orderNo       订单号
+     * @param renterOrderNo 租客订单号
+     * @param context       请求参数
+     * @return RenterOrderEntity 租客订单信息
+     */
+    public RenterOrderEntity buildRenterOrderEntity(String orderNo, String renterOrderNo, OrderReqContext context) {
+
+        OrderReqVO orderReqVO = context.getOrderReqVO();
+
+        RenterOrderEntity record = new RenterOrderEntity();
+        record.setOrderNo(orderNo);
+        record.setRenterOrderNo(renterOrderNo);
+        record.setExpRentTime(orderReqVO.getRentTime());
+        record.setExpRevertTime(orderReqVO.getRevertTime());
+        record.setGoodsCode(orderReqVO.getCarNo());
+        record.setGoodsType(String.valueOf(OrderConstant.ONE));
+        record.setAgreeFlag(null == context.getRenterGoodsDetailDto().getReplyFlag() ? OrderConstant.NO :
+                context.getRenterGoodsDetailDto().getReplyFlag());
+        record.setReqAcceptTime(record.getAgreeFlag() == OrderConstant.NO ? null : LocalDateTime.now());
+        record.setIsUseCoin(orderReqVO.getUseAutoCoin());
+        record.setIsUseWallet(orderReqVO.getUseBal());
+        if (StringUtils.isNotBlank(orderReqVO.getDriverIds())) {
+            String[] driverIds = orderReqVO.getDriverIds().split(",");
+            record.setAddDriver(driverIds.length);
+        } else {
+            record.setAddDriver(OrderConstant.ZERO);
+        }
+        record.setIsUseCoupon(StringUtils.isNotBlank(orderReqVO.getCarOwnerCouponNo())
+                || StringUtils.isNotBlank(orderReqVO.getDisCouponIds())
+                || StringUtils.isNotBlank(orderReqVO.getGetCarFreeCouponId()) ? OrderConstant.YES : OrderConstant.NO);
+        record.setIsGetCar(orderReqVO.getSrvGetFlag());
+        record.setIsReturnCar(orderReqVO.getSrvReturnFlag());
+        record.setIsAbatement(Objects.isNull(orderReqVO.getAbatement()) ? OrderConstant.NO : orderReqVO.getAbatement());
+        record.setIsUseSpecialPrice(Objects.isNull(orderReqVO.getUseSpecialPrice()) ? OrderConstant.NO :
+                Integer.valueOf(orderReqVO.getUseSpecialPrice()));
+        record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+        record.setRenterMemNo(orderReqVO.getMemNo());
+        record.setCreateOp(orderReqVO.getOperator());
+        record.setChangeSource(orderReqVO.getChangeSource());
+        logger.info("Build RenterOrderEntity.result is,record:[{}]",
+                JSON.toJSONString(record));
+        return record;
+    }
+
+
+    /**
+     * 构建订单附加驾驶人列表
+     *
+     * @param orderNo           订单号
+     * @param renterOrderNo     租客订单号
+     * @param commUseDriverList 租客附加驾驶人列表
+     * @param driverIds         订单附加驾驶人ID列表
+     * @return List<RenterAdditionalDriverEntity> 附加驾驶人列表
+     */
+    public List<RenterAdditionalDriverEntity> buildRenterAdditionalDriverEntitys(String orderNo,
+                                                                                 String renterOrderNo,
+                                                                                 List<CommUseDriverInfoDTO> commUseDriverList,
+                                                                                 List<String> driverIds) {
+        List<RenterAdditionalDriverEntity> list = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(driverIds) && !CollectionUtils.isEmpty(commUseDriverList)) {
+            for (CommUseDriverInfoDTO commUseDriverInfo : commUseDriverList) {
+                if (null != commUseDriverInfo.getId() && driverIds.contains(commUseDriverInfo.getId().toString())) {
+                    RenterAdditionalDriverEntity record = new RenterAdditionalDriverEntity();
+                    record.setOrderNo(orderNo);
+                    record.setRenterOrderNo(renterOrderNo);
+                    record.setDriverId(String.valueOf(commUseDriverInfo.getId()));
+                    record.setRealName(commUseDriverInfo.getRealName());
+                    record.setPhone(String.valueOf(commUseDriverInfo.getMobile()));
+                    record.setIdCard(commUseDriverInfo.getIdCard());
+                    record.setDriLicAllowCar(commUseDriverInfo.getDriLicAllowCar());
+                    record.setValidityStartDate(commUseDriverInfo.getValidityStartDate());
+                    record.setValidityEndDate(commUseDriverInfo.getValidityEndDate());
+
+                    //添加操作人
+                    record.setCreateOp(commUseDriverInfo.getConsoleOperatorName());
+                    record.setUpdateOp(commUseDriverInfo.getConsoleOperatorName());
+
+                    list.add(record);
+                }
+            }
+        }
+        logger.info("Build RenterAdditionalDriverEntity.result is,list:[{}]",
+                JSON.toJSONString(list));
+        return list;
+    }
+
+    public RenterOrderCostRespDTO buildRenterOrderCostRespDTO() {
+        RenterOrderCostRespDTO renterOrderCostRespDTO = new RenterOrderCostRespDTO();
+
+
+        return renterOrderCostRespDTO;
     }
 
 }

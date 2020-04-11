@@ -222,7 +222,7 @@ public class RenterOrderService {
                 || StringUtils.isNotBlank(renterOrderReqVO.getGetCarFreeCouponId()) ? 1 : 0);
         record.setIsGetCar(renterOrderReqVO.getSrvGetFlag());
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
-        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
+        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:renterOrderReqVO.getAbatement());
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
@@ -266,6 +266,10 @@ public class RenterOrderService {
      * @param createRenterOrderDataReqDTO 租客订单数据
      */
     public void createRenterOrder(CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO){
+
+
+
+
 
     }
 
