@@ -63,7 +63,7 @@ public class AccountRenterWzDepositDTO implements Serializable {
      */
     private Integer surplusCreditPayAmt;
     /**
-     * 免押方式
+     * 免押方式 免押方式(1:绑卡减免,2:芝麻减免,3:支付押金)
      */
     private Integer freeDepositType;
 	/**
