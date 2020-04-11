@@ -114,6 +114,9 @@ public class OrderCostService {
 			if(data != null) {
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
 				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
+				if(costVo != null) {
+					 logger.info("costVo toString=[{}]",costVo.toString());
+				}
 				
 				//租金费用  费用明细表renter_order_cost_detail   
 				putRenterOrderCostDetail(realVo,data);
