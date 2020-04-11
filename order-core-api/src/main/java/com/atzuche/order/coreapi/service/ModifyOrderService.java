@@ -1466,13 +1466,15 @@ public class ModifyOrderService {
 	 */
 	public void saveRenterDelivery(ModifyOrderDTO modifyOrderDTO) {
 		// 修改项
-		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
-		if (changeCodeList != null && !changeCodeList.isEmpty() && 
-				(changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode()) || 
-						changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()))) {
-			return;
-		}
+		/*
+		 * List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
+		 * List<String> changeCodeList =
+		 * modifyOrderConfirmService.listChangeCode(changeItemList); if (changeCodeList
+		 * != null && !changeCodeList.isEmpty() &&
+		 * (changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode()) ||
+		 * changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode())))
+		 * { return; }
+		 */
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
 			// 换车操作
 			return;
@@ -1483,16 +1485,12 @@ public class ModifyOrderService {
 		updateFlowOrderVO.setRenterDeliveryAddrDTO(deliveryAddr);
 		// 配送订单
 		Map<Integer,OrderDeliveryDTO> deliveryMap = getOrderDeliveryDTO(modifyOrderDTO);
-		if (modifyOrderDTO.getSrvGetFlag() != null && modifyOrderDTO.getSrvGetFlag() == 1) {
-			updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode()));
-			// 保存配送订单信息
-			deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
-		}
-		if (modifyOrderDTO.getSrvReturnFlag() != null && modifyOrderDTO.getSrvReturnFlag() == 1) {
-			updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode()));
-			// 保存配送订单信息
-			deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
-		}
+		updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode()));
+		// 保存配送订单信息
+		deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
+		updateFlowOrderVO.setOrderDeliveryDTO(deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode()));
+		// 保存配送订单信息
+		deliveryCarService.updateFlowOrderInfo(updateFlowOrderVO);
 	}
 	
 	/**
@@ -1565,6 +1563,12 @@ public class ModifyOrderService {
 		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getGetMinutes() != null) {
 			getDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getGetMinutes());
 		}
+		if (modifyOrderDTO.getSrvGetFlag() != null && modifyOrderDTO.getSrvGetFlag() == 1) {
+			getDelivery.setIsNotifyRenyun(1);
+		} else {
+			getDelivery.setIsNotifyRenyun(0);
+		}
+		
 		delivMap.put(SrvGetReturnEnum.SRV_GET_TYPE.getCode(), getDelivery);
 		OrderDeliveryDTO returnDelivery = new OrderDeliveryDTO();
 		returnDelivery.setRentTime(modifyOrderDTO.getRentTime());
@@ -1577,6 +1581,11 @@ public class ModifyOrderService {
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
 		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getReturnMinutes() != null) {
 			returnDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getReturnMinutes());
+		}
+		if (modifyOrderDTO.getSrvReturnFlag() != null && modifyOrderDTO.getSrvReturnFlag() == 1) {
+			returnDelivery.setIsNotifyRenyun(1);
+		} else {
+			returnDelivery.setIsNotifyRenyun(0);
 		}
 		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
