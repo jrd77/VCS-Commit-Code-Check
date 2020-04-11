@@ -238,7 +238,7 @@
     </select>
 
 	<select id="selectByOrderNo" resultMap="BaseResultMap">
-		select  <include refid="Base_Column_List"/> from renter_delivery_addr where order_no = #{orderNo}
+		select  <include refid="Base_Column_List"/> from renter_delivery_addr where order_no = #{orderNo} limit 1
 	</select>
   	
 </mapper>
