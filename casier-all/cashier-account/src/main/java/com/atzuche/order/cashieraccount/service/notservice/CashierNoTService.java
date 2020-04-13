@@ -108,6 +108,15 @@ public class CashierNoTService {
         }
         return renterOrderEntity;
     }
+    
+    public RenterOrderEntity getRenterOrderNoByOrderNoIncrement(String orderNo){
+        RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
+        if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
+           return new RenterOrderEntity();
+        }
+        return renterOrderEntity;
+    }
+    
 
     /**
      * 收银台根据主单号 向订单模块查询子单号
@@ -214,6 +223,12 @@ public class CashierNoTService {
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
         vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
+        //容错处理，07微信的一定是消费  200413
+        if(DataPaySourceConstant.WEIXIN_APP.equals(notifyDataVo.getPaySource()) 
+        		|| DataPaySourceConstant.WEIXIN_H5.equals(notifyDataVo.getPaySource())
+        		|| DataPaySourceConstant.WEIXIN_MP.equals(notifyDataVo.getPaySource()) ) {
+        	notifyDataVo.setPayType(DataPayTypeConstant.PAY_PUR);
+        }
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
         	vo.setIsAuthorize(0);
@@ -248,6 +263,11 @@ public class CashierNoTService {
      * @param vo
      */
 	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO vo) {
+		//否则下面的Double.valueOf报错。
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeCreditAmount())){
+			//设置默认值。
+			notifyDataVo.setTotalFreezeCreditAmount(notifyDataVo.getSettleAmount());
+		}
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   //考虑到带小数点的情况。
 			//预授权方式
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
