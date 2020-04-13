@@ -41,7 +41,9 @@ public class AccountRenterCostSettleService{
     public int getCostPaidRent(String orderNo,String memNo) {
         Assert.notNull(orderNo, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
-        return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,memNo);
+        int shishouAmt = accountRenterCostSettleNoTService.getCostPaidRent(orderNo,memNo);
+        log.info("orderNo=[{}],memNo=[{}],实收金额=[{}]",orderNo,memNo,shishouAmt);
+        return shishouAmt;
     }
 
     /**

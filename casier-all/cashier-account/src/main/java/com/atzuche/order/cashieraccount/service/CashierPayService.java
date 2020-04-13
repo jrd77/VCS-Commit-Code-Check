@@ -139,7 +139,7 @@ public class CashierPayService{
         notifyDataVo.setAtappId("20");
         notifyDataVo.setPayKind(payVO.getCashType().getValue());
         notifyDataVo.setPayType(payVO.getPayType().getCode());
-        notifyDataVo.setPaySource("91");
+        notifyDataVo.setPaySource("02");
         notifyDataVo.setTransStatus("00");
         notifyDataVo.setSettleAmount(String.valueOf(payVO.getPayAmt()));
         notifyDataVo.setPayLine(1);
@@ -476,8 +476,14 @@ public class CashierPayService{
         //1 查询子单号
         RenterOrderEntity renterOrderEntity = null;
         //查询子订单有关：进行中的子订单，其他的无关(针对结算后的补付功能。)。200410
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
 	        renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
+	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
+	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+	        }
+        }else if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)) {
+        	//未支付不是有效订单
+        	renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoIncrement(orderPayReqVO.getOrderNo());
 	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
 	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
 	        }
