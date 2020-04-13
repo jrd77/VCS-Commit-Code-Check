@@ -17,6 +17,7 @@ import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
@@ -37,7 +38,6 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
-import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
@@ -91,6 +91,8 @@ public class SubmitOrderHandleService {
     private OrderTransferRecordService orderTransferRecordService;
     @Autowired
     private CashierService cashierService;
+    @Autowired
+    private OrderCommonConver orderCommonConver;
 
 
     /**
@@ -102,9 +104,8 @@ public class SubmitOrderHandleService {
     @Transactional(rollbackFor = Exception.class)
     public int save(OrderReqContext context, OrderCostContext costContext) {
         OrderCostBaseReqDTO baseReqDTO = costContext.getReqContext().getBaseReqDTO();
-        //todo 租客订单处理
-        CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO = new CreateRenterOrderDataReqDTO();
-        renterOrderService.createRenterOrder(createRenterOrderDataReqDTO);
+        // 租客订单处理
+        renterOrderService.createRenterOrder(orderCommonConver.buildCreateRenterOrderDataReqDTO(context, costContext));
         // 租客商品处理
         renterGoodsService.save(baseReqDTO.getOrderNo(), baseReqDTO.getRenterOrderNo(), context.getRenterGoodsDetailDto());
         // 租客会员处理
@@ -147,7 +148,6 @@ public class SubmitOrderHandleService {
         orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
         // 换车记录初始化(orderTransferRecordService.saveOrderTransferRecord)
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
-
         return parentOrderDTO.getOrderStatusDTO().getStatus();
     }
 

@@ -119,7 +119,12 @@ public class SubmitOrderController {
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
-            orderResVO = submitOrderService.submitOrder(context);
+            if(StringUtils.isNotBlank(normalOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(normalOrderReqVO.getBusinessParentType(),"6")) {
+                orderResVO = submitOrderService.submitLongOrder(context);
+            } else {
+                orderResVO = submitOrderService.submitOrder(context);
+            }
+
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
@@ -229,7 +234,11 @@ public class SubmitOrderController {
         OrderReqContext context = buildOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
-            orderResVO = submitOrderService.submitOrder(context);
+            if(StringUtils.isNotBlank(adminOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(adminOrderReqVO.getBusinessParentType(),"6")) {
+                orderResVO = submitOrderService.submitLongOrder(context);
+            } else {
+                orderResVO = submitOrderService.submitOrder(context);
+            }
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
             orderRecordEntity.setErrorCode(ErrorCode.SUCCESS.getCode());
             orderRecordEntity.setErrorTxt(ErrorCode.SUCCESS.getText());
