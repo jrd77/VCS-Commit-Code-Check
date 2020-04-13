@@ -539,6 +539,11 @@ public class ModifyOrderConfirmService {
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
 		stockService.cutCarStock(orderInfoDTO);
+		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag() && 
+				modifyOrderOwnerDTO.getOldCarNo() != null) {
+			// 换车要释放上一辆车的库存
+			stockService.releaseCarStock(modifyOrderOwnerDTO.getOrderNo(), modifyOrderOwnerDTO.getOldCarNo());
+		}
 	}
 	
 	/**
