@@ -538,12 +538,13 @@ public class ModifyOrderConfirmService {
 		returnCarAddress.setLon(modifyOrderOwnerDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderOwnerDTO.getRevertCarLon()):null);
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
-		stockService.cutCarStock(orderInfoDTO);
 		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag() && 
 				modifyOrderOwnerDTO.getOldCarNo() != null) {
 			// 换车要释放上一辆车的库存
-			stockService.releaseCarStock(modifyOrderOwnerDTO.getOrderNo(), modifyOrderOwnerDTO.getOldCarNo());
+			orderInfoDTO.setOldCarNo(modifyOrderOwnerDTO.getOldCarNo());
+			orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDHC.getType());
 		}
+		stockService.cutCarStock(orderInfoDTO);
 	}
 	
 	/**
