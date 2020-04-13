@@ -112,14 +112,18 @@ public class DeliveryCarInfoService {
             if (null == renterOrderDeliveryEntity) {
                 continue;
             }
-            if(renterOrderDeliveryEntity.getType().intValue() == 1) {
+            if (renterOrderDeliveryEntity.getType().intValue() == 1) {
                 getReturnCarCostReqDto.setIsGetCarCost(true);
                 deliveryCarVO.setIsGetCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
-                ownerGetAndReturnCarDTO.setRealGetTime(DateUtils.formate(renterOrderDeliveryEntity.getRentTime().minusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()),DateUtils.DATE_DEFAUTE_4));
+                if (renterOrderDeliveryEntity.getIsNotifyRenyun() != 0) {
+                    ownerGetAndReturnCarDTO.setRealGetTime(DateUtils.formate(renterOrderDeliveryEntity.getRentTime().minusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()), DateUtils.DATE_DEFAUTE_4));
+                }
             } else { //还车
                 getReturnCarCostReqDto.setIsReturnCarCost(true);
                 deliveryCarVO.setIsReturnCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
-                ownerGetAndReturnCarDTO.setRealReturnTime(DateUtils.formate(renterOrderDeliveryEntity.getRevertTime().plusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()),DateUtils.DATE_DEFAUTE_4));
+                if (renterOrderDeliveryEntity.getIsNotifyRenyun() != 0) {
+                    ownerGetAndReturnCarDTO.setRealReturnTime(DateUtils.formate(renterOrderDeliveryEntity.getRevertTime().plusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()), DateUtils.DATE_DEFAUTE_4));
+                }
             }
             getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
             getReturnCarCostReqDto.setIsPackageOrder(false);
