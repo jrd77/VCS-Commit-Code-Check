@@ -17,6 +17,7 @@ import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
 import com.atzuche.order.delivery.service.handover.RenterHandoverCarService;
+import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.utils.MathUtil;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
@@ -169,11 +170,17 @@ public class DeliveryCarInfoPriceService {
                 continue;
             }
             if (ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue() || ownerHandoverCarInfoEntity.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().intValue()) {
-                ownerGetAndReturnCarDTO.setGetCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setGetKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0": String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                ownerGetAndReturnCarDTO.setGetCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0" : String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setGetKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0" : String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                if (Objects.nonNull(ownerHandoverCarInfoEntity.getRealReturnTime())) {
+                    ownerGetAndReturnCarDTO.setRealGetTime(DateUtils.formate(ownerHandoverCarInfoEntity.getRealReturnTime(), DateUtils.DATE_DEFAUTE_4));
+                }
             } else {
-                ownerGetAndReturnCarDTO.setReturnCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
-                ownerGetAndReturnCarDTO.setReturnKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0":String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                ownerGetAndReturnCarDTO.setReturnCarOil(ownerHandoverCarInfoEntity.getOilNum() == null ? "0" : String.valueOf(ownerHandoverCarInfoEntity.getOilNum()));
+                ownerGetAndReturnCarDTO.setReturnKM(ownerHandoverCarInfoEntity.getMileageNum() == null ? "0" : String.valueOf(ownerHandoverCarInfoEntity.getMileageNum()));
+                if (Objects.nonNull(ownerHandoverCarInfoEntity.getRealReturnTime())) {
+                    ownerGetAndReturnCarDTO.setRealReturnTime(DateUtils.formate(ownerHandoverCarInfoEntity.getRealReturnTime(), DateUtils.DATE_DEFAUTE_4));
+                }
             }
         }
         //行驶里程
