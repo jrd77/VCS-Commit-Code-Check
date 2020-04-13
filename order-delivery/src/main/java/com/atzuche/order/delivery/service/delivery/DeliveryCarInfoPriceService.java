@@ -186,16 +186,16 @@ public class DeliveryCarInfoPriceService {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
-            //ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilDifference) + "L");
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
+            double lastOilDifference = MathUtil.mulByDouble(MathUtil.div(Integer.valueOf(oilContainer), 16.0),oilDifference);
+            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(lastOilDifference) + "L");
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
-            ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(oilMiddleDataFee) + "L");
             log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
             oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
-            log.error("设置参数失败,目前没有值",e);
+            log.error("设置参数失败,目前没有值");
         }
         return ownerGetAndReturnCarDTO;
     }
@@ -294,7 +294,7 @@ public class DeliveryCarInfoPriceService {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败",e);
+            log.info("获取平台加油服务费失败");
         }
         return 0;
     }
@@ -320,7 +320,7 @@ public class DeliveryCarInfoPriceService {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败", e);
+            log.info("获取平台加油服务费失败，目前没有值");
         }
         return 0;
     }

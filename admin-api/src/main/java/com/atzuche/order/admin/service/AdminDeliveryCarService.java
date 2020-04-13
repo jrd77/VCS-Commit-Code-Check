@@ -168,7 +168,7 @@ public class AdminDeliveryCarService {
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if(Objects.nonNull(ownerTransAddressReqVO)) {
             ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
-            if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("510004")) {
+            if (!ownerResponseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !ownerResponseData.getResCode().equals("510004")) {
                 logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
                 throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());
             }
@@ -240,11 +240,6 @@ public class AdminDeliveryCarService {
         GetHandoverCarDTO getHandoverCarDTO = deliveryCarVO.getGetHandoverCarDTO();
         ReturnHandoverCarDTO returnHandoverCarDTO = deliveryCarVO.getReturnHandoverCarDTO();
         if (Objects.nonNull(getHandoverCarDTO)) {
-            if(StringUtils.isBlank(getHandoverCarDTO.getRenterRealGetAddr()) || StringUtils.isBlank(getHandoverCarDTO.getOwnRealReturnAddr()))
-            {
-                logger.info("取车地址相关信息不能为空");
-                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
-            }
             DeliveryReqDTO deliveryReqDTO = new DeliveryReqDTO();
             deliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsGetCar()));
             deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
@@ -260,11 +255,6 @@ public class AdminDeliveryCarService {
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
-            if(StringUtils.isBlank(returnHandoverCarDTO.getRenterRealReturnAddr()) || StringUtils.isBlank(returnHandoverCarDTO.getOwnerRealGetAddr()))
-            {
-                logger.info("还车地址相关信息不能为空");
-                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
-            }
             DeliveryReqDTO renterDeliveryReqDTO = new DeliveryReqDTO();
             renterDeliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsReturnCar()));
             renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());

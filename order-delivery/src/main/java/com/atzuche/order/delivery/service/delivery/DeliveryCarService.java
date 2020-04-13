@@ -214,6 +214,8 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
             }
         }
         insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
