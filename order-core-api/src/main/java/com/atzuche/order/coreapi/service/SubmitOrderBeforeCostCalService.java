@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -190,6 +191,11 @@ public class SubmitOrderBeforeCostCalService {
 
 
 
+
+
+
+
+
     /**
      * 获取订单内租客优惠抵扣信息
      * <p>可用平台券列表</p>
@@ -215,7 +221,7 @@ public class SubmitOrderBeforeCostCalService {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntities = renterOrderCostDetailService.getRenterOrderCostDetailList(reqVO.getOrderNo(), renterOrderNo);
         if(CollectionUtils.isNotEmpty(renterOrderCostDetailEntities)) {
             Optional<RenterOrderCostDetailEntity> rentAmtOptional = renterOrderCostDetailEntities.stream().filter(cost -> cost.getCostCode().equals(RenterCashCodeEnum.RENT_AMT.getCashNo())).findFirst();
-            holidayAverage = rentAmtOptional.get().getUnitPrice();
+            holidayAverage = rentAmtOptional.isPresent() ? rentAmtOptional.get().getUnitPrice() : OrderConstant.ZERO;
         }
         int srvGetCost = 0;
         int srvReturnCost = 0;
@@ -257,8 +263,8 @@ public class SubmitOrderBeforeCostCalService {
         AdminGetDisCouponListResVO resVO = new AdminGetDisCouponListResVO();
         resVO.setWalletBal(String.valueOf(balance));
         resVO.setOwnerDisCouponList(buildOwnerDisCoupon(ownerCoupons));
-        resVO.setPlatformCouponList(buildDisCoupon(platformCoupons, 1));
-        resVO.setGetCarFeeDisCouponList(buildDisCoupon(getCarFeeCoupons, 2));
+        resVO.setPlatformCouponList(buildDisCoupon(platformCoupons, OrderConstant.ONE));
+        resVO.setGetCarFeeDisCouponList(buildDisCoupon(getCarFeeCoupons, OrderConstant.TWO));
         return resVO;
 
     }
@@ -273,7 +279,7 @@ public class SubmitOrderBeforeCostCalService {
     private List<OwnerDisCoupon> buildOwnerDisCoupon(List<OwnerDiscountCouponVO> list) {
         if(CollectionUtils.isNotEmpty(list)) {
             List<OwnerDisCoupon> coupons = new ArrayList<>();
-            list.stream().forEach(c -> {
+            list.forEach(c -> {
                 OwnerDisCoupon ownerDisCoupon = new OwnerDisCoupon();
                 BeanUtils.copyProperties(c, ownerDisCoupon);
                 coupons.add(ownerDisCoupon);
@@ -298,7 +304,7 @@ public class SubmitOrderBeforeCostCalService {
             if(2 == opType) {
                 list =  list.stream().filter(c -> c.getCouponType() == 8).collect(Collectors.toList());
             }
-            list.stream().forEach(c -> {
+            list.forEach(c -> {
                 DisCoupon disCoupon = new DisCoupon();
                 disCoupon.setDisCouponId(c.getId());
                 disCoupon.setDisName(c.getDisName());
