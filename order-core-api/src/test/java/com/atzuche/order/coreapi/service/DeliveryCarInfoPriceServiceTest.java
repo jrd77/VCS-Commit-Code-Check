@@ -7,6 +7,7 @@ import com.atzuche.order.mq.common.sms.ShortMessageSendService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.xxl.job.core.biz.model.ReturnT;
+import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -94,18 +97,33 @@ public class DeliveryCarInfoPriceServiceTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
-	public void testRevertCar4HoursAutoSettleTask() throws Exception{
-////	    //测试定时任务
-////        revertCar4HoursAutoSettleTask.execute("");
-////        //测试起租时间
-////        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective("59700170400299");
-////        String fieldValue = shortMessageSendService.getFieldValueByFieldName("expRentTime",renterOrderEntity);
-//	   //测试违章相关的短信定时任务
-         // remindPayIllegalCrashWithHoursTask.execute("");
+//	@Test
+//	public void testRevertCar4HoursAutoSettleTask() throws Exception{
+//////	    //测试定时任务
+//////        revertCar4HoursAutoSettleTask.execute("");
+//////        //测试起租时间
+//////        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective("59700170400299");
+//////        String fieldValue = shortMessageSendService.getFieldValueByFieldName("expRentTime",renterOrderEntity);
+////	   //测试违章相关的短信定时任务
+//         // remindPayIllegalCrashWithHoursTask.execute("");
+////        //remindVoicePayIllegalCrashWithHoursTask.execute("");
 //        //remindVoicePayIllegalCrashWithHoursTask.execute("");
-        //remindVoicePayIllegalCrashWithHoursTask.execute("");
-        //remindPushPayDepositTask.execute("");
-	}
+//        //remindPushPayDepositTask.execute("");
+//
+//		//起租时间
+//		LocalDateTime localDateTime = LocalDateTime.now().plusHours(2);
+//		//结束时间
+//		LocalDateTime finshDateTime = localDateTime.plusDays(1);
+//		log.info("起租时间：");
+
+
+
+
+
+
+
+
+
+	//}
 
 }
