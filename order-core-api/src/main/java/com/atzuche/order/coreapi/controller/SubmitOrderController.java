@@ -1,27 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import com.atzuche.order.commons.entity.dto.*;
-import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
@@ -34,23 +13,37 @@ import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
-import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.filter.OrderFilterChain;
 import com.atzuche.order.coreapi.service.PayCallbackService;
+import com.atzuche.order.coreapi.service.SubmitOrderInitContextService;
 import com.atzuche.order.coreapi.service.SubmitOrderService;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
-import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderRecordEntity;
 import com.atzuche.order.parentorder.service.OrderRecordService;
-import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * 下单
@@ -71,13 +64,7 @@ public class SubmitOrderController {
     @Autowired
     private StockProxyService stockService;
     @Autowired
-    private MemProxyService memberService;
-    @Autowired
-    private CarProxyService goodsService;
-    @Autowired
-    private OrderCommonConver orderCommonConver;
-    @Autowired
-    private RenterCommodityService renterCommodityService;
+    private SubmitOrderInitContextService submitOrderInitContextService;
     @Autowired
     private OrderFilterChain orderFilterChain;
     @Autowired
@@ -88,8 +75,7 @@ public class SubmitOrderController {
     private PayCallbackService payCallbackService;
     @Autowired
     private CashierPayService cashierPayService;
-    @Autowired
-    private CarRentalTimeApiProxyService carRentalTimeApiService;
+
     
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
@@ -116,7 +102,7 @@ public class SubmitOrderController {
 
         orderReqVO.setReqTime(LocalDateTime.now());
         orderReqVO.setChangeSource(ChangeSourceEnum.RENTER.getCode());
-        OrderReqContext context = buildOrderReqContext(orderReqVO);
+        OrderReqContext context = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
             if(StringUtils.isNotBlank(normalOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(normalOrderReqVO.getBusinessParentType(),"6")) {
@@ -231,7 +217,7 @@ public class SubmitOrderController {
 
         orderReqVO.setReqTime(LocalDateTime.now());
         orderReqVO.setChangeSource(ChangeSourceEnum.CONSOLE.getCode());
-        OrderReqContext context = buildOrderReqContext(orderReqVO);
+        OrderReqContext context = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
         orderFilterChain.validate(context);
         try{
             if(StringUtils.isNotBlank(adminOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(adminOrderReqVO.getBusinessParentType(),"6")) {
@@ -314,42 +300,4 @@ public class SubmitOrderController {
         return ResponseData.success(orderResVO);
     }
 
-    /**
-     * 构建请求参数上下文
-     *
-     * @param orderReqVO 下单请求参数
-     * @return OrderReqContext
-     */
-    private OrderReqContext buildOrderReqContext(OrderReqVO orderReqVO) {
-        //1.请求参数处理
-        OrderReqContext reqContext = new OrderReqContext();
-        orderReqVO.setReqTime(LocalDateTime.now());
-        reqContext.setOrderReqVO(orderReqVO);
-        //租客会员信息
-        RenterMemberDTO renterMemberDTO =
-                memberService.getRenterMemberInfo(orderReqVO.getMemNo());
-        reqContext.setRenterMemberDto(renterMemberDTO);
-        //租客商品明细
-        RenterGoodsDetailDTO renterGoodsDetailDTO =
-                goodsService.getRenterGoodsDetail(orderCommonConver.buildCarDetailReqVO(orderReqVO));
-        reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
-
-        //一天一价分组
-        renterGoodsDetailDTO = renterCommodityService.setPriceAndGroup(renterGoodsDetailDTO);
-
-        //车主商品明细
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
-        reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
-
-        //车主会员信息
-        OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
-        reqContext.setOwnerMemberDto(ownerMemberDTO);
-
-
-        //提前延后时间计算
-        CarRentTimeRangeDTO carRentTimeRangeResVO =
-                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
-        reqContext.setCarRentTimeRangeDTO(carRentTimeRangeResVO);
-        return reqContext;
-    }
 }

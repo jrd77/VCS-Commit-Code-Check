@@ -66,7 +66,12 @@ public class SubmitOrderBeforeCostCalculateController {
                 LocalDateTimeUtils.DEFAULT_PATTERN));
 
         LOGGER.info("Submit order before cost calculate.conversion param is,orderReqVO:[{}]", JSON.toJSONString(orderReqVO));
-        NormalOrderCostCalculateResVO resVO = submitOrderBeforeCostCalService.costCalculate(orderReqVO);
+        NormalOrderCostCalculateResVO resVO;
+        if(StringUtils.isNotBlank(orderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(orderReqVO.getBusinessParentType(),"6")) {
+            resVO = submitOrderBeforeCostCalService.costCalculateForLong(orderReqVO);
+        } else {
+            resVO = submitOrderBeforeCostCalService.costCalculate(orderReqVO);
+        }
         LOGGER.info("Submit order before cost calculate.result is,resVO:[{}]", JSON.toJSONString(resVO));
         return ResponseData.success(resVO);
     }

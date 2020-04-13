@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.filter.cost.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
@@ -123,6 +124,13 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
         }
 
         if (Objects.nonNull(ownerCouponLongEntity)) {
+            int actUnitPrice = ownerCouponLongEntity.getActUnitPrice();
+            //更新单价
+            context.getCostDetailContext().getCostDetails().stream()
+                    .filter(cost -> StringUtils.equals(RenterCashCodeEnum.RENT_AMT.getCashNo(), cost.getCostCode()))
+                    .forEach(cost ->  cost.setShowUnitPrice(actUnitPrice));
+
+            orderRentAmtResDTO.getDetails().forEach(cost ->  cost.setShowUnitPrice(actUnitPrice));
             longOrderOwnerCouponResDTO.setOwnerCouponLongEntity(ownerCouponLongEntity);
         }
         log.info("订单费用计算-->长租订单租金折扣.result is,longOrderOwnerCouponResDTO:[{}]",

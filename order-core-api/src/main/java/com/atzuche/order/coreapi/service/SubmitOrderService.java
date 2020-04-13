@@ -130,7 +130,7 @@ public class SubmitOrderService {
         String renterOrderNo = uniqueOrderNoService.genRenterOrderNo(orderNo);
         //4.2.调用租客订单模块处理租客订单相关业务
         RenterOrderResVO renterOrderResVO =
-                renterOrderService.generateRenterOrderInfo(orderCommonConver.buildRenterOrderReqVO(orderNo, renterOrderNo, context, carRentTimeRangeResVO));
+                renterOrderService.generateRenterOrderInfo(orderCommonConver.buildRenterOrderReqVO(orderNo, renterOrderNo, context));
         //4.3.接收租客订单返回信息
         //4.3.1 车辆押金处理
         BeanCopier beanCopierCarDeposit = BeanCopier.create(RenterOrderCarDepositResVO.class,

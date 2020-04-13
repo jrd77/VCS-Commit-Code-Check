@@ -627,6 +627,63 @@ public class RenterOrderCalCostService {
         return null;
     }
 
+
+    /**
+     * 下单前费用计算--优惠券抵扣信息
+     *
+     * @param deductContext           抵扣信息公共参数
+     * @param memAvailCouponRequestVO 优惠券列表请求参数
+     * @param disCouponIds            选中优惠券ID
+     * @return CouponReductionVO
+     */
+    public CouponReductionVO getCouponReductionVO(DeductContextDTO deductContext,
+                                                  MemAvailCouponRequestVO memAvailCouponRequestVO, String disCouponIds) {
+
+        LOGGER.info("获取优惠券抵扣信息(平台优惠券). param is,deductContext:[{}],memAvailCouponRequestVO:[{}]," +
+                        "disCouponIds:[{}]", JSON.toJSONString(deductContext),
+                JSON.toJSONString(memAvailCouponRequestVO),
+                disCouponIds);
+
+        MemAvailCouponRequest request = new MemAvailCouponRequest();
+        BeanCopier beanCopier = BeanCopier.create(MemAvailCouponRequestVO.class, MemAvailCouponRequest.class, false);
+        beanCopier.copy(memAvailCouponRequestVO, request, null);
+        request.setAveragePrice(memAvailCouponRequestVO.getHolidayAverage());
+        request.setLabelIds(memAvailCouponRequestVO.getLabelIds());
+        request.setRentAmt(deductContext.getSurplusRentAmt());
+        MemAvailCouponResponse memAvailCouponResponse = platformCouponService.findAvailMemCoupons(request);
+
+        if (null != memAvailCouponResponse) {
+            differentiateCouponsByPlatformType(memAvailCouponResponse, deductContext.getOsVal());
+            List<MemAvailCoupon> availCoupons = memAvailCouponResponse.getAvailCoupons();
+            if (!CollectionUtils.isEmpty(availCoupons)) {
+                MemAvailCoupon discoupon = null;
+                MemAvailCoupon getCarFeeDiscoupon = null;
+                Map<String, MemAvailCoupon> availCouponMap = availCoupons.stream()
+                        .collect(Collectors.toMap(MemAvailCoupon::getId, memAvailCoupon -> memAvailCoupon));
+
+                if (StringUtils.isNotBlank(disCouponIds)) {
+                    discoupon = availCouponMap.get(disCouponIds);
+                }
+
+                int discouponDeductibleAmt = 0;
+                if (null != discoupon) {
+                    discouponDeductibleAmt = discoupon.getRealCouponOffset();
+                    int surplusRentAmt = deductContext.getSurplusRentAmt() - discouponDeductibleAmt;
+                    deductContext.setSurplusRentAmt(surplusRentAmt > 0 ? surplusRentAmt : 0);
+                }
+
+                CouponReductionVO couponReductionVO = new CouponReductionVO();
+                couponReductionVO.setDiscouponDeductibleAmt(discouponDeductibleAmt);
+                couponReductionVO.setDiscoupons(newCouponToOdlCouponV2(availCoupons));
+
+                LOGGER.info("获取优惠券抵扣信息(平台优惠券). result is,couponReductionVO:[{}]", JSON.toJSONString(couponReductionVO));
+                return couponReductionVO;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * 下单前费用计算--凹凸币抵扣信息
      *
