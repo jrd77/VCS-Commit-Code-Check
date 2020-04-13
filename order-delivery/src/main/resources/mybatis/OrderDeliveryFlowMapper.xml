@@ -40,6 +40,8 @@
         <result property="ownerReturnAddr" column="owner_return_addr"/>
         <result property="dayMileage" column="day_mileage"/>
         <result property="tankCapacity" column="tank_capacity"/>
+		<result property="beforeTime" column="before_time"/>
+		<result property="afterTime" column="after_time"/>
     </resultMap>
 
 
@@ -78,8 +80,10 @@
 	`real_return_car_lat`, 	
 	`owner_get_addr`, 	
 	`owner_return_addr`, 	
-	`day_mileage`, 	
-	`tank_capacity`	
+	`day_mileage`,
+    `before_time`,
+    `after_time`,
+    `tank_capacity`
 
 	</sql>
 
@@ -124,7 +128,9 @@
 				`real_return_car_lat`,		
 				`owner_get_addr`,		
 				`owner_return_addr`,		
-				`day_mileage`,		
+				`day_mileage`,
+                `before_time`,
+                `after_time`,
 				`tank_capacity`		
 			)
 		values
@@ -162,7 +168,9 @@
 				#{realReturnCarLat}, 		
 				#{ownerGetAddr}, 		
 				#{ownerReturnAddr}, 		
-				#{dayMileage}, 		
+				#{dayMileage},
+                #{beforeTime},
+                #{afterTime},
 				#{tankCapacity}		
 			)
 	</insert>
@@ -204,6 +212,8 @@
 				<if test="ownerGetAddr != null">`owner_get_addr`, </if>
 				<if test="ownerReturnAddr != null">`owner_return_addr`, </if>
 				<if test="dayMileage != null">`day_mileage`, </if>
+                <if test="beforeTime != null">`before_time`, </if>
+                <if test="afterTime != null">`after_time`, </if>
 				<if test="tankCapacity != null">`tank_capacity` </if>
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -241,6 +251,8 @@
 				<if test="ownerGetAddr != null">#{ownerGetAddr},  </if>
 				<if test="ownerReturnAddr != null">#{ownerReturnAddr},  </if>
 				<if test="dayMileage != null">#{dayMileage},  </if>
+                <if test="beforeTime != null">#{beforeTime},  </if>
+                <if test="afterTime != null">#{afterTime},  </if>
 				<if test="tankCapacity != null">#{tankCapacity} </if>
 	        </trim>
 	</insert>
@@ -283,6 +295,8 @@
 				<if test="ownerGetAddr != null">`owner_get_addr` = #{ownerGetAddr}, </if>
 				<if test="ownerReturnAddr != null">`owner_return_addr` = #{ownerReturnAddr}, </if>
 				<if test="dayMileage != null">`day_mileage` = #{dayMileage}, </if>
+                <if test="beforeTime != null">`before_time` = #{beforeTime}, </if>
+                <if test="afterTime != null">`after_time` = #{afterTime}, </if>
 				<if test="tankCapacity != null">`tank_capacity` = #{tankCapacity}</if>
 			</set>
 		where id = #{id}
@@ -324,8 +338,10 @@
 				`real_return_car_lat` = #{realReturnCarLat}, 		
 				`owner_get_addr` = #{ownerGetAddr}, 		
 				`owner_return_addr` = #{ownerReturnAddr}, 		
-				`day_mileage` = #{dayMileage}, 		
-				`tank_capacity` = #{tankCapacity}		
+			 	`day_mileage` = #{dayMileage},
+                `before_time` = #{beforeTime},
+                `after_time` = #{afterTime},
+            `tank_capacity` = #{tankCapacity}
 	
 		</set>
 		where id = #{id}
