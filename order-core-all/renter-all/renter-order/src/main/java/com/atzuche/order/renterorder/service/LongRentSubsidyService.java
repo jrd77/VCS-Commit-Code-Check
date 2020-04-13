@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -192,7 +193,7 @@ public class LongRentSubsidyService {
 		req.setRenterMemNo(costBaseDTO.getMemNo());
 		req.setRentTime(CommonUtils.formatTime(costBaseDTO.getStartTime(), CommonUtils.FORMAT_STR_DEFAULT));
 		req.setRevertTime(CommonUtils.formatTime(costBaseDTO.getEndTime(), CommonUtils.FORMAT_STR_DEFAULT));
-		OwnerCouponLongResVO res = ownerDiscountCouponService.getLongOwnerCoupon(req);
+        OwnerCouponLongVO res = ownerDiscountCouponService.getLongOwnerCoupon(req);
 		if (res != null) {
 			saveOwnerCouponLongBatch(longCouponCode, costBaseDTO, res);
 			return res.getOwnerUnitPriceRespVOS();
@@ -286,7 +287,7 @@ public class LongRentSubsidyService {
 	 * @param res
 	 * @return List<OwnerCouponLongEntity>
 	 */
-	public List<OwnerCouponLongEntity> listOwnerCouponLongEntity(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongResVO res) {
+	public List<OwnerCouponLongEntity> listOwnerCouponLongEntity(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongVO res) {
 		if (costBaseDTO == null || res == null) {
 			return null;
 		}
@@ -318,7 +319,7 @@ public class LongRentSubsidyService {
 	 * @param costBaseDTO
 	 * @param res
 	 */
-	public void saveOwnerCouponLongBatch(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongResVO res) {
+	public void saveOwnerCouponLongBatch(String longCouponCode, CostBaseDTO costBaseDTO, OwnerCouponLongVO res) {
 		List<OwnerCouponLongEntity> list = listOwnerCouponLongEntity(longCouponCode, costBaseDTO, res);
 		ownerCouponLongService.saveOwnerCouponLongBatch(list);
 	}

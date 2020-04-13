@@ -17,6 +17,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.service.RenterOrderCostHandleService;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
@@ -79,7 +80,7 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
             ownerUnitPriceVOS.add(ownerUnitPrice);
         });
         reqVO.setOwnerUnitPriceVOS(ownerUnitPriceVOS);
-        OwnerCouponLongResVO resVO = couponAndCoinHandleService.getLongOwnerCoupon(reqVO);
+        OwnerCouponLongVO resVO = couponAndCoinHandleService.getLongOwnerCoupon(reqVO);
 
         log.info("订单费用计算-->长租订单租金折扣.resVO:[{}]", JSON.toJSONString(resVO));
         OwnerCouponLongEntity ownerCouponLongEntity = null;
