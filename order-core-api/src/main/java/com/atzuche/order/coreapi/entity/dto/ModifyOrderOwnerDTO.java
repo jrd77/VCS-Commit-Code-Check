@@ -100,5 +100,13 @@ public class ModifyOrderOwnerDTO {
      * 是否扫码还车的修改还车时间
      */
     private Boolean scanCodeFlag;
+    /**
+     * 租车费用支付状态
+     */
+    private Integer rentCarPayStatus;
+    /**
+     * 换车时使用释放老车辆的库存
+     */
+    private Integer oldCarNo;
     
 }

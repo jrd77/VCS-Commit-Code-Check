@@ -9,13 +9,16 @@ import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
+import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.order.*;
+import com.atzuche.order.open.service.FeignCashWithdrawalService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.service.FeignOrderModifyService;
@@ -49,6 +52,8 @@ public class AdminOrderService {
 
     @Autowired
     private FeignOrderCostService feignOrderCostService;
+    @Autowired
+    private FeignCashWithdrawalService feignCashWithdrawalService;
 
 
     public MemAvailableCouponVO getPreOrderCouponList(NormalOrderCostCalculateReqVO reqVO){
@@ -248,6 +253,7 @@ public class AdminOrderService {
 
 
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
+            adminModifyOrderFeeCompareVO.setNeedSupplementAmt(modifyOrderCompareVO.getNeedSupplementAmt());
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
             if(initModifyOrderFeeVO.getModifyOrderCostVO()!=null) {
                 BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderCostVO(), before);
@@ -501,6 +507,36 @@ public class AdminOrderService {
             t.complete();
         }
         return responseObject;
+    }
+    
+    
+    /**
+     * 获取欠款
+     * @param memNo
+     * @return Integer
+     */
+    public DebtDetailVO getDebtAmt(String memNo){
+    	SearchCashWithdrawalReqDTO req = new SearchCashWithdrawalReqDTO();
+    	req.setMemNo(memNo);
+        ResponseData<DebtDetailVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getDebtAmt");
+            log.info("Feign 获取欠款,param={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            responseObject =feignCashWithdrawalService.getDebtAmt(req);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 管理后台获取欠款,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 管理后台获取欠款",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        return null;
     }
 
 

@@ -7,6 +7,6 @@ import lombok.Data;
 public class GetWalletRemoteException extends OrderException {
 
     public GetWalletRemoteException() {
-        super(ErrorCode.GET_WALLETR_MSG.getCode(), ErrorCode.GET_WALLETR_MSG.getCode());
+        super(ErrorCode.GET_WALLETR_MSG.getCode(), ErrorCode.GET_WALLETR_MSG.getText());
     }
 }

@@ -38,7 +38,7 @@ public interface RenterHandoverCarRemarkMapper{
      * @param type
      * @return
      */
-    RenterHandoverCarRemarkEntity selectObjectByOrderNoType(@Param("orderNo") String orderNo,@Param("type") Integer type);
+    RenterHandoverCarRemarkEntity selectObjectByOrderNoType(@Param("orderNo") String orderNo,@Param("type") String type);
 
 
     /**

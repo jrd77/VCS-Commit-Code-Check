@@ -102,7 +102,7 @@ public class OrderCostService {
     @Autowired
     private OwnerOrderService ownerOrderService;
 
-	
+
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
 		
@@ -146,20 +146,21 @@ public class OrderCostService {
         	rentVoReal.setYingfuDepositAmt(0);
         }
         //封装减免金额
-        if(rentVoReal.getReductionAmt() == null) {
-        	RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
-        	if(entity != null) {
-        		rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
-        	}
+
+        RenterDepositDetailEntity entity = renterDepositDetailService.queryByOrderNo(orderNo);
+        if(entity != null) {
+            rentVoReal.setReductionAmt(entity.getReductionDepositAmt());
+            rentVoReal.setOriginalDepositAmt(entity.getOriginalDepositAmt());
         }
-        
+
+
         resVo.setRentVo(rentVoReal);
         
         //钱包
         List<AccountRenterCostDetailEntity> lstCostDetail =  accountRenterCostSettleService.getAccountRenterCostDetailsByOrderNo(orderNo);
         AccountRenterCostDetailEntity walletCostDetail = null; //仅仅关心的是钱包的。
         for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
-        	if(RenterCashCodeEnum.WALLET_DEDUCT.equals(accountRenterCostDetailEntity.getSourceCode())) {
+        	if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo().equals(accountRenterCostDetailEntity.getSourceCode()) && "00".equals(accountRenterCostDetailEntity.getPaySourceCode())) {
         		walletCostDetail = new AccountRenterCostDetailEntity();
         		BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
         	}

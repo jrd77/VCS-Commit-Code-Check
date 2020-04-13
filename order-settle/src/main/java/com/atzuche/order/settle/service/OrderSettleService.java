@@ -1,14 +1,17 @@
 package com.atzuche.order.settle.service;
 
+
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
-import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierService;
-import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -19,7 +22,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.settle.exception.CancelOrderSettleParamException;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderOwnerSettleNoTService;
@@ -52,11 +55,11 @@ public class OrderSettleService{
     @Autowired private OrderSettleNoTService orderSettleNoTService;
     @Autowired private CashierService cashierService;
     @Autowired private OrderSettleNewService orderSettleNewService;
-    @Autowired private RenterOrderService renterOrderService;
-    @Autowired private CashierSettleService cashierSettleService;
+//    @Autowired private RenterOrderService renterOrderService;
+//    @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierRefundApplyNoTService cashierRefundApplyNoTService;
 //    @Autowired private CashierPayService cashierPayService;
-    @Autowired private CashierQueryService cashierQueryService;
+//    @Autowired private CashierQueryService cashierQueryService;
     @Autowired private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired private OwnerOrderSettleService ownerOrderSettleService;
     @Autowired private RenterOrderSettleService renterOrderSettleService;
@@ -64,28 +67,153 @@ public class OrderSettleService{
     private OrderOwnerSettleNoTService orderOwnerSettleNoTService;
     @Autowired
     private RemoteOldSysDebtService remoteOldSysDebtService;
+    @Autowired
+    private AccountRenterCostSettleService accountRenterCostSettleService;
+    @Autowired
+    private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
+    @Autowired
+    private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     
     /**
      * 查询所以费用
      */
-    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,int yingfuAmt){
+    public RenterCostVO getRenterCostByOrderNo(String orderNo,String renterOrderNo,String renterNo,Integer renterCostAmtFinalForYingshou){
+    	log.info("getRenterCostByOrderNo params orderNo=[{}],renterOrderNo=[{}],renterNo=[{}],renterCostAmtFinalForYingshou=[{}]",orderNo,renterOrderNo,renterNo,renterCostAmtFinalForYingshou);
 //        RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
 //        Assert.notNull(renterOrder,"订单信息不存在");
 //        Assert.notNull(renterOrder.getRenterOrderNo(),"订单信息不存在");
-
+    	
+    	if(renterCostAmtFinalForYingshou == null) {
+    		renterCostAmtFinalForYingshou = 0;//设置默认值。
+    	}
+    	
         RenterCostVO vo = new RenterCostVO();
         vo.setOrderNo(orderNo);
-        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterNo);
-        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterNo);
-        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterNo);
+        
+     // 实付 租车费用
+//      int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterNo);
+	  	AccountRenterCostSettleEntity accountRenterCostSettleEntity = accountRenterCostSettleService.selectByOrderNo(orderNo,renterNo);
+	  	int feeShishouOri = 0;
+	  	int feeYingkouOri = 0;
+	  	int feeYingtui = 0;
+	  	//renterCostAmtFinalForYingshou  yingshou
+	  	
+	  	//非空处理
+	  	if(accountRenterCostSettleEntity != null) {
+	  		feeShishouOri = accountRenterCostSettleEntity.getShifuAmt()!=null?accountRenterCostSettleEntity.getShifuAmt():0;
+	  		//结算前：租车费用应扣等于应收
+	  		feeYingkouOri = accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0?Math.abs(accountRenterCostSettleEntity.getYingkouAmt()):Math.abs(renterCostAmtFinalForYingshou);  //取绝对值。
+	  	}
+	  	log.info("feeShishouOri=[{}],feeYingkouOri=[{}],orderNo=[{}],memNo=[{}]",feeShishouOri,feeYingkouOri,orderNo,renterNo);
+	  	
+	  	//实收(必定是消费，无免押预授权的情况。)
+	      int feeShishou = Math.abs(feeShishouOri);
+	      //应扣
+	      int feeYingkou = Math.abs(feeYingkouOri);
+	      //计算应退
+	      if(feeShishou >= feeYingkou) {
+	      	feeYingtui = feeShishou - feeYingkou;
+	      }
+	      log.info("feeShishou=[{}],feeYingkou=[{}],feeYingshou=[{}],feeYingtui=[{}],orderNo=[{}],memNo=[{}]",feeShishou,feeYingkou,renterCostAmtFinalForYingshou,feeYingtui,orderNo,renterNo);
+	      //应收
+	      vo.setRenterCostFeeYingshou(Math.abs(renterCostAmtFinalForYingshou));
+	      vo.setRenterCostFeeShishou(feeShishou);
+	      vo.setRenterCostFeeYingtui(feeYingtui);
+	      vo.setRenterCostFeeYingkou(feeYingkou);
+      
+      
         //车辆押金
-        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
-        vo.setDepositCostShifu(Math.abs(accountRenterDepositResVO.getShifuDepositAmt()));
-        vo.setDepositCostYingfu(Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()));
+        AccountRenterDepositResVO accountRenterDepositResVO = cashierService.getRenterDepositEntity(orderNo,renterNo);
+//        vo.setDepositCost(Math.abs(accountRenterDepositResVO.getSurplusDepositAmt()));
+        int depositShishouOri = 0;
+        int depositYingshouOri = 0;
+        
+        int depositYingkouOri = 0; //应扣
+        int depositYingtuiOri = 0;
+        int depositShishouAuthOri = 0;
+        
+        if(accountRenterDepositResVO != null) {
+        	depositShishouOri = accountRenterDepositResVO.getShifuDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getShifuDepositAmt()):0;
+        	depositYingshouOri = accountRenterDepositResVO.getYingfuDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getYingfuDepositAmt()):0;
+        	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
+        		depositShishouAuthOri = accountRenterDepositResVO.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt()):0;
+        	}
+        	
+        }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,orderNo,renterNo);
+        
+        //应扣取值
+        //结算前：默认按应收和应扣来处理，不干涉到车辆
+        if(accountRenterCostSettleEntity != null) {
+	        if(accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0) {
+		        if(feeYingkouOri > feeShishou) {
+		        	//费用不够的情况下从租车押金中扣除。
+		        	depositYingkouOri = feeYingkouOri - feeShishou;
+		        }
+	        }
+        }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,orderNo,renterNo);
+        
+        //计算应退
+        if(depositShishouOri >= depositYingkouOri) {
+        	depositYingtuiOri = depositShishouOri - depositYingkouOri;
+        }
+        log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],depositYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,depositYingtuiOri,orderNo,renterNo);
+
+        vo.setDepositCostShishou(depositShishouOri);
+        vo.setDepositCostYingshou(depositYingshouOri);
+        vo.setDepositCostYingkou(depositYingkouOri);
+        vo.setDepositCostYingtui(depositYingtuiOri);
+        vo.setDepositCostShishouAuth(depositShishouAuthOri);
+        
+        
         //违章押金
-        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
-        vo.setDepositWzCostShifu(Math.abs(accountRenterWZDeposit.getShishouDeposit()));
-        vo.setDepositWzCostYingFu(Math.abs(accountRenterWZDeposit.getYingshouDeposit()));
+//        int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo,renterNo);
+        AccountRenterWZDepositResVO accountRenterWZDeposit = cashierService.getRenterWZDepositEntity(orderNo,renterNo);
+//        vo.setDepositWzCost(Math.abs(rentWzDepositAmt));
+        int wzShishouOri = 0;  //收银台落库的时候，做处理。
+        int wzYingshouOri = 0;
+        int wzYingkouOri = 0; //应扣
+        int wzYingtuiOri = 0;
+        int wzShishouAuthOri = 0;
+        if(accountRenterWZDeposit != null) {
+        	wzShishouOri = accountRenterWZDeposit.getShishouDeposit()!=null?Math.abs(accountRenterWZDeposit.getShishouDeposit()):0;
+        	wzYingshouOri = accountRenterWZDeposit.getYingshouDeposit()!=null?Math.abs(accountRenterWZDeposit.getYingshouDeposit()):0;
+        	if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 1) {
+        		wzShishouAuthOri = accountRenterWZDeposit.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt()):0;
+        	}
+        }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,orderNo,renterNo);
+        
+        //应扣
+        AccountRenterWzDepositCostEntity wzEntity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterNo);
+        if(wzEntity != null) {
+        	//结算前：应扣等于0，应收等于应退，默认押金是要退的。
+        	wzYingkouOri = wzEntity.getYingkouAmt() !=null?Math.abs(wzEntity.getYingkouAmt()):0;  //负数 取绝对值   wzYingshouOri
+        	//wzYingkouOri 为0，代表的是结算前，从renter_order_wz_cost_detail
+        	if(wzYingkouOri == 0) {
+        		Integer wzYingkouOriSum = renterOrderWzCostDetailService.sumQuerySettleInfoByOrder(orderNo);
+        		if(wzYingkouOriSum != null) {
+        			wzYingkouOri = wzYingkouOriSum.intValue();
+        		}
+        	}
+        }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,orderNo,renterNo);
+        
+        //计算应退
+        if(wzShishouOri >= wzYingkouOri) {
+        	wzYingtuiOri = wzShishouOri - wzYingkouOri;
+        }
+        log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],wzYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,wzYingtuiOri,orderNo,renterNo);
+        
+        vo.setDepositWzCostShishou(wzShishouOri);
+        vo.setDepositWzCostYingshou(wzYingshouOri);
+        vo.setDepositWzCostYingkou(wzYingkouOri);
+        vo.setDepositWzCostYingtui(wzYingtuiOri);
+        //预授权
+        vo.setDepositWzCostShishouAuth(wzShishouAuthOri);
+        
+        
         
         //避免重复调用。200306
 //        RentCosts rentCosts = preRenterSettleOrder(orderNo, renterOrderNo);
@@ -97,55 +225,137 @@ public class OrderSettleService{
         	//代码重构 200309 huangjing
 //        	int yingfuAmt = rentCosts.getRenterCostAmtFinal();
         	
-            List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
-            // 实付
-            int renterCostAmtEd = cashierQueryService.getRenterCost(orderNo,renterNo);
-            if(!CollectionUtils.isEmpty(renterCostDetails)){
+            
+            
+            
+//            int renterCost = yingfuAmt + renterCostAmtEd;
+//            vo.setRenterCost(renterCost>0?renterCost:0);
+            
+            
+            //统计补付
+//            List<AccountRenterCostDetailEntity> renterCostDetails = cashierQueryService.getRenterCostDetails(orderNo);
+//            if(!CollectionUtils.isEmpty(renterCostDetails)){
+            
+            //补付
                 List<OrderSupplementDetailEntity> orderSupplementDetails = orderSupplementDetailService.listOrderSupplementDetailByOrderNo(orderNo);
                 if(!CollectionUtils.isEmpty(orderSupplementDetails)){
-                    int renterCostBufuShifu = orderSupplementDetails.stream().filter(obj ->{
+                    int renterCostBufuShishou = orderSupplementDetails.stream().filter(obj ->{
                         return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
-                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
+//                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
                                 Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3
                                 ;
                     }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-                    int renterCostBufuYingfu = orderSupplementDetails.stream().filter(obj ->{
-                        return Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
-                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==2&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==3&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4&&
-                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5
+                    
+                    int renterCostBufuYingfu = orderSupplementDetails.stream()./*filter(obj ->{
+                        return
+                                ( Objects.nonNull(obj.getOpStatus()) && obj.getOpStatus()==1&&
+                                Objects.nonNull(obj.getCashType()) && obj.getCashType()==1)  &&
+
+                                (Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==1 ||
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==0 ||
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==4 ||
+                                Objects.nonNull(obj.getPayFlag()) && obj.getPayFlag()==5 )
                                 ;
-                    }).mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-                    vo.setRenterCostBufu(renterCostBufuYingfu);
-                    vo.setRenterCostShishou(renterCostBufuShifu);
+                    }).*/mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+                    
+                    vo.setRenterCostBufuYingshou(renterCostBufuYingfu);
+                    vo.setRenterCostBufuShishou(Math.abs(renterCostBufuShishou));
+                    
+                    log.info("renterCostBufuYingfu=[{}],renterCostBufuShishou=[{}],orderNo=[{}],memNo=[{}]",renterCostBufuYingfu,renterCostBufuShishou,orderNo,renterNo);
+                    
                 }
-            }
-            vo.setRenterCostYingshou(Math.abs(yingfuAmt));
-            vo.setRenterCostShishou(Math.abs(renterCostAmtEd));
-            int renterCost = yingfuAmt + renterCostAmtEd;
-            vo.setRenterCost(renterCost>0?renterCost:0);
+//            }
+            
 //        }
             
+        //===================================== 退款部分 yingtui shitui  =====================================
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
            // 获取实退 租车费用
-            int renterCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setRenterCostReal(renterCostReal);
+//            int renterCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+            
+        	
+        	int feeShituiOri = 0;
+        	int feeShikouOri = 0;
+        	
+        	int wzShituiOri = 0;
+        	int wzShikouOri = 0;
+        	
+        	int depositShituiOri = 0;
+        	int depositShikouOri = 0;
+        	
+            for (CashierRefundApplyEntity obj : cashierRefundApplys) {
+            	//租车费用
+            	//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
+					feeShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
+					feeShikouOri += Math.abs(obj.getAmt());
+				}
+				//违章押金
+				//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
+					wzShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
+					wzShikouOri += Math.abs(obj.getAmt());
+				}
+				
+				//租车押金
+				//消费方式
+				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
+					depositShituiOri += Math.abs(obj.getAmt());
+				}
+				//预授权方式，实扣
+				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
+					depositShikouOri += Math.abs(obj.getAmt());
+				}
+			}
+            
+            //租车费用
+            //实扣
+            if(feeShituiOri > 0) {
+            	feeShikouOri += feeShishou - feeShituiOri;
+            }
+            log.info("feeShikouOri=[{}],feeShituiOri=[{}],orderNo=[{}],memNo=[{}]",feeShikouOri,feeShituiOri,orderNo,renterNo);
+            vo.setRenterCostFeeShikou(feeShikouOri);
+            //实退
+            vo.setRenterCostFeeShitui(feeShituiOri); //预授权0
+           
+            //违章押金
+            //实扣
+            if(wzShituiOri > 0) {
+            	wzShikouOri += wzShishouOri - wzShituiOri;
+            }
+            log.info("wzShikouOri=[{}],wzShituiOri=[{}],orderNo=[{}],memNo=[{}]",wzShikouOri,wzShituiOri,orderNo,renterNo);
+            vo.setDepositWzCostShikou(wzShikouOri);
+            vo.setDepositWzCostShitui(wzShituiOri);
+            
+            //租车押金
+            //实扣
+            if(depositShituiOri > 0) {
+            	depositShikouOri += depositShishouOri - depositShituiOri;
+            }
+            log.info("depositShikouOri=[{}],depositShituiOri=[{}],orderNo=[{}],memNo=[{}]",depositShikouOri,depositShituiOri,orderNo,renterNo);
+            vo.setDepositCostShikou(depositShikouOri);
+            vo.setDepositCostShitui(depositShituiOri);
+            
             // 获取实退 车俩押金
-            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.RENT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setDepositCostReal(depositCostReal);
+//            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.RENT.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+//            vo.setDepositCostReal(depositCostReal);
+            
             // 获取实退 违章押金
-            int depositWzCostReal =  cashierRefundApplys.stream().filter(obj ->{
-                return DataPayKindConstant.DEPOSIT.equals(obj.getPayKind());
-            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
-            vo.setDepositWzCostReal(depositWzCostReal);
+//            int depositWzCostReal =  cashierRefundApplys.stream().filter(obj ->{
+//                return DataPayKindConstant.DEPOSIT.equals(obj.getPayKind());
+//            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
+//            vo.setDepositWzCostReal(depositWzCostReal);
         }
 
 
@@ -267,12 +477,14 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.settleOrderAfterSeparateOwner(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfterSeparateOwner [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderAfterSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
+            
             // 调远程增加车辆gps押金
             orderOwnerSettleNoTService.updateCarDeposit(settleOrders);
             // 调远程抵扣老系统租客欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getRenterTotalOldRealDebtAmt());
             // 调远程抵扣老系统车主欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
+            
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
@@ -283,6 +495,10 @@ public class OrderSettleService{
                 record.setId(entity.getId());
                 record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
                 record.setSettleTime(LocalDateTime.now());
+                //车辆押金状态
+                record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+                record.setCarDepositSettleTime(LocalDateTime.now());
+                
                 orderStatusService.updateByPrimaryKeySelective(record);
             }
             t.setStatus(e);
@@ -374,6 +590,7 @@ public class OrderSettleService{
      **/
     @Transactional(rollbackFor=Exception.class)
     public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
+        log.info("订单取消结算cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         String orderNo = cancelOrderReqDTO.getOrderNo();
         String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();
         String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
@@ -391,10 +608,10 @@ public class OrderSettleService{
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
             OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+            /*if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
                 log.info("订单已经结算过orderNo={}",orderNo);
                 return;
-            }
+            }*/
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
             renterOrderSettleService.settleRenterOrderCancel(orderNo,renterOrderNo);
         }else{

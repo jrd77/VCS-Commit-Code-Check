@@ -8,6 +8,7 @@ import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReq
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
@@ -184,7 +185,9 @@ public class OrderSettleNoTService {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() || SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()){
+        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() 
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
             throw new RuntimeException("租客订单状态不是待结算，不能结算");
         }
 //        //2校验租客是否还车
@@ -715,6 +718,9 @@ public class OrderSettleNoTService {
         orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
         orderStatusDTO.setStatus(OrderStatusEnum.TO_WZ_SETTLE.getStatus());
         orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        //车辆押金的结算状态
+        orderStatusDTO.setCarDepositSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setCarDepositSettleTime(LocalDateTime.now());
         
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
@@ -741,6 +747,22 @@ public class OrderSettleNoTService {
         //16 退优惠卷 凹凸币(跟租客结算走)
         this.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
+        
+        //更新应扣account_renter_cost_settle yingkou_amt   200407
+        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();
+        int yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+        int yingkouAmt = yingkouAmt1 + yingkouAmt2;
+        //单独修改
+        AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
+        //根据ID来修改
+//        entity.setId(accountRenterCostSettle.getId());
+//        entity.setVersion(accountRenterCostSettle.getVersion());//根据版本号来修改。
+        entity.setOrderNo(settleOrders.getOrderNo());
+        entity.setMemNo(settleOrders.getRenterMemNo());
+        entity.setYingkouAmt(-yingkouAmt);
+        cashierSettleService.updateRentSettleCost(entity);
+        log.info("cashierSettleService.updateRentSettleCost. param is,entity:[{}]", GsonUtils.toJson(entity));
+        
         Cat.logEvent("settleUndoCoupon",GsonUtils.toJson(settleOrdersAccount));
     }
     
@@ -882,6 +904,7 @@ public class OrderSettleNoTService {
      */
     public void saveOrderStatusInfo(SettleOrdersAccount settleOrdersAccount) {
         //1更新 订单流转状态
+    	
         orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);

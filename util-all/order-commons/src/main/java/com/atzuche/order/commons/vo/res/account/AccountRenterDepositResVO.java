@@ -4,8 +4,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  * 个人总欠款信息
  * @author haibao.yan
@@ -71,6 +69,10 @@ public class AccountRenterDepositResVO {
      * 免押金额
      */
     private Integer reductionAmt;
+    /**
+     * 原始押金金额
+     */
+    private Integer originalDepositAmt;
     /**
      * 开启免押
      */

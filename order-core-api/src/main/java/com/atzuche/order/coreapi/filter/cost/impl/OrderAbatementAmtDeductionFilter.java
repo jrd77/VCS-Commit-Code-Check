@@ -53,7 +53,11 @@ public class OrderAbatementAmtDeductionFilter implements OrderCostFilter {
         }
 
         // 获取不计免赔的折扣
-        double ratio = CommonUtils.getInsureDiscount(baseReqDTO.getStartTime(), baseReqDTO.getEndTime());
+        Integer inmsrpGuidePrice = Objects.isNull(context.getReqContext().getAbatementAmtReqDTO().getInmsrp()) ?
+                context.getReqContext().getAbatementAmtReqDTO().getGuidPrice() :
+                context.getReqContext().getAbatementAmtReqDTO().getInmsrp();
+        double ratio = CommonUtils.getInsureDiscount(baseReqDTO.getStartTime(), baseReqDTO.getEndTime(),
+                inmsrpGuidePrice);
         log.info("订单费用计算-->全面保障服务折扣.orderNo=[{}],ratio=[{}]", baseReqDTO.getOrderNo(), ratio);
         if (ratio >= OrderConstant.D_ONE) {
             log.info("订单费用计算-->全面保障服务折扣.order no relief!");

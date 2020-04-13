@@ -150,7 +150,7 @@ public class OrderCostDetailService {
         	if(renterDepositDetailEntity.getOriginalDepositAmt()!=null && renterDepositDetailEntity.getReductionDepositAmt()!=null) {
         		reductionAfterRentDepost = String.valueOf(renterDepositDetailEntity.getOriginalDepositAmt().intValue() - renterDepositDetailEntity.getReductionDepositAmt().intValue());
         	}
-        	yearCoefficient = String.valueOf(renterDepositDetailEntity.getSuggestTotal());
+        	yearCoefficient = String.valueOf(renterDepositDetailEntity.getNewCarCoefficient());
         	brandCoefficient = String.valueOf(renterDepositDetailEntity.getCarSpecialCoefficient());
         	
         }
@@ -179,7 +179,8 @@ public class OrderCostDetailService {
 	private void putTaskRight(List<ReductionTaskResVO> reductTaskList,
 			List<RenterMemberRightDTO> renterMemberRightDTOList) {
 		
-		
+		int totalReductionOrderRatio = 0;
+		int totalReductionItemGetRatio = 0;
 		for (RenterMemberRightDTO renterMemberRightDTO : renterMemberRightDTOList) {
 			//任务
 			if(renterMemberRightDTO.getRightType().intValue() == RightTypeEnum.TASK.getCode().intValue()) {
@@ -190,9 +191,19 @@ public class OrderCostDetailService {
 				task.setReductionOrderRatio(renterMemberRightDTO.getRightValue());
 				///
 				reductTaskList.add(task);
+
+                totalReductionOrderRatio += task.getReductionOrderRatio()==null?0:Integer.valueOf(task.getReductionOrderRatio());
+                totalReductionItemGetRatio += task.getReductionItemGetRatio()==null?0:Integer.valueOf(task.getReductionItemGetRatio());
 			}
 		}
-		
+        String reductionOrderRatio = String.valueOf(totalReductionOrderRatio>=70?70:totalReductionOrderRatio);
+		String reductionItemGetRatio = String.valueOf(totalReductionItemGetRatio>=70?70:totalReductionItemGetRatio);
+        ReductionTaskResVO task = new ReductionTaskResVO();
+        task.setReductionItemGetRatio(reductionItemGetRatio);
+        task.setReductionItemName("总计");
+        task.setReductionItemRule("最高减免比例70%（总计超过70%，按70%计算）");
+        task.setReductionOrderRatio(reductionOrderRatio);
+        reductTaskList.add(task);
 	}
 	
 	
@@ -1116,10 +1127,13 @@ public class OrderCostDetailService {
 	        
 	        //统一设置修改人名称。20200205 huangjing
 	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            if(consoleRenterOrderFineDeatailEntity != null){
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+            }
+
 	        
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
@@ -1127,11 +1141,13 @@ public class OrderCostDetailService {
 	        	ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterBeforeReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeCashCodeEnum.MODIFY_ADVANCE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
+
 	        }
 	        
 		}
@@ -1140,28 +1156,33 @@ public class OrderCostDetailService {
 		if(StringUtils.isNotBlank(renterDelayReturnCarFineAmt)) {
 	        ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
 	                consoleRenterOrderFineDeatailService.fineDataConvert(costBaseDTO, -Integer.valueOf(renterDelayReturnCarFineAmt),
-	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.DELAY_FINE);
+	                        FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.RENTER,
+                            FineTypeCashCodeEnum.DELAY_FINE);
 	        
 	        //统一设置修改人名称。20200205 huangjing
-	        String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-	        consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
-	        consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
-	        
-	        consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
-	        
+            String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
+            if(consoleRenterOrderFineDeatailEntity != null){
+
+                consoleRenterOrderFineDeatailEntity.setUpdateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setCreateOp(userName);
+                consoleRenterOrderFineDeatailEntity.setOperatorId(userName);
+
+                consoleRenterOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
+
+            }
+
 	        //当前存在的情况下，否则归平台。
 	        if(orderEntityOwner!=null) {
 		        //同时增加反向记录，算车主的收益  200217 通过平台中转
 		        ConsoleOwnerOrderFineDeatailEntity ownerEntity =
 	        			consoleOwnerOrderFineDeatailService.fineDataConvert(ownerCostDTO, Integer.valueOf(renterDelayReturnCarFineAmt),
 		                        FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.PLATFORM, FineTypeCashCodeEnum.DELAY_FINE);
-		        
-		        ownerEntity.setUpdateOp(userName);
-		        ownerEntity.setCreateOp(userName);
-		        ownerEntity.setOperatorId(userName);
-		        consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
-		        
+		        if(ownerEntity != null){
+                    ownerEntity.setUpdateOp(userName);
+                    ownerEntity.setCreateOp(userName);
+                    ownerEntity.setOperatorId(userName);
+                    consoleOwnerOrderFineDeatailService.saveOrUpdateConsoleRenterOrderFineDeatail(ownerEntity);
+                }
 	        }
 	        
 		}

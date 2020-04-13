@@ -5,6 +5,6 @@ import com.atzuche.order.commons.enums.ErrorCode;
 public class CashierPayApplyException extends OrderException {
 
     public CashierPayApplyException() {
-        super(ErrorCode.CASHIER_PAY_APPLY.getCode(), ErrorCode.CASHIER_PAY_APPLY.getCode());
+        super(ErrorCode.CASHIER_PAY_APPLY.getCode(), ErrorCode.CASHIER_PAY_APPLY.getText());
     }
 }

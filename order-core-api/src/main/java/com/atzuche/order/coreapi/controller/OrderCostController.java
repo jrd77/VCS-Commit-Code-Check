@@ -23,6 +23,7 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -157,8 +158,9 @@ public class OrderCostController {
 
 		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
 		AccountRenterWzDepositEntity wzDepositEntity = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
-
-		RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
+        Integer isAuthorize = depositEntity.getIsAuthorize();
+        Integer wzIsAuthorize = wzDepositEntity.getIsAuthorize();
+        RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
 		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
 		shortDetail.setTotalFineAmt(-totalFineAmt);
@@ -168,8 +170,8 @@ public class OrderCostController {
 		shortDetail.setShiFuWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
 		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
-		shortDetail.setExpReturnDeposit(depositEntity.getShifuDepositAmt());
-		shortDetail.setExpReturnWzDeposit(wzDepositEntity.getShishouDeposit());
+		shortDetail.setExpReturnDeposit(isAuthorize!=null&&isAuthorize == 1 ? depositEntity.getCreditPayAmt() : depositEntity.getShifuDepositAmt());
+		shortDetail.setExpReturnWzDeposit(wzIsAuthorize!=null&&wzIsAuthorize == 1 ? wzDepositEntity.getCreditPayAmt() : wzDepositEntity.getShishouDeposit());
 		shortDetail.setOrderNo(orderNo);
 
 		return ResponseData.success(shortDetail);
@@ -219,4 +221,24 @@ public class OrderCostController {
         RenterCostDetailDTO renterCostDetailDTO = facadeService.renterCostDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());
         return ResponseData.success(renterCostDetailDTO);
     }
+    
+    /**
+     * 实收应收mock
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/order/renter/cost/shishouDetail")
+	public ResponseData<RenterCostVO> renterCostShishouDetail(@RequestParam("orderNo") String orderNo){
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        if(orderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity==null){
+            throw new OrderNotFoundException(orderNo);
+        }
+        RenterCostVO renterCostVO = facadeService.renterCostShishouDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());
+        return ResponseData.success(renterCostVO);
+    }
+    
 }

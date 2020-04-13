@@ -21,7 +21,7 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     private static final long serialVersionUID = -7311434304468158415L;
 
     @AutoDocProperty(value = "订单类型", required = true)
-    @NotBlank(message = "订单类型不能为空")
+    @NotBlank(message = "订单类型不能为空,1:短租,2:套餐,3,长租")
     private String orderCategory;
 
     @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有,6:长租")

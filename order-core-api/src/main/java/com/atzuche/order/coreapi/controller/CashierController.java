@@ -5,19 +5,25 @@ import javax.validation.Valid;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.PayRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.ErrorCode;
+import com.atzuche.order.commons.enums.sys.Env;
 import com.atzuche.order.coreapi.service.PayCallbackService;
 import com.autoyol.autopay.gateway.vo.req.PrePlatformRequest;
 import com.autoyol.autopay.gateway.vo.res.PayResVo;
@@ -37,7 +43,11 @@ public class CashierController {
     @Autowired PayCallbackService payCallbackService;
     @Autowired
     PayRemoteService payRemoteService;
-
+    @Autowired
+    CashierRefundApplyNoTService cashierRefundApplyNoTService;
+    //环境变量，1正式，2测试
+    @Value("${sysEnv:2}") String sysEnv;
+    
     /**
      * 查询支付款项信息
      * @param orderPayReqVO
@@ -100,4 +110,29 @@ public class CashierController {
         log.info("CashierController getPaySignStr end param [{}],result [{}]", GsonUtils.toJson(orderPaySign),result);
         return ResponseData.success(result);
 	}
+    
+    
+    /**
+     * 同XXLJOB定时任务退款方法。
+     * @param orderNo
+     * @param payKind
+     * @return
+     */
+    @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
+    @GetMapping("/cashierRefundApply")
+    public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
+    	//测试环境执行
+    	if(Env.test.getCode().equals(sysEnv)) {
+	        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
+	        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
+	        cashierPayService.refundOrderPay(cashierRefundApply);
+	        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
+	        return ResponseData.success();
+    	}else {
+    		//访问受限
+    		log.info("pro sysEnv="+sysEnv);
+    		return ResponseData.createErrorCodeResponse(com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getCode(),com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getText());
+    	}
+    }
+    
 }

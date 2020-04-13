@@ -52,6 +52,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.AESSecurityUtils;
 import com.autoyol.autopay.gateway.util.MD5;
@@ -60,6 +61,7 @@ import com.autoyol.autopay.gateway.vo.req.BatchPayVo;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.req.PayVo;
 import com.autoyol.autopay.gateway.vo.req.RefundVo;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.doc.util.StringUtil;
@@ -106,6 +108,15 @@ public class CashierNoTService {
         }
         return renterOrderEntity;
     }
+    
+    public RenterOrderEntity getRenterOrderNoByOrderNoIncrement(String orderNo){
+        RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
+        if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
+           return new RenterOrderEntity();
+        }
+        return renterOrderEntity;
+    }
+    
 
     /**
      * 收银台根据主单号 向订单模块查询子单号
@@ -212,6 +223,12 @@ public class CashierNoTService {
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
         vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
+        //容错处理，07微信的一定是消费  200413
+        if(DataPaySourceConstant.WEIXIN_APP.equals(notifyDataVo.getPaySource()) 
+        		|| DataPaySourceConstant.WEIXIN_H5.equals(notifyDataVo.getPaySource())
+        		|| DataPaySourceConstant.WEIXIN_MP.equals(notifyDataVo.getPaySource()) ) {
+        	notifyDataVo.setPayType(DataPayTypeConstant.PAY_PUR);
+        }
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
         	vo.setIsAuthorize(0);
@@ -246,6 +263,11 @@ public class CashierNoTService {
      * @param vo
      */
 	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterDepositReqVO vo) {
+		//否则下面的Double.valueOf报错。
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeCreditAmount())){
+			//设置默认值。
+			notifyDataVo.setTotalFreezeCreditAmount(notifyDataVo.getSettleAmount());
+		}
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   //考虑到带小数点的情况。
 			//预授权方式
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -283,42 +305,51 @@ public class CashierNoTService {
         CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
         int result =0;
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
-            CashierEntity cashier = new CashierEntity();
-            BeanUtils.copyProperties(notifyDataVo,cashier);
-            cashier.setId(cashierEntity.getId());
-            cashier.setVersion(cashierEntity.getVersion());
-            cashier.setPaySn(cashierEntity.getPaySn()+1);
-            cashier.setPayEvn(notifyDataVo.getPayEnv());
-            cashier.setOs(notifyDataVo.getReqOs());
-            cashier.setPayTransNo(notifyDataVo.getQn());
-            cashier.setPayTime(notifyDataVo.getOrderTime());
-            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
-            cashier.setPayChannel(notifyDataVo.getPayChannel());
-            cashier.setPayLine(notifyDataVo.getPayLine());
-            cashier.setVirtualAccountNo(notifyDataVo.getVirtualAccountNo());
-            String amtStr = notifyDataVo.getSettleAmount();
-            amtStr = Objects.isNull(amtStr)?"0":amtStr;
-            cashier.setPayAmt(Integer.valueOf(amtStr));
-            result = cashierMapper.updateByPrimaryKeySelective(cashier);
-            if(result == 0){
-                throw new OrderPayCallBackAsnyException();
-            }
-            return false;
+        	//解决重复操作
+        	if(!"00".equals(cashierEntity.getTransStatus())) {  //成功 00
+	            CashierEntity cashier = new CashierEntity(); 
+	            BeanUtils.copyProperties(notifyDataVo,cashier);
+	            cashier.setId(cashierEntity.getId());
+	            cashier.setVersion(cashierEntity.getVersion());
+	            cashier.setPaySn(cashierEntity.getPaySn()+1);
+	            cashier.setPayEvn(notifyDataVo.getPayEnv());
+	            cashier.setOs(notifyDataVo.getReqOs());
+	            cashier.setPayTransNo(notifyDataVo.getQn());
+	            cashier.setPayTime(notifyDataVo.getOrderTime());
+	            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
+	            cashier.setPayChannel(notifyDataVo.getPayChannel());
+	            cashier.setPayLine(notifyDataVo.getPayLine());
+	            cashier.setVirtualAccountNo(notifyDataVo.getVirtualAccountNo());
+	            String amtStr = notifyDataVo.getSettleAmount();
+	            amtStr = Objects.isNull(amtStr)?"0":amtStr;
+	            cashier.setPayAmt(Integer.valueOf(amtStr));
+	            result = cashierMapper.updateByPrimaryKeySelective(cashier);
+	            if(result == 0){
+	                throw new OrderPayCallBackAsnyException();
+	            }
+        	}else {
+        		log.info("当前状态已经为成功,orderNo=[{}],payMd5=[{}]",notifyDataVo.getOrderNo(),notifyDataVo.getPayMd5());
+        	}
+        	return false;
         }else {
-            CashierEntity cashier = new CashierEntity();
-            BeanUtils.copyProperties(notifyDataVo,cashier);
-            cashier.setPayEvn(notifyDataVo.getPayEnv());
-            cashier.setOs(notifyDataVo.getReqOs());
-            cashier.setPayTransNo(notifyDataVo.getQn());
-            cashier.setPayTime(notifyDataVo.getOrderTime());
-            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
-            String amtStr = notifyDataVo.getSettleAmount();
-            amtStr = Objects.isNull(amtStr)?"0":amtStr;
-            cashier.setPayAmt(Integer.valueOf(amtStr));
-            result = cashierMapper.insertSelective(cashier);
-            if(result == 0){
-                throw new OrderPayCallBackAsnyException();
-            }
+            try {
+            	CashierEntity cashier = new CashierEntity();
+                BeanUtils.copyProperties(notifyDataVo,cashier);
+                cashier.setPayEvn(notifyDataVo.getPayEnv());
+                cashier.setOs(notifyDataVo.getReqOs());
+                cashier.setPayTransNo(notifyDataVo.getQn());
+                cashier.setPayTime(notifyDataVo.getOrderTime());
+                cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
+                String amtStr = notifyDataVo.getSettleAmount();
+                amtStr = Objects.isNull(amtStr)?"0":amtStr;
+                cashier.setPayAmt(Integer.valueOf(amtStr));
+                result = cashierMapper.insertSelective(cashier);
+                if(result == 0){
+                    throw new OrderPayCallBackAsnyException();
+                }
+			} catch (Exception e) {
+				log.error("收银台入库违反唯一约束：params=[{}]",GsonUtils.toJson(notifyDataVo),e);
+			}
             return true;
         }
 
@@ -522,11 +553,30 @@ public class CashierNoTService {
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
-        if(freeDepositType == 2) {
-        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
-        }else {
-        	vo.setPayType(orderPaySign.getPayType());
+//        if(freeDepositType == 2) {
+//        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+//        }else {
+        	vo.setPayType(orderPaySign.getPayType());  //默认
+//        }
+        
+        //只有押金才有预授权的情况
+        if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
+	        String sourceType = orderPaySign.getPaySource();
+	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
+				//只有押金的时候才有是预授权，其他的情况都是消费
+				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
+			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_MP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_H5.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else {
+				//默认
+				vo.setPayType(orderPaySign.getPayType());
+			}
         }
+        
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
@@ -552,11 +602,30 @@ public class CashierNoTService {
         vo.setPaySn(String.valueOf(paySn));
         vo.setPaySource(orderPaySign.getPaySource());
         vo.setPayTitle(title);
-        if(freeDepositType == 2) {
-        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
-        }else {
+//        if(freeDepositType == 2) {
+//        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+//        }else {
         	vo.setPayType(orderPaySign.getPayType());
+//        }
+        
+      //只有押金才有预授权的情况
+        if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
+	        String sourceType = orderPaySign.getPaySource();
+	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
+				//只有押金的时候才有是预授权，其他的情况都是消费
+				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
+			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_MP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_H5.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else {
+				//默认
+				vo.setPayType(orderPaySign.getPayType());
+			}
         }
+        
         vo.setReqIp(IpUtil.getLocalIp());
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
@@ -770,13 +839,12 @@ public class CashierNoTService {
      * 退款成功事件
      * @param orderNo
      */
-    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type) {
+    public void sendOrderRefundSuccessMq(String orderNo, FineSubsidyCodeEnum type,AutoPayResultVo notifyDataVo) {
         OrderRefundMq orderSettlementMq = new OrderRefundMq();
         orderSettlementMq.setType(Integer.valueOf(type.getFineSubsidyCode()));
         orderSettlementMq.setOrderNo(orderNo);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
-        //TODO 短信发送
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS.routingKey,orderMessage);
     }
     /**

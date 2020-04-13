@@ -141,9 +141,12 @@ public class ModifyOrderFeeService {
 		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,modifyOrderReq.getMemNo());
 		// 应付
 		int payable = getTotalRentCarFee(updateModifyOrderFeeVO);
-		if (rentAmtPayed > Math.abs(payable)) {
+		if (rentAmtPayed >= Math.abs(payable)) {
 			// 实付大于应付，不需要支付
 			modifyOrderCompareVO.setCleanSupplementAmt(1);
+			modifyOrderCompareVO.setNeedSupplementAmt(0);
+		} else {
+			modifyOrderCompareVO.setNeedSupplementAmt(Math.abs(payable) - rentAmtPayed);
 		}
 		modifyOrderCompareVO.setRentAmtPayed(rentAmtPayed);
 		return modifyOrderCompareVO;

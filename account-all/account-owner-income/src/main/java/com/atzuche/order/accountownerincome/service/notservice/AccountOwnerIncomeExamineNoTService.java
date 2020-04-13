@@ -6,6 +6,7 @@ import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineE
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineRepeatException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineInsertException;
@@ -21,8 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -52,6 +56,14 @@ public class AccountOwnerIncomeExamineNoTService {
         accountOwnerIncomeExamineEntity.setIsDelete(NumberUtils.INTEGER_ZERO);
 
         int result = accountOwnerIncomeExamineMapper.insertSelective(accountOwnerIncomeExamineEntity);
+        Integer id = accountOwnerIncomeExamineEntity.getId();
+        AccountOwnerIncomeExamineEntity ownerIncomeExamineEntity = new AccountOwnerIncomeExamineEntity();
+        ownerIncomeExamineEntity.setExamineId(id);
+        ownerIncomeExamineEntity.setId(id);
+        ownerIncomeExamineEntity.setVersion(accountOwnerIncomeExamineEntity.getVersion());
+        int i = accountOwnerIncomeExamineMapper.updateByPrimaryKeySelective(ownerIncomeExamineEntity);
+        log.info("插入accountOwnerIncomeExamine之后，更新examineId ，ownerIncomeExamineEntity={},i={}",JSON.toJSONString(ownerIncomeExamineEntity),i);
+
         log.info("车主收益审核录入结果result={},accountOwnerIncomeExamineEntity={}",result, JSON.toJSONString(accountOwnerIncomeExamineEntity));
         if(result==0){
             log.error("车主收益审核录入失败result={},accountOwnerIncomeExamineEntity={}",result,JSON.toJSONString(accountOwnerIncomeExamineEntity));
@@ -171,5 +183,23 @@ public class AccountOwnerIncomeExamineNoTService {
             accountOwnerIncomeDetailEntity.setAmt(currIncomAmt);
             accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetailEntity);
         }*/
+    }
+
+    public List<AccountOwnerIncomeExamineEntity> getIncomByOwnerMemAndStatus(String ownerMemeNo,List<AccountOwnerIncomeExamineStatus> statusList) {
+        List<Integer> status = Optional.ofNullable(statusList).orElseGet(ArrayList::new).stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineMapper.getIncomByOwnerMemAndStatus(ownerMemeNo,status);
+        return accountOwnerIncomeExamineEntityList;
+    }
+
+
+    public List<AccountOwnerIncomeExamineDTO> getIncomByOwnerMem(String ownerMemeNo) {
+        List<AccountOwnerIncomeExamineEntity> incomByOwnerMemAndStatus = getIncomByOwnerMemAndStatus(ownerMemeNo, null);
+        List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS = new ArrayList<>();
+        incomByOwnerMemAndStatus.stream().forEach(x->{
+            AccountOwnerIncomeExamineDTO accountOwnerIncomeExamineDTO = new AccountOwnerIncomeExamineDTO();
+            BeanUtils.copyProperties(x,accountOwnerIncomeExamineDTO);
+            accountOwnerIncomeExamineDTOS.add(accountOwnerIncomeExamineDTO);
+        });
+        return accountOwnerIncomeExamineDTOS;
     }
 }

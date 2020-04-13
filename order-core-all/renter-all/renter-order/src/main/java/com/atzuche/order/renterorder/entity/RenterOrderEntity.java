@@ -145,5 +145,10 @@ public class RenterOrderEntity implements Serializable {
      * 订单是否查看,1:是，0：否
      */
     private Integer seeFlag;
+    
+    /**
+     * 需补付金额
+     */
+    private Integer supplementAmt;
 
 }

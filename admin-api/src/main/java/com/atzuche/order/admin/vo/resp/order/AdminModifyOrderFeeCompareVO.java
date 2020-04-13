@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.vo.resp.order;
 
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -16,4 +17,8 @@ public class AdminModifyOrderFeeCompareVO {
     private AdminModifyOrderFeeVO before;
     @AutoDocProperty(value = "修改后的费用明细")
     private AdminModifyOrderFeeVO after;
+    @AutoDocProperty(value = "用户总欠款")
+    private DebtDetailVO debtDetailVO;
+    @AutoDocProperty(value = "需要补付金额")
+	private Integer needSupplementAmt; 
 }

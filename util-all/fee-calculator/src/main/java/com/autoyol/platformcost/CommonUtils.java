@@ -4,8 +4,8 @@ import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
 
 @Slf4j
 public class CommonUtils {
@@ -68,8 +66,14 @@ public class CommonUtils {
 	
 	public static final double INSURE_DISCOUNT_NORMAL = 1.0;
 	public static final double INSURE_DISCOUNT_DIS = 0.7;
+	public static final double INSURE_DISCOUNT_EIGHT = 0.8;
+	public static final double INSURE_DISCOUNT_NINE = 0.9;
 	/** 一天小时数  */
 	private static final int HOURS_PER_DAY = 24;
+	
+	private static final int CARPURCHASEPRICE_150000 = 150000;
+	private static final int CARPURCHASEPRICE_200000 = 200000;
+	private static final int CARPURCHASEPRICE_300000 = 300000;
 	
     /**
                * 初始化全面保障费单价配置
@@ -668,7 +672,7 @@ public class CommonUtils {
 	 * @param revertTime 还车时间
 	 * @return double
 	 */
-	public static double getInsureDiscount(LocalDateTime rentTime,LocalDateTime revertTime) {
+	public static double getInsureDiscount(LocalDateTime rentTime,LocalDateTime revertTime,Integer inmsrpGuidePrice) {
 		if (rentTime == null || revertTime == null) {
 			return INSURE_DISCOUNT_NORMAL;
 		}
@@ -678,7 +682,17 @@ public class CommonUtils {
 			long minutes = duration.toMinutes();
 			// 如果24h制租期大于7天，平台保障费和全面保障费打7折
 			if (minutes >= HOURS_PER_DAY*7*60) {
-				return INSURE_DISCOUNT_DIS;
+				// 计算保费指导价
+				int guidePrice = inmsrpGuidePrice == null ? 0:inmsrpGuidePrice;
+				if (guidePrice <= CARPURCHASEPRICE_150000) {
+					return INSURE_DISCOUNT_DIS;
+				} else if (guidePrice <= CARPURCHASEPRICE_200000) {
+					return INSURE_DISCOUNT_EIGHT;
+				} else if (guidePrice <= CARPURCHASEPRICE_300000) {
+					return INSURE_DISCOUNT_NINE;
+				} else {
+					return INSURE_DISCOUNT_NORMAL;
+				}
 			}
 		} catch (Exception e) {
 			log.error("CommonUtils.getInsureDiscount has exception rentTime=[{}],revertTime=[{}]",rentTime,revertTime,e);

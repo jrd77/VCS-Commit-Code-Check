@@ -2,7 +2,6 @@ package com.atzuche.order.admin.vo.resp.car;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 public class CarDepositRespVo {
@@ -38,8 +37,14 @@ public class CarDepositRespVo {
     @AutoDocProperty("预计抵扣租车费用")
     private Integer expDeductionRentCarAmt;
 
+    @AutoDocProperty(value = "预计与实际标记：1:预计，2实际")
+    private int expOrActFlag;
+
+
     @AutoDocProperty("结算时抵扣的历史欠款")
     private Integer deductionHistoryAmt;
+
+
 
     @AutoDocProperty("车辆押金预计结算时间")
     private String expSettleTime;
@@ -74,6 +79,7 @@ public class CarDepositRespVo {
 
     @AutoDocProperty(value = "理赔-暂扣原因")
     private String lpDetainReason;
+
 
 
 

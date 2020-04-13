@@ -21,6 +21,7 @@ import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.coupon.api.CouponSettleRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +144,11 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPay(orderNo);
     }
-    
+
+    public RenterOrderEntity getRenterOrderByOrderNoAndWaitPayIncrement(String orderNo) {
+        return renterOrderMapper.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
+    }
+
     //根据会员号查询
     public List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(String memNo) {
         return renterOrderMapper.getRenterOrderByMemNoAndWaitPay(memNo);
@@ -535,6 +540,10 @@ public class RenterOrderService {
         return renterOrderMapper.updateChildStatusByOrderNo(orderNo, childStatus);
     }
 
+    public Integer updateSrvGetAndReturnFlagByRenterOrderNo(String renterOrderNo, Integer isGetCar, Integer isReturnCar) {
+        return renterOrderMapper.updateSrvGetAndReturnFlagByRenterOrderNo(renterOrderNo, isGetCar, isReturnCar);
+    }
+
     /**
      * 修改租客订单信息
      *
@@ -578,6 +587,12 @@ public class RenterOrderService {
         return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
     }
 
-
-
+    /**
+     * 获取进行中的有效子订单
+     * @param orderNo
+     * @return RenterOrderEntity
+     */
+    public RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(String orderNo) {
+    	return renterOrderMapper.getRenterOrderByOrderNoAndChildStatus(orderNo);
+    }
 }

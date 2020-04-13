@@ -37,6 +37,9 @@ public interface RenterOrderMapper{
     Integer updateRenterOrderEffective(@Param("id") Integer id, @Param("effectiveFlag") Integer effectiveFlag);
     
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(@Param("orderNo") String orderNo);
+    //
+    RenterOrderEntity getRenterOrderByOrderNoAndWaitPayIncrement(@Param("orderNo") String orderNo);
+    
     //列表
     List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(@Param("memNo") String memNo);
     //
@@ -62,6 +65,10 @@ public interface RenterOrderMapper{
 
     int updateChildStatusByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("childStatus") Integer childStatus);
 
+    int updateSrvGetAndReturnFlagByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo,
+                                                 @Param("isGetCar") Integer isGetCar, @Param("isReturnCar") Integer isReturnCar);
 
     RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(@Param("orderNo")String orderNo);
+    
+    RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(@Param("orderNo") String orderNo);
 }

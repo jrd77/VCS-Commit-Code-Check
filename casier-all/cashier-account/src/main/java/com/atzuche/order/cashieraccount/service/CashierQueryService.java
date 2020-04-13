@@ -118,8 +118,9 @@ public class CashierQueryService {
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
         CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,entity.getMemNo(), DataPayKindConstant.DEPOSIT);
-
-        if(Objects.nonNull(cashierEntity)){
+        
+        //加上成功标识
+        if(Objects.nonNull(cashierEntity) && "00".equals(cashierEntity.getTransStatus())){  //00 
             result.setPayStatus("支付成功");
             result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
             result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));

@@ -181,4 +181,25 @@ public class OrderRenterCostResVO {
     private String ownerLongRentDeduct;
     @AutoDocProperty(value="车主长租折扣实际抵扣金额")
     private String ownerLongRentDeductAmt;
+
+	//ADD
+	@AutoDocProperty(value="租车费用-应扣")
+	private String rentFeeYingkou = "0";
+	@AutoDocProperty(value="租车费用-实扣")
+	private String rentFeeShikou = "0";
+	//Add
+	@AutoDocProperty(value="车辆押金-应扣")
+	private String vehicleDepositYingkou;
+	@AutoDocProperty(value="车辆押金-实扣")
+	private String vehicleDepositShikou;
+	@AutoDocProperty(value="车辆押金-实收免押预授权")
+	private String vehicleDepositShishouAuth;
+	//Add
+	@AutoDocProperty(value="违章押金-应扣")
+	private String violationDepositYingkou;
+	@AutoDocProperty(value="违章押金-实扣")
+	private String violationDepositShikou;
+	@AutoDocProperty(value="违章押金-实收免押预授权")
+	private String violationDepositShishouAuth;
+
 }

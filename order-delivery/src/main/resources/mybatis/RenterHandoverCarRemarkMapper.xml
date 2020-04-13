@@ -169,7 +169,8 @@
     <select id="selectObjectByOrderNoType" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from renter_handover_car_remark where order_no = #{orderNo} and type = #{type} and is_delete = 0
+        from renter_handover_car_remark where order_no = #{orderNo} and type = ${type} and is_delete = 0
+        order by id desc limit 1
     </select>
 
     <select id="findRemarkObjectByRenterOrderNo" resultMap="BaseResultMap">

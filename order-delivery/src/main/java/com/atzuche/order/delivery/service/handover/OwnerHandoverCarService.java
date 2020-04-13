@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.vo.req.handover.req.HandoverCarInfoReqDTO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarInfoMapper;
 import com.atzuche.order.delivery.mapper.OwnerHandoverCarRemarkMapper;
@@ -79,7 +78,7 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public OwnerHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, Integer type) {
+    public OwnerHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, String type) {
         return ownerHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
     }
 
@@ -156,7 +155,7 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo, Integer type) {
+    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo, String type) {
         return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
     }
 

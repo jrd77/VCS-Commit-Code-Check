@@ -11,6 +11,11 @@ import org.springframework.context.annotation.Configuration;
  **/
 @Configuration
 public class ConfigServiceConfiguration {
+    @Bean
+    public ServicePointService registerServicePoint(@Autowired ConfigRegisterFactory factory, ServicePointService service){
+        factory.register(service);
+        return service;
+    }
 
     @Bean
     public OilAverageCostConfigService registerOilAverageCost(@Autowired  ConfigRegisterFactory factory, OilAverageCostConfigService configService){
@@ -73,11 +78,6 @@ public class ConfigServiceConfiguration {
     @Bean
     public CityService registerCityService(@Autowired ConfigRegisterFactory factory,
                                            CityService service){
-        factory.register(service);
-        return service;
-    }
-    @Bean
-    public ServicePointService registerServicePointService(@Autowired ConfigRegisterFactory factory, ServicePointService service){
         factory.register(service);
         return service;
     }

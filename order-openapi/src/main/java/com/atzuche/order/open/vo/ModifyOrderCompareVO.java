@@ -31,4 +31,9 @@ public class ModifyOrderCompareVO implements Serializable{
 	 * 实付金额
 	 */
 	private Integer rentAmtPayed;
+	
+	/**
+	 * 需要补付金额
+	 */
+	private Integer needSupplementAmt;
 }

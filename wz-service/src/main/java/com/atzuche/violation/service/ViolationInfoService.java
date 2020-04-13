@@ -1,6 +1,7 @@
 package com.atzuche.violation.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
@@ -64,6 +65,7 @@ public class ViolationInfoService {
         renterOrderWzDetailEntities.stream().forEach(r -> {
             RenterOrderWzDetailResVO renterOrderWzDetailRes = new RenterOrderWzDetailResVO();
             CommonUtil.copyPropertiesIgnoreNull(r, renterOrderWzDetailRes);
+            renterOrderWzDetailRes.setIllegalTime(DateUtils.parseDate(DateUtils.formate(renterOrderWzDetailRes.getIllegalTime(),DateUtils.DATE_DEFAUTE1),DateUtils.DATE_DEFAUTE1));
             renterOrderWzDetailResVOS.add(renterOrderWzDetailRes);
         });
         return renterOrderWzDetailResVOS;

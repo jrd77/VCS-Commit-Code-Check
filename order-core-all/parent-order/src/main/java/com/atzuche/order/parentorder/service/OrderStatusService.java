@@ -2,6 +2,8 @@ package com.atzuche.order.parentorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.mapper.OrderStatusMapper;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -114,5 +117,13 @@ public class OrderStatusService {
 
     public List<OrderStatusEntity> queryInProcess() {
         return orderStatusMapper.queryInProcess();
+    }
+
+    public List<OrderStatusEntity> queryByStatus(List<OrderStatusEnum> orderStatusEnums) {
+        if(orderStatusEnums == null || orderStatusEnums.size()<=0){
+            throw new InputErrorException();
+        }
+        List<Integer> statusList = orderStatusEnums.stream().map(x -> x.getStatus()).collect(Collectors.toList());
+        return orderStatusMapper.queryByStatus(statusList);
     }
 }

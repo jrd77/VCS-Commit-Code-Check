@@ -393,6 +393,17 @@ public class CashierWzSettleService {
     public int insertAccountRenterWzDepositCostSettleDetail(AccountRenterWzDepositCostSettleDetailEntity record) {
         return accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetail(record);
     }
-    
+
+
+    /**
+     * 依据订单号和会员号更新违章押金信息
+     *
+     * @param entity 违章押金信息
+     * @return int
+     */
+    public int updateAccountRenterWzDepositCostByOrderNo(AccountRenterWzDepositCostEntity entity){
+        return accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCostByOrderNo(entity);
+    }
+
 
 }

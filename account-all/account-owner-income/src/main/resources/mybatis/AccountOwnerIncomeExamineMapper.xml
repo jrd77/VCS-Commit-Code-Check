@@ -59,7 +59,7 @@
         select <include refid="Base_Column_List" /> from account_owner_income_examine where owner_order_no = #{ownerOrderNo}  and is_delete = 0
     </select>
 	<select id="getTotalAccountOwnerIncomeExamineByOrderNo" resultType="java.lang.Integer">
-		select IFNULL(SUM(amt),0) from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
+		select IFNULL(SUM(amt),0) from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0 and type = 1 
 	</select>
 
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity" useGeneratedKeys="true" keyProperty="id">
@@ -134,6 +134,17 @@
     <select id="selectByExamineId" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_income_examine where examine_id = #{examineId} or id = #{examineId}
     </select>
-
+    <select id="getIncomByOwnerMemAndStatus" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income_examine where
+        mem_no = #{ownerMemeNo}
+        <if test="statusList !=null and statusList.size()>0">
+            and status IN
+            <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        and is_delete = 0
+        order by id desc
+    </select>
 
 </mapper>

@@ -2,6 +2,8 @@ package com.atzuche.order.rentercost.service;
 
 import java.util.List;
 
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.mapper.ConsoleRenterOrderFineDeatailMapper;
 
@@ -64,7 +65,7 @@ public class ConsoleRenterOrderFineDeatailService{
      * @return Integer
      */
     public Integer saveConsoleRenterOrderFineDeatail(ConsoleRenterOrderFineDeatailEntity consoleFine) {
-        if(null == consoleFine) {
+        if(null == consoleFine || null == consoleFine.getFineAmount() || consoleFine.getFineAmount() == OrderConstant.ZERO) {
             logger.warn("Not fund console renter order fine data.");
             return 0;
         }
@@ -113,7 +114,7 @@ public class ConsoleRenterOrderFineDeatailService{
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public ConsoleRenterOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeCashCodeEnum type) {
-        if (fineAmt == null || fineAmt == 0) {
+        if (fineAmt == null/* || fineAmt == 0*/) {
             return null;
         }
         ConsoleRenterOrderFineDeatailEntity fineEntity = new ConsoleRenterOrderFineDeatailEntity();
@@ -125,6 +126,8 @@ public class ConsoleRenterOrderFineDeatailService{
         fineEntity.setFineSubsidySourceDesc(source.getFineSubsidySourceDesc());
         fineEntity.setFineType(type.getFineType());
         fineEntity.setFineTypeDesc(type.getFineTypeDesc());
+        fineEntity.setCostCode(type.getCode());
+        fineEntity.setCostName(type.getFineTypeDesc());
         fineEntity.setMemNo(costBaseDTO.getMemNo());
         fineEntity.setOrderNo(costBaseDTO.getOrderNo());
         return fineEntity;

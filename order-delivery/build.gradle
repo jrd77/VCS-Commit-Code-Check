@@ -8,6 +8,8 @@ version '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
+    maven{url "http://10.0.3.208:8081/nexus/content/groups/public/"}
+    maven{url "http://maven.aliyun.com/nexus/content/groups/public/"}
     mavenCentral()
 }
 
@@ -40,5 +42,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.0'
     compile project(":order-mq")
     compile project(":order-core-all:renter-all:renter-commodity")
+    compile project(":order-core-all:renter-all:renter-order")
 
 }

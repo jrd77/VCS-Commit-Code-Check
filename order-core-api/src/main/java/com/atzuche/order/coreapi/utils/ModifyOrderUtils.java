@@ -154,10 +154,12 @@ public class ModifyOrderUtils {
 				initReturnLat = srvReturnDelivery.getRenterGetReturnAddrLat();
 			}
 		}
-		if (getModifyGetReturnAddrFlag(initGetLon, initGetLat, updModifyOrder.getGetCarLon(), updModifyOrder.getGetCarLat())) {
+		if (initRenterOrder.getIsGetCar() != null && initRenterOrder.getIsGetCar() == 1 && 
+				getModifyGetReturnAddrFlag(initGetLon, initGetLat, updModifyOrder.getGetCarLon(), updModifyOrder.getGetCarLat())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_GETADDR.getCode(), OrderChangeItemEnum.MODIFY_GETADDR.getName()));
 		}
-		if (getModifyGetReturnAddrFlag(initReturnLon, initReturnLat, updModifyOrder.getRevertCarLon(), updModifyOrder.getRevertCarLat())) {
+		if (initRenterOrder.getIsReturnCar() != null && initRenterOrder.getIsReturnCar() == 1 && 
+				getModifyGetReturnAddrFlag(initReturnLon, initReturnLat, updModifyOrder.getRevertCarLon(), updModifyOrder.getRevertCarLat())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_RETURNADDR.getCode(), OrderChangeItemEnum.MODIFY_RETURNADDR.getName()));
 		}
 		String initCarOwnerCouponId = null,initGetReturnCouponId = null,initPlatformCouponId = null;

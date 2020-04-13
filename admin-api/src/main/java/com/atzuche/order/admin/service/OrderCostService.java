@@ -116,6 +116,9 @@ public class OrderCostService {
 			if(data != null) {
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
 				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
+				if(costVo != null) {
+					 logger.info("costVo toString=[{}]",costVo.toString());
+				}
 				
 				//租金费用  费用明细表renter_order_cost_detail   
 				putRenterOrderCostDetail(realVo,data);
@@ -143,8 +146,8 @@ public class OrderCostService {
 				
 				//补付费用 
 				//需补付金额,跟修改订单的补付金额是同一个方法。
-				int needIncrementAmt = cashierPayService.getRentCostBufuNew(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
-				putSupplementAmt(realVo,data,needIncrementAmt,costVo);
+//				int needIncrementAmt = cashierPayService.getRentCostBufuNew(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
+				putSupplementAmt(realVo,data,costVo);
 				
 				//租客支付给平台的费用。console  200214
 				putRenterToPlatformCost(realVo,data);
@@ -230,12 +233,11 @@ public class OrderCostService {
 		realVo.setRentFeeBase(String.valueOf(NumberUtils.convertNumberToZhengshu(base)));
 	}
 
-	private void putSupplementAmt(OrderRenterCostResVO realVo,
-			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, int needIncrementAmt, RenterCostVO costVo) {
+	private void putSupplementAmt(OrderRenterCostResVO realVo,com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterCostVO costVo) {
 		String paymentAmountShishou = "";
 		String paymentAmountYingshou = "";
-//		int yingshouAmt = 0;
-		int shishouAmt = costVo.getRenterCostBufu();  //补付   实收
+		int yingshouAmt = costVo.getRenterCostBufuYingshou();
+		int shishouAmt = costVo.getRenterCostBufuShishou();  //补付   实收
 		
 		/*
 		 * List<OrderSupplementDetailEntity> supplementList = data.getSupplementList();
@@ -255,9 +257,9 @@ public class OrderCostService {
 		
 
 		//海豹提供  
-		paymentAmountShishou = String.valueOf(shishouAmt); //NumberUtils.convertNumberToZhengshu(shishouAmt)
+		paymentAmountShishou = String.valueOf(Math.abs(shishouAmt)); //NumberUtils.convertNumberToZhengshu(shishouAmt)
 		//总额补付
-		paymentAmountYingshou = String.valueOf( NumberUtils.convertNumberToZhengshu(needIncrementAmt));
+		paymentAmountYingshou = String.valueOf(yingshouAmt>=0?0:NumberUtils.convertNumberToZhengshu(yingshouAmt));
 		realVo.setPaymentAmountShishou(paymentAmountShishou);
 		realVo.setPaymentAmountYingshou(paymentAmountYingshou);
 		
@@ -417,7 +419,7 @@ public class OrderCostService {
 
 	
 	private void putRenterOrderDeposit(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterCostVO costVo) {
-		realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getYingfuDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getYingfuDepositAmt())):"---");
+	    realVo.setVehicleDeposit(data.getRentVo()!=null && data.getRentVo().getOriginalDepositAmt() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getRentVo().getOriginalDepositAmt())):"---");
 		realVo.setViolationDeposit(data.getWzVo()!=null && data.getWzVo().getYingshouDeposit() != null?String.valueOf(NumberUtils.convertNumberToZhengshu(data.getWzVo().getYingshouDeposit())):"---");
 		
 		//任务减免金额
@@ -440,17 +442,24 @@ public class OrderCostService {
 		
 		
 		//直接从海豹那边的调用
-		realVo.setVehicleDepositYingshou(String.valueOf(costVo.getDepositCostYingfu()));
-		realVo.setVehicleDepositShishou(String.valueOf(costVo.getDepositCostShifu()));
-		realVo.setVehicleDepositYingtui(String.valueOf(costVo.getDepositCost()));
-		realVo.setVehicleDepositShitui(String.valueOf(costVo.getDepositCostReal()));
+		realVo.setVehicleDepositYingshou(String.valueOf(costVo.getDepositCostYingshou()));
+		realVo.setVehicleDepositShishou(String.valueOf(costVo.getDepositCostShishou()));
+		realVo.setVehicleDepositYingtui(String.valueOf(costVo.getDepositCostYingtui()));
+		realVo.setVehicleDepositShitui(String.valueOf(costVo.getDepositCostShitui()));
+		//add
+		realVo.setVehicleDepositYingkou(String.valueOf(costVo.getDepositCostYingkou()));
+		realVo.setVehicleDepositShikou(String.valueOf(costVo.getDepositCostShikou()));
+		
 		
 		//直接从海豹那边的调用
-		realVo.setViolationDepositYingshou(String.valueOf(costVo.getDepositWzCostYingFu()));
-		realVo.setViolationDepositShishou(String.valueOf(costVo.getDepositWzCostShifu()));
-		realVo.setViolationDepositYingtui(String.valueOf(costVo.getDepositWzCost()));
-		realVo.setViolationDepositShitui(String.valueOf(costVo.getDepositWzCostReal()));
-				
+		realVo.setViolationDepositYingshou(String.valueOf(costVo.getDepositWzCostYingshou()));
+		realVo.setViolationDepositShishou(String.valueOf(costVo.getDepositWzCostShishou()));
+		realVo.setViolationDepositYingtui(String.valueOf(costVo.getDepositWzCostYingtui()));
+		realVo.setViolationDepositShitui(String.valueOf(costVo.getDepositWzCostShitui()));
+		//add
+		realVo.setViolationDepositYingkou(String.valueOf(costVo.getDepositWzCostYingkou()));
+		realVo.setViolationDepositShikou(String.valueOf(costVo.getDepositWzCostShikou()));
+		
 	}
 
 	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderEntity entity, String memNo) {
@@ -665,10 +674,13 @@ public class OrderCostService {
 //		realVo.setRentFeeShitui("---");//data.getWzVo()!=null?String.valueOf(data.getWzVo().getYingshouDeposit()):"---"
 		
 		//直接从海豹那边的调用
-		realVo.setRentFeeYingshou(String.valueOf(costVo.getRenterCostYingshou()));
-		realVo.setRentFeeShishou(String.valueOf(costVo.getRenterCostShishou()));
-		realVo.setRentFeeYingtui(String.valueOf(costVo.getRenterCost()));
-		realVo.setRentFeeShitui(String.valueOf(costVo.getRenterCostReal()));
+		realVo.setRentFeeYingshou(String.valueOf(costVo.getRenterCostFeeYingshou()));
+		realVo.setRentFeeShishou(String.valueOf(costVo.getRenterCostFeeShishou()));
+		realVo.setRentFeeYingtui(String.valueOf(costVo.getRenterCostFeeYingtui()));
+		realVo.setRentFeeShitui(String.valueOf(costVo.getRenterCostFeeShitui()));
+		//add
+		realVo.setRentFeeYingkou(String.valueOf(costVo.getRenterCostFeeYingkou()));
+		realVo.setRentFeeShikou(String.valueOf(costVo.getRenterCostFeeShikou()));
 	}
 	
 	
@@ -1121,8 +1133,7 @@ public class OrderCostService {
 
                 //补付费用
                 //需补付金额,跟修改订单的补付金额是同一个方法。
-                int needIncrementAmt = cashierPayService.getRentCostBufuNew(renterCostReqVO.getOrderNo(), orderEntity.getMemNoRenter());
-                putSupplementAmt(realVo,data,needIncrementAmt,costVo);
+                putSupplementAmt(realVo,data,costVo);
 
                 //租客支付给平台的费用。console  200214
                 putRenterToPlatformCost(realVo,data);
