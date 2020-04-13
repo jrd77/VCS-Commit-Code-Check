@@ -134,13 +134,13 @@ public class SupplementService {
 		int suppRentAmt = afterList.stream().filter(cash -> {return "12".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
 		int suppDebtAmt = afterList.stream().filter(cash -> {return "07".equals(cash.getPayKind());}).mapToInt(CashierEntity::getPayAmt).sum();
 		if (suppRentAmt > 0) {
-			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppRentAmt, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER, afterList.get(0).getMemNo(), orderNo);
+			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-suppRentAmt, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER, afterList.get(0).getMemNo(), orderNo);
 			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
 			BeanUtils.copyProperties(entity,vo);
 			voList.add(vo);
 		}
 		if (suppDebtAmt > 0) {
-			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(suppDebtAmt, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN, afterList.get(0).getMemNo(), orderNo);
+			OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-suppDebtAmt, RenterCashCodeEnum.ACCOUNT_RENTER_DEBT_COST_AGAIN, afterList.get(0).getMemNo(), orderNo);
 			OrderSupplementDetailVO vo = new OrderSupplementDetailVO();
 			BeanUtils.copyProperties(entity,vo);
 			voList.add(vo);
