@@ -1,10 +1,9 @@
 package com.atzuche.order.coreapi.service;
 
-import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -18,11 +17,12 @@ import com.atzuche.order.commons.vo.res.coupon.DisCoupon;
 import com.atzuche.order.commons.vo.res.coupon.OwnerDisCoupon;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
-import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.submit.filter.cost.LongOrderCostFilterChain;
+import com.atzuche.order.coreapi.submit.filter.cost.LongSubmitOrderBeforeCostFilterChain;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
@@ -70,15 +70,9 @@ public class SubmitOrderBeforeCostCalService {
     @Autowired
     private RenterOrderCalCostService renterOrderCalCostService;
     @Autowired
-    private CarRentalTimeApiProxyService carRentalTimeApiService;
-    @Autowired
     private OrderCommonConver orderCommonConver;
     @Autowired
     private MemProxyService memberService;
-    @Autowired
-    private CarProxyService goodsService;
-    @Autowired
-    private RenterCommodityService renterCommodityService;
     @Autowired
     private RenterOrderService renterOrderService;
     @Autowired
@@ -95,6 +89,10 @@ public class SubmitOrderBeforeCostCalService {
     private CouponAndCoinHandleService couponAndCoinHandleService;
     @Autowired
     private InsurAbamentDiscountService insurAbamentDiscountService;
+    @Autowired
+    private SubmitOrderInitContextService submitOrderInitContextService;
+    @Autowired
+    private LongSubmitOrderBeforeCostFilterChain longSubmitOrderBeforeCostFilterChain;
 
 
 
@@ -105,31 +103,9 @@ public class SubmitOrderBeforeCostCalService {
      * @return NormalOrderCostCalculateResVO 返回信息
      */
     public NormalOrderCostCalculateResVO costCalculate(OrderReqVO orderReqVO) {
-        //公共参数处理
-        //1.请求参数处理
-        OrderReqContext reqContext = new OrderReqContext();
-        reqContext.setOrderReqVO(orderReqVO);
-        //租客会员信息
-        RenterMemberDTO renterMemberDTO =
-                memberService.getRenterMemberInfo(String.valueOf(orderReqVO.getMemNo()));
-        reqContext.setRenterMemberDto(renterMemberDTO);
-        //租客商品明细
-        RenterGoodsDetailDTO renterGoodsDetailDTO = goodsService.getRenterGoodsDetail(orderCommonConver.buildCarDetailReqVO(orderReqVO));
-        reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
-        //一天一价分组
-        renterGoodsDetailDTO = renterCommodityService.setPriceAndGroup(renterGoodsDetailDTO);
-        //车主商品明细
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = goodsService.getOwnerGoodsDetail(renterGoodsDetailDTO);
-        reqContext.setOwnerGoodsDetailDto(ownerGoodsDetailDTO);
-        //车主会员信息
-        OwnerMemberDTO ownerMemberDTO = memberService.getOwnerMemberInfo(renterGoodsDetailDTO.getOwnerMemNo());
-        reqContext.setOwnerMemberDto(ownerMemberDTO);
-        //租车费用处理
-        CarRentTimeRangeDTO carRentTimeRangeResVO =
-                carRentalTimeApiService.getCarRentTimeRange(carRentalTimeApiService.buildCarRentTimeRangeReqVO(orderReqVO));
-
-        RenterOrderReqVO renterOrderReqVO = orderCommonConver.buildRenterOrderReqVO(null, null, reqContext,
-                carRentTimeRangeResVO);
+        //请求参数处理
+        OrderReqContext reqContext = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
+        RenterOrderReqVO renterOrderReqVO = orderCommonConver.buildRenterOrderReqVO(null, null, reqContext);
         RenterOrderCostReqDTO renterOrderCostReqDTO =
                 renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
         // 获取平台保障费和全面保障费折扣补贴
@@ -189,11 +165,65 @@ public class SubmitOrderBeforeCostCalService {
 
     }
 
+    /**
+     * 长租订单-下单前费用计算
+     *
+     * @param orderReqVO 请求参数
+     * @return NormalOrderCostCalculateResVO
+     */
+    public NormalOrderCostCalculateResVO costCalculateForLong(OrderReqVO orderReqVO) {
+        //请求参数初始化
+        OrderReqContext context = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
+        //费用计算参数初始化
+        OrderCostContext orderCostContext = orderCommonConver.initOrderCostContext(null, null, null, context);
+        //计算订单费用
+        longSubmitOrderBeforeCostFilterChain.calculate(orderCostContext);
+        //费用项列表
+        List<CostItemVO> costItemVOList = orderCommonConver.buildCostItemList(orderCostContext);
+        //费用总计
+        TotalCostVO totalCostVO = orderCommonConver.buildTotalCostVO(costItemVOList);
+        //车辆押金信息
+        DepositAmtVO carDeposit =
+                orderCommonConver.buildDepositAmtVO(orderCostContext.getResContext().getOrderCarDepositAmtResDTO().getCarDeposit());
+        //违章押金信息
+        IllegalDepositVO illegalDepositVO =
+                orderCommonConver.buildIllegalDepositVO(orderCostContext.getResContext().getOrderIllegalDepositAmtResDTO().getIllegalDeposit());
 
+        //抵扣公共信息抽取
+        DeductContextDTO deductContext = orderCommonConver.initDeductContext(orderCostContext);
+        deductContext.setOsVal(StringUtils.isBlank(orderReqVO.getOS()) ?
+                OsTypeEnum.OTHER.getOsVal() : OsTypeEnum.from(orderReqVO.getOS()).getOsVal());
 
+        //车主券抵扣
+        CarOwnerCouponReductionVO carOwnerCouponReductionVO = new CarOwnerCouponReductionVO(OrderConstant.ZERO);
+        //限时红包
+        //优惠券抵扣
+        MemAvailCouponRequestVO memAvailCouponRequestVO =
+                orderCommonConver.buildMemAvailCouponRequestVO(context, orderCostContext);
+        CouponReductionVO couponReductionVO = renterOrderCalCostService.getCouponReductionVO(deductContext,
+                memAvailCouponRequestVO, orderReqVO.getDisCouponIds());
+        //凹凸币
+        AutoCoinReductionVO autoCoinReductionVO = renterOrderCalCostService.getAutoCoinReductionVO(deductContext,
+                orderReqVO.getMemNo(),
+                orderReqVO.getUseAutoCoin());
+        //钱包抵扣信息
+        WalletReductionVO walletReductionVO =
+                new WalletReductionVO(walletProxyService.getWalletByMemNo(orderReqVO.getMemNo()));
 
+        NormalOrderCostCalculateResVO res = new NormalOrderCostCalculateResVO();
+        res.setTotalCost(totalCostVO);
+        res.setCostItemList(costItemVOList);
+        res.setDeposit(carDeposit);
+        res.setIllegalDeposit(illegalDepositVO);
 
-
+        ReductionVO reduction = new ReductionVO();
+        reduction.setCarOwnerCouponReduction(carOwnerCouponReductionVO);
+        reduction.setCouponReduction(couponReductionVO);
+        reduction.setAutoCoinReduction(autoCoinReductionVO);
+        reduction.setWalletReduction(walletReductionVO);
+        res.setReduction(reduction);
+        return res;
+    }
 
 
     /**

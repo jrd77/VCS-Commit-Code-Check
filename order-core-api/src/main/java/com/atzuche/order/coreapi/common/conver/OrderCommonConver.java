@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.common.conver;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -23,6 +24,7 @@ import com.atzuche.order.coreapi.entity.dto.cost.OrderCostReqContext;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostResContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.*;
 import com.atzuche.order.coreapi.utils.OrderCostDetailCalculationUtil;
+import com.atzuche.order.coreapi.utils.RenterOrderSubsidyDetailCalculationUtil;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -35,6 +37,7 @@ import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.platformcost.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +51,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author pengcheng.fu
@@ -65,11 +69,9 @@ public class OrderCommonConver {
      * @param orderNo               主订单号
      * @param renterOrderNo         租客子订单号
      * @param reqContext            下单请求参数
-     * @param carRentTimeRangeResVO 提前延后信息
      * @return RenterOrderReqVO 租客订单请求参数
      */
-    public RenterOrderReqVO buildRenterOrderReqVO(String orderNo, String renterOrderNo, OrderReqContext reqContext,
-                                                  CarRentTimeRangeDTO carRentTimeRangeResVO) {
+    public RenterOrderReqVO buildRenterOrderReqVO(String orderNo, String renterOrderNo, OrderReqContext reqContext) {
 
         RenterOrderReqVO renterOrderReqVO = new RenterOrderReqVO();
         renterOrderReqVO.setOrderNo(orderNo);
@@ -83,9 +85,10 @@ public class OrderCommonConver {
         renterOrderReqVO.setSource(orderReqVO.getSource());
         String driverIds = orderReqVO.getDriverIds();
         renterOrderReqVO.setDriverIds(ListUtil.parseString(driverIds, ","));
-        renterOrderReqVO.setGetCarBeforeTime(null == carRentTimeRangeResVO || null == carRentTimeRangeResVO.getGetMinutes() ? 0 : carRentTimeRangeResVO.getGetMinutes());
-        renterOrderReqVO.setReturnCarAfterTime(null == carRentTimeRangeResVO || null == carRentTimeRangeResVO.getReturnMinutes() ? 0 :
-                carRentTimeRangeResVO.getReturnMinutes());
+        renterOrderReqVO.setGetCarBeforeTime(null == reqContext.getCarRentTimeRangeDTO() || null == reqContext.getCarRentTimeRangeDTO().getGetMinutes() ?
+                OrderConstant.ZERO : reqContext.getCarRentTimeRangeDTO().getGetMinutes());
+        renterOrderReqVO.setReturnCarAfterTime(null == reqContext.getCarRentTimeRangeDTO() || null == reqContext.getCarRentTimeRangeDTO().getReturnMinutes() ? OrderConstant.ZERO :
+                reqContext.getCarRentTimeRangeDTO().getReturnMinutes());
 
         RenterGoodsDetailDTO goodsDetail = reqContext.getRenterGoodsDetailDto();
         renterOrderReqVO.setGuidPrice(goodsDetail.getCarGuidePrice());
@@ -135,10 +138,12 @@ public class OrderCommonConver {
      * 下单前费用计算--租车费用列表
      *
      * @param renterOrderCostRespDTO 订单租车费用信息
+     * @param renterOrderReqVO 请求信息
      * @return List<CostItemVO>
      */
     public List<CostItemVO> buildCostItemList(RenterOrderCostRespDTO renterOrderCostRespDTO, RenterOrderReqVO renterOrderReqVO) {
-        logger.info("Build costItem list.param is,renterOrderCostRespDTO:[{}]", JSON.toJSONString(renterOrderCostRespDTO));
+        logger.info("Build costItem list A.param is,renterOrderCostRespDTO:[{}]",
+                JSON.toJSONString(renterOrderCostRespDTO));
         if (null == renterOrderCostRespDTO || CollectionUtils.isEmpty(renterOrderCostRespDTO.getRenterOrderCostDetailDTOList())) {
             return null;
         }
@@ -172,7 +177,71 @@ public class OrderCommonConver {
         costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
         // 全面保障费用项
         costItemList.add(getAbatementCostItemVO(renterOrderCostRespDTO, insureDiscount));
-        logger.info("Build costItem list.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
+        logger.info("Build costItem list A.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
+        return costItemList;
+    }
+
+
+    /**
+     * 下单前费用计算--租车费用列表
+     *
+     * @param orderCostContext 订单租车费用信息
+     * @return List<CostItemVO>
+     */
+    public List<CostItemVO> buildCostItemList(OrderCostContext orderCostContext) {
+        logger.info("Build costItem list B.param is,orderCostContext:[{}]",
+                JSON.toJSONString(orderCostContext));
+        if (null == orderCostContext || CollectionUtils.isEmpty(orderCostContext.getCostDetailContext().getCostDetails())) {
+            return null;
+        }
+        List<CostItemVO> costItemList = new ArrayList<>();
+
+        orderCostContext.getCostDetailContext().getCostDetails().forEach(cost -> {
+            if (StringUtils.equals(RenterCashCodeEnum.SRV_GET_COST.getCashNo(), cost.getCostCode()) ||
+                    StringUtils.equals(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo(), cost.getCostCode()) ||
+                    StringUtils.equals(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo(), cost.getCostCode()) ||
+                    StringUtils.equals(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo(), cost.getCostCode())
+            ) {
+                return;
+            }
+            CostItemVO vo = new CostItemVO();
+            vo.setCostCode(cost.getCostCode());
+            vo.setCostDesc(cost.getCostDesc());
+            vo.setCount(cost.getCount());
+            int subsidyAmt =
+                    RenterOrderSubsidyDetailCalculationUtil.getOrderSubsidyCostByCashCode(orderCostContext.getCostDetailContext().getSubsidyDetails(), RenterCashCodeEnum.from(cost.getCostCode())).getAmt();
+            vo.setTotalAmount(cost.getTotalAmount() + subsidyAmt);
+            vo.setUnitPrice(cost.getShowUnitPrice());
+            costItemList.add(vo);
+        });
+
+        //取车服务费用(取车服务费 + 取车超运能溢价)
+        int srvGetCost = OrderCostDetailCalculationUtil.getSrvGetCostAmt(orderCostContext.getCostDetailContext().getCostDetails(),
+                orderCostContext.getCostDetailContext().getSubsidyDetails());
+        int getBlockedRaiseAmt = OrderCostDetailCalculationUtil.getGetBlockedRaiseAmt(orderCostContext.getCostDetailContext().getCostDetails(),
+                orderCostContext.getCostDetailContext().getSubsidyDetails());
+        CostItemVO getCarCostVo = new CostItemVO();
+        getCarCostVo.setCostCode(RenterCashCodeEnum.SRV_GET_COST.getCashNo());
+        getCarCostVo.setCostDesc(RenterCashCodeEnum.SRV_GET_COST.getTxt());
+        getCarCostVo.setCount(OrderConstant.D_ONE);
+        getCarCostVo.setTotalAmount(srvGetCost + getBlockedRaiseAmt);
+        getCarCostVo.setUnitPrice(Math.abs(getCarCostVo.getTotalAmount()));
+        costItemList.add(getCarCostVo);
+
+        //取车服务费用(还车服务费 + 还车超运能溢价)
+        int srvReturnCost = OrderCostDetailCalculationUtil.getSrvReturnCostAmt(orderCostContext.getCostDetailContext().getCostDetails(),
+                orderCostContext.getCostDetailContext().getSubsidyDetails());
+        int returnBlockedRaiseAmt = OrderCostDetailCalculationUtil.getReturnBlockedRaiseAmt(orderCostContext.getCostDetailContext().getCostDetails(),
+                orderCostContext.getCostDetailContext().getSubsidyDetails());
+        CostItemVO returnCarCostVo = new CostItemVO();
+        returnCarCostVo.setCostCode(RenterCashCodeEnum.SRV_RETURN_COST.getCashNo());
+        returnCarCostVo.setCostDesc(RenterCashCodeEnum.SRV_RETURN_COST.getTxt());
+        returnCarCostVo.setCount(OrderConstant.D_ONE);
+        returnCarCostVo.setTotalAmount(srvReturnCost + returnBlockedRaiseAmt);
+        returnCarCostVo.setUnitPrice(Math.abs(returnCarCostVo.getTotalAmount()));
+        costItemList.add(getCarCostVo);
+
+        logger.info("Build costItem list B.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
     }
 
@@ -263,7 +332,7 @@ public class OrderCommonConver {
         if (CollectionUtils.isEmpty(costItems)) {
             return null;
         }
-        int totalFee = costItems.stream().mapToInt(CostItemVO::getTotalAmount).sum();
+        int totalFee = costItems.stream().filter(cost -> Objects.nonNull(cost.getTotalAmount())).mapToInt(CostItemVO::getTotalAmount).sum();
         TotalCostVO totalCost = new TotalCostVO();
         totalCost.setTotalFee(totalFee);
         logger.info("Build TotalCostVO.result is,totalCost:[{}]", JSON.toJSONString(totalCost));
@@ -309,6 +378,42 @@ public class OrderCommonConver {
     /**
      * 依据租车费用初始化抵扣信息
      *
+     * @param orderCostContext 租车费用明细
+     * @return DeductContextDTO 抵扣信息公共参数
+     */
+    public DeductContextDTO initDeductContext(OrderCostContext orderCostContext) {
+
+        if (null == orderCostContext || CollectionUtils.isEmpty(orderCostContext.getCostDetailContext().getCostDetails())) {
+            return null;
+        }
+
+        DeductContextDTO deductContext = new DeductContextDTO();
+        deductContext.setOriginalRentAmt(null == orderCostContext.getCostDetailContext().getOriginalRentAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getOriginalRentAmt()));
+        deductContext.setSurplusRentAmt(null == orderCostContext.getCostDetailContext().getSurplusRentAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusRentAmt()));
+
+        int srvGetCost = null == orderCostContext.getCostDetailContext().getSurplusSrvGetCost() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusSrvGetCost());
+
+        int srvReturnCost = null == orderCostContext.getCostDetailContext().getSurplusSrvReturnCost() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusSrvReturnCost());
+
+        int overGetCost = null == orderCostContext.getCostDetailContext().getSurplusGetBlockedRaiseAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusGetBlockedRaiseAmt());
+        int overReturnCost = null == orderCostContext.getCostDetailContext().getSurplusReturnBlockedRaiseAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusReturnBlockedRaiseAmt());
+
+        deductContext.setSrvGetCost(srvGetCost + overGetCost);
+        deductContext.setSrvReturnCost(srvReturnCost + overReturnCost);
+        logger.info("下单前费用计算--初始context数据 B.deductContext:[{}]", JSON.toJSONString(deductContext));
+        return deductContext;
+    }
+
+
+    /**
+     * 依据租车费用初始化抵扣信息
+     *
      * @param renterOrderCostRespDTO 租车费用明细
      * @return DeductContextDTO 抵扣信息公共参数
      */
@@ -334,8 +439,55 @@ public class OrderCommonConver {
 
         deductContext.setSrvGetCost(srvGetCost + overGetCost);
         deductContext.setSrvReturnCost(srvReturnCost + overReturnCost);
-        logger.info("下单前费用计算--初始context数据.deductContext:[{}]", JSON.toJSONString(deductContext));
+        logger.info("下单前费用计算--初始context数据 A.deductContext:[{}]", JSON.toJSONString(deductContext));
         return deductContext;
+    }
+
+    /**
+     * 封装优惠券请求参数
+     *
+     * @param context          租车费用相关信息
+     * @param orderCostContext 租客订单请求信息
+     * @return MemAvailCouponRequestVO 优惠券请求信息
+     */
+    public MemAvailCouponRequestVO buildMemAvailCouponRequestVO(OrderReqContext context, OrderCostContext orderCostContext) {
+        MemAvailCouponRequestVO memAvailCouponRequestVO = new MemAvailCouponRequestVO();
+        memAvailCouponRequestVO.setOrderNo(orderCostContext.getReqContext().getBaseReqDTO().getOrderNo());
+        memAvailCouponRequestVO.setMemNo(Integer.valueOf(context.getOrderReqVO().getMemNo()));
+        memAvailCouponRequestVO.setCarNo(Integer.valueOf(context.getOrderReqVO().getCarNo()));
+        memAvailCouponRequestVO.setCityCode(Integer.valueOf(context.getOrderReqVO().getCityCode()));
+        memAvailCouponRequestVO.setIsNew(null != context.getRenterMemberDto().getIsNew() && OrderConstant.YES == context.getRenterMemberDto().getIsNew());
+        memAvailCouponRequestVO.setRentAmt(null == orderCostContext.getCostDetailContext().getSurplusRentAmt() ?
+                OrderConstant.ZERO : Math.abs(orderCostContext.getCostDetailContext().getSurplusRentAmt()));
+        memAvailCouponRequestVO.setInsureTotalPrices(Math.abs(OrderCostDetailCalculationUtil.getInsuranceAmt(orderCostContext.getCostDetailContext().getCostDetails(), orderCostContext.getCostDetailContext().getSubsidyDetails())));
+        memAvailCouponRequestVO.setAbatement(Math.abs(OrderCostDetailCalculationUtil.getAbatementAmt(orderCostContext.getCostDetailContext().getCostDetails(), orderCostContext.getCostDetailContext().getSubsidyDetails())));
+
+        int srvGetCost = null == orderCostContext.getCostDetailContext().getSurplusSrvGetCost() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusSrvGetCost());
+        int srvReturnCost = null == orderCostContext.getCostDetailContext().getSurplusSrvReturnCost() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusSrvReturnCost());
+        int overGetCost = null == orderCostContext.getCostDetailContext().getSurplusGetBlockedRaiseAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusGetBlockedRaiseAmt());
+        int overReturnCost = null == orderCostContext.getCostDetailContext().getSurplusReturnBlockedRaiseAmt() ? OrderConstant.ZERO :
+                Math.abs(orderCostContext.getCostDetailContext().getSurplusReturnBlockedRaiseAmt());
+
+        memAvailCouponRequestVO.setSrvGetCost(srvGetCost + overGetCost);
+        memAvailCouponRequestVO.setSrvReturnCost(srvReturnCost + overReturnCost);
+
+
+        int holidayAverage =
+                Objects.isNull(orderCostContext.getResContext().getOrderRentAmtResDTO().getHolidayAverage()) ?
+                        OrderConstant.ZERO : orderCostContext.getResContext().getOrderRentAmtResDTO().getHolidayAverage();
+        memAvailCouponRequestVO.setHolidayAverage(Math.abs(holidayAverage));
+        memAvailCouponRequestVO.setLabelIds(context.getRenterGoodsDetailDto().getLabelIds());
+        memAvailCouponRequestVO.setRentTime(DateUtils.formateLong(context.getOrderReqVO().getRentTime(), DateUtils.DATE_DEFAUTE));
+        memAvailCouponRequestVO.setRevertTime(DateUtils.formateLong(context.getOrderReqVO().getRevertTime(), DateUtils.DATE_DEFAUTE));
+
+        memAvailCouponRequestVO.setCounterFee(Math.abs(OrderCostDetailCalculationUtil.getFeeAmt(orderCostContext.getCostDetailContext().getCostDetails(), orderCostContext.getCostDetailContext().getSubsidyDetails())));
+        memAvailCouponRequestVO.setOriginalRentAmt(null == orderCostContext.getCostDetailContext().getOriginalRentAmt() ?
+                OrderConstant.ZERO : Math.abs(orderCostContext.getCostDetailContext().getOriginalRentAmt()));
+        logger.info("下单前费用计算--优惠券请求参数 memAvailCouponRequestVO:[{}]", JSON.toJSONString(memAvailCouponRequestVO));
+        return memAvailCouponRequestVO;
     }
 
     /**

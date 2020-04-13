@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
 
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import lombok.Data;
 
 /**
@@ -15,17 +16,11 @@ import lombok.Data;
 @Data
 public class OwnerCouponLongResVO {
 
-    /**
-     * 主订单号
-     */
-    private String orderNo;
-    /**
-     * 折扣的文案信息
-     */
-    private String discountDesc;
-    /**
-     * 租金单价折扣后的集合
-     */
-    private List<HolidayAverageResultVO> ownerUnitPriceRespVOS;
+    private String resCode;
+
+    private String resMsg;
+
+    private OwnerCouponLongVO data;
+
 
 }

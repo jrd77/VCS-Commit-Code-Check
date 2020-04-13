@@ -21,6 +21,14 @@ public class CarOwnerCouponReductionVO implements Serializable {
     @AutoDocProperty(value = "可用优惠券列表")
     private List<CarOwnerCouponDetailVO> availableCouponList;
 
+
+    public CarOwnerCouponReductionVO() {
+    }
+
+    public CarOwnerCouponReductionVO(Integer discouponDeductibleAmt) {
+        this.discouponDeductibleAmt = discouponDeductibleAmt;
+    }
+
     public Integer getDiscouponDeductibleAmt() {
         return discouponDeductibleAmt;
     }

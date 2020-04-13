@@ -121,7 +121,7 @@ public class LongOrderGetAndReturnCarCostSubsidyFilter implements OrderCostFilte
                                                                         Integer subsidyAmount,
                                                                         SubsidyTypeCodeEnum subsidyTypeCodeEnum,
                                                                         RenterCashCodeEnum renterCashCodeEnum) {
-        if (null == subsidyAmount || OrderConstant.ZERO != subsidyAmount) {
+        if (null == subsidyAmount || OrderConstant.ZERO == subsidyAmount) {
             return null;
         }
         RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();

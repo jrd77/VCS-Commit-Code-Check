@@ -24,7 +24,7 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @NotBlank(message = "订单类型不能为空")
     private String orderCategory;
 
-    @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有 ")
+    @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有,6:长租")
     private String businessParentType;
 
     @AutoDocProperty(value = "业务来源子类型 1:OTA-携程,2:OTA-同城,3:OTA-飞猪,4:OTA-租租车,5:代步车-出险代步车,6:代步车-2*2代步车,7:代步车-券码下单,8:代步车-特供车  ")
@@ -92,7 +92,7 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
     @NotBlank(message = "车辆注册号不能为空")
     private String carNo;
 
-    @AutoDocProperty(value = "是否购买补充保障", required = true)
+    @AutoDocProperty(value = "是否购买补充保障:0.否 1.是", required = true)
     @NotBlank(message = "是否购买补充保障不能为空")
     private String abatement;
 
