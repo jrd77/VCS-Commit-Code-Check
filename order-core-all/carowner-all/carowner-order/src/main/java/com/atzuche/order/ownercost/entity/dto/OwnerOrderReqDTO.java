@@ -17,6 +17,10 @@ public class OwnerOrderReqDTO {
      */
     private String ownerOrderNo;
     /**
+     * 租客子订单号
+     */
+    private String renterOrderNo;
+    /**
      * 会员号
      */
     private String memNo;

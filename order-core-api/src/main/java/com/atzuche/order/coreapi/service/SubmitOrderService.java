@@ -164,6 +164,7 @@ public class SubmitOrderService {
         String ownerOrderNo = uniqueOrderNoService.genOwnerOrderNo(orderNo);
         //5.2.调用车主订单模块处理车主订单相关业务
         OwnerOrderReqDTO ownerOrderReqDTO = buildOwnerOrderReqDTO(orderNo, ownerOrderNo, context);
+        ownerOrderReqDTO.setRenterOrderNo(renterOrderNo);
         ownerOrderReqDTO.setOwnerOrderSubsidyDetailEntity(submitOrderHandleService.buildOwnerOrderSubsidyDetailEntity(orderNo, ownerOrderNo,
                 renterGoodsDetailDTO.getOwnerMemNo(), renterOrderResVO.getOwnerCoupon()));
         ownerOrderReqDTO.setOwnerOrderPurchaseDetailEntity(submitOrderHandleService.buildOwnerOrderPurchaseDetailEntity(orderNo, ownerOrderNo,

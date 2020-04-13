@@ -367,6 +367,7 @@ public class SubmitOrderHandleService {
         OwnerOrderReqDTO ownerOrderReqDTO = new OwnerOrderReqDTO();
         ownerOrderReqDTO.setOrderNo(costContext.getReqContext().getBaseReqDTO().getOrderNo());
         ownerOrderReqDTO.setOwnerOrderNo(costContext.getReqContext().getBaseReqDTO().getOwnerOrderNo());
+        ownerOrderReqDTO.setRenterOrderNo(costContext.getReqContext().getBaseReqDTO().getRenterOrderNo());
         ownerOrderReqDTO.setMemNo(reqContext.getRenterGoodsDetailDto().getOwnerMemNo());
         ownerOrderReqDTO.setExpRentTime(reqContext.getOrderReqVO().getRentTime());
         ownerOrderReqDTO.setExpRevertTime(reqContext.getOrderReqVO().getRevertTime());
