@@ -3,18 +3,6 @@
  */
 package com.atzuche.order.coreapi.controller;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
@@ -24,11 +12,7 @@ import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
-import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
-import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
-import com.atzuche.order.commons.vo.res.OwnerCostDetailVO;
-import com.atzuche.order.commons.vo.res.OwnerCostSettleDetailVO;
-import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
+import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -42,8 +26,13 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -169,8 +158,9 @@ public class OrderCostController {
 
 		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
 		AccountRenterWzDepositEntity wzDepositEntity = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
-
-		RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
+        Integer isAuthorize = depositEntity.getIsAuthorize();
+        Integer wzIsAuthorize = wzDepositEntity.getIsAuthorize();
+        RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
 		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
 		shortDetail.setTotalFineAmt(-totalFineAmt);
@@ -180,8 +170,8 @@ public class OrderCostController {
 		shortDetail.setShiFuWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
 		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
-		shortDetail.setExpReturnDeposit(depositEntity.getShifuDepositAmt());
-		shortDetail.setExpReturnWzDeposit(wzDepositEntity.getShishouDeposit());
+		shortDetail.setExpReturnDeposit(isAuthorize!=null&&isAuthorize == 1 ? depositEntity.getCreditPayAmt() : depositEntity.getShifuDepositAmt());
+		shortDetail.setExpReturnWzDeposit(wzIsAuthorize!=null&&wzIsAuthorize == 1 ? wzDepositEntity.getCreditPayAmt() : wzDepositEntity.getShishouDeposit());
 		shortDetail.setOrderNo(orderNo);
 
 		return ResponseData.success(shortDetail);
