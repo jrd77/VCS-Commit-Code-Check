@@ -2,10 +2,8 @@ package com.atzuche.order.delivery.common;
 
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
-import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
