@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Objects;
 
 import com.atzuche.order.transport.service.GetReturnCarCostService;
+import com.atzuche.order.transport.vo.GetReturnResponseVO;
 import com.autoyol.platformcost.CommonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -130,12 +132,14 @@ public class DeliveryCarInfoService {
             createGetHandoverCar(getReturnCarCostReqDto,deliveryCarVO, renterOrderDeliveryEntity,carType,renterGoodsDetailDTO);
         }
         GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
-        //GetReturnResponseVO getReturnResponseVO = deliveryCarInfoPriceService.getDeliveryCarFee(renterOrderDeliveryEntityList.get(0).getOrderNo());
-        //log.info(String.valueOf(getReturnResponseVO.getGetFee()));
-
+        GetReturnResponseVO getReturnResponseVO =  getReturnCostDTO.getGetReturnResponseVO();
         if(Objects.nonNull(getReturnCostDTO)) {
-            deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
-            deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
+            int getCarCost = getReturnResponseVO.getGetFee()+Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetTimePeriodUpPrice()) == true ? getReturnResponseVO.getGetTimePeriodUpPrice() : "0")+Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetCicrleUpPrice()) == true ? getReturnResponseVO.getGetCicrleUpPrice() : "0")+
+                    Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetDistanceUpPrice()) == true ? getReturnResponseVO.getGetDistanceUpPrice() : "0");
+            int returnCarCost = getReturnResponseVO.getReturnFee()+Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getReturnTimePeriodUpPrice()) == true ? getReturnResponseVO.getReturnTimePeriodUpPrice() : "0")+Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getReturnCicrleUpPrice()) == true ? getReturnResponseVO.getReturnCicrleUpPrice() : "0")+
+                    Integer.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getReturnDistanceUpPrice()) == true ? getReturnResponseVO.getReturnDistanceUpPrice() : "0");
+            deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getCarCost));
+            deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(returnCarCost));
         }
         //取车时的所在城市
         RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();
