@@ -42,8 +42,6 @@ public class DeliveryCarTask {
     CodeUtils codeUtils;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
-    @Autowired
-    DeliveryCarService deliveryCarService;
 
     /**
      * 添加订单到仁云流程系统
@@ -99,9 +97,8 @@ public class DeliveryCarTask {
         orderDeliveryEntity.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
         cancelOtherDeliveryTypeInfo(renterOrderNo,serviceType,cancelOrderDeliveryVO);
-        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
-       return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
+        renyunDeliveryCarService.addHandoverInfo(orderDeliveryEntity);
+        return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 
     /**

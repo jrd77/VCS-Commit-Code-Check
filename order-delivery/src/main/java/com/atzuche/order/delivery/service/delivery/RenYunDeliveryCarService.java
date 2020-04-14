@@ -2,7 +2,9 @@ package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
+import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
@@ -29,6 +31,8 @@ public class RenYunDeliveryCarService {
 
     @Autowired
     RetryDeliveryCarService retryDeliveryCarService;
+    @Autowired
+    DeliveryCarService deliveryCarService;
 
     /**
      * 添加订单到仁云流程系统
@@ -108,5 +112,16 @@ public class RenYunDeliveryCarService {
         }
         return sb.toString();
     }
+
+
+    /**
+     * 新增更新handover
+     * @param orderDeliveryEntity
+     */
+    public void addHandoverInfo(RenterOrderDeliveryEntity orderDeliveryEntity) {
+        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+    }
+
 
 }

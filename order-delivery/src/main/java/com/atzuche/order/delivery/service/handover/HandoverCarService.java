@@ -9,6 +9,7 @@ import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.*;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.delivery.HandoverProVO;
 import com.atzuche.order.delivery.vo.handover.*;
@@ -220,9 +221,10 @@ public class HandoverCarService {
         RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), type);
         if (Objects.nonNull(handoverCarInfoEntity)) {
             CommonUtil.copyPropertiesIgnoreNull(handoverCarInfoDTO, handoverCarInfoEntity);
-             renterHandoverCarService.updateRenterHandoverInfoByPrimaryKey(handoverCarInfoEntity);
+            renterHandoverCarService.updateRenterHandoverInfoByPrimaryKey(handoverCarInfoEntity);
         } else {
             RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = new RenterHandoverCarInfoEntity();
+            renterHandoverCarInfoEntity.setIsDelete(0);
             BeanUtils.copyProperties(handoverCarInfoDTO, renterHandoverCarInfoEntity);
             renterHandoverCarService.insertRenterHandoverCar(renterHandoverCarInfoEntity);
         }
@@ -230,7 +232,8 @@ public class HandoverCarService {
             if (null == renterHandoverCarRemarkEntity) {
                 RenterHandoverCarRemarkEntity renterRemarkEntity = new RenterHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, renterRemarkEntity);
-                 renterHandoverCarService.insertRenterHandoverCarRemark(renterRemarkEntity);
+                renterRemarkEntity.setIsDelete(0);
+                renterHandoverCarService.insertRenterHandoverCarRemark(renterRemarkEntity);
             } else {
                 CommonUtil.copyPropertiesIgnoreNull(handoverCarRemarkDTO, renterHandoverCarRemarkEntity);
                 renterHandoverCarService.updateRenterHandoverRemarkByPrimaryKey(renterHandoverCarRemarkEntity);
@@ -242,6 +245,7 @@ public class HandoverCarService {
 
     /**
      * 更新车主交接车和备注信息
+     *
      * @param handoverCarInfoDTO
      * @param handoverCarRemarkDTO
      */
@@ -254,19 +258,21 @@ public class HandoverCarService {
             type = " 2 or type = 4 ";
         }
         OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), type);
-        OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(),type);
+        OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), type);
         if (Objects.nonNull(ownerHandoverCarInfoEntity)) {
             CommonUtil.copyPropertiesIgnoreNull(handoverCarInfoDTO, ownerHandoverCarInfoEntity);
             ownerHandoverCarService.updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarInfoEntity);
         } else {
             OwnerHandoverCarInfoEntity ownerHandoverCarInfo = new OwnerHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarInfoDTO, ownerHandoverCarInfo);
+            ownerHandoverCarInfo.setIsDelete(0);
             ownerHandoverCarService.insertOwnerHandoverCarInfo(ownerHandoverCarInfo);
         }
         if (Objects.nonNull(handoverCarRemarkDTO)) {
             if (null == ownerHandoverCarRemarkEntity) {
                 OwnerHandoverCarRemarkEntity ownerRemarkEntity = new OwnerHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, ownerRemarkEntity);
+                ownerRemarkEntity.setIsDelete(0);
                 ownerHandoverCarService.insertOwnerHandoverCarRemark(ownerRemarkEntity);
             } else {
                 CommonUtil.copyPropertiesIgnoreNull(handoverCarRemarkDTO, ownerHandoverCarRemarkEntity);
@@ -274,5 +280,4 @@ public class HandoverCarService {
             }
         }
     }
-
 }
