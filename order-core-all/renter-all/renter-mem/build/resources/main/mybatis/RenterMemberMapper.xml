@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.rentermem.mapper.RenterMemberMapper">
+
+    <resultMap type="com.atzuche.order.rentermem.entity.RenterMemberEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="phone" column="phone"/>
+        <result property="headerUrl" column="header_url"/>
+        <result property="realName" column="real_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="certificationTime" column="certification_time"/>
+        <result property="orderSuccessCount" column="order_success_count"/>
+        <result property="rentFlag" column="rent_flag"/>
+        <result property="firstName" column="first_name"/>
+        <result property="gender" column="gender"/>
+        <result property="idNo" column="id_no"/>
+        <result property="idCardAuth" column="id_card_auth"/>
+        <result property="driLicAuth" column="dri_lic_auth"/>
+        <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
+        <result property="renterCheck" column="renter_check"/>
+        <result property="outerSource" column="outer_source"/>
+        <result property="regTime" column="reg_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+	`id`,
+	`order_no`,
+	`renter_order_no`,
+	`mem_no`,
+	`phone`,
+	`header_url`,
+	`real_name`,
+	`nick_name`,
+	`certification_time`,
+	`order_success_count`,
+	`rent_flag`,
+	`first_name`,
+	`gender`,
+	`id_no`,
+	`id_card_auth`,
+	`dri_lic_auth`,
+	`dri_vice_lic_auth`,
+	`renter_check`,
+	`outer_source`,
+	`reg_time`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
+
+	</sql>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from renter_member where id = #{value}
+    </select>
+
+    <insert id="insert" parameterType="com.atzuche.order.rentermem.entity.RenterMemberEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_member
+        (
+        `order_no`,
+        `renter_order_no`,
+        `mem_no`,
+        `phone`,
+        `header_url`,
+        `real_name`,
+        `nick_name`,
+        `certification_time`,
+        `order_success_count`,
+        `rent_flag`,
+        `first_name`,
+        `gender`,
+        `id_no`,
+        `id_card_auth`,
+        `dri_lic_auth`,
+        `dri_vice_lic_auth`,
+        `renter_check`,
+        `outer_source`,
+        `reg_time`,
+        `create_op`,
+        `update_op`
+        )
+        values
+        (
+        #{orderNo},
+        #{renterOrderNo},
+        #{memNo},
+        #{phone},
+        #{headerUrl},
+        #{realName},
+        #{nickName},
+        #{certificationTime},
+        #{orderSuccessCount},
+        #{rentFlag},
+        #{firstName},
+        #{gender},
+        #{idNo},
+        #{idCardAuth},
+        #{driLicAuth},
+        #{driViceLicAuth},
+        #{renterCheck},
+        #{outerSource},
+        #{regTime},
+        #{createOp},
+        #{updateOp}
+        )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.atzuche.order.rentermem.entity.RenterMemberEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into renter_member
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="phone != null">`phone`, </if>
+            <if test="headerUrl != null">`header_url`, </if>
+            <if test="realName != null">`real_name`, </if>
+            <if test="nickName != null">`nick_name`, </if>
+            <if test="certificationTime != null">`certification_time`, </if>
+            <if test="orderSuccessCount != null">`order_success_count`, </if>
+            <if test="rentFlag != null">`rent_flag`, </if>
+            <if test="firstName != null">`first_name`, </if>
+            <if test="gender != null">`gender`, </if>
+            <if test="idNo != null">`id_no`, </if>
+            <if test="idCardAuth != null">`id_card_auth`, </if>
+            <if test="driLicAuth != null">`dri_lic_auth`, </if>
+            <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
+            <if test="renterCheck != null">`renter_check`, </if>
+            <if test="outerSource != null">`outer_source`,</if>
+            <if test="regTime != null">`reg_time`,</if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="phone != null">#{phone},  </if>
+            <if test="headerUrl != null">#{headerUrl},  </if>
+            <if test="realName != null">#{realName},  </if>
+            <if test="nickName != null">#{nickName},  </if>
+            <if test="certificationTime != null">#{certificationTime},  </if>
+            <if test="orderSuccessCount != null">#{orderSuccessCount},  </if>
+            <if test="rentFlag != null">#{rentFlag},  </if>
+            <if test="firstName != null">#{firstName},  </if>
+            <if test="gender != null">#{gender},  </if>
+            <if test="idNo != null">#{idNo}, </if>
+            <if test="idCardAuth != null">#{idCardAuth},  </if>
+            <if test="driLicAuth != null">#{driLicAuth},  </if>
+            <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
+            <if test="renterCheck != null">#{renterCheck}, </if>
+            <if test="outerSource != null">#{outerSource},</if>
+            <if test="regTime != null">#{regTime},</if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentermem.entity.RenterMemberEntity">
+        update renter_member
+        <set>
+            <if test="orderNo != null">`order_no` = #{orderNo}, </if>
+            <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
+            <if test="memNo != null">`mem_no` = #{memNo}, </if>
+            <if test="phone != null">`phone` = #{phone}, </if>
+            <if test="headerUrl != null">`header_url` = #{headerUrl}, </if>
+            <if test="realName != null">`real_name` = #{realName}, </if>
+            <if test="nickName != null">`nick_name` = #{nickName}, </if>
+            <if test="certificationTime != null">`certification_time` = #{certificationTime}, </if>
+            <if test="orderSuccessCount != null">`order_success_count` = #{orderSuccessCount}, </if>
+            <if test="rentFlag != null">`rent_flag` = #{rentFlag}, </if>
+            <if test="firstName != null">`first_name` = #{firstName}, </if>
+            <if test="gender != null">`gender` = #{gender}, </if>
+            <if test="idNo != null">`id_no` = #{idNo}, </if>
+            <if test="idCardAuth != null">`id_card_auth` = #{idCardAuth}, </if>
+            <if test="driLicAuth != null">`dri_lic_auth` = #{driLicAuth}, </if>
+            <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
+            <if test="renterCheck != null">`renter_check` = #{renterCheck}, </if>
+            <if test="outerSource != null">`outer_source` = #{outerSource}, </if>
+            <if test="regTime != null">`reg_time` = #{regTime}, </if>
+            <if test="createOp != null">`create_op` = #{createOp}, </if>
+            <if test="updateOp != null">`update_op` = #{updateOp}, </if>
+            <if test="isDelete != null">`is_delete` = #{isDelete}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentermem.entity.RenterMemberEntity">
+        update renter_member
+        <set>
+            `order_no` = #{orderNo},
+            `renter_order_no` = #{renterOrderNo},
+            `mem_no` = #{memNo},
+            `phone` = #{phone},
+            `header_url` = #{headerUrl},
+            `real_name` = #{realName},
+            `nick_name` = #{nickName},
+            `certification_time` = #{certificationTime},
+            `order_success_count` = #{orderSuccessCount},
+            `rent_flag` = #{rentFlag},
+            `first_name` = #{firstName},
+            `gender` = #{gender},
+            `id_no` = #{idNo},
+            `id_card_auth` = #{idCardAuth},
+            `dri_lic_auth` = #{driLicAuth},
+            `dri_vice_lic_auth` = #{driViceLicAuth},
+            `renter_check` = #{renterCheck},
+            `outer_source` = #{outerSource},
+            `reg_time` = #{regTime},
+            `create_op` = #{createOp},
+            `update_op` = #{updateOp}
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectByRenterOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from renter_member
+        where renter_order_no=#{renterOrderNo} and is_delete = 0 limit 1
+    </select>
+
+    <select id="getRenterNoByOrderNo" resultType="java.lang.String" parameterType="java.lang.String">
+        select
+            mem_no
+        from renter_member
+        where order_no = #{orderNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
+    <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
+        SELECT
+            order_no,
+            mem_no,
+            phone
+        FROM
+        renter_member
+        <where>
+            order_no in
+            <foreach collection="orderNos" open="(" separator="," close=")" item="orderNo">
+                #{orderNo}
+            </foreach>
+        </where>
+    </select>
+
+    <select id="queryRenterInfoByOrderNoAndRenterNo" resultMap="BaseResultMap">
+        select mem_no,phone,real_name from renter_member where order_no = #{orderNo} and mem_no = #{renterNo} and is_delete = 0 order by id desc limit 1
+    </select>
+
+</mapper>

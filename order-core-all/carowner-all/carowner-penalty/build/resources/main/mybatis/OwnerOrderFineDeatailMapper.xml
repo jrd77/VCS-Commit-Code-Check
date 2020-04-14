@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.ownercost.mapper.OwnerOrderFineDeatailMapper">
+
+    <resultMap type="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="fineAmount" column="fine_amount"/>
+        <result property="fineSubsidyCode" column="fine_subsidy_code"/>
+        <result property="fineSubsidyDesc" column="fine_subsidy_desc"/>
+        <result property="fineSubsidySourceCode" column="fine_subsidy_source_code"/>
+        <result property="fineSubsidySourceDesc" column="fine_subsidy_source_desc"/>
+        <result property="fineType" column="fine_type"/>
+        <result property="fineTypeDesc" column="fine_type_desc"/>
+        <result property="costCode" column="cost_code"/>
+        <result property="costName" column="cost_name"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="operator" column="operator"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+        `id`,
+	`order_no`,
+	`owner_order_no`,
+	`mem_no`,
+	`fine_amount`,
+	`fine_subsidy_code`,
+	`fine_subsidy_desc`,
+	`fine_subsidy_source_code`,
+	`fine_subsidy_source_desc`,
+	`fine_type`,
+	`fine_type_desc`,
+	`cost_code`,
+	`cost_name`,
+	`operator_id`,
+	`operator`,
+	`dept_id`,
+	`dept_name`,
+	`remark`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from owner_order_fine_deatail where id = #{value}
+	</select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where order_no = #{orderNo}
+    </select>
+    
+    
+    <select id="selectByOrderNoOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where order_no = #{orderNo} and owner_order_no = #{ownerOrderNo} and is_delete = 0 
+    </select>
+
+	<insert id="insert" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into owner_order_fine_deatail (
+				`order_no`,		
+				`owner_order_no`,		
+				`mem_no`,		
+				`fine_amount`,		
+				`fine_subsidy_code`,		
+				`fine_subsidy_desc`,		
+				`fine_subsidy_source_code`,		
+				`fine_subsidy_source_desc`,
+                `cost_code`,
+                `cost_name`,
+				`fine_type`,		
+				`fine_type_desc`,		
+				`operator_id`,		
+				`operator`,		
+				`dept_id`,		
+				`dept_name`,		
+				`remark`
+        )
+		values
+		(
+				#{orderNo}, 		
+				#{ownerOrderNo}, 		
+				#{memNo}, 		
+				#{fineAmount}, 		
+				#{fineSubsidyCode}, 		
+				#{fineSubsidyDesc}, 		
+				#{fineSubsidySourceCode}, 		
+				#{fineSubsidySourceDesc},
+                #{costCode},
+                #{costName},
+				#{fineType}, 		
+				#{fineTypeDesc}, 		
+				#{operatorId}, 		
+				#{operator}, 		
+				#{deptId}, 		
+				#{deptName}, 		
+				#{remark}
+        )
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_order_fine_deatail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="ownerOrderNo != null">`owner_order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="fineAmount != null">`fine_amount`, </if>
+            <if test="fineSubsidyCode != null">`fine_subsidy_code`, </if>
+            <if test="fineSubsidyDesc != null">`fine_subsidy_desc`, </if>
+            <if test="fineSubsidySourceCode != null">`fine_subsidy_source_code`, </if>
+            <if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc`, </if>
+            <if test="fineType != null">`fine_type`, </if>
+            <if test="fineTypeDesc != null">`fine_type_desc`, </if>
+            <if test="costCode != null">`cost_code`, </if>
+            <if test="costName != null">`cost_name`, </if>
+            <if test="operatorId != null">`operator_id`, </if>
+            <if test="operator != null">`operator`, </if>
+            <if test="deptId != null">`dept_id`, </if>
+            <if test="deptName != null">`dept_name`, </if>
+            <if test="remark != null">`remark`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="fineAmount != null">#{fineAmount},  </if>
+            <if test="fineSubsidyCode != null">#{fineSubsidyCode},  </if>
+            <if test="fineSubsidyDesc != null">#{fineSubsidyDesc},  </if>
+            <if test="fineSubsidySourceCode != null">#{fineSubsidySourceCode},  </if>
+            <if test="fineSubsidySourceDesc != null">#{fineSubsidySourceDesc},  </if>
+            <if test="fineType != null">#{fineType},  </if>
+            <if test="fineTypeDesc != null">#{fineTypeDesc},  </if>
+            <if test="costCode != null">#{costCode},  </if>
+            <if test="costName != null">#{costName},  </if>
+            <if test="operatorId != null">#{operatorId},  </if>
+            <if test="operator != null">#{operator},  </if>
+            <if test="deptId != null">#{deptId},  </if>
+            <if test="deptName != null">#{deptName},  </if>
+            <if test="remark != null">#{remark},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+        </trim>
+	</insert>
+	
+	 
+	<update id="updateByCashNoAndOwnerOrderNo" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
+		update owner_order_fine_deatail 
+		    <set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
+				<if test="fineAmount != null">`fine_amount` = #{fineAmount}, </if>
+				<if test="fineSubsidyCode != null">`fine_subsidy_code` = #{fineSubsidyCode}, </if>
+				<if test="fineSubsidyDesc != null">`fine_subsidy_desc` = #{fineSubsidyDesc}, </if>
+				<if test="fineSubsidySourceCode != null">`fine_subsidy_source_code` = #{fineSubsidySourceCode}, </if>
+				<if test="fineSubsidySourceDesc != null">`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, </if>
+				<if test="fineType != null">`fine_type` = #{fineType}, </if>
+				<if test="fineTypeDesc != null">`fine_type_desc` = #{fineTypeDesc}, </if>
+                <if test="costCode != null">`cost_code` = #{costCode}, </if>
+                <if test="costName != null">`cost_name` = #{costName}, </if>
+				<if test="operatorId != null">`operator_id` = #{operatorId}, </if>
+				<if test="operator != null">`operator` = #{operator}, </if>
+				<if test="deptId != null">`dept_id` = #{deptId}, </if>
+				<if test="deptName != null">`dept_name` = #{deptName}, </if>
+				<if test="remark != null">`remark` = #{remark}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where owner_order_no = #{ownerOrderNo} and fine_type = #{fineType}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity">
+		update owner_order_fine_deatail 
+		    <set>
+				`order_no` = #{orderNo}, 		
+				`owner_order_no` = #{ownerOrderNo}, 		
+				`mem_no` = #{memNo}, 		
+				`fine_amount` = #{fineAmount}, 		
+				`fine_subsidy_code` = #{fineSubsidyCode}, 		
+				`fine_subsidy_desc` = #{fineSubsidyDesc}, 		
+				`fine_subsidy_source_code` = #{fineSubsidySourceCode}, 		
+				`fine_subsidy_source_desc` = #{fineSubsidySourceDesc}, 		
+				`fine_type` = #{fineType}, 		
+				`fine_type_desc` = #{fineTypeDesc},
+                `cost_code` = #{costCode},
+                `cost_name` = #{costName},
+                `operator_id` = #{operatorId},
+				`operator` = #{operator}, 		
+				`dept_id` = #{deptId}, 		
+				`dept_name` = #{deptName}, 		
+				`remark` = #{remark}
+		    </set>
+		where id = #{id}
+	</update>
+    <select id="getOwnerOrderFineDeatailByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where owner_order_no = #{ownerOrderNo} and is_delete = 0
+    </select>
+    <select id="getByCashNoAndOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order_fine_deatail where owner_order_no = #{ownerOrderNo} and  fine_type = #{fineType} and is_delete = 0
+    </select>
+    
+</mapper>

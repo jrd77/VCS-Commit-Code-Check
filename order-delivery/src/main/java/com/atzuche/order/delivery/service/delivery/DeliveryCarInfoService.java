@@ -134,8 +134,8 @@ public class DeliveryCarInfoService {
         //log.info(String.valueOf(getReturnResponseVO.getGetFee()));
 
         if(Objects.nonNull(getReturnCostDTO)) {
-            deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetFee()));
-            deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnFee()));
+            deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getGetShouldFee()));
+            deliveryCarVO.getReturnHandoverCarDTO().setReturnCarCrash(String.valueOf(getReturnCostDTO.getGetReturnResponseVO().getReturnShouldFee()));
         }
         //取车时的所在城市
         RenterOrderDeliveryEntity renterOrderDelivery = renterOrderDeliveryEntityList.stream().filter(r->r.getType() == 1).findFirst().get();

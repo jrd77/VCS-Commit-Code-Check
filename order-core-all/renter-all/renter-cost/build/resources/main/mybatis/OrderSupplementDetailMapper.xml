@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.rentercost.mapper.OrderSupplementDetailMapper">
+
+    <resultMap type="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="cashType" column="cash_type"/>
+        <result property="cashNo" column="cash_no"/>
+        <result property="title" column="title"/>
+        <result property="amt" column="amt"/>
+        <result property="requestPayCode" column="request_pay_code"/>
+        <result property="opStatus" column="op_status"/>
+        <result property="supplementType" column="supplement_type"/>
+        <result property="opType" column="op_type"/>
+        <result property="remark" column="remark"/>
+        <result property="payFlag" column="pay_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="payTime" column="pay_time"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`mem_no`, 
+	`cash_type`,	
+	`cash_no`, 	
+	`title`, 	
+	`amt`, 	
+	`request_pay_code`,
+	`op_status`, 	
+	`supplement_type`, 	
+	`op_type`, 	
+	`remark`, 	
+	`pay_flag`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`is_delete`,
+	`pay_time`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_supplement_detail where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_supplement_detail
+		(
+				`order_no`,		
+				`mem_no`,		
+				`cash_no`,		
+				`title`,		
+				`amt`,		
+				`op_status`,		
+				`supplement_type`,		
+				`op_type`,		
+				`remark`,		
+				`pay_flag`,		
+				`create_time`,		
+				`create_op`,		
+				`update_time`,		
+				`update_op`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{memNo}, 		
+				#{cashNo}, 		
+				#{title}, 		
+				#{amt}, 		
+				#{opStatus}, 		
+				#{supplementType}, 		
+				#{opType}, 		
+				#{remark}, 		
+				#{payFlag}, 		
+				#{createTime}, 		
+				#{createOp}, 		
+				#{updateTime}, 		
+				#{updateOp}, 		
+				#{isDelete}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into order_supplement_detail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="memNo != null">`mem_no`, </if>
+				<if test="cashType != null">`cash_type`, </if>
+				<if test="cashNo != null">`cash_no`, </if>
+				<if test="title != null">`title`, </if>
+				<if test="amt != null">`amt`, </if>
+				<if test="requestPayCode != null">`request_pay_code`, </if>
+				<if test="opStatus != null">`op_status`, </if>
+				<if test="supplementType != null">`supplement_type`, </if>
+				<if test="opType != null">`op_type`, </if>
+				<if test="remark != null">`remark`, </if>
+				<if test="payFlag != null">`pay_flag`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="createOp != null">`create_op`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="updateOp != null">`update_op`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="memNo != null">#{memNo},  </if>
+				<if test="cashType != null">#{cashType},  </if>
+				<if test="cashNo != null">#{cashNo},  </if>
+				<if test="title != null">#{title},  </if>
+				<if test="amt != null">#{amt},  </if>
+				<if test="requestPayCode != null">#{requestPayCode},  </if>
+				<if test="opStatus != null">#{opStatus},  </if>
+				<if test="supplementType != null">#{supplementType},  </if>
+				<if test="opType != null">#{opType},  </if>
+				<if test="remark != null">#{remark},  </if>
+				<if test="payFlag != null">#{payFlag},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="createOp != null">#{createOp},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="updateOp != null">#{updateOp},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity">
+		update order_supplement_detail 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
+				<if test="cashNo != null">`cash_no` = #{cashNo}, </if>
+				<if test="title != null">`title` = #{title}, </if>
+				<if test="amt != null">`amt` = #{amt}, </if>
+				<if test="opStatus != null">`op_status` = #{opStatus}, </if>
+				<if test="supplementType != null">`supplement_type` = #{supplementType}, </if>
+				<if test="opType != null">`op_type` = #{opType}, </if>
+				<if test="remark != null">`remark` = #{remark}, </if>
+				<if test="payFlag != null">`pay_flag` = #{payFlag}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity">
+		update order_supplement_detail 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`mem_no` = #{memNo}, 		
+				`cash_no` = #{cashNo}, 		
+				`title` = #{title}, 		
+				`amt` = #{amt}, 		
+				`op_status` = #{opStatus}, 		
+				`supplement_type` = #{supplementType}, 		
+				`op_type` = #{opType}, 		
+				`remark` = #{remark}, 		
+				`pay_flag` = #{payFlag}, 		
+				`create_time` = #{createTime}, 		
+				`create_op` = #{createOp}, 		
+				`update_time` = #{updateTime}, 		
+				`update_op` = #{updateOp}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updatePayFlagById">
+		update order_supplement_detail 
+		set `pay_flag` = #{payFlag}
+		<if test="payTime != null">, pay_time = #{payTime}</if>
+		where id = #{id}
+	</update>
+	
+	<select id="listOrderSupplementDetailByOrderNoAndMemNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_supplement_detail where order_no = #{orderNo} 
+		and mem_no = #{memNo} 
+		and op_status = 1 
+		and pay_flag in (1,2,4,5)
+		and is_delete = 0
+	</select>
+	
+	<select id="listOrderSupplementDetailByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_supplement_detail where order_no = #{orderNo} 
+		and is_delete = 0
+	</select>
+  	
+  	<update id="updateDeleteById">
+		update order_supplement_detail 
+		set `is_delete` = 1
+		where id = #{id}
+	</update>
+</mapper>
