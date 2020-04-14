@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.config.server.mapper.master.IllegalDepositConfigMapper">
+    <resultMap id="base" type="com.atzuche.config.common.entity.IllegalDepositConfigEntity">
+        <id property="id" column="id"/>
+        <result column="city_code" property="cityCode"></result>
+        <result column="lease_min" property="leaseMin"></result>
+        <result column="lease_max" property="leaseMax"></result>
+        <result column="deposit_amt" property="depositAmt"></result>
+    </resultMap>
+    <select id="findAll" resultMap="base">
+        SELECT
+        id,
+        city_code,
+        lease_max,
+        lease_min,
+        deposit_amt
+        FROM illegal_deposit_config
+    </select>
+</mapper>

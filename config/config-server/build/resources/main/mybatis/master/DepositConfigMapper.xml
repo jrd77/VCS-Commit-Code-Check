@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.config.server.mapper.master.DepositConfigMapper">
+    <resultMap id="base" type="com.atzuche.config.common.entity.DepositConfigEntity">
+        <id property="id" column="id"/>
+         <result column="deposit_type" property="depositType"></result>
+         <result column="purchase_price_begin" property="purchasePriceBegin"></result>
+         <result column="purchase_price_end" property="purchasePriceEnd"></result>
+         <result column="deposit_value" property="depositValue"></result>
+         <result column="city_code" property="cityCode"></result>
+         <result column="multiple" property="multiple"></result>
+    </resultMap>
+
+
+    <select id="findAll" resultMap="base">
+        SELECT
+        id,
+        deposit_type,
+        purchase_price_begin,
+        purchase_price_end,
+        deposit_value,
+        city_code,multiple
+        FROM deposit_config
+    </select>
+</mapper>

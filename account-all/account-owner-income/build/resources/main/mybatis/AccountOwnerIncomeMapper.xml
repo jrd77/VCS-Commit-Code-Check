@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper">
+
+    <resultMap type="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="incomeAmt" column="income_amt"/>
+        <result property="version" column="version"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+	<sql id="Base_Column_List">
+	`id`, 	
+	`mem_no`, 	
+	`income_amt`, 	
+	`version`, 	
+	`create_time`	
+
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from account_owner_income where id = #{value}
+	</select>
+
+	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into account_owner_income
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="incomeAmt != null">`income_amt`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="createTime != null">`create_time` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="incomeAmt != null">#{incomeAmt},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="createTime != null">#{createTime} </if>
+        </trim>
+	</insert>
+
+
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity">
+		update account_owner_income 
+		<set>
+				`mem_no` = #{memNo}, 		
+				`income_amt` = #{incomeAmt},
+                 version = version +1
+		</set>
+		where id = #{id} and version = #{version}
+    </update>
+
+    <select id="selectByMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income where mem_no = #{memNo} limit 1
+    </select>
+  	
+</mapper>

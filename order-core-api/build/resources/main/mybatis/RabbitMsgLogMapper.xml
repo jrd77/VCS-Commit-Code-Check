@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.coreapi.mapper.RabbitMsgLogMapper">
+
+    <resultMap type="com.atzuche.order.coreapi.entity.RabbitMsgLogEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="mqKey" column="mq_key"/>
+        <result property="mqExchange" column="mq_exchange"/>
+        <result property="mqQueue" column="mq_queue"/>
+        <result property="isConsume" column="is_consume"/>
+        <result property="businessType" column="business_type"/>
+        <result property="uniqueNo" column="unique_no"/>
+        <result property="mqMsg" column="mq_msg"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`mq_key`, 	
+	`mq_exchange`, 	
+	`mq_queue`, 	
+	`is_consume`, 	
+	`business_type`, 	
+	`unique_no`, 	
+	`mq_msg`, 	
+	`create_time`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from rabbit_msg_log where id = #{value}
+	</select>
+
+	<insert id="insert" parameterType="com.atzuche.order.coreapi.entity.RabbitMsgLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into rabbit_msg_log
+		(
+				`mq_key`,		
+				`mq_exchange`,		
+				`mq_queue`,		
+				`is_consume`,		
+				`business_type`,		
+				`unique_no`,		
+				`mq_msg`,		
+				`create_time`		
+			)
+		values
+		(
+				#{mqKey}, 		
+				#{mqExchange}, 		
+				#{mqQueue}, 		
+				#{isConsume}, 		
+				#{businessType}, 		
+				#{uniqueNo}, 		
+				#{mqMsg}, 		
+				#{createTime}		
+			)
+	</insert>
+
+    <update id="updateConsume">
+    update rabbit_msg_log
+    set
+      is_consume = 1
+    where unique_no = #{uniqueNo}
+  </update>
+    <select id="selectByUniqueNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from rabbit_msg_log where unique_no = #{uniqueNo} and business_type = #{businessType} limit 1
+    </select>
+
+</mapper>

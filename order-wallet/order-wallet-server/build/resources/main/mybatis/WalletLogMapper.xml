@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.wallet.server.mapper.WalletLogMapper">
+
+    <resultMap id="base" type="com.atzuche.order.wallet.server.entity.WalletLogEntity">
+        <id column="id" property="id"/>
+        <result column="mem_no"  property="memNo"/>
+        <result column="amt" property="amt"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="flag" property="flag"/>
+        <result column="flag_txt" property="flagTxt"/>
+
+    </resultMap>
+
+    <insert id="insertWalletLog" parameterType="com.atzuche.order.wallet.server.entity.WalletLogEntity">
+          insert into wallet_log(mem_no,order_no,amt,flag,flag_txt) values(
+             #{memNo},
+             #{orderNo},
+             #{amt},
+             #{flag},
+             #{flagTxt}
+          )
+    </insert>
+    <select id="findByMemNoAndOrderNo" resultMap="base">
+        select id,mem_no,order_no,amt,flag,flag_txt from wallet_log
+        where mem_no=#{memNo} and order_no=#{orderNo}
+    </select>
+</mapper>

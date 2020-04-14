@@ -105,7 +105,7 @@ public class DeliveryCarService {
                 .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())));
         if (result.isDone()) {
             //开始新增数据并发送仁云
-            insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+            //insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
             deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
         }
