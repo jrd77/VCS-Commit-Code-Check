@@ -16,8 +16,7 @@ public class RenterOrderWzDetailResVO {
     @AutoDocProperty(value = "id")
     private Long id;
     @AutoDocProperty(value = "违章时间")
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
-    private Date illegalTime;
+    private String illegalTime;
     @AutoDocProperty(value = "违章地点")
     private String illegalAddr;
     @AutoDocProperty(value = "违章原因")
