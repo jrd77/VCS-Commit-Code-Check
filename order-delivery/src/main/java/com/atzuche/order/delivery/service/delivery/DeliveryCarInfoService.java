@@ -132,9 +132,7 @@ public class DeliveryCarInfoService {
             createGetHandoverCar(getReturnCarCostReqDto,deliveryCarVO, renterOrderDeliveryEntity,carType,renterGoodsDetailDTO);
         }
         GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
-        //GetReturnResponseVO getReturnResponseVO = deliveryCarInfoPriceService.getDeliveryCarFee(renterOrderDeliveryEntityList.get(0).getOrderNo());
-        //log.info(String.valueOf(getReturnResponseVO.getGetFee()));
-
+        GetReturnResponseVO getReturnResponseVO = getReturnCostDTO.getGetReturnResponseVO();
         if(Objects.nonNull(getReturnCostDTO)) {
             double getCarCost = getReturnResponseVO.getGetFee()+Double.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetTimePeriodUpPrice()) == true ? getReturnResponseVO.getGetTimePeriodUpPrice() : "0")+Double.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetCicrleUpPrice()) == true ? getReturnResponseVO.getGetCicrleUpPrice() : "0")+
                     Double.valueOf(StringUtils.isNotEmpty(getReturnResponseVO.getGetDistanceUpPrice()) == true ? getReturnResponseVO.getGetDistanceUpPrice() : "0");

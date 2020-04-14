@@ -128,8 +128,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
-
         }
         //车主取还车
         if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
@@ -159,7 +157,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
         }
     }
 
