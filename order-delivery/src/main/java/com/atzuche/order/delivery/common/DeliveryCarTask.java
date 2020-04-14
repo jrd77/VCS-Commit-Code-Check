@@ -84,18 +84,7 @@ public class DeliveryCarTask {
      */
     @Transactional(rollbackFor = Exception.class)
     public Future<Boolean> cancelOrderDelivery(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
-        RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType);
-
-        if (null == orderDeliveryEntity) {
-            log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
-            return new AsyncResult(false);
-        }
-        orderDeliveryEntity.setStatus(3);
-        orderDeliveryEntity.setIsNotifyRenyun(0);
-        orderDeliveryEntity.setRenterOrderNo(renterOrderNo);
-        renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
         cancelOtherDeliveryTypeInfo(renterOrderNo,serviceType,cancelOrderDeliveryVO);
-        renyunDeliveryCarService.addHandoverInfo(orderDeliveryEntity);
         return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 

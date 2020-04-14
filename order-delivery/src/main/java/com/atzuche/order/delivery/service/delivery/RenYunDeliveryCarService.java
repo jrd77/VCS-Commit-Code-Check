@@ -113,15 +113,4 @@ public class RenYunDeliveryCarService {
         return sb.toString();
     }
 
-
-    /**
-     * 新增更新handover
-     * @param orderDeliveryEntity
-     */
-    public void addHandoverInfo(RenterOrderDeliveryEntity orderDeliveryEntity) {
-        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-        deliveryCarService.addHandoverCarInfo(orderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
-    }
-
-
 }

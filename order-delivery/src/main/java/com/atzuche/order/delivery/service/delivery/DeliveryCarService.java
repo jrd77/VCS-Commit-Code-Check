@@ -24,6 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -166,11 +167,14 @@ public class DeliveryCarService {
         int serviceType;
         if (cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals("all")) {
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO);
             deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO);
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
             deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
         } else {
             serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
            return deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
         }
         return null;
@@ -412,6 +416,24 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setOwnerReturnAddr(orderDeliveryFlowEntity.getOwnerReturnAddr());
         renYunFlowOrderDTO.setOwnerGetAddr(orderDeliveryFlowEntity.getOwnerGetAddr());
         return renYunFlowOrderDTO;
+    }
+
+    /**
+     * 新增更新handover
+     */
+    public void addHandoverInfo(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
+        RenterOrderDeliveryEntity orderDelivery = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType);
+
+        if (null == orderDelivery) {
+            log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
+            return;
+        }
+        orderDelivery.setStatus(3);
+        orderDelivery.setIsNotifyRenyun(0);
+        orderDelivery.setRenterOrderNo(renterOrderNo);
+        renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDelivery);
+        addHandoverCarInfo(orderDelivery, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        addHandoverCarInfo(orderDelivery, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
     }
 
 }
