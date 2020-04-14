@@ -86,8 +86,8 @@ public class AccountRenterCostSettleService{
         int settleDetail = accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(accountRenterCostSettleDetailEntity);
         log.info("结算明细记录accountRenterCostSettleDetailEntity={}", JSON.toJSONString(accountRenterCostSettleDetailEntity));*/
         //3 记录退款费用记录
-        accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySource());
-        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySource()));
+        accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySourceCode());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySourceCode()));
         int renterCostDetail = accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
 
         return renterCostDetail;
