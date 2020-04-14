@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.renterwz.mapper.RenterOrderWzRecordMapper">
+	<sql id="select_column">
+		id,car_plate_num,result_json,create_time
+	</sql>
+
+	<resultMap id = "selectColumnMap" type="com.atzuche.order.renterwz.entity.RenterOrderWzRecordEntity">
+		<result property="id" column="id"/>
+		<result property="carPlateNum" column="car_plate_num"/>
+		<result property="resultJson" column="result_json"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<insert id="saveRenterOrderWzRecord" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzRecordEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into renter_order_wz_record(
+			<if test="carPlateNum != null">
+				car_plate_num,
+			</if>
+			<if test="resultJson != null">
+				result_json,
+			</if>
+			create_time
+		) values (
+			<if test="carPlateNum != null">
+				#{carPlateNum},
+			</if>
+			<if test="resultJson != null">
+				#{resultJson},
+			</if>
+			NOW())
+	</insert>
+
+	<select id="queryRenterOrderWzRecordById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzRecordEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_record
+		where id = #{id} and is_delete = 0
+	</select>
+
+	<select id="queryList" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzRecordEntity">
+		select <include refid="select_column" />
+		from renter_order_wz_record
+		where is_delete = 0
+	</select>
+
+	 <update id="updateRenterOrderWzRecord" parameterType="com.atzuche.order.renterwz.entity.RenterOrderWzRecordEntity">
+		update renter_order_wz_record set
+		<if test="carPlateNum != null">
+			car_plate_num = #{carPlateNum},
+		</if>
+		<if test="resultJson != null">
+			result_json = #{resultJson},
+		</if>
+		<if test="createTime != null">
+			create_time = #{createTime},
+		</if>
+		update_time = NOW()
+		where id = #{id} and is_delete = 0
+	</update>
+
+	<delete id="deleteNotToday">
+        DELETE FROM renter_order_wz_record
+        WHERE date_format(create_time, '%Y-%m-%d') != date_format(now(), '%Y-%m-%d')
+    </delete>
+</mapper>

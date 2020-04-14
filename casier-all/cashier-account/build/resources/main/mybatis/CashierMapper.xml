@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.cashieraccount.mapper.CashierMapper">
+
+    <resultMap type="com.atzuche.order.cashieraccount.entity.CashierEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="atappId" column="atapp_id"/>
+        <result property="os" column="os"/>
+        <result property="payEvn" column="pay_evn"/>
+        <result property="payKind" column="pay_kind"/>
+        <result property="paySource" column="pay_source"/>
+        <result property="payType" column="pay_type"/>
+        <result property="payTransNo" column="pay_trans_no"/>
+        <result property="payTime" column="pay_time"/>
+        <result property="isAgainPay" column="is_again_pay"/>
+        <result property="paySn" column="pay_sn"/>
+        <result property="payTitle" column="pay_title"/>
+        <result property="payAmt" column="pay_amt"/>
+        <result property="internalNo" column="internal_no"/>
+        <result property="transStatus" column="trans_status"/>
+        <result property="payMd5" column="pay_md5"/>
+        <result property="qn" column="qn"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createOp" column="create_op"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateOp" column="update_op"/>
+        <result property="version" column="version"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="payLine" column="pay_line"/>
+        <result property="payChannel" column="pay_channel"/>
+        <result property="virtualAccountNo" column="virtual_account_no"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`mem_no`, 	
+	`atapp_id`, 	
+	`os`, 	
+	`pay_evn`, 	
+	`pay_kind`, 	
+	`pay_source`, 	
+	`pay_type`, 	
+	`pay_trans_no`, 	
+	`pay_time`, 	
+	`is_again_pay`, 	
+	`pay_sn`, 	
+	`pay_title`, 	
+	`pay_amt`, 	
+	`internal_no`, 	
+	`trans_status`, 	
+	`pay_md5`, 	
+	`qn`, 	
+	`create_time`, 	
+	`create_op`, 	
+	`update_time`, 	
+	`update_op`, 	
+	`version`, 	
+	`is_delete`	,
+	pay_line,
+	pay_channel,
+	virtual_account_no
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from cashier where id = #{value}
+	</select>
+
+    <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into cashier
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">`order_no`, </if>
+            <if test="memNo != null">`mem_no`, </if>
+            <if test="atappId != null">`atapp_id`, </if>
+            <if test="os != null">`os`, </if>
+            <if test="payEvn != null">`pay_evn`, </if>
+            <if test="payKind != null">`pay_kind`, </if>
+            <if test="paySource != null">`pay_source`, </if>
+            <if test="payType != null">`pay_type`, </if>
+            <if test="payTransNo != null">`pay_trans_no`, </if>
+            <if test="payTime != null">`pay_time`, </if>
+            <if test="isAgainPay != null">`is_again_pay`, </if>
+            <if test="paySn != null">`pay_sn`, </if>
+            <if test="payTitle != null">`pay_title`, </if>
+            <if test="payAmt != null">`pay_amt`, </if>
+            <if test="internalNo != null">`internal_no`, </if>
+            <if test="transStatus != null">`trans_status`, </if>
+            <if test="payMd5 != null">`pay_md5`, </if>
+            <if test="qn != null">`qn`, </if>
+            <if test="createTime != null">`create_time`, </if>
+            <if test="createOp != null">`create_op`, </if>
+            <if test="updateTime != null">`update_time`, </if>
+            <if test="updateOp != null">`update_op`, </if>
+            <if test="version != null">`version`, </if>
+            <if test="isDelete != null">`is_delete` </if>
+            <if test="payLine != null">`pay_line` </if>
+            <if test="virtualAccountNo != null">`virtual_account_no` </if>
+            <if test="payChannel != null">`pay_channel` </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null">#{orderNo},  </if>
+            <if test="memNo != null">#{memNo},  </if>
+            <if test="atappId != null">#{atappId},  </if>
+            <if test="os != null">#{os},  </if>
+            <if test="payEvn != null">#{payEvn},  </if>
+            <if test="payKind != null">#{payKind},  </if>
+            <if test="paySource != null">#{paySource},  </if>
+            <if test="payType != null">#{payType},  </if>
+            <if test="payTransNo != null">#{payTransNo},  </if>
+            <if test="payTime != null">#{payTime},  </if>
+            <if test="isAgainPay != null">#{isAgainPay},  </if>
+            <if test="paySn != null">#{paySn},  </if>
+            <if test="payTitle != null">#{payTitle},  </if>
+            <if test="payAmt != null">#{payAmt},  </if>
+            <if test="internalNo != null">#{internalNo},  </if>
+            <if test="transStatus != null">#{transStatus},  </if>
+            <if test="payMd5 != null">#{payMd5},  </if>
+            <if test="qn != null">#{qn},  </if>
+            <if test="createTime != null">#{createTime},  </if>
+            <if test="createOp != null">#{createOp},  </if>
+            <if test="updateTime != null">#{updateTime},  </if>
+            <if test="updateOp != null">#{updateOp},  </if>
+            <if test="version != null">#{version},  </if>
+            <if test="isDelete != null">#{isDelete} </if>
+            <if test="payLine != null">#{payLine} </if>
+            <if test="virtualAccountNo != null">#{virtualAccountNo} </if>
+            <if test="payChannel != null">#{payChannel}</if>
+        </trim>
+    </insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierEntity">
+		update cashier 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
+				<if test="atappId != null">`atapp_id` = #{atappId}, </if>
+				<if test="os != null">`os` = #{os}, </if>
+				<if test="payEvn != null">`pay_evn` = #{payEvn}, </if>
+				<if test="payKind != null">`pay_kind` = #{payKind}, </if>
+				<if test="paySource != null">`pay_source` = #{paySource}, </if>
+				<if test="payType != null">`pay_type` = #{payType}, </if>
+				<if test="payTransNo != null">`pay_trans_no` = #{payTransNo}, </if>
+				<if test="payTime != null">`pay_time` = #{payTime}, </if>
+				<if test="isAgainPay != null">`is_again_pay` = #{isAgainPay}, </if>
+				<if test="paySn != null">`pay_sn` = #{paySn}, </if>
+				<if test="payTitle != null">`pay_title` = #{payTitle}, </if>
+				<if test="payAmt != null">`pay_amt` = #{payAmt}, </if>
+				<if test="internalNo != null">`internal_no` = #{internalNo}, </if>
+				<if test="transStatus != null">`trans_status` = #{transStatus}, </if>
+				<if test="payMd5 != null">`pay_md5` = #{payMd5}, </if>
+				<if test="qn != null">`qn` = #{qn}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="createOp != null">`create_op` = #{createOp}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
+				version = version + 1,
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id} and version = #{version}
+	</update>
+    <select id="getPayDeposit" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} order by id desc limit 1
+    </select>
+    <select id="getCashierRentCosts" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType}
+    </select>
+    
+    <select id="getCashierRentCostsByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and is_delete = 0
+    </select>
+    
+    <select id="getPayDetail" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_type = #{payType} and pay_source = #{paySource} order by id desc limit 1
+
+
+    </select>
+    <select id="getPayAmtByPayKind" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc limit 1
+
+    </select>
+    <select id="selectCashierEntity" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where pay_md5 = #{payMd5} limit 1
+
+    </select>
+    <select id="getPayAmtByPayKinds" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc
+
+    </select>
+
+
+</mapper>
