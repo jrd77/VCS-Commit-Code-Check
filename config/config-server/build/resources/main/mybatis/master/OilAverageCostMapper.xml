@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.config.server.mapper.master.OilAverageCostMapper">
+    <resultMap id="oilAverageCost" type="com.atzuche.config.common.entity.OilAverageCostEntity">
+        <id property="id" column="id"/>
+         <result column="engine_type" property="engineType"></result>
+         <result column="molecule" property="molecule"></result>
+         <result column="denominator" property="denominator"></result>
+         <result column="city_code" property="cityCode"></result>
+    </resultMap>
+    <select id="findAll" resultMap="oilAverageCost">
+        SELECT
+        id,
+        engine_type,
+        molecule,
+        denominator,
+        city_code
+        FROM oil_average_cost
+    </select>
+</mapper>
