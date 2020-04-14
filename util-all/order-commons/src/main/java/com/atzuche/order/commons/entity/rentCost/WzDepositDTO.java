@@ -29,17 +29,4 @@ public class WzDepositDTO {
     @AutoDocProperty("抵扣历史欠款")
     public Integer deductionRentHistoricalAmt = 0;
 
-    public Integer getTotal(WzDepositDTO wzDepositDTO){
-        return
-                 wzDepositDTO.wzDepositAmt +
-                wzDepositDTO.wzFineAmt +
-                wzDepositDTO.wzServiceCostAmt +
-                wzDepositDTO.wzDysFineAmt +
-                wzDepositDTO.wzStopCostAmt +
-                wzDepositDTO.wzOtherAmt +
-                wzDepositDTO.wzInsuranceAmt +
-                wzDepositDTO.expDeductionRentCarAmt +
-                wzDepositDTO.deductionRentHistoricalAmt;
-    }
-
 }
