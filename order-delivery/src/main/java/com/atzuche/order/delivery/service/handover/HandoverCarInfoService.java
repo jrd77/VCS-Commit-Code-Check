@@ -128,7 +128,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
 
         }
         //车主取还车
@@ -159,7 +158,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
         }
     }
 
