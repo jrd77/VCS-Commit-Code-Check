@@ -221,14 +221,14 @@ public class AdminDeliveryCarService {
             ownerTransAddressReqVO.setMemNo(memNo);
         }
         if(Objects.nonNull(deliveryCarVO.getGetHandoverCarDTO())) {
-            ownerTransAddressReqVO.setGetCarAddressText(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetAddr());
-            ownerTransAddressReqVO.setSrvGetLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLat());
-            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLng());
+            ownerTransAddressReqVO.setGetCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
+            ownerTransAddressReqVO.setSrvGetLat(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLat());
+            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
         }
         if(Objects.nonNull(deliveryCarVO.getReturnHandoverCarDTO())) {
-            ownerTransAddressReqVO.setReturnCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
-            ownerTransAddressReqVO.setSrvReturnLat(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLat());
-            ownerTransAddressReqVO.setSrvReturnLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
+            ownerTransAddressReqVO.setReturnCarAddressText(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetAddr());
+            ownerTransAddressReqVO.setSrvReturnLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLat());
+            ownerTransAddressReqVO.setSrvReturnLon(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLng());
         }
         return ownerTransAddressReqVO;
     }
