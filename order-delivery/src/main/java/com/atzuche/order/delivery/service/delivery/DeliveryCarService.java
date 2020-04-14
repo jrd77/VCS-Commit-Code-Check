@@ -420,7 +420,11 @@ public class DeliveryCarService {
 
     /**
      * 新增更新handover
+     * @param renterOrderNo
+     * @param serviceType
+     * @param cancelOrderDeliveryVO
      */
+    @Transactional(rollbackFor = Exception.class)
     public void addHandoverInfo(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
         RenterOrderDeliveryEntity orderDelivery = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType);
 
