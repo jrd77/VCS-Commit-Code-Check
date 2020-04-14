@@ -150,8 +150,8 @@ public class AdminDeliveryCarService {
         }
         DeliveryReqVO deliveryReqVO = createParams(deliveryCarVO);
         orderReqVo.setCityCode(orderEntity.getCityCode());
-        orderReqVo.setSrvGetFlag(Integer.valueOf(deliveryReqVO.getGetDeliveryReqDTO().getIsUsedGetAndReturnCar()));
-        orderReqVo.setSrvReturnFlag(Integer.valueOf(deliveryReqVO.getRenterDeliveryReqDTO().getIsUsedGetAndReturnCar()));
+        orderReqVo.setSrvGetFlag(deliveryCarVO.getIsGetCar());
+        orderReqVo.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
         orderReqVo.setSrvGetLat(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLat());
         orderReqVo.setSrvGetLon(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLng());
         orderReqVo.setSrvReturnLat(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnLat());
