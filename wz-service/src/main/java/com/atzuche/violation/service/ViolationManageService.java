@@ -144,7 +144,6 @@ public class ViolationManageService {
         Date wzRenterLastTime = renterOrderWzStatusEntity.getWzRenterLastTime();
         Date wzPlatformLastTime = renterOrderWzStatusEntity.getWzPlatformLastTime();
         Date wzHandleCompleteTime = renterOrderWzStatusEntity.getWzHandleCompleteTime();
-        Integer managementMode = renterOrderWzStatusEntity.getManagementMode();
 
         if(!ObjectUtils.isEmpty(wzRenterLastTime)){
             //租客最晚处理时间
@@ -159,10 +158,6 @@ public class ViolationManageService {
         if(!ObjectUtils.isEmpty(wzHandleCompleteTime)){
             //办理完成时间
             violationHandleInformationResponseVO.setWzHandleCompleteTime(DateUtils.formate(wzHandleCompleteTime, DateUtils.DATE_DEFAUTE1));
-        }
-        if(!ObjectUtils.isEmpty(managementMode)){
-            //违章处理方
-            violationHandleInformationResponseVO.setManagementMode(String.valueOf(managementMode));
         }
 
         return violationHandleInformationResponseVO;
@@ -386,7 +381,8 @@ public class ViolationManageService {
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
         renterOrderWzStatusEntity.setOrderNo(violationAlterationRequestVO.getOrderNo());
         renterOrderWzStatusEntity.setCarPlateNum(violationAlterationRequestVO.getPlateNum());
-
+        Integer managementMode = Integer.parseInt(violationAlterationRequestVO.getManagementMode());
+        renterOrderWzStatusEntity.setManagementMode(managementMode);
         String wzRenterLastTime = violationAlterationRequestVO.getWzRenterLastTime();
         String wzPlatformLastTime = violationAlterationRequestVO.getWzPlatformLastTime();
         String wzHandleCompleteTime = violationAlterationRequestVO.getWzHandleCompleteTime();
@@ -407,22 +403,20 @@ public class ViolationManageService {
 
         renterOrderWzStatusEntity.setWzRemarks( violationAlterationRequestVO.getWzRemarks());
 
-        String managementMode = violationAlterationRequestVO.getManagementMode();
         if(!org.springframework.util.StringUtils.isEmpty(managementMode)){
-            if(managementMode.equals("1")){
+            if(managementMode == 1){
                 renterOrderWzStatusEntity.setStatus(25);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(25));
-            } else if (managementMode.equals("2")) {
+            } else if (managementMode == 2) {
                 renterOrderWzStatusEntity.setStatus(26);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(26));
-            } else if (managementMode.equals("3")) {
+            } else if (managementMode == 3) {
                 renterOrderWzStatusEntity.setStatus(40);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(40));
-            } else if (managementMode.equals("4")) {
+            } else if (managementMode == 4) {
                 renterOrderWzStatusEntity.setStatus(46);
                 renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(46));
             }
-            renterOrderWzStatusEntity.setManagementMode(Integer.parseInt(managementMode));
         }
 
 
