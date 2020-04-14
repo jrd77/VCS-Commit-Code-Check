@@ -607,7 +607,6 @@ public class RenterOrderCostCombineService {
 	/**
 	 * 
 	 * @param orderNo
-	 * @param renterOrderNo
 	 * @param memNo
 	 * @return
 	 */
