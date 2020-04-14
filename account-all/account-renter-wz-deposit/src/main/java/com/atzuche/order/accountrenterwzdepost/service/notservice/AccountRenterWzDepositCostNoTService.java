@@ -4,6 +4,8 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCost
 import com.atzuche.order.accountrenterwzdepost.exception.RenterWZDepositCostException;
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositCostMapper;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.commons.constant.OrderConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,4 +78,25 @@ public class AccountRenterWzDepositCostNoTService {
 	public int updateAccountRenterWzDepositCost(AccountRenterWzDepositCostEntity entity) {
 		return accountRenterWzDepositCostMapper.updateByPrimaryKeySelective(entity);
 	}
+
+    /**
+     * 依据订单号和会员号更新违章押金信息
+     *
+     * @param entity 违章押金信息
+     * @return int
+     */
+    public int updateAccountRenterWzDepositCostByOrderNo(AccountRenterWzDepositCostEntity entity) {
+        if (null == entity || StringUtils.isBlank(entity.getOrderNo()) || StringUtils.isBlank(entity.getMemNo())) {
+            return OrderConstant.ZERO;
+        }
+
+        AccountRenterWzDepositCostEntity record =
+                accountRenterWzDepositCostMapper.selectByOrderNo(entity.getOrderNo(), entity.getMemNo());
+        if (null == record) {
+            return OrderConstant.ZERO;
+        }
+        entity.setId(record.getId());
+        entity.setVersion(record.getVersion());
+        return accountRenterWzDepositCostMapper.updateByPrimaryKeySelective(entity);
+    }
 }

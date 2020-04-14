@@ -29,7 +29,7 @@ public class OwnerHandoverCarInfoEntity implements Serializable {
 	 */
 	private String ownerOrderNo;
 	/**
-	 * 交车类型 1-车主向租客交车、2-租客向车主交车、3-车管家向车主交车、4-车主向车管家交车
+	 * 交车类型 1-租客向车主交车、2-车主向租客交车、3-车管家向车主交车、4-车主向车管家交车
 	 */
 	private Integer type;
 	/**

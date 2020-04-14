@@ -16,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.coreapi.TemplateApplication;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -40,6 +41,8 @@ public class CashierNoTServiceTest {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 	@Autowired
 	private AccountRenterCostSettleService accountRenterCostSettleService;
+	@Autowired
+	private SupplementService supplementService;
 	
 	String memNo = "985856422";
 	
@@ -220,6 +223,12 @@ public class CashierNoTServiceTest {
 	@Test
 	public void testSendOrderRefundFailMq() {
 		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testListOrderSupplementDetailVOByOrderNo() {
+		List<OrderSupplementDetailVO> list = supplementService.listOrderSupplementDetailVOByOrderNo("43267162300299");
+		log.info("supplementlist=",list);
 	}
 
 }

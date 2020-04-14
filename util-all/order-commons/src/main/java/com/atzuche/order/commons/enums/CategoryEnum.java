@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum CategoryEnum {
-    ordinary("1","普通"),
-    Set_meal("2","套餐");
+    ORDINARY("1","普通"),
+    SET_MEAL("2","套餐");
 
     private String code;
 

@@ -141,6 +141,21 @@ public class RenterOrderWzCostDetailService {
         }
         return rs;
     }
+    
+    /**
+     * 统计费用
+     * @param orderNo
+     * @return
+     */
+    public Integer sumQuerySettleInfoByOrder(String orderNo) {
+    	Integer totalAmount = 0;
+        List<RenterOrderWzCostDetailEntity> costDetails = queryInfosByOrderNo(orderNo);
+        if(!CollectionUtils.isEmpty(costDetails)){
+            totalAmount = costDetails.stream().filter(Objects::nonNull).filter(dto -> dto.getAmount() != null).mapToInt(RenterOrderWzCostDetailEntity::getAmount).sum();
+        }
+        return totalAmount;
+    }
+    
 
     public RenterOrderWzCostDetailEntity queryInfoWithSumAmountByOrderAndCode(String orderNo, String costCode) {
         return renterOrderWzCostDetailMapper.queryInfoWithSumAmountByOrderAndCode(orderNo,costCode);

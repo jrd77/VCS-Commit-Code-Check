@@ -44,9 +44,14 @@ public class AccountRenterDepositResVO {
      */
     private Integer shifuDepositAmt;
     /**
+     * 是否预授权，0否1是
+     */
+    private Integer isAuthorize;
+    /**
      * 预授权金额
      */
     private Integer authorizeDepositAmt;
+    
     /**
      * 信用支付金额
      */

@@ -149,7 +149,7 @@ public class OrderCostDetailService {
         	if(renterDepositDetailEntity.getOriginalDepositAmt()!=null && renterDepositDetailEntity.getReductionDepositAmt()!=null) {
         		reductionAfterRentDepost = String.valueOf(renterDepositDetailEntity.getOriginalDepositAmt().intValue() - renterDepositDetailEntity.getReductionDepositAmt().intValue());
         	}
-        	yearCoefficient = String.valueOf(renterDepositDetailEntity.getSuggestTotal());
+        	yearCoefficient = String.valueOf(renterDepositDetailEntity.getNewCarCoefficient());
         	brandCoefficient = String.valueOf(renterDepositDetailEntity.getCarSpecialCoefficient());
         	
         }
@@ -178,7 +178,8 @@ public class OrderCostDetailService {
 	private void putTaskRight(List<ReductionTaskResVO> reductTaskList,
 			List<RenterMemberRightDTO> renterMemberRightDTOList) {
 		
-		
+		int totalReductionOrderRatio = 0;
+		int totalReductionItemGetRatio = 0;
 		for (RenterMemberRightDTO renterMemberRightDTO : renterMemberRightDTOList) {
 			//任务
 			if(renterMemberRightDTO.getRightType().intValue() == RightTypeEnum.TASK.getCode().intValue()) {
@@ -189,9 +190,19 @@ public class OrderCostDetailService {
 				task.setReductionOrderRatio(renterMemberRightDTO.getRightValue());
 				///
 				reductTaskList.add(task);
+
+                totalReductionOrderRatio += task.getReductionOrderRatio()==null?0:Integer.valueOf(task.getReductionOrderRatio());
+                totalReductionItemGetRatio += task.getReductionItemGetRatio()==null?0:Integer.valueOf(task.getReductionItemGetRatio());
 			}
 		}
-		
+        String reductionOrderRatio = String.valueOf(totalReductionOrderRatio>=70?70:totalReductionOrderRatio);
+		String reductionItemGetRatio = String.valueOf(totalReductionItemGetRatio>=70?70:totalReductionItemGetRatio);
+        ReductionTaskResVO task = new ReductionTaskResVO();
+        task.setReductionItemGetRatio(reductionItemGetRatio);
+        task.setReductionItemName("总计");
+        task.setReductionItemRule("最高减免比例70%（总计超过70%，按70%计算）");
+        task.setReductionOrderRatio(reductionOrderRatio);
+        reductTaskList.add(task);
 	}
 	
 	

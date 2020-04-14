@@ -6,9 +6,11 @@ package com.atzuche.order.mq.enums;
 public enum  PushParamsTypeEnum {
 
     /*##################################################################PUSH信息模版参数替换（新订单）###################################################################################################################*/
-    CAR_BRAND_NAME("carBrand", "carBrandName"),
-    CAR_TYPE_NAME("carType", "carTypeName"),
-    CAR_PLATE_NUM("carPlateNum", "plateNum"),;
+    CAR_BRAND_NAME("carBrandTxt", "carBrandName"),
+    CAR_TYPE_NAME("carTypeTxt", "carTypeName"),
+    CAR_PLATE_NUM("carPlateNum", "plateNum"),
+    LEFT_HOURS("leftHours", "leftHours"),
+    ;
 
 
     /**

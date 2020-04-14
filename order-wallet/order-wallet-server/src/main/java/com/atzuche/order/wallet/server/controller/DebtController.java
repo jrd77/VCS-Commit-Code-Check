@@ -2,6 +2,7 @@ package com.atzuche.order.wallet.server.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.exceptions.InputErrorException;
+import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.api.DeductBalanceVO;
 import com.atzuche.order.wallet.api.DeductDebtVO;
 import com.atzuche.order.wallet.api.MemBalanceVO;
@@ -51,5 +52,16 @@ public class DebtController {
         }
         debtService.deductDebt(deductDebtVO.getMemNo(),deductDebtVO.getDeduct());
         return ResponseData.success();
+    }
+    
+    /**
+     * 返回用户名下的欠款(区分历史欠款和订单欠款)
+     * @param memNo
+     * @return ResponseData<DebtDetailVO>
+     */
+    @RequestMapping(value = "debt/detail",method = RequestMethod.GET)
+    public ResponseData<DebtDetailVO> getDebtDetailVO(@RequestParam("memNo")String memNo){
+    	DebtDetailVO debtDetailVO = debtService.getDebtDetailVO(memNo);
+        return ResponseData.success(debtDetailVO);
     }
 }

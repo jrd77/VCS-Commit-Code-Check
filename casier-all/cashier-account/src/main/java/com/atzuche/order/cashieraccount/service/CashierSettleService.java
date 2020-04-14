@@ -225,7 +225,16 @@ public class CashierSettleService {
 
 
     }
-
+    
+    /**
+     * 更新，通过收银台来修改
+     * @param accountRenterCostSettleEntity
+     */
+    public void updateRentSettleCost(AccountRenterCostSettleEntity accountRenterCostSettleEntity) {
+    	AccountRenterCostSettleEntity entity = accountRenterCostSettleNoTService.getCostPaidRentSettle(accountRenterCostSettleEntity.getOrderNo(),accountRenterCostSettleEntity.getMemNo());
+    	entity.setYingkouAmt(accountRenterCostSettleEntity.getYingkouAmt());
+    	accountRenterCostSettleNoTService.updateAccountRenterCostSettle(entity);
+    }
     
 
 

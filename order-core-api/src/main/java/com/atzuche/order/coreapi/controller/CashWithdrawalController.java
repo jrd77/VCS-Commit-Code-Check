@@ -16,6 +16,8 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
+import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class CashWithdrawalController {
 	
 	@Autowired
 	private CashWithdrawalService cashWithdrawalService;
+	@Autowired
+	private AccountDebtService accountDebtService;
 
 	/**
 	 * 提现
@@ -48,7 +52,7 @@ public class CashWithdrawalController {
 	 * @return ResponseData<List<AccountOwnerCashExamine>>
 	 */
 	@GetMapping("/account/withdraw/list")
-    public ResponseData<List<AccountOwnerCashExamine>> listCashWithdrawal(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+    public ResponseData<List<AccountOwnerCashExamine>> listCashWithdrawal(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
 		log.info("获取提现记录 req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		List<AccountOwnerCashExamine> list = cashWithdrawalService.listCashWithdrawal(req);
@@ -62,10 +66,24 @@ public class CashWithdrawalController {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/account/withdraw/getbalance")
-    public ResponseData<?> getBalance(@Valid @RequestBody SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+    public ResponseData<?> getBalance(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
 		log.info("获取可提现余额 req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		Integer balance = cashWithdrawalService.getBalance(req);
     	return ResponseData.success(balance);
     }
+	
+	
+	/**
+	 * 获取用户总欠款
+	 * @param req
+	 * @return ResponseData<?>
+	 */
+	@GetMapping("/debt/get")
+    public ResponseData<DebtDetailVO> getDebtAmt(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
+		log.info("获取用户总欠款 req=[{}]", req);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(req.getMemNo());
+    	return ResponseData.success(debtDetailVO);
+    } 
 }

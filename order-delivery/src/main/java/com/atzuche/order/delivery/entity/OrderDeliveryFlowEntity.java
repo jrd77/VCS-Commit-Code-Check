@@ -48,6 +48,14 @@ public class OrderDeliveryFlowEntity implements Serializable {
 	 */
 	private LocalDateTime returnTime;
 	/**
+	 * 预计取车时间（YYYY-MM-DD HH:mm)
+	 **/
+	private String beforeTime;
+	/**
+	 * 预计还车时间（YYYY-MM-DD HH:mm)
+	 **/
+	private String afterTime;
+	/**
 	 * 车牌号
 	 */
 	private String carNo;

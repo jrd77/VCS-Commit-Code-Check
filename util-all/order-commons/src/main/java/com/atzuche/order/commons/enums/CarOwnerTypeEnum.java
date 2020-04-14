@@ -32,4 +32,19 @@ public enum CarOwnerTypeEnum {
         }
         return null;
     }
+
+    /**
+     *是否是凹凸自營
+     */
+    public static Boolean isAuToByCode(Integer code){
+        boolean result = false;
+        if (code == null) {
+            return result;
+        }
+        if (code == F.code || code == G.code) {
+            result = true;
+            return result;
+        }
+        return result;
+    }
 }

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /*
@@ -106,7 +107,13 @@ public class RenterOrderSettleService {
 
     private void updateOrderStatus(OrderStatusDTO orderStatusDTO,String renterOrder){
         //1更新 订单流转状态
+        LocalDateTime now = LocalDateTime.now();
         orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setSettleTime(now);
+        orderStatusDTO.setCarDepositSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setCarDepositSettleTime(now);
+        orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        orderStatusDTO.setWzSettleTime(now);
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
 
         //更新租客订单状态

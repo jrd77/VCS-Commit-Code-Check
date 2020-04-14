@@ -22,23 +22,29 @@ public class WzDepositDTO {
     public Integer wzOtherAmt=0;
     @AutoDocProperty(value = "保险理赔")
     public Integer wzInsuranceAmt=0;
-    @AutoDocProperty(value = "预计抵扣的租车费用")
+    @AutoDocProperty(value = "抵扣的租车费用")
     public Integer expDeductionRentCarAmt = 0;
+    @AutoDocProperty("预计和实际抵扣租车费用标志 1：预计、2实际")
+    public Integer expAndActFlg;
     @AutoDocProperty("抵扣历史欠款")
     public Integer deductionRentHistoricalAmt = 0;
 
-
-    public Integer getTotal(WzDepositDTO wzDepositDTO){
+    public Integer getOther(WzDepositDTO wzDepositDTO){
         return
-                 wzDepositDTO.wzDepositAmt +
-                wzDepositDTO.wzFineAmt +
-                wzDepositDTO.wzServiceCostAmt +
-                wzDepositDTO.wzDysFineAmt +
-                wzDepositDTO.wzStopCostAmt +
-                wzDepositDTO.wzOtherAmt +
-                wzDepositDTO.wzInsuranceAmt +
-                wzDepositDTO.expDeductionRentCarAmt +
-                wzDepositDTO.deductionRentHistoricalAmt;
+                nullToSero(wzDepositDTO.wzFineAmt)+
+                nullToSero(wzDepositDTO.wzServiceCostAmt)+
+                nullToSero(wzDepositDTO.wzDysFineAmt)+
+                nullToSero(wzDepositDTO.wzStopCostAmt)+
+                nullToSero(wzDepositDTO.wzOtherAmt)+
+                nullToSero(wzDepositDTO.wzInsuranceAmt)+
+                nullToSero(wzDepositDTO.deductionRentHistoricalAmt);
+    }
+
+    private int nullToSero(Integer amt){
+        if(amt == null){
+            return 0;
+        }
+        return amt;
     }
 
 }

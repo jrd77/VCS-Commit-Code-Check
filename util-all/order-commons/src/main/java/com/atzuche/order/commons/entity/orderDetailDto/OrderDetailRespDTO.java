@@ -42,6 +42,7 @@ public class OrderDetailRespDTO {
     public AccountRenterWzDepositDTO accountRenterWzDepositDTO;
     public List<AccountRenterCostDetailDTO> accountRenterCostDetailDTO;
     public OrderRefundRecordDTO orderRefundRecordDTO;
+    public RenterDeliveryAddrDTO renterDeliveryAddrDTO;
 
     //变更申请的租客子订单号（application_id）
     public String changeApplyRenterOrderNo;

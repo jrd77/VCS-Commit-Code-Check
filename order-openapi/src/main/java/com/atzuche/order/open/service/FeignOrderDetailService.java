@@ -102,4 +102,13 @@ public interface FeignOrderDetailService {
      */
     @GetMapping("/order/detail/getOrderNoAll")
     public ResponseData<OrderNoListDTO> getOrderNoAll();
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/3/6 17:04
+     * @Description: 获取非正常结束的订单
+     *
+     **/
+    @GetMapping("/order/detail/queryRefuse")
+    public ResponseData<ProcessRespDTO> queryRefuse();
 }

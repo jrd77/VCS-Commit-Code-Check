@@ -4,6 +4,8 @@ import com.autoyol.commons.web.ErrorCode;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,7 +21,8 @@ public class SMSIcsocVoiceUtils {
 
     public  static Logger logger = LoggerFactory.getLogger(SMSIcsocVoiceUtils.class);
 
-    private static final String ICSOC_URL="http://180.168.109.174:2180";
+    //private static final String ICSOC_URL="http://180.168.109.174:2180";
+    private static final String ICSOC_URL="http://10.0.0.28";
     private static final String ICSOC_ACCOUNT="icsoc";
     private static final String ICSOC_PASSWORD="abc123456";
 
@@ -137,7 +140,7 @@ public class SMSIcsocVoiceUtils {
     private static int getIcsocLines(){
         Map<String,Object> map = new HashMap<String,Object>();
         String account=ICSOC_ACCOUNT;
-        String password=SHA1("icsoc"+Base64.getEncoder().encode(ICSOC_PASSWORD.getBytes()));
+        String password=SHA1("icsoc"+new BASE64Encoder().encode(ICSOC_PASSWORD.getBytes()));
         String url=ICSOC_URL+ "/voiceserver.php";
         map.put("Account", account);
         map.put("password", password);
@@ -208,7 +211,6 @@ public class SMSIcsocVoiceUtils {
 
         return buffer.toString();
     }
-
 
     public static String SHA1(String decript) {
         try {
