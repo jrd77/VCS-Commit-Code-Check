@@ -215,7 +215,7 @@ public class CashierQueryService {
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             //油费
             int oilCost=  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return OwnerCashCodeEnum.OIL_COST_OWNER.getCashNo().equals(obj.getSourceCode());
+                return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //取消订单罚金
             int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
