@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo.req;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
+import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
@@ -11,13 +12,12 @@ import javax.validation.constraints.NotNull;
  * @author pengcheng.fu
  * @date 2020/1/11 14:15
  */
-
 public class NormalOrderCostCalculateReqVO extends BaseVO {
 
     private static final long serialVersionUID = 4077530429676649793L;
 
     @AutoDocProperty(value = "订单类型", required = true)
-    @NotBlank(message = "订单类型不能为空,1.普通订单 2.套餐订单")
+    @NotBlank(message = "订单类型不能为空,1.普通订单 2.套餐订单 3.长租")
     private String orderCategory;
 
     @AutoDocProperty(value = "业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有,6:长租 ")
@@ -293,6 +293,14 @@ public class NormalOrderCostCalculateReqVO extends BaseVO {
 
     public void setCarOwnerCouponNo(String carOwnerCouponNo) {
         this.carOwnerCouponNo = carOwnerCouponNo;
+    }
+
+    public String getLongOwnerCouponNo() {
+        return longOwnerCouponNo;
+    }
+
+    public void setLongOwnerCouponNo(String longOwnerCouponNo) {
+        this.longOwnerCouponNo = longOwnerCouponNo;
     }
 
     public Integer getUseAutoCoin() {
