@@ -18,6 +18,7 @@ import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.wallet.api.DebtDetailVO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -81,9 +82,12 @@ public class CashWithdrawalController {
 	 */
 	@GetMapping("/debt/get")
     public ResponseData<DebtDetailVO> getDebtAmt(@Valid SearchCashWithdrawalReqDTO req, BindingResult bindingResult) {
-		log.info("获取用户总欠款 req=[{}]", req);
+		log.info("获取用户总欠款 req=[{}]", GsonUtils.toJson(req));
 		BindingResultUtil.checkBindingResult(bindingResult);
 		DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(req.getMemNo());
+		if(debtDetailVO != null) {
+			log.info("getDebtAmt出参=[{}],入参=[{}]",GsonUtils.toJson(debtDetailVO),GsonUtils.toJson(req));
+		}
     	return ResponseData.success(debtDetailVO);
     } 
 }

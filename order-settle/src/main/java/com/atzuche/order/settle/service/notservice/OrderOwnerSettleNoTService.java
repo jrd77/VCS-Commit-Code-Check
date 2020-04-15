@@ -521,7 +521,8 @@ public class OrderOwnerSettleNoTService {
 	            entity.setSourceCode(OwnerCashCodeEnum.MILEAGE_COST_OWNER_PROXY.getCashNo());
 	            entity.setSourceDesc(OwnerCashCodeEnum.MILEAGE_COST_OWNER_PROXY.getTxt());
 	            entity.setUniqueNo(String.valueOf(0)); //默认0
-	            entity.setAmt(mileageAmt.getTotalFee()); //已经是正数
+	            //取正数
+	            entity.setAmt(Math.abs(mileageAmt.getTotalFee())); //已经是正数
 	            settleOrdersDefinition.addPlatformProfit(entity);
 	            
         	}else {
@@ -531,7 +532,8 @@ public class OrderOwnerSettleNoTService {
 	            accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
 	            accountOwnerCostSettleDetail.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
 	            accountOwnerCostSettleDetail.setMemNo(settleOrders.getOwnerMemNo());
-	            accountOwnerCostSettleDetail.setAmt(mileageAmt.getTotalFee());  //金额的字段不一致。
+	            //bugfix 车主超里程取正数
+	            accountOwnerCostSettleDetail.setAmt(Math.abs(mileageAmt.getTotalFee()));  //金额的字段不一致。
 	            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.MILEAGE_COST_OWNER.getCashNo());
 	            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.MILEAGE_COST_OWNER.getTxt());
 	            accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
