@@ -3,16 +3,10 @@
  */
 package com.atzuche.order.admin.service;
 
-import java.time.LocalDateTime;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.admin.enums.YesNoEnum;
 import com.atzuche.order.admin.vo.req.cost.GetReturnRequestVO;
 import com.atzuche.order.admin.vo.resp.cost.GetReturnCostVO;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
 import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
@@ -21,6 +15,13 @@ import com.atzuche.order.rentercost.entity.dto.GetReturnOverCostDTO;
 import com.atzuche.order.rentercost.entity.dto.GetReturnOverTransportDTO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * @author jing.huang
@@ -98,8 +99,14 @@ public class GetReturnCarService {
 			
 			if(grrv != null) {
 				logger.info("GetReturnResponseVO data={}", grrv.toString());
-				respVo.setGetCost(String.valueOf(grrv.getGetFee()));
-				respVo.setReturnCost(String.valueOf(grrv.getReturnFee()));
+				if(StringUtils.equals(vo.getOrderType(),String.valueOf(OrderConstant.THREE))) {
+				    // 长租订单都不收取还车费用
+                    respVo.setGetCost("0");
+                    respVo.setReturnCost("0");
+                } else {
+                    respVo.setGetCost(String.valueOf(grrv.getGetFee()));
+                    respVo.setReturnCost(String.valueOf(grrv.getReturnFee()));
+                }
 				respVo.setGetShouldCost(String.valueOf(grrv.getGetShouldFee()));
 				respVo.setReturnShouldCost(String.valueOf(grrv.getReturnShouldFee()));
 			}
@@ -120,11 +127,18 @@ public class GetReturnCarService {
 				}else {
 					respVo.setIsReturnOverTransport(YesNoEnum.NO.getType());
 				}
-				
-				respVo.setGetOverTransportFee(String.valueOf(grot.getGetOverTransportFee()));
-				respVo.setReturnOverTransportFee(String.valueOf(grot.getReturnOverTransportFee()));
-				respVo.setNightGetOverTransportFee(String.valueOf(grot.getNightGetOverTransportFee()));
-				respVo.setNightReturnOverTransportFee(String.valueOf(grot.getNightReturnOverTransportFee()));
+                if(StringUtils.equals(vo.getOrderType(),String.valueOf(OrderConstant.THREE))) {
+                    // 长租订单都不收取超运能溢价金额
+                    respVo.setGetOverTransportFee("0");
+                    respVo.setReturnOverTransportFee("0");
+                    respVo.setNightGetOverTransportFee("0");
+                    respVo.setNightReturnOverTransportFee("0");
+                } else {
+                    respVo.setGetOverTransportFee(String.valueOf(grot.getGetOverTransportFee()));
+                    respVo.setReturnOverTransportFee(String.valueOf(grot.getReturnOverTransportFee()));
+                    respVo.setNightGetOverTransportFee(String.valueOf(grot.getNightGetOverTransportFee()));
+                    respVo.setNightReturnOverTransportFee(String.valueOf(grot.getNightReturnOverTransportFee()));
+                }
 			}
 		}
 		
