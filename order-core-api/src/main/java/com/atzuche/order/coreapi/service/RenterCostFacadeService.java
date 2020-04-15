@@ -350,7 +350,6 @@ public class RenterCostFacadeService {
             wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou();
         }
 
-
         //1、租车费用
         RentCarCostDTO rentCarCostDTO = new RentCarCostDTO();
         //1.1、基础费用
