@@ -8,6 +8,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.atzuche.order.commons.entity.dto.AccountOwnerCashExamineDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
@@ -30,5 +31,5 @@ public interface FeignCashWithdrawalService {
 	 * @return ResponseData<?>
 	 */
 	@GetMapping("/debt/get")
-    public ResponseData<DebtDetailVO> getDebtAmt(@Valid SearchCashWithdrawalReqDTO req);
+    public ResponseData<DebtDetailVO> getDebtAmt(@RequestParam(value="memNo",required = true) String memNo);
 }
