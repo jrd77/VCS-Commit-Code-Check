@@ -188,10 +188,9 @@ public class AdminOrderController {
 
         AdminModifyOrderFeeCompareVO compareVO = adminOrderService.preModifyOrderFee(reqVO,renterNo);
         // 获取欠款
-		/*
-		 * DebtDetailVO debtDetailVO = adminOrderService.getDebtAmt(renterNo);
-		 * compareVO.setDebtDetailVO(debtDetailVO);
-		 */
+		DebtDetailVO debtDetailVO = adminOrderService.getDebtAmt(renterNo);
+		compareVO.setDebtDetailVO(debtDetailVO);
+		 
         return ResponseData.success(compareVO);
 
     }
