@@ -109,7 +109,7 @@ public class OwnerOrderService {
         ownerOrderCostReqDTO.setSrvGetFlag(ownerOrderReqDTO.getSrvGetFlag());
         ownerOrderCostReqDTO.setSrvReturnFlag(ownerOrderReqDTO.getSrvReturnFlag());
         ownerOrderCostReqDTO.setOwnerOrderPurchaseDetailEntity(ownerOrderReqDTO.getOwnerOrderPurchaseDetailEntity());
-        ownerOrderCostReqDTO.setOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOwnerOrderSubsidyDetailEntity());
+        ownerOrderCostReqDTO.setOwnerOrderSubsidyDetails(ownerOrderReqDTO.getOwnerOrderSubsidyDetails());
 
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         costBaseDTO.setOrderNo(ownerOrderReqDTO.getOrderNo());

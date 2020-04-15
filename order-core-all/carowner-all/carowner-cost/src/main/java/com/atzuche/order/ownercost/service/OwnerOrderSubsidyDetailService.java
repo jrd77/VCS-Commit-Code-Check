@@ -40,7 +40,8 @@ public class OwnerOrderSubsidyDetailService {
 		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
 	}
-	
+
+
 	/**
 	 * 批量保存车主补贴明细
 	 * @param costList 车主补贴明细列表

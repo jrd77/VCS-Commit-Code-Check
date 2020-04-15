@@ -36,6 +36,7 @@ import com.atzuche.order.parentorder.service.ParentOrderService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
+import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
@@ -50,6 +51,8 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -302,12 +305,35 @@ public class SubmitOrderHandleService {
         if (null == ownerCoupon) {
             return null;
         }
+        return buildOwnerOrderSubsidyDetailEntity(orderNo, ownerOrderNo, memNo, ownerCoupon.getAmount(),
+                RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST, "使用车主券抵扣租金");
+    }
 
+    /**
+     * 车主券补贴信息封装(车主端)
+     *
+     * @param orderNo 订单号
+     * @param ownerOrderNo 车主订单号
+     * @param memNo 车主注册号
+     * @param subsidyAmount 补贴金额
+     * @param subsidyCost 补贴费用项编码
+     * @param subsidyDesc 补贴费用项描述
+     * @return OwnerOrderSubsidyDetailEntity
+     */
+    public OwnerOrderSubsidyDetailEntity buildOwnerOrderSubsidyDetailEntity(String orderNo,
+                                                                            String ownerOrderNo,
+                                                                            String memNo,
+                                                                            int subsidyAmount,
+                                                                            RenterCashCodeEnum subsidyCost,
+                                                                            String subsidyDesc) {
+        if(OrderConstant.ZERO == subsidyAmount) {
+            return null;
+        }
         OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity = new OwnerOrderSubsidyDetailEntity();
         ownerOrderSubsidyDetailEntity.setOrderNo(orderNo);
         ownerOrderSubsidyDetailEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderSubsidyDetailEntity.setMemNo(memNo);
-        ownerOrderSubsidyDetailEntity.setSubsidyAmount(-ownerCoupon.getAmount());
+        ownerOrderSubsidyDetailEntity.setSubsidyAmount(-Math.abs(subsidyAmount));
 
         ownerOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
         ownerOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
@@ -316,14 +342,15 @@ public class SubmitOrderHandleService {
 
         ownerOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
         ownerOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-        ownerOrderSubsidyDetailEntity.setSubsidyCostCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
-        ownerOrderSubsidyDetailEntity.setSubsidyCostName(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
-        ownerOrderSubsidyDetailEntity.setSubsidyDesc("使用车主券抵扣租金");
+        ownerOrderSubsidyDetailEntity.setSubsidyCostCode(subsidyCost.getCashNo());
+        ownerOrderSubsidyDetailEntity.setSubsidyCostName(subsidyCost.getTxt());
+        ownerOrderSubsidyDetailEntity.setSubsidyDesc(subsidyDesc);
 
         logger.info("Build ownerOrderSubsidyDetailEntity,result is ,ownerOrderSubsidyDetailEntity:[{}]",
                 JSON.toJSONString(ownerOrderSubsidyDetailEntity));
         return ownerOrderSubsidyDetailEntity;
     }
+
 
     /**
      * 车主租金明细(车主端，目前与租客相同)
@@ -384,11 +411,29 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
 
-
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails = new ArrayList<>();
         Optional<OrderCouponDTO> ownerCoupon =
                 costContext.getCostDetailContext().getCoupons().stream().filter(coupon -> Objects.nonNull(coupon.getCouponType()) && coupon.getCouponType() == CouponTypeEnum.ORDER_COUPON_TYPE_OWNER.getCode()).findFirst();
-        ownerOrderReqDTO.setOwnerOrderSubsidyDetailEntity(buildOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOrderNo(),
-                ownerOrderReqDTO.getOwnerOrderNo(), ownerOrderReqDTO.getMemNo(), ownerCoupon.orElse(null)));
+        OwnerOrderSubsidyDetailEntity ownerCouponSubsidy =
+                buildOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOrderNo(),
+                ownerOrderReqDTO.getOwnerOrderNo(), ownerOrderReqDTO.getMemNo(), ownerCoupon.orElse(null));
+        if(Objects.nonNull(ownerCouponSubsidy)) {
+            ownerOrderSubsidyDetails.add(ownerCouponSubsidy);
+        }
+
+        int subsidyAmt =
+                costContext.getCostDetailContext().getSubsidyDetails().stream()
+                        .filter(x -> StringUtils.equals(x.getSubsidyCostCode(), RenterCashCodeEnum.RENT_AMT.getCashNo()) && null != x.getSubsidyAmount())
+                        .mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount)
+                        .sum();
+        OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity = buildOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOrderNo(),
+                ownerOrderReqDTO.getOwnerOrderNo(), ownerOrderReqDTO.getMemNo(), subsidyAmt,
+                RenterCashCodeEnum.RENT_AMT, "长租订单租金折扣补贴");
+        if(Objects.nonNull(ownerOrderSubsidyDetailEntity)) {
+            ownerOrderSubsidyDetails.add(ownerOrderSubsidyDetailEntity);
+        }
+        ownerOrderReqDTO.setOwnerOrderSubsidyDetails(ownerOrderSubsidyDetails);
+
 
         Optional<RenterOrderCostDetailEntity> rentAmtEntity =
                 costContext.getCostDetailContext().getCostDetails().stream().filter(costDetail -> StringUtils.equals(costDetail.getCostCode(),

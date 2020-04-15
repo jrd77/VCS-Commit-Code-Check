@@ -24,6 +24,7 @@ import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -50,6 +51,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 订单业务处理类
@@ -165,8 +169,16 @@ public class SubmitOrderService {
         //5.2.调用车主订单模块处理车主订单相关业务
         OwnerOrderReqDTO ownerOrderReqDTO = buildOwnerOrderReqDTO(orderNo, ownerOrderNo, context);
         ownerOrderReqDTO.setRenterOrderNo(renterOrderNo);
-        ownerOrderReqDTO.setOwnerOrderSubsidyDetailEntity(submitOrderHandleService.buildOwnerOrderSubsidyDetailEntity(orderNo, ownerOrderNo,
-                renterGoodsDetailDTO.getOwnerMemNo(), renterOrderResVO.getOwnerCoupon()));
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails = new ArrayList<>();
+        OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity =
+                submitOrderHandleService.buildOwnerOrderSubsidyDetailEntity(orderNo,
+                ownerOrderNo,
+                renterGoodsDetailDTO.getOwnerMemNo(), renterOrderResVO.getOwnerCoupon());
+        if(Objects.nonNull(ownerOrderSubsidyDetailEntity)) {
+            ownerOrderSubsidyDetails.add(ownerOrderSubsidyDetailEntity);
+        }
+        ownerOrderReqDTO.setOwnerOrderSubsidyDetails(ownerOrderSubsidyDetails);
+
         ownerOrderReqDTO.setOwnerOrderPurchaseDetailEntity(submitOrderHandleService.buildOwnerOrderPurchaseDetailEntity(orderNo, ownerOrderNo,
                 renterGoodsDetailDTO.getOwnerMemNo(), renterOrderResVO.getRentAmtEntity()));
 
