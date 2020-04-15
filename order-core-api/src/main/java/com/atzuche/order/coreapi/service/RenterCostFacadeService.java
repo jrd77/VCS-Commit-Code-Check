@@ -421,6 +421,8 @@ public class RenterCostFacadeService {
         carDepositDTO.DeductionRentHistoricalAmt = carDeductionRentHistoricalAmt;
         carDepositDTO.expDeductionRentAmt = carDeductionRentAmt;
         carDepositDTO.expAndActFlg = carExpAndActFlg;
+        carDepositDTO.isDetain = orderStatusEntity.getIsDetain();
+
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();
         carDepositStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositCostYingshou();
@@ -448,6 +450,7 @@ public class RenterCostFacadeService {
         wzCostStatisticsDTO.shouldDeductionAmt = renterCostVO.getDepositWzCostYingkou();
         wzCostStatisticsDTO.realDeductionAmt = renterCostVO.getDepositWzCostShikou();
         wzDepositDTO.costStatisticsDTO = wzCostStatisticsDTO;
+        wzDepositDTO.isWzDetain = orderStatusEntity.getIsDetainWz();
 
         //4、租车费用结算后补付
         SettleMakeUpDTO settleMakeUpDTO = new SettleMakeUpDTO();
