@@ -5,6 +5,7 @@ import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OwnerOrderReqDTO {
@@ -87,7 +88,7 @@ public class OwnerOrderReqDTO {
     /**
      * 补贴费用明细（车主券）
      */
-    private OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity;
+    private List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails;
 
     /**
      * 租金明细

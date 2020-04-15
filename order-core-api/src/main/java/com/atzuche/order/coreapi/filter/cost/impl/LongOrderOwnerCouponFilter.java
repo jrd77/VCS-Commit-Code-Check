@@ -126,7 +126,7 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
 
         if (Objects.nonNull(ownerCouponLongEntity)) {
             int actUnitPrice = ownerCouponLongEntity.getActUnitPrice();
-            //更新单价
+            //更新租金单价
             context.getCostDetailContext().getCostDetails().stream()
                     .filter(cost -> StringUtils.equals(RenterCashCodeEnum.RENT_AMT.getCashNo(), cost.getCostCode()))
                     .forEach(cost ->  cost.setShowUnitPrice(actUnitPrice));
