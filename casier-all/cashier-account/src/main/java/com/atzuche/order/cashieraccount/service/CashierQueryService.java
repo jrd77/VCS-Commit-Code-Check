@@ -209,6 +209,7 @@ public class CashierQueryService {
 //            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
         }
 
+
         //查询车主罚金
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
         // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
