@@ -23,6 +23,7 @@ import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.res.*;
+import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.*;
@@ -309,10 +310,10 @@ public class RenterCostFacadeService {
         RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
         RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderCostEntity.getMemNo(),rentCost.getRenterCostAmtFinal());
         RenterWzCostVO wzCostVO = wzCostFacadeService.getRenterWzCostDetail(orderNo);
-        String oilDifferenceCrash = rentCost.getOilAmt().getOilDifferenceCrash();
-        oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-        int extraMileageFee = (rentCost == null || rentCost.getMileageAmt() == null)?0:rentCost.getMileageAmt().getTotalFee();
+        RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
+        String oilDifferenceCrash = (oilAmt==null||rentCost.getOilAmt()==null||rentCost.getOilAmt().getOilDifferenceCrash()==null)?"0":rentCost.getOilAmt().getOilDifferenceCrash();
         int oilFee = (int)Float.parseFloat(oilDifferenceCrash);
+        int extraMileageFee = (rentCost == null || rentCost.getMileageAmt() == null)?0:rentCost.getMileageAmt().getTotalFee();
 
 
         int carDeductionRentAmt = 0;//车辆抵扣的租车费用
