@@ -142,19 +142,20 @@ public class AdminPreOrderController {
 
         normalOrderCostCalculateReqVO.setDisCouponId(request.getDisCouponIds());
 
-
         normalOrderCostCalculateReqVO.setMemNo(memNo);
-        normalOrderCostCalculateReqVO.setOrderCategory("1");
         normalOrderCostCalculateReqVO.setSceneCode("EX007");
         normalOrderCostCalculateReqVO.setSource("1");
         normalOrderCostCalculateReqVO.setPlatformParentType("7");
-
+        normalOrderCostCalculateReqVO.setOrderCategory("1");
+        normalOrderCostCalculateReqVO.setBusinessParentType("5");
+        if(StringUtils.isNotBlank(request.getLongOwnerCouponNo())) {
+            normalOrderCostCalculateReqVO.setOrderCategory("3");
+            normalOrderCostCalculateReqVO.setBusinessParentType("6");
+        }
         MemAvailableCouponVO memAvailableCouponVO = adminOrderService.getPreOrderCouponList(normalOrderCostCalculateReqVO);
-
         responseVO.setPlatCouponList(memAvailableCouponVO.getPlatCouponList());
         responseVO.setGetCarCouponList(memAvailableCouponVO.getGetCarCouponList());
         responseVO.setCarOwnerCouponDetailVOList(memAvailableCouponVO.getCarOwnerCouponDetailVOList());
-
         return ResponseData.success(responseVO);
 
     }
