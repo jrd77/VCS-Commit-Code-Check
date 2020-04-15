@@ -239,7 +239,7 @@ public class OrderCommonConver {
         returnCarCostVo.setCount(OrderConstant.D_ONE);
         returnCarCostVo.setTotalAmount(srvReturnCost + returnBlockedRaiseAmt);
         returnCarCostVo.setUnitPrice(Math.abs(returnCarCostVo.getTotalAmount()));
-        costItemList.add(getCarCostVo);
+        costItemList.add(returnCarCostVo);
 
         logger.info("Build costItem list B.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
