@@ -16,6 +16,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
+import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.autoyol.commons.utils.GsonUtils;
@@ -31,6 +32,8 @@ public class CashWithdrawalController {
 	private CashWithdrawalService cashWithdrawalService;
 	@Autowired
 	private AccountDebtService accountDebtService;
+	@Autowired
+    private OrderSupplementDetailService orderSupplementDetailService;
 
 	/**
 	 * 提现
@@ -85,6 +88,7 @@ public class CashWithdrawalController {
 		log.info("获取用户总欠款 req=[{}]", GsonUtils.toJson(req));
 		BindingResultUtil.checkBindingResult(bindingResult);
 		DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(req.getMemNo());
+		debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(req.getMemNo()));
 		if(debtDetailVO != null) {
 			log.info("getDebtAmt出参=[{}],入参=[{}]",GsonUtils.toJson(debtDetailVO),GsonUtils.toJson(req));
 		}
