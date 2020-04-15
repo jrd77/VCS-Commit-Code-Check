@@ -250,8 +250,8 @@ public class DeliveryCarInfoPriceService {
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
-        feeResult.setTotalFee(mileageAmt);
-        feeResult.setUnitPrice(mileageAmt);
+        feeResult.setTotalFee(-mileageAmt);
+        feeResult.setUnitPrice(-mileageAmt);
         return feeResult;
     }
 

@@ -28,5 +28,7 @@ public class WzDepositDTO {
     public Integer expAndActFlg;
     @AutoDocProperty("抵扣历史欠款")
     public Integer deductionRentHistoricalAmt = 0;
+    @AutoDocProperty("是否违章暂扣 0,否 1,是,2-撤销暂扣")
+    public Integer isWzDetain;
 
 }
