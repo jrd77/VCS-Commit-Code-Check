@@ -103,11 +103,12 @@ public class SubmitOrderController {
         orderReqVO.setReqTime(LocalDateTime.now());
         orderReqVO.setChangeSource(ChangeSourceEnum.RENTER.getCode());
         OrderReqContext context = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
-        orderFilterChain.validate(context);
+
         try{
             if(StringUtils.isNotBlank(normalOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(normalOrderReqVO.getOrderCategory(),"3")) {
                 orderResVO = submitOrderService.submitLongOrder(context);
             } else {
+                orderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitOrder(context);
             }
 
@@ -218,11 +219,12 @@ public class SubmitOrderController {
         orderReqVO.setReqTime(LocalDateTime.now());
         orderReqVO.setChangeSource(ChangeSourceEnum.CONSOLE.getCode());
         OrderReqContext context = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
-        orderFilterChain.validate(context);
+
         try{
             if(StringUtils.isNotBlank(adminOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(adminOrderReqVO.getOrderCategory(),"3")) {
                 orderResVO = submitOrderService.submitLongOrder(context);
             } else {
+                orderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitOrder(context);
             }
             OrderRecordEntity orderRecordEntity = new OrderRecordEntity();
