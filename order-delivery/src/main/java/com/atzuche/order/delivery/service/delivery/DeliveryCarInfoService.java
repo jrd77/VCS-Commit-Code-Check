@@ -146,7 +146,7 @@ public class DeliveryCarInfoService {
         String cityCode = renterOrderDelivery.getCityCode();
         String  tenancy = CommonUtils.getRentDays(renterOrderDelivery.getRentTime(), renterOrderDelivery.getRevertTime(), configHours).toString();
         ownerGetAndReturnCarDTO.setZuQi(tenancy);
-        deliveryCarVO = createDeliveryCarInfo(ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar, carEngineType, cityCode, renterGoodsDetailDTO);
+        deliveryCarVO = createDeliveryCarInfo(renterOrderDelivery,ownerGetAndReturnCarDTO, deliveryCarVO, ownerHandoverCarInfoEntities, renterHandoverCarInfoEntities, isEscrowCar, carEngineType, cityCode, renterGoodsDetailDTO);
         return deliveryCarVO;
     }
 
@@ -235,12 +235,12 @@ public class DeliveryCarInfoService {
      * @param renterHandoverCarInfoEntities
      * @return
      */
-    public DeliveryCarVO createDeliveryCarInfo(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, DeliveryCarVO deliveryCarVO, List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities, List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities,
+    public DeliveryCarVO createDeliveryCarInfo(RenterOrderDeliveryEntity renterOrderDelivery,OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, DeliveryCarVO deliveryCarVO, List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities, List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities,
                                                Boolean isEscrowCar,Integer carEngineType,String cityCode,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
         //车主取送信息
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode,2);
-        int overMileageAmt = getDeliveryCarOverMileageAmt(ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
+        int overMileageAmt = getDeliveryCarOverMileageAmt(renterOrderDelivery,ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
         ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(overMileageAmt)));
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
@@ -254,14 +254,14 @@ public class DeliveryCarInfoService {
         }
         ownerHandoverCarInfoEntities = CommonUtil.copyList(ownerHandoverCarInfoList);
         OwnerGetAndReturnCarDTO getAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO,ownerHandoverCarInfoEntities,carEngineType,cityCode,1);
-        int renterOverMileageAmt = getDeliveryCarOverMileageAmt(getAndReturnCarDTO, renterGoodsDetailDTO);
+        int renterOverMileageAmt = getDeliveryCarOverMileageAmt(renterOrderDelivery,getAndReturnCarDTO, renterGoodsDetailDTO);
         getAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(renterOverMileageAmt)));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
         try {
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
         } catch (Exception e) {
-            log.info("获取平台加邮费出错，cause：[{}]", e);
+            log.info("获取平台加邮费出错", e);
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
         }
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
@@ -333,7 +333,7 @@ public class DeliveryCarInfoService {
     /**
      * 获取超历程数据
      */
-    public Integer getDeliveryCarOverMileageAmt(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,RenterGoodsDetailDTO renterGoodsDetailDTO) {
+    public Integer getDeliveryCarOverMileageAmt(RenterOrderDeliveryEntity renterOrderDelivery,OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         try {
             MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
             mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType());
@@ -342,8 +342,8 @@ public class DeliveryCarInfoService {
             mileageAmtDTO.setReturnMileage(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
             mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice());
             CostBaseDTO costBaseDTO = new CostBaseDTO();
-            costBaseDTO.setStartTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealGetTime(),DateUtils.DATE_DEFAUTE_4));
-            costBaseDTO.setEndTime(DateUtils.parseLocalDateTime(ownerGetAndReturnCarDTO.getRealReturnTime(),DateUtils.DATE_DEFAUTE_4));
+            costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
+            costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
         } catch (Exception e) {
