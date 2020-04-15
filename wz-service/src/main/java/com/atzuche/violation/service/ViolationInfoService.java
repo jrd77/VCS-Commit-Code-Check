@@ -65,7 +65,11 @@ public class ViolationInfoService {
         renterOrderWzDetailEntities.stream().forEach(r -> {
             RenterOrderWzDetailResVO renterOrderWzDetailRes = new RenterOrderWzDetailResVO();
             CommonUtil.copyPropertiesIgnoreNull(r, renterOrderWzDetailRes);
-            renterOrderWzDetailRes.setIllegalTime(DateUtils.parseDate(DateUtils.formate(renterOrderWzDetailRes.getIllegalTime(),DateUtils.DATE_DEFAUTE1),DateUtils.DATE_DEFAUTE1));
+            try {
+                renterOrderWzDetailRes.setIllegalTime(DateUtils.formate(r.getIllegalTime(), DateUtils.DATE_DEFAUTE1));
+            } catch (Exception e) {
+                log.info("違章時間爲空");
+            }
             renterOrderWzDetailResVOS.add(renterOrderWzDetailRes);
         });
         return renterOrderWzDetailResVOS;
