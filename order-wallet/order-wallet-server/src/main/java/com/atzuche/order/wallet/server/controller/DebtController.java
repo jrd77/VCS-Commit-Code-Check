@@ -55,7 +55,7 @@ public class DebtController {
     }
     
     /**
-     * 返回用户名下的欠款(区分历史欠款和订单欠款)
+     * 返回用户名下的欠款(区分历史欠款和订单欠款还包含违章押金和车辆押金循环扣不下来的欠款)
      * @param memNo
      * @return ResponseData<DebtDetailVO>
      */
