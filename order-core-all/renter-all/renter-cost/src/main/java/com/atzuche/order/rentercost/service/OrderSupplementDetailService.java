@@ -185,4 +185,25 @@ public class OrderSupplementDetailService{
     public int updateOpStatusByPrimaryKey(Integer primaryKey, Integer opStatus) {
         return orderSupplementDetailMapper.updateOpStatusByPrimaryKey(primaryKey, opStatus);
     }
+    
+    
+    /**
+     * 获取为支付的补付金额
+     * @param memNo
+     * @return int
+     */
+    public int getSumNoPaySupplementAmt(String memNo) {
+    	int noPaySupplementAmt = 0;
+    	List<OrderSupplementDetailEntity> list = listOrderSupplementDetailByMemNo(memNo);
+    	if (list == null || list.isEmpty()) {
+    		return noPaySupplementAmt;
+    	}
+    	for (OrderSupplementDetailEntity sup:list) {
+    		if (sup != null && sup.getAmt() != null) {
+    			noPaySupplementAmt += sup.getAmt();
+    		}
+    	}
+    	noPaySupplementAmt = noPaySupplementAmt > 0 ? 0:Math.abs(noPaySupplementAmt);
+    	return noPaySupplementAmt;
+    }
 }

@@ -349,8 +349,8 @@ public class ModifyOrderConfirmService {
 						reqContext.getOrderReqVO().setSrvGetFlag(1);
 						reqContext.getOrderReqVO().setSrvReturnFlag(0);
 					}
-					// 新增取车服务
-					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+					// 新增取车服务 （修改订单前面已经做了，此处不需要再新增配送订单）
+					//deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
 					sendRenyunFlag = true;
 				}
 				if (srvGetFlag != null && srvGetFlag == 0) {
@@ -369,8 +369,8 @@ public class ModifyOrderConfirmService {
 						reqContext.getOrderReqVO().setSrvGetFlag(0);
 						reqContext.getOrderReqVO().setSrvReturnFlag(1);
 					}
-					// 新增取车服务
-					deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+					// 新增取车服务 （修改订单前面已经做了，此处不需要再新增配送订单）
+					//deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
 					sendRenyunFlag = true;
 				}
 				if (srvReturnFlag != null && srvReturnFlag == 0) {
@@ -538,6 +538,12 @@ public class ModifyOrderConfirmService {
 		returnCarAddress.setLon(modifyOrderOwnerDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderOwnerDTO.getRevertCarLon()):null);
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
+		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag() && 
+				modifyOrderOwnerDTO.getOldCarNo() != null) {
+			// 换车要释放上一辆车的库存
+			orderInfoDTO.setOldCarNo(modifyOrderOwnerDTO.getOldCarNo());
+			orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDHC.getType());
+		}
 		stockService.cutCarStock(orderInfoDTO);
 	}
 	

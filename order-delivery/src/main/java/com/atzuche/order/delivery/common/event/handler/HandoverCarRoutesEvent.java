@@ -23,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -118,9 +119,11 @@ public class HandoverCarRoutesEvent {
         if (serviceType.equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
             handoverCarInfoDTO.setRealGetUserName(handoverCarRenYunVO.getHeadName());
             handoverCarInfoDTO.setRealGetUserPhone(handoverCarRenYunVO.getHeadPhone());
+            handoverCarInfoDTO.setRealReturnTime(LocalDateTime.now());
         } else if (serviceType.equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
             handoverCarInfoDTO.setRealReturnUserName(handoverCarRenYunVO.getHeadName());
             handoverCarInfoDTO.setRealReturnUserPhone(handoverCarRenYunVO.getHeadPhone());
+            handoverCarInfoDTO.setRealReturnTime(LocalDateTime.now());
         }
         handoverCarInfoDTO.setCreateOp("");
         handoverCarInfoDTO.setMsgId(handoverCarRenYunVO.getMessageId());

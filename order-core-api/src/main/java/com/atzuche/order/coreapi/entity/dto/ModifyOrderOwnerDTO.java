@@ -104,5 +104,9 @@ public class ModifyOrderOwnerDTO {
      * 租车费用支付状态
      */
     private Integer rentCarPayStatus;
+    /**
+     * 换车时使用释放老车辆的库存
+     */
+    private Integer oldCarNo;
     
 }

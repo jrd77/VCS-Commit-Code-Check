@@ -99,6 +99,8 @@ public class ModifyOrderForOwnerService {
 		OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsDetailDTO(modifyOrderOwnerDTO, ownerOrderEntity);
 		// 设置商品信息
 		modifyOrderOwnerDTO.setOwnerGoodsDetailDTO(ownerGoodsDetailDTO);
+		// 换车时获取原订单车辆号
+		modifyOrderOwnerDTO.setOldCarNo(getOldCarNo(modifyOrderOwnerDTO, ownerOrderEntity.getOwnerOrderNo()));
 		// 获取车主会员信息
 		OwnerMemberDTO ownerMemberDTO = getOwnerMemberDTO(modifyOrderOwnerDTO, ownerOrderEntity.getOwnerOrderNo(), ownerOrderNo, ownerGoodsDetailDTO.getMemNo());
 		// 设置车主会员信息
@@ -275,18 +277,18 @@ public class ModifyOrderForOwnerService {
 		}
 		// gps费
 		String gpsSerialNumber = ownerGoodsDetailDTO.getGpsSerialNumber();
+		List<Integer> lsGpsSerialNumber = null;
 		if (StringUtils.isNotBlank(gpsSerialNumber)) {
 			String [] gpsSerials = gpsSerialNumber.split(",");
-			List<Integer> lsGpsSerialNumber = new ArrayList<Integer>();
+			lsGpsSerialNumber = new ArrayList<Integer>();
 			for (int i=0;i<gpsSerials.length;i++) {
 				lsGpsSerialNumber.add(Integer.valueOf(gpsSerials[i]));
 			}
-			List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
-			if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
-				incrementList.addAll(gpsFeeList);
-			}
 		}
-		
+		List<OwnerOrderIncrementDetailEntity> gpsFeeList =  ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO, lsGpsSerialNumber);
+		if (gpsFeeList != null && !gpsFeeList.isEmpty()) {
+			incrementList.addAll(gpsFeeList);
+		}
 		incrementList.add(srvGetFeeEntity);
 		incrementList.add(srvReturnFeeEntity);
 		return incrementList;
@@ -602,5 +604,23 @@ public class ModifyOrderForOwnerService {
 		costBaseDTO.setOwnerOrderNo(modifyOrderOwnerDTO.getOwnerOrderNo());
 		costBaseDTO.setStartTime(modifyOrderOwnerDTO.getRentTime());
 		return costBaseDTO;
+	}
+	
+	
+	/**
+	 * 换车时获取原订单车辆号
+	 * @param modifyOrderOwnerDTO
+	 * @param ownerOrderNo
+	 * @return String
+	 */
+	public Integer getOldCarNo(ModifyOrderOwnerDTO modifyOrderOwnerDTO, String ownerOrderNo) {
+		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag()) {
+			// 获取还车前车主商品信息
+			OwnerGoodsDetailDTO ownerGoodsDetailDTOOld = ownerCommodityService.getOwnerGoodsDetail(ownerOrderNo, false);
+			if (ownerGoodsDetailDTOOld != null && ownerGoodsDetailDTOOld.getCarNo() != null) {
+				return ownerGoodsDetailDTOOld.getCarNo();
+			}
+		}
+		return null;
 	}
 }

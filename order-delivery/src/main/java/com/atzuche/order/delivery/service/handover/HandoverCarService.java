@@ -4,14 +4,12 @@ import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.req.handover.rep.OwnerHandoverCarInfoVO;
 import com.atzuche.order.commons.vo.req.handover.rep.RenterHandoverCarInfoVO;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
-import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.OwnerHandoverCarRemarkEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterHandoverCarRemarkEntity;
+import com.atzuche.order.delivery.entity.*;
 import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.exception.HandoverCarOrderException;
 import com.atzuche.order.delivery.mapper.*;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.delivery.HandoverProVO;
 import com.atzuche.order.delivery.vo.handover.*;
@@ -42,7 +40,6 @@ public class HandoverCarService {
 
     /**
      * 新增交接车数据
-     *
      * @param handoverCarVO
      */
     @Transactional(rollbackFor = Exception.class)
@@ -195,9 +192,9 @@ public class HandoverCarService {
     public void setHandoverCarInfo(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity, OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity, Integer userType, String orderNo, Integer photoType) {
         int type = photoType == 2 ? 3 : 4;
         if (UserTypeEnum.isUserType(userType) && userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
-            renterHandoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(orderNo, type);
+            renterHandoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(orderNo, String.valueOf(type));
         } else if (UserTypeEnum.isUserType(userType) && userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
-            ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(orderNo, type);
+            ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(orderNo, String.valueOf(type));
         } else {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到合适的类型");
         }
@@ -214,13 +211,20 @@ public class HandoverCarService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertOrUpdateRenterHandoverCarInfo(HandoverCarInfoDTO handoverCarInfoDTO, HandoverCarRemarkDTO handoverCarRemarkDTO) {
-        RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), handoverCarInfoDTO.getType());
-        RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), handoverCarInfoDTO.getType());
+        String type = String.valueOf(handoverCarInfoDTO.getType());
+        if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
+            type = " 1 or type = 3";
+        } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
+            type = " 2 or type = 4";
+        }
+        RenterHandoverCarInfoEntity handoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), type);
+        RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), type);
         if (Objects.nonNull(handoverCarInfoEntity)) {
             CommonUtil.copyPropertiesIgnoreNull(handoverCarInfoDTO, handoverCarInfoEntity);
-             renterHandoverCarService.updateRenterHandoverInfoByPrimaryKey(handoverCarInfoEntity);
+            renterHandoverCarService.updateRenterHandoverInfoByPrimaryKey(handoverCarInfoEntity);
         } else {
             RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = new RenterHandoverCarInfoEntity();
+            renterHandoverCarInfoEntity.setIsDelete(0);
             BeanUtils.copyProperties(handoverCarInfoDTO, renterHandoverCarInfoEntity);
             renterHandoverCarService.insertRenterHandoverCar(renterHandoverCarInfoEntity);
         }
@@ -228,7 +232,8 @@ public class HandoverCarService {
             if (null == renterHandoverCarRemarkEntity) {
                 RenterHandoverCarRemarkEntity renterRemarkEntity = new RenterHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, renterRemarkEntity);
-                 renterHandoverCarService.insertRenterHandoverCarRemark(renterRemarkEntity);
+                renterRemarkEntity.setIsDelete(0);
+                renterHandoverCarService.insertRenterHandoverCarRemark(renterRemarkEntity);
             } else {
                 CommonUtil.copyPropertiesIgnoreNull(handoverCarRemarkDTO, renterHandoverCarRemarkEntity);
                 renterHandoverCarService.updateRenterHandoverRemarkByPrimaryKey(renterHandoverCarRemarkEntity);
@@ -240,25 +245,34 @@ public class HandoverCarService {
 
     /**
      * 更新车主交接车和备注信息
+     *
      * @param handoverCarInfoDTO
      * @param handoverCarRemarkDTO
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertOrUpdateOwnerHandoverCarInfo(HandoverCarInfoDTO handoverCarInfoDTO, HandoverCarRemarkDTO handoverCarRemarkDTO) {
-        OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), handoverCarInfoDTO.getType());
-        OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), handoverCarInfoDTO.getType());
+        String type = String.valueOf(handoverCarInfoDTO.getType());
+        if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
+            type = " 1 or type = 3 ";
+        } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
+            type = " 2 or type = 4 ";
+        }
+        OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = ownerHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo(), type);
+        OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo(), type);
         if (Objects.nonNull(ownerHandoverCarInfoEntity)) {
             CommonUtil.copyPropertiesIgnoreNull(handoverCarInfoDTO, ownerHandoverCarInfoEntity);
             ownerHandoverCarService.updateOwnerHandoverInfoByPrimaryKey(ownerHandoverCarInfoEntity);
         } else {
             OwnerHandoverCarInfoEntity ownerHandoverCarInfo = new OwnerHandoverCarInfoEntity();
             BeanUtils.copyProperties(handoverCarInfoDTO, ownerHandoverCarInfo);
+            ownerHandoverCarInfo.setIsDelete(0);
             ownerHandoverCarService.insertOwnerHandoverCarInfo(ownerHandoverCarInfo);
         }
         if (Objects.nonNull(handoverCarRemarkDTO)) {
             if (null == ownerHandoverCarRemarkEntity) {
                 OwnerHandoverCarRemarkEntity ownerRemarkEntity = new OwnerHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, ownerRemarkEntity);
+                ownerRemarkEntity.setIsDelete(0);
                 ownerHandoverCarService.insertOwnerHandoverCarRemark(ownerRemarkEntity);
             } else {
                 CommonUtil.copyPropertiesIgnoreNull(handoverCarRemarkDTO, ownerHandoverCarRemarkEntity);
@@ -266,22 +280,4 @@ public class HandoverCarService {
             }
         }
     }
-
-    /**
-     * 租客是否还车
-     * @param orderNo
-     * @return
-     */
-    public Boolean isReturnCar(String orderNo) {
-        boolean result = false;
-        RenterHandoverCarInfoEntity renterHandoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(orderNo, 4);
-        if (Objects.isNull(renterHandoverCarInfoEntity) || StringUtils.isBlank(renterHandoverCarInfoEntity.getMsgId())) {
-            return result;
-        }
-        result = true;
-        return result;
-    }
-
-
-
 }

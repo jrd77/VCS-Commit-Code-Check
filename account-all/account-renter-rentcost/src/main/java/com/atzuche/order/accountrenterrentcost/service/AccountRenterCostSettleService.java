@@ -41,7 +41,9 @@ public class AccountRenterCostSettleService{
     public int getCostPaidRent(String orderNo,String memNo) {
         Assert.notNull(orderNo, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
-        return accountRenterCostSettleNoTService.getCostPaidRent(orderNo,memNo);
+        int shishouAmt = accountRenterCostSettleNoTService.getCostPaidRent(orderNo,memNo);
+        log.info("orderNo=[{}],memNo=[{}],实收金额=[{}]",orderNo,memNo,shishouAmt);
+        return shishouAmt;
     }
 
     /**
@@ -84,8 +86,8 @@ public class AccountRenterCostSettleService{
         int settleDetail = accountRenterCostSettleDetailNoTService.insertAccountRenterCostSettleDetail(accountRenterCostSettleDetailEntity);
         log.info("结算明细记录accountRenterCostSettleDetailEntity={}", JSON.toJSONString(accountRenterCostSettleDetailEntity));*/
         //3 记录退款费用记录
-        accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySource());
-        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySource()));
+        accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySourceCode());
+        accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySourceCode()));
         int renterCostDetail = accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
 
         return renterCostDetail;

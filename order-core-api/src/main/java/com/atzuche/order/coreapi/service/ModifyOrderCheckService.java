@@ -309,10 +309,10 @@ public class ModifyOrderCheckService {
 		}
 		// 订单状态
 		int status = orderStatus.getStatus() == null ? -1:orderStatus.getStatus();
-		if (status == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+		if (status == OrderStatusEnum.TO_CONFIRM.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()) {
 			throw new ModifyOrderWaitReceiptException();
 		}
-		if (status == OrderStatusEnum.COMPLETED.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()) {
+		if (status == OrderStatusEnum.COMPLETED.getStatus()) {
 			throw new ModifyOrderAlreadyOverException();
 		}
 		if (status >= OrderStatusEnum.TO_SETTLE.getStatus() || 

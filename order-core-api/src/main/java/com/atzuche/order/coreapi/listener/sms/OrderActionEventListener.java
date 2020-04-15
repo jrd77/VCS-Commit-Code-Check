@@ -79,11 +79,11 @@ public class OrderActionEventListener extends OrderSendMessageManager {
             if (CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(orderRenterPayMessage.getMessage().getOrderNo()))) {
                 Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(), ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
                 orderMessage.setMap(smsMap);
-                Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
-                orderMessage.setPushMap(map);
-            } else {
                 Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
                 orderMessage.setPushMap(map);
+            } else {
+                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
+                orderMessage.setMap(smsMap);
             }
         }
         log.info("----处理支付租车费用事件完成 发送参数：[{}]", JSONObject.toJSONString(orderRenterPayMessage));

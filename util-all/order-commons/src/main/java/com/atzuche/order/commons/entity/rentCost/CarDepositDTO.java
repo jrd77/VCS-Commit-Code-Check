@@ -20,4 +20,8 @@ public class CarDepositDTO {
     public Integer expDeductionRentAmt = 0;
     @AutoDocProperty("抵扣历史欠款")
     public Integer DeductionRentHistoricalAmt = 0;
+    @AutoDocProperty("预计和实际抵扣租车费用标志 1：预计、2实际")
+    public Integer expAndActFlg;
+    @AutoDocProperty("是否车辆押金暂扣  0-否，1-是,2-撤销暂扣")
+    public Integer isDetain;
 }

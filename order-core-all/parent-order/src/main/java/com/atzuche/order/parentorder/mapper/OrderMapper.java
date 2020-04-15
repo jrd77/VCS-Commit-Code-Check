@@ -66,4 +66,6 @@ public interface OrderMapper {
     List<OrderEntity> getByOrderNos(@Param("orderNos")List<String> orderNos);
 
     List<String> getorderNoAll();
+
+    List<OrderEntity> getOrderByRenterMemNo(@Param("renterMemNo")String renterMemNo);
 }

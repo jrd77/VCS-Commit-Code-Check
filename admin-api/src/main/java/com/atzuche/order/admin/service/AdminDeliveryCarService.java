@@ -150,8 +150,8 @@ public class AdminDeliveryCarService {
         }
         DeliveryReqVO deliveryReqVO = createParams(deliveryCarVO);
         orderReqVo.setCityCode(orderEntity.getCityCode());
-        orderReqVo.setSrvGetFlag(Integer.valueOf(deliveryReqVO.getGetDeliveryReqDTO().getIsUsedGetAndReturnCar()));
-        orderReqVo.setSrvReturnFlag(Integer.valueOf(deliveryReqVO.getRenterDeliveryReqDTO().getIsUsedGetAndReturnCar()));
+        orderReqVo.setSrvGetFlag(deliveryCarVO.getIsGetCar());
+        orderReqVo.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
         orderReqVo.setSrvGetLat(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLat());
         orderReqVo.setSrvGetLon(deliveryReqVO.getGetDeliveryReqDTO().getRenterGetReturnLng());
         orderReqVo.setSrvReturnLat(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnLat());
@@ -163,12 +163,14 @@ public class AdminDeliveryCarService {
         ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
         if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
             logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
+            throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
         }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if(Objects.nonNull(ownerTransAddressReqVO)) {
             ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
-            if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode())) {
+            if (!ownerResponseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !ownerResponseData.getResCode().equals("510004")) {
                 logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
+                throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());
             }
         }
         if(Objects.nonNull(deliveryReqVO.getGetDeliveryReqDTO())){
@@ -219,14 +221,14 @@ public class AdminDeliveryCarService {
             ownerTransAddressReqVO.setMemNo(memNo);
         }
         if(Objects.nonNull(deliveryCarVO.getGetHandoverCarDTO())) {
-            ownerTransAddressReqVO.setGetCarAddressText(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetAddr());
-            ownerTransAddressReqVO.setSrvGetLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLat());
-            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLng());
+            ownerTransAddressReqVO.setGetCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
+            ownerTransAddressReqVO.setSrvGetLat(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLat());
+            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
         }
         if(Objects.nonNull(deliveryCarVO.getReturnHandoverCarDTO())) {
-            ownerTransAddressReqVO.setReturnCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
-            ownerTransAddressReqVO.setSrvReturnLat(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLat());
-            ownerTransAddressReqVO.setSrvGetLon(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnLng());
+            ownerTransAddressReqVO.setReturnCarAddressText(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetAddr());
+            ownerTransAddressReqVO.setSrvReturnLat(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLat());
+            ownerTransAddressReqVO.setSrvReturnLon(deliveryCarVO.getReturnHandoverCarDTO().getOwnerRealGetLng());
         }
         return ownerTransAddressReqVO;
     }
@@ -238,11 +240,6 @@ public class AdminDeliveryCarService {
         GetHandoverCarDTO getHandoverCarDTO = deliveryCarVO.getGetHandoverCarDTO();
         ReturnHandoverCarDTO returnHandoverCarDTO = deliveryCarVO.getReturnHandoverCarDTO();
         if (Objects.nonNull(getHandoverCarDTO)) {
-            if(StringUtils.isBlank(getHandoverCarDTO.getRenterRealGetAddr()) || StringUtils.isBlank(getHandoverCarDTO.getOwnRealReturnAddr()))
-            {
-                logger.info("取车地址相关信息不能为空");
-                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
-            }
             DeliveryReqDTO deliveryReqDTO = new DeliveryReqDTO();
             deliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsGetCar()));
             deliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());
@@ -258,11 +255,6 @@ public class AdminDeliveryCarService {
             deliveryReqVO.setGetDeliveryReqDTO(deliveryReqDTO);
         }
         if (Objects.nonNull(returnHandoverCarDTO)) {
-            if(StringUtils.isBlank(returnHandoverCarDTO.getRenterRealReturnAddr()) || StringUtils.isBlank(returnHandoverCarDTO.getOwnerRealGetAddr()))
-            {
-                logger.info("还车地址相关信息不能为空");
-                throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
-            }
             DeliveryReqDTO renterDeliveryReqDTO = new DeliveryReqDTO();
             renterDeliveryReqDTO.setIsUsedGetAndReturnCar(String.valueOf(deliveryCarVO.getIsReturnCar()));
             renterDeliveryReqDTO.setOrderNo(deliveryCarVO.getOrderNo());

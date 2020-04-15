@@ -48,18 +48,18 @@ public class RemindVoicePayIllegalCrashWithHoursTask extends IJobHandler {
             if (CollectionUtils.isEmpty(orderNos)) {
                 return SUCCESS;
             }
-//            for (OrderDTO violateBO : orderNos) {
-//                    OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
-//                    if (orderStatusEntity.getWzPayStatus().intValue() == 0 && orderStatusEntity.getStatus().intValue() < 8) {
-//                        //没有支付违章押金
-//                        boolean is2HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 2);
-//                        remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashWithHoursData(is2HoursAgo,  violateBO.getOrderNo(),"13628645717", DateUtils.formate(violateBO.getExpRentTime(), DateUtils.DATE_DEFAUTE));
-//                        boolean is1HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 1);
-//                        remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashWithHoursData(is1HoursAgo, violateBO.getOrderNo(),"13628645717", DateUtils.formate(violateBO.getExpRentTime(), DateUtils.DATE_DEFAUTE));
-//                        boolean isHoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 0.5);
-//                        remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashWithHoursData(isHoursAgo, violateBO.getOrderNo(),"13628645717", DateUtils.formate(violateBO.getExpRentTime(), DateUtils.DATE_DEFAUTE));
-//                    }
-//            }
+            for (OrderDTO violateBO : orderNos) {
+                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                if (orderStatusEntity.getStatus().intValue() != 0 && orderStatusEntity.getWzPayStatus().intValue() == 0 && orderStatusEntity.getStatus().intValue() < 8) {
+                    //没有支付违章押金
+                    boolean is2HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 2);
+                    remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashData(is2HoursAgo, violateBO.getOrderNo(),null);
+                    boolean is1HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 1);
+                    remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashData(is1HoursAgo, violateBO.getOrderNo(), null);
+                    boolean isHoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 0.5);
+                    remindPayIllegalCrashService.sendVoiceRemindVoicePayIllegalCrashData(isHoursAgo, violateBO.getOrderNo(), null);
+                }
+            }
             logger.info("结束执行 取车时间前2小时、1小时、30分钟語音提醒支付违章押金 ");
             XxlJobLogger.log("结束执行 取车时间前2小时、1小时、30分钟語音提醒支付违章押金 ");
             return SUCCESS;

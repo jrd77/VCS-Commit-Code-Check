@@ -128,7 +128,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
 
         }
         //车主取还车
@@ -159,7 +158,6 @@ public class HandoverCarInfoService {
                     }
                 }
             }
-            return;
         }
     }
 
@@ -200,10 +198,10 @@ public class HandoverCarInfoService {
                 return;
             }
             //车主租客备注
-            if(StringUtils.isBlank(deliveryReqVO.getOwnerRealGetAddrReamrk())){
+            if(!StringUtils.isBlank(deliveryReqVO.getOwnerRealGetAddrReamrk())){
                 renterOrderDeliveryEntity.setOwnerRealGetReturnRemark(deliveryReqVO.getOwnerRealGetAddrReamrk());
             }
-            if(StringUtils.isBlank(deliveryReqVO.getRenterRealGetAddrReamrk())){
+            if(!StringUtils.isBlank(deliveryReqVO.getRenterRealGetAddrReamrk())){
                 renterOrderDeliveryEntity.setRenterRealGetReturnRemark(deliveryReqVO.getRenterRealGetAddrReamrk());
             }
             renterOrderDeliveryMapper.updateByPrimaryKeySelective(renterOrderDeliveryEntity);

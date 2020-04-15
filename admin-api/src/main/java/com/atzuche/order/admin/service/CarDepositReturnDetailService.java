@@ -9,6 +9,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -133,13 +134,13 @@ public class CarDepositReturnDetailService {
         RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterMemNo,rentCost.getRenterCostAmtFinal());
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
         int expOrActFlag = 1;
-        if(1== orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
             expOrActFlag = 2;
             carDepositRespVo.setRealDeductionRentCarAmt(depositToCarAmt);
         }else{
             carDepositRespVo.setExpDeductionRentCarAmt(renterCostVO.getDepositCostYingkou());
         }
-
+        carDepositRespVo.setExpOrActFlag(expOrActFlag);
         carDepositRespVo.setCarDepositMonty(renterDepositDetailDTO.getOriginalDepositAmt());
         carDepositRespVo.setOriginalTotalAmt(renterDepositDetailDTO.getReductionDepositAmt());
         carDepositRespVo.setReceivableMonty(Math.abs(accountRenterDepositDTO.getYingfuDepositAmt()));
@@ -162,7 +163,7 @@ public class CarDepositReturnDetailService {
         }
         carDepositRespVo.setActDetainStatus(detainStatus.getMsg());
         carDepositRespVo.setActDetainTime(detainTime);
-        carDepositRespVo.setActDetainAmt(expOrActFlag);
+
         detainReasonHandle(carDepositRespVo, data.getDetainReasons());
 
         return ResponseData.success(carDepositRespVo);

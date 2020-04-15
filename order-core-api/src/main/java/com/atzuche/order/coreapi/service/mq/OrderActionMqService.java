@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.service.mq;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
@@ -9,6 +11,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
+import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -51,6 +54,10 @@ public class OrderActionMqService {
     private RenterCostFacadeService facadeService;
     @Autowired
     OrderService orderService;
+    @Autowired
+    OrderCostService orderCostService;
+    @Autowired
+    AccountRenterCostSettleService accountRenterCostSettleService;
     /**
      * 发送下单成功事件
      *
@@ -316,14 +323,29 @@ public class OrderActionMqService {
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             map.put("Owner2YouAdjust", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
+
         //优惠券抵扣金额
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.REAL_COUPON_OFFSET.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             map.put("CouponOffset", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
-        //钱包抵扣金额
-        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.WALLET_DEDUCT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
-            map.put("WalletPay", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
-        });
+
+        //钱包
+        List<AccountRenterCostDetailEntity> lstCostDetail =  accountRenterCostSettleService.getAccountRenterCostDetailsByOrderNo(orderNo);
+        AccountRenterCostDetailEntity walletCostDetail = null;
+        for (AccountRenterCostDetailEntity accountRenterCostDetailEntity : lstCostDetail) {
+            if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo().equals(accountRenterCostDetailEntity.getSourceCode()) && "00".equals(accountRenterCostDetailEntity.getPaySourceCode())) {
+                walletCostDetail = new AccountRenterCostDetailEntity();
+                BeanUtils.copyProperties(accountRenterCostDetailEntity,walletCostDetail);
+            }
+        }
+        if(Objects.nonNull(walletCostDetail))
+        {
+            map.put("WalletPay", String.valueOf(walletCostDetail.getAmt()));
+        }
+//        //钱包抵扣金额
+//        list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.WALLET_DEDUCT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
+//            map.put("WalletPay", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
+//        });
         //车主给租客的租金补贴金额
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             map.put("RenterPayPlatformContent", String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));

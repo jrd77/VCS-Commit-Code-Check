@@ -80,7 +80,7 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, Integer type) {
+    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, String type) {
         return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
     }
 
@@ -110,7 +110,7 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo, Integer type) {
+    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo, String type) {
         return renterHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
     }
 

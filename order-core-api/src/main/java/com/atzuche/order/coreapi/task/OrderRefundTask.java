@@ -36,7 +36,28 @@ public class OrderRefundTask extends IJobHandler {
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
-        logger.info("开始执行 退款订单任务");
+//        logger.info("开始执行 退款订单任务");
+//        List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
+//        if (CollectionUtils.isNotEmpty(list)) {
+//        	logger.info("开始执行 退款订单任务 查询需要退换的 记录list={}", GsonUtils.toJson(list));
+//        	for (int i = 0; i < list.size(); i++) {
+//                Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list.get(i)));
+//                try {
+//                    cashierPayService.refundOrderPay(list.get(i));
+//                } catch (Exception e) {
+//                    logger.error("执行 退款操作异常 异常 {}", e); //GsonUtils.toJson(list.get(i)), 
+//                    Cat.logError("执行 退款操作异常 异常 {}", e);
+//                    XxlJobLogger.log("执行 退款操作异常 异常 {}",e);  //GsonUtils.toJson(list.get(i))
+//                }
+//            }
+//        }else{
+//        	logger.info("开始执行 退款订单任务 未查询需要退换的 记录list=0");
+//        }
+//        logger.info("结束执行 退款 ");
+//        XxlJobLogger.log("结束执行 退款 ");
+    	
+    	
+    	logger.info("开始执行 退款订单任务");
         List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAll();
         if (CollectionUtils.isNotEmpty(list)) {
         	logger.info("开始执行 退款订单任务 查询需要退换的 记录list={}", GsonUtils.toJson(list));
@@ -47,7 +68,7 @@ public class OrderRefundTask extends IJobHandler {
                 } catch (Exception e) {
                     logger.error("执行 退款操作异常 异常 {}", e); //GsonUtils.toJson(list.get(i)), 
                     Cat.logError("执行 退款操作异常 异常 {}", e);
-                    XxlJobLogger.log("执行 退款操作异常 异常 {}",e);  //GsonUtils.toJson(list.get(i))
+                    XxlJobLogger.log("执行 退款操作异常 异常,params=[{}]"+GsonUtils.toJson(list.get(i)));  //GsonUtils.toJson(list.get(i))
                 }
             }
         }else{
@@ -55,6 +76,7 @@ public class OrderRefundTask extends IJobHandler {
         }
         logger.info("结束执行 退款 ");
         XxlJobLogger.log("结束执行 退款 ");
+        
         return SUCCESS;
 
     }

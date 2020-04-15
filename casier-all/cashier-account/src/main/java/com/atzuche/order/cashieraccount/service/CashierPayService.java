@@ -1,20 +1,5 @@
 package com.atzuche.order.cashieraccount.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
@@ -30,12 +15,7 @@ import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayServ
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.RefundRemoteService;
-import com.atzuche.order.cashieraccount.vo.req.pay.OfflineNotifyDataVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.VirtualNotifyDataVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
+import com.atzuche.order.cashieraccount.vo.req.pay.*;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
@@ -44,7 +24,6 @@ import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.flow.service.OrderFlowService;
@@ -53,7 +32,6 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -70,8 +48,21 @@ import com.autoyol.autopay.gateway.vo.req.RefundVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -138,7 +129,7 @@ public class CashierPayService{
         notifyDataVo.setAtappId("20");
         notifyDataVo.setPayKind(payVO.getCashType().getValue());
         notifyDataVo.setPayType(payVO.getPayType().getCode());
-        notifyDataVo.setPaySource("91");
+        notifyDataVo.setPaySource("02");
         notifyDataVo.setTransStatus("00");
         notifyDataVo.setSettleAmount(String.valueOf(payVO.getPayAmt()));
         notifyDataVo.setPayLine(1);
@@ -475,8 +466,14 @@ public class CashierPayService{
         //1 查询子单号
         RenterOrderEntity renterOrderEntity = null;
         //查询子订单有关：进行中的子订单，其他的无关(针对结算后的补付功能。)。200410
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
 	        renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
+	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
+	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+	        }
+        }else if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)) {
+        	//未支付不是有效订单
+        	renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoIncrement(orderPayReqVO.getOrderNo());
 	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
 	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
 	        }
@@ -883,25 +880,6 @@ public class CashierPayService{
         return Math.abs(rentAmt) - rentAmtPayed<0?0:(Math.abs(rentAmt) - rentAmtPayed);
     }
 
-    /*
-     * @Author ZhangBin
-     * @Date 2020/3/19 16:27
-     * @Description: 获取补付信息
-     *
-     **/
-    public int getRentCostBufuNew(String orderNo,String memNo){
-        /*RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAndFinish(orderNo);
-
-        if(Objects.isNull(renterOrderEntity) || Objects.isNull(renterOrderEntity.getRenterOrderNo())){
-            return 0;
-        }*/
-        //查询应付租车费用列表
-        List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
-        int sum = supplementList.stream().mapToInt(x -> x.getAmt()).sum();
-        return sum;
-    }
-
-    
     public int getRealRentCost(String orderNo,String memNo){
         RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
         if(renterOrderEntity==null){
@@ -1090,34 +1068,38 @@ public class CashierPayService{
      * @param cashierRefundApply
      */
     public void refundOrderPay(CashierRefundApplyEntity cashierRefundApply){
-        if(Objects.isNull(cashierRefundApply) || Objects.isNull(cashierRefundApply.getId())){
-            return;
-        }
-        //更新退款次数，最多允许退3次。 num<3 LIMIT 100
-        cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
-        //2 构造退款参数
-        RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
-       //3退款
-        AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
-        if(Objects.nonNull(vo)){
-        	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
-        	
-            NotifyDataVo notifyDataVo = new NotifyDataVo();
-            BeanUtils.copyProperties(vo,notifyDataVo);
-            notifyDataVo.setSettleAmount(vo.getRefundAmt());
-            //退款调用成功操作
-            cashierService.refundCallBackSuccess(vo);
-            log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
-            
-            //更新收银台
-            List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
-            lstNotifyDataVo.add(notifyDataVo);
-            OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
-            log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
-            
-        }else {
-        	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
-        }
+        try {
+        	if(Objects.isNull(cashierRefundApply) || Objects.isNull(cashierRefundApply.getId())){
+                return;
+            }
+            //更新退款次数，最多允许退3次。 num<3 LIMIT 100
+            cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
+            //2 构造退款参数
+            RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
+           //3退款
+            AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
+            if(Objects.nonNull(vo)){
+            	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+            	
+                NotifyDataVo notifyDataVo = new NotifyDataVo();
+                BeanUtils.copyProperties(vo,notifyDataVo);
+                notifyDataVo.setSettleAmount(vo.getRefundAmt());
+                //退款调用成功操作
+                cashierService.refundCallBackSuccess(vo);
+                log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
+                
+                //更新收银台
+                List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
+                lstNotifyDataVo.add(notifyDataVo);
+                OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
+                log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
+                
+            }else {
+            	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
+            }
+		} catch (Exception e) {
+			log.error("refundOrderPay exception: params=[{}]",GsonUtils.toJson(cashierRefundApply),e);
+		}
     }
     
     

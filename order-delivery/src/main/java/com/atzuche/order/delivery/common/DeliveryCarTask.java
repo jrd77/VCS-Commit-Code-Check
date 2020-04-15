@@ -84,17 +84,24 @@ public class DeliveryCarTask {
      */
     @Transactional(rollbackFor = Exception.class)
     public Future<Boolean> cancelOrderDelivery(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
-        RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByRenterOrderNo(renterOrderNo, serviceType);
-
-        if (null == orderDeliveryEntity) {
-            log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
-            return new AsyncResult(false);
-        }
-        orderDeliveryEntity.setStatus(3);
-        renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
-       return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
+        cancelOtherDeliveryTypeInfo(renterOrderNo,serviceType,cancelOrderDeliveryVO);
+        return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());
     }
 
+    /**
+     * 更新另一個配送信息子订单号
+     */
+    public void cancelOtherDeliveryTypeInfo(String renterOrderNo, Integer serviceType, CancelOrderDeliveryVO cancelOrderDeliveryVO) {
+        RenterOrderDeliveryEntity orderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType == 1 ? 2 : 1);
+        if (null == orderDeliveryEntity) {
+            log.info("没有找到该配送订单信息，renterOrderNo：{}", renterOrderNo);
+        } else {
+            if (!renterOrderNo.equals(orderDeliveryEntity.getRenterOrderNo())) {
+                orderDeliveryEntity.setRenterOrderNo(renterOrderNo);
+                renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDeliveryEntity);
+            }
+        }
+    }
     /**
      * 发送email
      */
