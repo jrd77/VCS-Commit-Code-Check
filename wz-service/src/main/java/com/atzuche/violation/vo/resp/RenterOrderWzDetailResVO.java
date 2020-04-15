@@ -1,5 +1,6 @@
 package com.atzuche.violation.vo.resp;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -15,7 +16,7 @@ public class RenterOrderWzDetailResVO {
     @AutoDocProperty(value = "id")
     private Long id;
     @AutoDocProperty(value = "违章时间")
-    private Date illegalTime;
+    private String illegalTime;
     @AutoDocProperty(value = "违章地点")
     private String illegalAddr;
     @AutoDocProperty(value = "违章原因")
