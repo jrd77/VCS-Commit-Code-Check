@@ -27,7 +27,7 @@ public enum ShortMessageTypeEnum {
     PAY_ILLEGAL_DEPOSIT_CANCEL_OWNERNEWYEAR("PayIllegalDepositCancelOwnerNewYear", "$realName$，由于租客未在取车时间前支付违章押金，您的“$carBrandTxt$”(车牌$CarPlateNum$)的订单已经自动取消(订单号：$orderNo$，取车时间：$expRentTime$)，请不要将车辆交于租客，根据违约金规则（春节订单条款），您将获得最多500元违约金补偿。10100202"),
     PAY_ILLEGAL_DEPOSIT_CANCEL_RENTER("PayIllegalDepositCancelRenter", "由于您未在规定时间内支付违章押金，订单已被取消，系统将按平台规则扣除您的违约金"),
     PAY_ILLEGAL_DEPOSIT_CANCEL_RENTERNEWYEAR("PayIllegalDepositCancelRenterNewYear", "$realName$，由于您未在取车时间前支付违章押金，您对“$carBrandTxt$”(车牌$CarPlateNum$)的订单已自动取消(订单号：$orderNo$，取车时间：$expRentTime$)。根据违约金规则（春节订单条款），您需要支付最多500元违约金。如还需用车请您在App重新下单，如有疑问请致电客服：10100202"),
-    PAY_RENT_CAR_DEPOSIT_2_OWNER("PayRentCarDeposit2Owner", "$realName$预订您“$carBrandTxt$”(车牌$CarPlateNum$)(订单号：$orderNo$)的租车押金支付成功。干净的车况有助于提示租客爱护车辆并获得租客好评。"),
+    PAY_RENT_CAR_DEPOSIT_2_OWNER("PayRentCarDeposit2Owner", "$renterRealName$预订您“$carBrandTxt$”(车牌$CarPlateNum$)(订单号：$orderNo$)的租车押金支付成功。干净的车况有助于提示租客爱护车辆并获得租客好评。"),
     PAY_RENT_CAR_DEPOSIT_2_RENTER("PayRentCarDeposit2Renter", "你对“$carBrandTxt$”(车牌$CarPlateNum$)的租车订单(订单号:$orderNo$)租车押金已支付完毕10100202"),
     PAY_RENT_CAR_ILLEGAL_DEPOSIT_CANCEL_OWNER("PayRentCarIllegalDepositCancelOwner", "$realName$，由于租客未在规定时间内支付租车押金及违章押金，您的“$carBrandTxt$”(车牌$CarPlateNum$)的订单已经自动取消，并且不会产生违约责任(订单号：$orderNo$，取车时间：$expRentTime$)。10100202"),
     PAY_RENT_CAR_ILLEGAL_DEPOSIT_CANCEL_RENTER("PayRentCarIllegalDepositCancelRenter", "$realName$，由于您未在规定时间内支付租车押金，您对“$carBrandTxt$”(车牌$CarPlateNum$)的订单已自动取消(订单号：$orderNo$，取车时间：$expRentTime$)。如您是一时疏忽且还需用车，建议联系车主沟通后，在App重新下单，之前的车辆可在已取消订单中找到。客服热线：10100202"),

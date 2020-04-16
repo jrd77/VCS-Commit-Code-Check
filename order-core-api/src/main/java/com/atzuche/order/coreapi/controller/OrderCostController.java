@@ -6,8 +6,11 @@ package com.atzuche.order.coreapi.controller;
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
+import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.exceptions.AccountDepositException;
+import com.atzuche.order.commons.exceptions.AccountWzDepositException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -119,15 +122,6 @@ public class OrderCostController {
            throw new OwnerOrderNotFoundException(orderNo);
 		}
 
-
-
-
-
-
-
-
-
-
 		//FIXME:
         return null;
 	}
@@ -157,9 +151,42 @@ public class OrderCostController {
 		 int totalFineAmt = facadeService.getTotalFine(orderNo,renterOrderNo,memNo);
 
 		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
+		if(depositEntity == null){
+            throw new AccountDepositException();
+        }
 		AccountRenterWzDepositEntity wzDepositEntity = cashierQueryService.getTotalToPayWzDepositAmt(orderNo);
+		if(wzDepositEntity == null){
+            throw new AccountWzDepositException();
+        }
         Integer isAuthorize = depositEntity.getIsAuthorize();
         Integer wzIsAuthorize = wzDepositEntity.getIsAuthorize();
+        int expReturnDeposit = 0;
+        int expReturnWzDeposit = 0;
+        if(isAuthorize == null){
+            expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();
+        }else if(AuthorizeEnum.IS.getCode() == isAuthorize){
+            expReturnDeposit = depositEntity.getAuthorizeDepositAmt()==null?0:depositEntity.getAuthorizeDepositAmt();
+        }else if(AuthorizeEnum.NOT.getCode() == isAuthorize){
+            expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();;
+        }else if(AuthorizeEnum.CREDIT.getCode() == isAuthorize){
+            int authorizeDepositAmt = depositEntity.getAuthorizeDepositAmt() == null ? 0 : depositEntity.getAuthorizeDepositAmt();
+            expReturnDeposit = depositEntity.getCreditPayAmt()==null?0+authorizeDepositAmt:depositEntity.getCreditPayAmt()+authorizeDepositAmt;;
+        }else{
+            expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();;
+        }
+        if(wzIsAuthorize == null){
+            expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();
+        }else if(AuthorizeEnum.IS.getCode() == wzIsAuthorize){
+            expReturnWzDeposit =  wzDepositEntity.getAuthorizeDepositAmt() == null?0: wzDepositEntity.getAuthorizeDepositAmt();
+        }else if(AuthorizeEnum.NOT.getCode() == wzIsAuthorize){
+            expReturnWzDeposit =  wzDepositEntity.getShishouDeposit()==null?0: wzDepositEntity.getShishouDeposit();
+        }else if(AuthorizeEnum.CREDIT.getCode() == wzIsAuthorize){
+            int authorizeDepositAmt = wzDepositEntity.getAuthorizeDepositAmt() == null ? 0 : wzDepositEntity.getAuthorizeDepositAmt();
+            expReturnWzDeposit =  wzDepositEntity.getCreditPayAmt()==null?0+authorizeDepositAmt: wzDepositEntity.getCreditPayAmt()+authorizeDepositAmt;
+        }else{
+            expReturnWzDeposit =  wzDepositEntity.getShishouDeposit()==null?0: wzDepositEntity.getShishouDeposit();
+        }
+
         RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
 		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
@@ -170,8 +197,8 @@ public class OrderCostController {
 		shortDetail.setShiFuWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
 		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
-		shortDetail.setExpReturnDeposit(isAuthorize!=null&&isAuthorize == 1 ? depositEntity.getAuthorizeDepositAmt() : depositEntity.getShifuDepositAmt());
-		shortDetail.setExpReturnWzDeposit(wzIsAuthorize!=null&&wzIsAuthorize == 1 ? wzDepositEntity.getAuthorizeDepositAmt() : wzDepositEntity.getShishouDeposit());
+		shortDetail.setExpReturnDeposit(expReturnDeposit);
+		shortDetail.setExpReturnWzDeposit(expReturnWzDeposit);
 		shortDetail.setOrderNo(orderNo);
 
 		return ResponseData.success(shortDetail);

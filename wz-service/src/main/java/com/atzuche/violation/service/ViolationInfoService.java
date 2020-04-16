@@ -5,6 +5,8 @@ import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.mapper.OrderStatusMapper;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
@@ -50,6 +52,8 @@ public class ViolationInfoService {
     RenterOrderWzDetailMapper renterOrderWzDetailMapper;
     @Resource
     RenterOrderWzStatusMapper renterOrderWzStatusMapper;
+    @Resource
+    OrderStatusMapper orderStatusMapper;
     /**
      * 明细列表
      * @param violationDetailReqVO
@@ -126,7 +130,14 @@ public class ViolationInfoService {
                     violationExportResVO.setIllegalDeduct(r.getIllegalDeduct());
                     violationExportResVO.setIllegalDysFine(String.valueOf(r.getIllegalDysFine()));
                     violationExportResVO.setIllegalFine(String.valueOf(r.getIllegalFine()));
-                    violationExportResVO.setIllegalPauseCost("0");
+                    OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(r.getOrderNo());
+                    String orderDetain = "未暂扣";
+                    if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                        orderDetain = "未暂扣";
+                    } else {
+                        orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                    }
+                    violationExportResVO.setIllegalPauseCost(orderDetain);
                     violationExportResVO.setIllegalReason(r.getIllegalReason());
                     violationExportResVO.setIllegalServiceCost(String.valueOf(r.getIllegalServiceCost()));
                     violationExportResVO.setIllegalSupercerCost(String.valueOf(r.getIllegalSupercerCost()));

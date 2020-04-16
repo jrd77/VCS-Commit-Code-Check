@@ -126,8 +126,6 @@ public class RenterOrderSettleService {
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
 
         //更新应扣
-
-
         AccountRenterCostSettleEntity byOrderNo = accountRenterCostSettleNoTService.getByOrderNo(orderStatusDTO.getOrderNo(), settleOrders.getRenterMemNo());
         if(byOrderNo != null){
             int rentCostAmt = settleCancelOrdersAccount.getRentCostAmt();
