@@ -12,7 +12,7 @@
         update wallet
         set balance=balance-#{expPay}-#{expGive},
         pay_balance=pay_balance-#{expPay},
-        give_balance=give_balance-#{expGive} where mem_no=#{memNo} and balance>=#{expPay}+#{expGive}
+        give_balance=give_balance-#{expGive} where mem_no=#{memNo} and balance>=#{expPay}+#{expGive} and pay_balance>=#{expPay} and give_balance>=#{expGive}
     </update>
 
     <select id="getWalletByMemNo" resultMap="base">

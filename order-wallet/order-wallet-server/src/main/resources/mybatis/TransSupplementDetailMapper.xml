@@ -378,4 +378,27 @@
      set pay_flag=3
      where id=#{id}
   </update>
+  
+  <select id="listRentDepositDebt" resultType="com.atzuche.order.wallet.server.entity.DepositDebtVO">
+  	SELECT DISTINCT pay_kind as payKind,trans_kind as transKind,trans_type as transType,trans_amt as transAmt FROM trans_pay tp 
+	INNER JOIN trans_free_double tfd ON tp.order_no=tfd.order_no
+	LEFT JOIN trans t ON tp.`order_no` = t.`order_no`
+	 WHERE tfd.`id` IS NOT NULL AND tfd.`free_double_type_id` = 2 AND tp.source = 6 
+	 AND t.`pay_flag` = 8
+	 AND tp.`pay_kind`=1
+	 AND tp.`trans_type`='03'
+	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
+  </select>
+  
+  <select id="listIllegalDepositDebt" resultType="com.atzuche.order.wallet.server.entity.DepositDebtVO">
+  	SELECT DISTINCT pay_kind as payKind,trans_kind as transKind,trans_type as transType,trans_amt as transAmt FROM trans_pay tp 
+	INNER JOIN trans_free_double tfd ON tp.order_no=tfd.order_no
+	LEFT JOIN trans t ON tp.`order_no` = t.`order_no`
+	 WHERE tfd.`id` IS NOT NULL AND tfd.`free_double_type_id` = 2 AND tp.source = 6 
+	 AND t.`deposit_pay_flag` = 8
+	 AND tp.`pay_kind`=2
+	 AND tp.`trans_type`='03'
+	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
+  </select>
+  
 </mapper>
