@@ -160,7 +160,7 @@
     </select>
     <select id="selectRefundByType" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
+        where order_no = #{orderNo} and pay_kind = #{payKind} AND `status`='01' limit 1
     </select>
 
     <select id="queryRefundTimeByOrderNo" resultType="java.util.Date">
@@ -182,6 +182,10 @@
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo}
     </select>
-
+	
+	<select id="getRefundApplyByOrderNoPayKind" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} AND pay_kind = #{payKind}
+	</select>
 
 </mapper>
