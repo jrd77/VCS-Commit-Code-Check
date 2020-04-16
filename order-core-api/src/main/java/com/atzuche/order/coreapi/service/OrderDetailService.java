@@ -550,7 +550,7 @@ public class OrderDetailService {
             consoleOwnerOrderFineDeatailDTOList.add(consoleOwnerOrderFineDeatailDTO);
         });
         //配送订单
-        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.findRenterOrderListByOrderNo(orderNo);
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
         RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
         RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
         RenterOrderDeliveryDTO renterOrderDeliveryGetDto = null;
@@ -745,7 +745,6 @@ public class OrderDetailService {
                 renterDeliveryAddrDTO.setActGetCarLon(renterDeliveryAddrDTO.getExpGetCarLon());
                 renterDeliveryAddrDTO.setActGetCarLat(renterDeliveryAddrDTO.getExpGetCarLat());
             }
-
         }
         if(renterOrderDeliveryReturn != null && renterOrderDeliveryReturn.getIsNotifyRenyun()!= null && renterOrderDeliveryReturn.getIsNotifyRenyun() == 1){
             renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryReturn.getOrderNo());
