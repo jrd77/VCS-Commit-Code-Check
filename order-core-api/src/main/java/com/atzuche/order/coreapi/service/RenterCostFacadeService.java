@@ -405,9 +405,7 @@ public class RenterCostFacadeService {
 
         //3、违章押金
         //3.1、基础费用
-        int wzDeductionRentAmt = 0;//违章抵扣的租车费用
-        int wzDeductionRentHistoricalAmt = 0;
-        int wzExpAndActFlg = 1;
+
         WzDepositDTO wzDepositDTO = new WzDepositDTO();
         wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingshou();
         wzDepositDTO.wzFineAmt = wzCostVO.getWzFineAmt();
@@ -416,16 +414,21 @@ public class RenterCostFacadeService {
         wzDepositDTO.wzStopCostAmt = wzCostVO.getWzStopCostAmt();
         wzDepositDTO.wzOtherAmt = wzCostVO.getWzOtherAmt();
         wzDepositDTO.wzInsuranceAmt = wzCostVO.getWzInsuranceAmt();
+        int wzDeductionRentAmt = 0;//违章抵扣的租车费用
+        int wzDeductionRentHistoricalAmt = 0;
+        int wzExpAndActFlg = 1;
         if(orderStatusEntity.getWzSettleStatus() == 1){//违章押金已经结算
             wzExpAndActFlg = 2;
             List<AccountRenterWzDepositDetailEntity> byOrderNo = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
             wzDeductionRentHistoricalAmt = AccountRenterWzDepositUtils.getWzDepositSettleDeductionDebtAmt(byOrderNo,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
+            wzDepositDTO.deductionRentHistoricalAmt = Math.abs(wzDeductionRentHistoricalAmt);
             wzDeductionRentAmt = Math.abs(renterCostVO.getDepositWzCostShikou()) - Math.abs(wzDeductionRentHistoricalAmt) - getOther(wzDepositDTO);
         }else{
+            wzDepositDTO.deductionRentHistoricalAmt = wzDeductionRentHistoricalAmt;
             wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou() - getOther(wzDepositDTO);
         }
         wzDepositDTO.expAndActFlg = wzExpAndActFlg;
-        wzDepositDTO.deductionRentHistoricalAmt = Math.abs(wzDeductionRentHistoricalAmt);
+
         wzDepositDTO.expDeductionRentCarAmt = wzDeductionRentAmt;
         //3.2、统计
         CostStatisticsDTO wzCostStatisticsDTO = new CostStatisticsDTO();
