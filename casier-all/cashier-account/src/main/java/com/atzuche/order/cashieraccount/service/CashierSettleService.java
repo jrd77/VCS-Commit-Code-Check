@@ -459,6 +459,18 @@ public class CashierSettleService {
         if(Objects.isNull(vo) || Objects.isNull(vo.getShifuDepositAmt())){
             return 0;
         }
-        return vo.getShifuDepositAmt();
+//        int depositAmt = vo.getShifuDepositAmt(); //默认值
+        int depositAmt = vo.getShifuDepositAmt()!=null?Math.abs(vo.getShifuDepositAmt()):0;
+        //普通预授权
+    	if(vo.getIsAuthorize() != null && vo.getIsAuthorize() == 1) {
+    		depositAmt = vo.getAuthorizeDepositAmt()!=null?Math.abs(vo.getAuthorizeDepositAmt()):0;
+    	}else if(vo.getIsAuthorize() != null && vo.getIsAuthorize() == 2){
+    		//信用预授权，一半一半的情况。
+    		int tmpAuthOri = vo.getAuthorizeDepositAmt()!=null?Math.abs(vo.getAuthorizeDepositAmt()):0;
+    		depositAmt = vo.getCreditPayAmt()!=null?Math.abs(vo.getCreditPayAmt()):0;
+    		//累加
+    		depositAmt += tmpAuthOri;
+    	}
+        return depositAmt;
     }
 }
