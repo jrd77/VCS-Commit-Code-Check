@@ -405,7 +405,6 @@ public class RenterCostFacadeService {
 
         //3、违章押金
         //3.1、基础费用
-
         WzDepositDTO wzDepositDTO = new WzDepositDTO();
         wzDepositDTO.wzDepositAmt = renterCostVO.getDepositWzCostYingshou();
         wzDepositDTO.wzFineAmt = wzCostVO.getWzFineAmt();
