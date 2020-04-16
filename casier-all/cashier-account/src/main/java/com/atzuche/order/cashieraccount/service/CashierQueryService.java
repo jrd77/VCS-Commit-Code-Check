@@ -132,7 +132,6 @@ public class CashierQueryService {
         int wzDepositSurplusAmt = list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
         //结算时候抵扣历史欠款
         int debtAmt = list.stream().filter(obj ->
-            RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(obj.getCostCode()) ||
                     RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT.getCashNo().equals(obj.getCostCode())
         ).mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
 

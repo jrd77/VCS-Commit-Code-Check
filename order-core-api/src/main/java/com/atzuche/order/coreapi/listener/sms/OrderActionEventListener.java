@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
 import com.atzuche.order.coreapi.listener.push.OrderSendMessageManager;
@@ -15,9 +16,14 @@ import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -43,6 +49,10 @@ public class OrderActionEventListener extends OrderSendMessageManager {
     OwnerOrderService ownerOrderService;
     @Autowired
     OwnerGoodsService ownerGoodsService;
+    @Autowired
+    RenterMemberService renterMemberService;
+    @Autowired
+    RenterOrderService renterOrderService;
 
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_08", durable = "true"),
@@ -76,13 +86,18 @@ public class OrderActionEventListener extends OrderSendMessageManager {
         OrderMessage<OrderRenterPaySuccessMq> orderRenterPayMessage = JSON.parseObject(new String(message.getBody()), new TypeReference<OrderMessage<OrderRenterPaySuccessMq>>(){});
         log.info("----开始处理支付租车费用事件-----");
         if (1 == orderRenterPayMessage.getMessage().getType().intValue()) {
+            String renterRealName = getRenterRealName(orderRenterPayMessage.getMessage().getOrderNo());
+            Map paramsMap = Maps.newHashMap();
+            if (StringUtils.isNotEmpty(renterRealName)) {
+                paramsMap.put("renterRealName", renterRealName);
+            }
             if (CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(orderRenterPayMessage.getMessage().getOrderNo()))) {
-                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(), ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
+                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(), ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), paramsMap);
                 orderMessage.setMap(smsMap);
                 Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
                 orderMessage.setPushMap(map);
             } else {
-                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), null);
+                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), paramsMap);
                 orderMessage.setMap(smsMap);
             }
         }
@@ -99,5 +114,15 @@ public class OrderActionEventListener extends OrderSendMessageManager {
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
         return ownerGoodsDetailDTO.getCarOwnerType();
+    }
+
+    /**
+     * 获取租客姓名
+     * @return
+     */
+    public String getRenterRealName(String orderNo){
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
+        return renterMemberDTO.getRealName();
     }
 }

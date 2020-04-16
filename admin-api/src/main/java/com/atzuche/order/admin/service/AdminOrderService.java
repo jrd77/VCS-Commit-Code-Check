@@ -516,21 +516,23 @@ public class AdminOrderService {
      * @return Integer
      */
     public DebtDetailVO getDebtAmt(String memNo){
-    	SearchCashWithdrawalReqDTO req = new SearchCashWithdrawalReqDTO();
-    	req.setMemNo(memNo);
+		/*
+		 * SearchCashWithdrawalReqDTO req = new SearchCashWithdrawalReqDTO();
+		 * req.setMemNo(memNo);
+		 */
         ResponseData<DebtDetailVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单CoreAPI服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getDebtAmt");
-            log.info("Feign 获取欠款,param={}", JSON.toJSONString(req));
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
-            responseObject =feignCashWithdrawalService.getDebtAmt(req);
+            log.info("Feign 获取欠款,memNo={}", memNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,memNo);
+            responseObject =feignCashWithdrawalService.getDebtAmt(memNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             return responseObject.getData();
         }catch (Exception e){
-            log.error("Feign 管理后台获取欠款,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            log.error("Feign 管理后台获取欠款,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),memNo,e);
             Cat.logError("Feign 管理后台获取欠款",e);
             t.setStatus(e);
         }finally {

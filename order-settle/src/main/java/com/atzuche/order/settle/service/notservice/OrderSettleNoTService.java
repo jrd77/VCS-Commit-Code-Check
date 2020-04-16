@@ -389,7 +389,8 @@ public class OrderSettleNoTService {
                 BeanUtils.copyProperties(mileageAmt,accountRenterCostSettleDetail);
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getCashNo());
                 accountRenterCostSettleDetail.setCostDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_MILEAGE_COST.getTxt());
-                accountRenterCostSettleDetail.setAmt(mileageAmt.getTotalFee());
+                //bugfix:200415 租客超里程费用取负数
+                accountRenterCostSettleDetail.setAmt(-Math.abs(mileageAmt.getTotalFee()));
                 accountRenterCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
                 accountRenterCostSettleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
                 accountRenterCostSettleDetail.setMemNo(settleOrders.getRenterMemNo());
@@ -1387,7 +1388,7 @@ public class OrderSettleNoTService {
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrders,cashierDeductDebtReq);
             cashierDeductDebtReq.setAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
-            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT);
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierWzSettleService.deductWZDebt(cashierDeductDebtReq);
             if(Objects.nonNull(result)){

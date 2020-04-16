@@ -199,7 +199,8 @@ public class DeliveryCarInfoPriceService {
             double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
             log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
-            oilDifferenceCrash = oilDifferenceCrash > 0D ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
+            oilDifferenceCrash = oilDifferenceCrash > 0D
+                    ? Math.floor(oilDifferenceCrash) : Math.ceil(oilDifferenceCrash);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(String.valueOf(Double.valueOf(oilDifferenceCrash).intValue()));
         } catch (Exception e) {
             log.error("设置参数失败,目前没有值");
@@ -250,8 +251,8 @@ public class DeliveryCarInfoPriceService {
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
-        feeResult.setTotalFee(mileageAmt);
-        feeResult.setUnitPrice(mileageAmt);
+        feeResult.setTotalFee(-mileageAmt);
+        feeResult.setUnitPrice(-mileageAmt);
         return feeResult;
     }
 

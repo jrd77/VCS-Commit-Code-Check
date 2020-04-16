@@ -12,9 +12,24 @@ import org.springframework.web.bind.annotation.*;
 //@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
 @FeignClient(name="order-center-api")
 public interface FeignOrderDetailService {
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/16 15:11
+     * @Description: 订单详情
+     *
+     **/
     @RequestMapping(method = RequestMethod.POST, value = "/order/detail/query")
     ResponseData<OrderDetailRespDTO> getOrderDetail(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/16 15:11
+     * @Description: 包含车主收益的订单详情
+     *
+     **/
+    @RequestMapping(method = RequestMethod.POST, value = "/order/detail/queryAndOwnerIncom")
+    ResponseData<OrderDetailRespDTO> queryAndOwnerIncom(@RequestBody OrderDetailReqDTO orderDetailReqDTO);
+
 
     /**
      * @Author ZhangBin

@@ -842,7 +842,7 @@ public class OrderCostService {
          oilAmtInt = data.getOwnerOilDifferenceCrashAmt();
 		 beyondMileAmtInt = data.getMileageAmt();
          //车主油费和超里程费用，是可正可负。
-		 beyondMileAmt = String.valueOf(beyondMileAmtInt);
+		 beyondMileAmt = String.valueOf(Math.abs(beyondMileAmtInt));
 		 oilAmt = String.valueOf(oilAmtInt);
 		 
 		 //统计
