@@ -425,7 +425,7 @@ public class RenterCostFacadeService {
             wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou() - getOther(wzDepositDTO);
         }
         wzDepositDTO.expAndActFlg = wzExpAndActFlg;
-        wzDepositDTO.deductionRentHistoricalAmt = wzDeductionRentHistoricalAmt;
+        wzDepositDTO.deductionRentHistoricalAmt = Math.abs(wzDeductionRentHistoricalAmt);
         wzDepositDTO.expDeductionRentCarAmt = wzDeductionRentAmt;
         //3.2、统计
         CostStatisticsDTO wzCostStatisticsDTO = new CostStatisticsDTO();
