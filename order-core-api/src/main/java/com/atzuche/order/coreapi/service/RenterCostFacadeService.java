@@ -374,9 +374,9 @@ public class RenterCostFacadeService {
         int carDeductionRentHistoricalAmt = 0;
         if(orderStatusEntity.getSettleStatus() == SettleStatusEnum.SETTLED.getCode()){//车辆押金已经结算
             //车辆押金
-            List<AccountRenterCostDetailEntity> accountRenterCostDetailEntityList = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
-            carDeductionRentAmt = Optional.ofNullable(accountRenterCostDetailEntityList).orElseGet(ArrayList::new).stream()
-                    .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getSourceCode()))
+            List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntities = accountRenterCostSettleService.getAccountRenterCostSettleDetail(orderNo);
+            carDeductionRentAmt = Optional.ofNullable(accountRenterCostSettleDetailEntities).orElseGet(ArrayList::new).stream()
+                    .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getCostCode()))
                     .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
             carExpAndActFlg = 2;
             List<AccountRenterDepositDetailEntity> accountRenterDepositDetailEntities = accountRenterDepositDetailNoTService.findByOrderNo(orderNo);
@@ -387,7 +387,7 @@ public class RenterCostFacadeService {
         carDepositDTO.carDeposit = abs(renterDepositDetailEntity.getOriginalDepositAmt());
         carDepositDTO.platformTaskRelief = renterDepositDetailEntity.getReductionDepositAmt();
         carDepositDTO.DeductionRentHistoricalAmt = Math.abs(carDeductionRentHistoricalAmt);
-        carDepositDTO.expDeductionRentAmt = carDeductionRentAmt;
+        carDepositDTO.expDeductionRentAmt = Math.abs(carDeductionRentAmt);
         carDepositDTO.expAndActFlg = carExpAndActFlg;
         carDepositDTO.isDetain = orderStatusEntity.getIsDetain();
 
