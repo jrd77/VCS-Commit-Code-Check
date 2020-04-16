@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.filter;
 
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.exceptions.LongRentGetReturnCarServiceException;
 import com.atzuche.order.commons.exceptions.RenterTime4HourException;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
@@ -14,11 +15,11 @@ import java.time.LocalDateTime;
 /*
  * @Author ZhangBin
  * @Date 2020/2/20 17:54
- * @Description: 取还车服务起租时间需大于4小时校验
+ * @Description: 长租必须使用取还车
  *
  **/
 @Slf4j
-@Service
+@Service("longSrvGetReturnFilter")
 public class LongSrvGetReturnFilter implements OrderFilter {
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
@@ -26,7 +27,7 @@ public class LongSrvGetReturnFilter implements OrderFilter {
         Integer srvReturnFlag = orderReqVO.getSrvReturnFlag()==null?0:orderReqVO.getSrvReturnFlag();
         Integer srvGetFlag = orderReqVO.getSrvGetFlag()==null?0:orderReqVO.getSrvGetFlag();
         if(srvReturnFlag != 1 || srvGetFlag != 1) {
-
+            throw new LongRentGetReturnCarServiceException();
         }
     }
 

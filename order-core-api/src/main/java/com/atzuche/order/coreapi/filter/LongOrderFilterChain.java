@@ -38,6 +38,9 @@ public class LongOrderFilterChain implements OrderFilter, ApplicationContextAwar
         orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
         /*取还车时间校验*/
         orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
+        /*长租-取还车服务校验*/
+        orderFilterList.add(applicationContext.getBean(LongSrvGetReturnFilter.class));
+
         /*取还车服务起租时间需大于4小时校验*/
         //orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
         /*车辆设置校验*/
