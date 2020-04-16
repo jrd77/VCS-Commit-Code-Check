@@ -772,8 +772,6 @@ public class OrderDetailService {
                 renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpGetCarLon());
                 renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpGetCarLat());
             }
-
-
         }
         return renterDeliveryAddrDTO;
     }
