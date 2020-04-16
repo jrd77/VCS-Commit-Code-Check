@@ -169,7 +169,8 @@ public class OrderCostController {
         }else if(AuthorizeEnum.NOT.getCode() == isAuthorize){
             expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();;
         }else if(AuthorizeEnum.CREDIT.getCode() == isAuthorize){
-            expReturnDeposit = depositEntity.getCreditPayAmt()==null?0:depositEntity.getCreditPayAmt();;
+            int authorizeDepositAmt = depositEntity.getAuthorizeDepositAmt() == null ? 0 : depositEntity.getAuthorizeDepositAmt();
+            expReturnDeposit = depositEntity.getCreditPayAmt()==null?0+authorizeDepositAmt:depositEntity.getCreditPayAmt()+authorizeDepositAmt;;
         }else{
             expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();;
         }
@@ -180,7 +181,8 @@ public class OrderCostController {
         }else if(AuthorizeEnum.NOT.getCode() == wzIsAuthorize){
             expReturnWzDeposit =  wzDepositEntity.getShishouDeposit()==null?0: wzDepositEntity.getShishouDeposit();
         }else if(AuthorizeEnum.CREDIT.getCode() == wzIsAuthorize){
-            expReturnWzDeposit =  wzDepositEntity.getCreditPayAmt()==null?0: wzDepositEntity.getCreditPayAmt();
+            int authorizeDepositAmt = wzDepositEntity.getAuthorizeDepositAmt() == null ? 0 : wzDepositEntity.getAuthorizeDepositAmt();
+            expReturnWzDeposit =  wzDepositEntity.getCreditPayAmt()==null?0+authorizeDepositAmt: wzDepositEntity.getCreditPayAmt()+authorizeDepositAmt;
         }else{
             expReturnWzDeposit =  wzDepositEntity.getShishouDeposit()==null?0: wzDepositEntity.getShishouDeposit();
         }
