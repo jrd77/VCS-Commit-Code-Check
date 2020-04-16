@@ -127,27 +127,29 @@ public class RenterOrderSettleService {
 
         //更新应扣
 
-        int rentCostAmt = settleCancelOrdersAccount.getRentCostAmt();
-        int rentSurplusCostAmt = settleCancelOrdersAccount.getRentSurplusCostAmt();
-        int rentDepositAmt = settleCancelOrdersAccount.getRentDepositAmt();
-        int rentSurplusDepositAmt = settleCancelOrdersAccount.getRentSurplusDepositAmt();
-        int rentWzDepositAmt = settleCancelOrdersAccount.getRentWzDepositAmt();
-        int rentSurplusWzDepositAmt = settleCancelOrdersAccount.getRentSurplusWzDepositAmt();
-        int renWalletAmt = settleCancelOrdersAccount.getRenWalletAmt();
-        int rentSurplusWalletAmt = settleCancelOrdersAccount.getRentSurplusWalletAmt();
 
-        int yingKou = (rentCostAmt + rentDepositAmt + rentWzDepositAmt + renWalletAmt)
-                -(rentSurplusCostAmt + rentSurplusDepositAmt + rentSurplusWzDepositAmt + rentSurplusWalletAmt);
         AccountRenterCostSettleEntity byOrderNo = accountRenterCostSettleNoTService.getByOrderNo(orderStatusDTO.getOrderNo(), settleOrders.getRenterMemNo());
-        if(byOrderNo == null){
-            log.error("订单结算-获取租客结算表数据失败，数据为空 orderNo={}",orderStatusDTO.getOrderNo());
-            throw  new RenterCancelSettleException();
+        if(byOrderNo != null){
+            int rentCostAmt = settleCancelOrdersAccount.getRentCostAmt();
+            int rentSurplusCostAmt = settleCancelOrdersAccount.getRentSurplusCostAmt();
+            int rentDepositAmt = settleCancelOrdersAccount.getRentDepositAmt();
+            int rentSurplusDepositAmt = settleCancelOrdersAccount.getRentSurplusDepositAmt();
+            int rentWzDepositAmt = settleCancelOrdersAccount.getRentWzDepositAmt();
+            int rentSurplusWzDepositAmt = settleCancelOrdersAccount.getRentSurplusWzDepositAmt();
+            int renWalletAmt = settleCancelOrdersAccount.getRenWalletAmt();
+            int rentSurplusWalletAmt = settleCancelOrdersAccount.getRentSurplusWalletAmt();
+
+            int yingKou = (rentCostAmt + rentDepositAmt + rentWzDepositAmt + renWalletAmt)
+                    -(rentSurplusCostAmt + rentSurplusDepositAmt + rentSurplusWzDepositAmt + rentSurplusWalletAmt);
+
+            AccountRenterCostSettleEntity accountRenterCostSettleEntity = new AccountRenterCostSettleEntity();
+            accountRenterCostSettleEntity.setId(byOrderNo.getId());
+            accountRenterCostSettleEntity.setVersion(byOrderNo.getVersion());
+            accountRenterCostSettleEntity.setYingkouAmt(yingKou);
+            accountRenterCostSettleNoTService.updateAccountRenterCostSettle(accountRenterCostSettleEntity);
+                 /*log.error("订单结算-获取租客结算表数据失败，数据为空 orderNo={}",orderStatusDTO.getOrderNo());
+            throw  new RenterCancelSettleException();*/
         }
-        AccountRenterCostSettleEntity accountRenterCostSettleEntity = new AccountRenterCostSettleEntity();
-        accountRenterCostSettleEntity.setId(byOrderNo.getId());
-        accountRenterCostSettleEntity.setVersion(byOrderNo.getVersion());
-        accountRenterCostSettleEntity.setYingkouAmt(yingKou);
-        accountRenterCostSettleNoTService.updateAccountRenterCostSettle(accountRenterCostSettleEntity);
 
         //更新租客订单状态
         renterOrderService.updateChildStatusByRenterOrderNo(settleOrders.getRenterOrderNo(), RenterChildStatusEnum.SETTLED);
