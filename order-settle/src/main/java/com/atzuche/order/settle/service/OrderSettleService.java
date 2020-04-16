@@ -159,7 +159,11 @@ public class OrderSettleService{
         	if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 1) {
         		depositShishouAuthOri = accountRenterDepositResVO.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt()):0;
         	}else if(accountRenterDepositResVO.getIsAuthorize() != null && accountRenterDepositResVO.getIsAuthorize() == 2){
+        		//信用预授权，一半一半的情况。
+        		int tmpAuthOri = accountRenterDepositResVO.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterDepositResVO.getAuthorizeDepositAmt()):0;
         		depositShishouAuthOri = accountRenterDepositResVO.getCreditPayAmt()!=null?Math.abs(accountRenterDepositResVO.getCreditPayAmt()):0;
+        		//累加
+        		depositShishouAuthOri += tmpAuthOri;
         	}
         	
         }
@@ -173,6 +177,10 @@ public class OrderSettleService{
 		        if(feeYingkouOri > feeShishou) {
 		        	//费用不够的情况下从租车押金中扣除。
 		        	depositYingkouOri = feeYingkouOri - feeShishou;
+		        	//原来的车辆费用中的应扣需要修改成实收,多出的部分从车辆押金中扣除。
+		        	feeYingkou = feeShishou;
+		        	//重新赋值。
+		        	vo.setRenterCostFeeYingkou(feeYingkou);
 		        }
 //	        }
 //        }
@@ -207,7 +215,11 @@ public class OrderSettleService{
         	if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 1) {
         		wzShishouAuthOri = accountRenterWZDeposit.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt()):0;
         	}else if(accountRenterWZDeposit.getIsAuthorize() != null && accountRenterWZDeposit.getIsAuthorize() == 2) {
+        		//信用预授权，一半一半的情况。
+        		int tmpAuthOri = accountRenterWZDeposit.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterWZDeposit.getAuthorizeDepositAmt()):0;
         		wzShishouAuthOri = accountRenterWZDeposit.getAuthorizeDepositAmt()!=null?Math.abs(accountRenterWZDeposit.getCreditPayAmt()):0;
+        		//累加
+        		wzShishouAuthOri += tmpAuthOri;
         	}
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,orderNo,renterNo);
@@ -320,41 +332,50 @@ public class OrderSettleService{
         	int depositShikouOri = 0;
         	
             for (CashierRefundApplyEntity obj : cashierRefundApplys) {
-            	//租车费用
-            	//消费方式
-				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
-					feeShituiOri += Math.abs(obj.getAmt());
-				}
-				//预授权方式，实扣
-				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())){
-					feeShikouOri += Math.abs(obj.getAmt());
-				}
-				
-				//违章押金,32预授权的不处理
-				//消费方式
-				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
-					wzShituiOri += Math.abs(obj.getAmt());
-				}
-				//预授权方式，实扣
-				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())){
-					wzShikouOri += Math.abs(obj.getAmt());
-				}
-				
-				//租车押金,32预授权的不处理
-				//消费方式
-				if("00".equals(obj.getStatus()) &&  ("04".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
-					depositShituiOri += Math.abs(obj.getAmt());
-				}
-				//预授权方式，实扣
-				if("00".equals(obj.getStatus()) &&  ("03".equals(obj.getPayType()))  && DataPayKindConstant.RENT.equals(obj.getPayKind())){
-					depositShikouOri += Math.abs(obj.getAmt());
-				}
+            	//一级分类
+            	if(DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())) {
+            		//二级分类
+            		//租车费用
+                	//消费方式
+            		if("00".equals(obj.getStatus())){
+            			//三级分类
+            			if("04".equals(obj.getPayType())) {
+            				feeShituiOri += Math.abs(obj.getAmt());
+            			}else if("03".equals(obj.getPayType())){     //预授权方式，实扣
+            				feeShikouOri += Math.abs(obj.getAmt());
+            			}
+    				}
+            	}else if(DataPayKindConstant.DEPOSIT.equals(obj.getPayKind())) {
+    				//违章押金,32预授权的不处理
+                	//消费方式
+            		if("00".equals(obj.getStatus())){
+            			if("04".equals(obj.getPayType())) {
+            				wzShituiOri += Math.abs(obj.getAmt());
+            			}else if("03".equals(obj.getPayType())) {   ////预授权方式，实扣
+            				wzShikouOri += Math.abs(obj.getAmt());
+            			}
+            		}
+            	}else if(DataPayKindConstant.RENT.equals(obj.getPayKind())) {
+            		//租车押金,32预授权的不处理
+    				//消费方式
+            		if("00".equals(obj.getStatus())){
+            			if("04".equals(obj.getPayType())) {
+            				depositShituiOri += Math.abs(obj.getAmt());
+            			}else if("03".equals(obj.getPayType())) {   ////预授权方式，实扣
+            				depositShikouOri += Math.abs(obj.getAmt());
+            			}
+            		}
+            	}
+            	
 			}
             
             //租车费用
             //实扣
-            if(feeShituiOri > 0) {
-            	feeShikouOri += feeShishou - feeShituiOri;
+            if(feeShishou > 0 && feeShituiOri >= 0) {  //只有消费的情况。   feeShituiOri等于0代表的是没有退款记录，实扣
+            	//全退的情况
+            	if(feeShishou >= feeShituiOri) {
+            		feeShikouOri += feeShishou - feeShituiOri;
+            	}
             }
             log.info("feeShikouOri=[{}],feeShituiOri=[{}],orderNo=[{}],memNo=[{}]",feeShikouOri,feeShituiOri,orderNo,renterNo);
             vo.setRenterCostFeeShikou(feeShikouOri);
@@ -362,18 +383,22 @@ public class OrderSettleService{
             vo.setRenterCostFeeShitui(feeShituiOri); //预授权0
            
             //违章押金
-            //实扣
-            if(wzShituiOri > 0) {
-            	wzShikouOri += wzShishouOri - wzShituiOri;
+            //实扣, 实收大于0代表的是消费。预授权默认实收为0
+            if(wzShishouOri > 0 && wzShituiOri >= 0) {
+            	if(wzShishouOri >= wzShituiOri) {
+            		wzShikouOri += wzShishouOri - wzShituiOri;
+            	}
             }
             log.info("wzShikouOri=[{}],wzShituiOri=[{}],orderNo=[{}],memNo=[{}]",wzShikouOri,wzShituiOri,orderNo,renterNo);
             vo.setDepositWzCostShikou(wzShikouOri);
             vo.setDepositWzCostShitui(wzShituiOri);
             
             //租车押金
-            //实扣
-            if(depositShituiOri > 0) {
-            	depositShikouOri += depositShishouOri - depositShituiOri;
+            //实扣, 实收大于0代表的是消费。预授权默认实收为0
+            if(depositShishouOri > 0 && depositShituiOri >= 0) {
+            	if(depositShishouOri >= depositShituiOri) {
+            		depositShikouOri += depositShishouOri - depositShituiOri;
+            	}
             }
             log.info("depositShikouOri=[{}],depositShituiOri=[{}],orderNo=[{}],memNo=[{}]",depositShikouOri,depositShituiOri,orderNo,renterNo);
             vo.setDepositCostShikou(depositShikouOri);

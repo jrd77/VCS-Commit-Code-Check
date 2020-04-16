@@ -238,7 +238,7 @@ public class CashierNoTService {
         }
         //"02"：预授权 TODO 预授权到期时间 （分为信用 和 芝麻）
         if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-        	vo.setIsAuthorize(1);
+        	vo.setIsAuthorize(1);  //默认值，普通预授权
         	//区分双免和非双免,根据是否信用减免来区分
         	putPayPreValue(notifyDataVo, vo);
             
@@ -273,8 +273,10 @@ public class CashierNoTService {
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
 		    vo.setAuthorizeDepositAmt(settleAmount);
 		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
+		    vo.setIsAuthorize(1); //普通预授权
 		}else {  
 			//存在信用支付的方式
+			vo.setIsAuthorize(2);
 			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  
 				//全部按信用支付
 				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -292,7 +294,6 @@ public class CashierNoTService {
 		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeCreditAmount());
 		        vo.setCreditPayAmt(creditAmount);
 		        vo.setSurplusCreditPayAmt(creditAmount);
-		        
 			}
 		}
 	}
@@ -306,6 +307,7 @@ public class CashierNoTService {
         int result =0;
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
         	//解决重复操作
+        	//数据库中的状态
         	if(!"00".equals(cashierEntity.getTransStatus())) {  //成功 00
 	            CashierEntity cashier = new CashierEntity(); 
 	            BeanUtils.copyProperties(notifyDataVo,cashier);
@@ -435,7 +437,7 @@ public class CashierNoTService {
         }
         //"02"：预授权 TODO 预授权到期时间 （分为信用 和 芝麻）
         if(DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-        	vo.setIsAuthorize(1);
+        	vo.setIsAuthorize(1); //默认普通预授权
         	//区分双免和非双免,根据是否信用减免来区分
         	putPayPreValue(notifyDataVo, vo);
             
@@ -466,7 +468,9 @@ public class CashierNoTService {
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
 		    vo.setAuthorizeDepositAmt(settleAmount);
 		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
+		    vo.setIsAuthorize(1);
 		}else {  //存在信用支付的方式
+			vo.setIsAuthorize(2);
 			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  //全部按信用支付
 				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
 		        vo.setCreditPayAmt(settleAmount);
