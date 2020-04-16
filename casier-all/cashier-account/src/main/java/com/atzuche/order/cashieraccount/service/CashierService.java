@@ -771,9 +771,11 @@ public class CashierService {
         }
         vo.setOrderNo(notifyDataVo.getOrderNo());
         vo.setMemNo(notifyDataVo.getMemNo());
+        
+        // --------------------------------------------------------------- 两大押金 ---------------------------------------------------------------
         //1.1 租车押金 01
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
-            //1 对象初始化转换
+            //1 对象初始化转换，数据准备。
             PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterDeposit(notifyDataVo,payedOrderRenterDeposit);
@@ -785,7 +787,7 @@ public class CashierService {
         
         //1.2 违章押金 02
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
-            //1 对象初始化转换
+            //1 对象初始化转换，数据准备。
             PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterWzDeposit(notifyDataVo,payedOrderRenterWZDeposit);
@@ -794,6 +796,13 @@ public class CashierService {
 	        sendOrderPayDepositSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYFEESUCCESS,1,vo);
         }
         
+        
+        /**
+         * DataPayKindConstant.RENT_AMOUNT
+			DataPayKindConstant.RENT_INCREMENT
+			DataPayKindConstant.RENT_AMOUNT_AFTER   更新实收字段。   动态计算的。
+			欠款 和 管理后台的补付supplement 不更新实收shishou，只收不退。
+         */
         // -------------------------------------------------------- 支付租车费用和APP修改订单补付组合,更新的是实收
         //1.3 租车费用 11
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
@@ -818,7 +827,7 @@ public class CashierService {
 	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
         }
         
-        // -------------------------------------------------------- 三大补付组合,更新的都是实收
+        // -------------------------------------------------------- 三大补付组合,  DataPayKindConstant.RENT_AMOUNT_AFTER 更新的是实收
         //补充
         if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind()) ){
             //1 对象初始化转换

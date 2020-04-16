@@ -22,7 +22,10 @@ public class OrderSettleTest {
 	@Test
 	public void testSettleOrder() {
 		
-		orderSettle.settleOrder("28261181200299");
+//		orderSettle.settleOrder("28261181200299");
+		
+		// 57912231400299
+		orderSettle.settleOrder("57912231400299");
 	}
 	
 	@Test
