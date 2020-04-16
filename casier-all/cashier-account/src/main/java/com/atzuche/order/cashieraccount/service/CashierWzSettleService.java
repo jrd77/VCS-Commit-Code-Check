@@ -274,13 +274,15 @@ public class CashierWzSettleService {
 		//考虑全额预授权完成
 		if(isExistsPreAuthFinish) {
 		    cashierRefundApply.setPayType(DataPayTypeConstant.PRE_FINISH); //预授权完成
-			cashierRefundApply.setAmt( cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) );
+			cashierRefundApply.setAmt(cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) );
 			cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		    cashierRefundApply.setRemake(cashCode.getTxt());
 		    cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getCashNo());
 		    cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
 		    cashierRefundApply.setQn(cashierEntity.getQn());
 		    cashierRefundApply.setPayKind(DataPayKindConstant.DEPOSIT);
+		    //预授权完成 进行中(预授权完成)
+		    cashierRefundApply.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
 		    id = this.refundWzDepositPreAuth(cashierRefundApply);  //仅仅提交预授权完成记录 
 		}
 		return id;

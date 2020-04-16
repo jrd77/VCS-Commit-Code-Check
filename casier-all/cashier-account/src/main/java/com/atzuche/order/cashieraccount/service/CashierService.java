@@ -659,7 +659,7 @@ public class CashierService {
                 	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
                 	if(settleAmount.intValue() == 0) {
                 		//金额为0的异常情况。
-                		Cat.logError(new SettleAmountException());
+                		Cat.logError("params="+GsonUtils.toJson(notifyDataVo),new SettleAmountException());
                 		log.error("支付异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));
                 	}else {
                 		payOrderCallBackSuccess(notifyDataVo,vo);
@@ -668,7 +668,7 @@ public class CashierService {
                 	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
                 	if(settleAmount.intValue() == 0) {
                 		//金额为0的异常情况。
-                		Cat.logError(new SettleAmountException());
+                		Cat.logError("params="+GsonUtils.toJson(notifyDataVo),new SettleAmountException());
                 		log.error("退款异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));
                 	}else {
                 		//更新收银台数据和发送mq
@@ -694,11 +694,12 @@ public class CashierService {
         if(Objects.isNull(notifyDataVo) || !TransStatusEnum.PAY_SUCCESS.getCode().equals(notifyDataVo.getTransStatus())){
             return;
         }
+        
         //更新退款申请表的状态。
         cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
         
-        //退款成功。
-        if(CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())) {
+        //退款成功。//32预授权解冻不算成功。 全额算,优先预授权完成，后预授权解冻。
+        if(CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())) {  //&& !"32".equals(notifyDataVo.getPayType())
 	        //更新退款状态
 	        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
 	        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
