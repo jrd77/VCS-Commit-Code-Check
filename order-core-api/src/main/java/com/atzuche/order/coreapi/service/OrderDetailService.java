@@ -73,7 +73,9 @@ import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.*;
 import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
+import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
+import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -176,10 +178,38 @@ public class OrderDetailService {
     private OrderRefundRecordService orderRefundRecordService;
     @Autowired
     private RenterDetainReasonService renterDetainReasonService;
-
+    @Autowired
+    private OrderSettleService orderSettleService;
 
     private static final String UNIT_HOUR = "小时";
 
+    public ResponseData<OrderDetailRespDTO> queryAndOwnerIncom(OrderDetailReqDTO orderDetailReqDTO) {
+        log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
+        ResponseData responseData = new ResponseData();
+        try{
+            OrderDetailRespDTO orderDetailRespDTO = renterOrderDetailTransProxy(orderDetailReqDTO);
+            OwnerOrderDTO ownerOrderDTO = orderDetailRespDTO.getOwnerOrder();
+            OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderDetailReqDTO.getOrderNo(), ownerOrderDTO.getOwnerOrderNo());
+            if(ownerCosts != null){
+                orderDetailRespDTO.setOwnerPreIncom(ownerCosts.getOwnerCostAmtFinal());
+            }
+            log.info("准备获取订单详情.result is,orderDetailRespDTO:[{}]", JSON.toJSONString(orderDetailRespDTO));
+            responseData.setResCode(ErrorCode.SUCCESS.getCode());
+            responseData.setData(orderDetailRespDTO);
+            responseData.setResMsg(ErrorCode.SUCCESS.getText());
+        }catch (OrderException e){
+            log.error("订单详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(e.getErrorCode());
+            responseData.setData(null);
+            responseData.setResMsg(e.getErrorMsg());
+        }catch (Exception e){
+            log.error("订单详情转化失败orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO),e);
+            responseData.setResCode(ErrorCode.SYS_ERROR.getCode());
+            responseData.setData(null);
+            responseData.setResMsg(ErrorCode.SYS_ERROR.getText());
+        }
+        return responseData;
+    }
 
     public ResponseData<OrderDetailRespDTO> orderDetailByRenter(OrderDetailReqDTO orderDetailReqDTO){
         log.info("准备获取订单详情orderDetailReqDTO={}", JSON.toJSONString(orderDetailReqDTO));
@@ -1861,5 +1891,6 @@ public class OrderDetailService {
         processRespDTO.setOrderStatusDTOs(orderStatusDTOList);
         return processRespDTO;
     }
+
 
 }

@@ -421,10 +421,10 @@ public class RenterCostFacadeService {
             List<AccountRenterWzDepositDetailEntity> byOrderNo = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
             wzDeductionRentHistoricalAmt = AccountRenterWzDepositUtils.getWzDepositSettleDeductionDebtAmt(byOrderNo,RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
             wzDepositDTO.deductionRentHistoricalAmt = Math.abs(wzDeductionRentHistoricalAmt);
-            wzDeductionRentAmt = Math.abs(renterCostVO.getDepositWzCostShikou()) - Math.abs(wzDeductionRentHistoricalAmt) - getOther(wzDepositDTO);
+            wzDeductionRentAmt = Math.abs(renterCostVO.getDepositWzCostShikou()) <= 0 ? 0:Math.abs(renterCostVO.getDepositWzCostShikou()) - getOther(wzDepositDTO);
         }else{
             wzDepositDTO.deductionRentHistoricalAmt = wzDeductionRentHistoricalAmt;
-            wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou() - getOther(wzDepositDTO);
+            wzDeductionRentAmt = renterCostVO.getDepositWzCostYingkou() <= 0 ? 0 : renterCostVO.getDepositWzCostYingkou()- getOther(wzDepositDTO);
         }
         wzDepositDTO.expAndActFlg = wzExpAndActFlg;
 
