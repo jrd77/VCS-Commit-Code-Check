@@ -174,13 +174,16 @@ public class OrderSettleService{
         //包含结算后的 结算金额为0的情况。
 //        if(accountRenterCostSettleEntity != null) {
 //	        if(accountRenterCostSettleEntity.getYingkouAmt() != null && accountRenterCostSettleEntity.getYingkouAmt() != 0) {
+        		
 		        if(feeYingkouOri > feeShishou) {
 		        	//费用不够的情况下从租车押金中扣除。
 		        	depositYingkouOri = feeYingkouOri - feeShishou;
 		        	//原来的车辆费用中的应扣需要修改成实收,多出的部分从车辆押金中扣除。
+		        	//应扣大于实收,应扣小于等于实收
 		        	feeYingkou = feeShishou;
 		        	//重新赋值。
 		        	vo.setRenterCostFeeYingkou(feeYingkou);
+		        	//depositYingkouOri 大于 shishou的情况，累计到违章押金中扣除。
 		        }
 //	        }
 //        }
@@ -190,6 +193,9 @@ public class OrderSettleService{
         //计算应退
         if(depositShishouOri >= depositYingkouOri) {
         	depositYingtuiOri = depositShishouOri - depositYingkouOri;
+        } else {  
+        	//应扣大于实收,应扣小于等于实收
+        	depositYingkouOri = depositShishouOri;
         }
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],depositYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,depositYingtuiOri,orderNo,renterNo);
 
@@ -248,6 +254,9 @@ public class OrderSettleService{
         //计算应退
         if(wzShishouOri >= wzYingkouOri) {
         	wzYingtuiOri = wzShishouOri - wzYingkouOri;
+        } else {
+        	//应扣大于实收,应扣小于等于实收
+        	wzYingkouOri = wzShishouOri;
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],wzYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,wzYingtuiOri,orderNo,renterNo);
         
@@ -371,38 +380,47 @@ public class OrderSettleService{
             
             //租车费用
             //实扣
-            if(feeShishou > 0 && feeShituiOri >= 0) {  //只有消费的情况。   feeShituiOri等于0代表的是没有退款记录，实扣
-            	//全退的情况
-            	if(feeShishou >= feeShituiOri) {
-            		feeShikouOri += feeShishou - feeShituiOri;
-            	}
+            //只有结算后才有退款记录
+            if(SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus()) {  //已结算
+	            if(feeShishou > 0 && feeShituiOri >= 0) {  //只有消费的情况。   feeShituiOri等于0代表的是没有退款记录，实扣
+	            	//全退的情况
+	            	if(feeShishou >= feeShituiOri) {
+	            		feeShikouOri += feeShishou - feeShituiOri;
+	            	}
+	            }
             }
             log.info("feeShikouOri=[{}],feeShituiOri=[{}],orderNo=[{}],memNo=[{}]",feeShikouOri,feeShituiOri,orderNo,renterNo);
             vo.setRenterCostFeeShikou(feeShikouOri);
             //实退
             vo.setRenterCostFeeShitui(feeShituiOri); //预授权0
-           
-            //违章押金
-            //实扣, 实收大于0代表的是消费。预授权默认实收为0
-            if(wzShishouOri > 0 && wzShituiOri >= 0) {
-            	if(wzShishouOri >= wzShituiOri) {
-            		wzShikouOri += wzShishouOri - wzShituiOri;
-            	}
-            }
-            log.info("wzShikouOri=[{}],wzShituiOri=[{}],orderNo=[{}],memNo=[{}]",wzShikouOri,wzShituiOri,orderNo,renterNo);
-            vo.setDepositWzCostShikou(wzShikouOri);
-            vo.setDepositWzCostShitui(wzShituiOri);
             
             //租车押金
             //实扣, 实收大于0代表的是消费。预授权默认实收为0
-            if(depositShishouOri > 0 && depositShituiOri >= 0) {
-            	if(depositShishouOri >= depositShituiOri) {
-            		depositShikouOri += depositShishouOri - depositShituiOri;
-            	}
+            //只有结算后才有退款记录
+            if(SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()) { //已结算
+	            if(depositShishouOri > 0 && depositShituiOri >= 0) {
+	            	if(depositShishouOri >= depositShituiOri) {
+	            		depositShikouOri += depositShishouOri - depositShituiOri;
+	            	}
+	            }
             }
             log.info("depositShikouOri=[{}],depositShituiOri=[{}],orderNo=[{}],memNo=[{}]",depositShikouOri,depositShituiOri,orderNo,renterNo);
             vo.setDepositCostShikou(depositShikouOri);
             vo.setDepositCostShitui(depositShituiOri);
+            
+            //违章押金
+            //实扣, 实收大于0代表的是消费。预授权默认实收为0
+            //只有结算后才有退款记录
+            if(SettleStatusEnum.SETTLEING.getCode() != orderStatus.getWzSettleStatus()) { //已结算
+	            if(wzShishouOri > 0 && wzShituiOri >= 0) {
+	            	if(wzShishouOri >= wzShituiOri) {
+	            		wzShikouOri += wzShishouOri - wzShituiOri;
+	            	}
+	            }
+            }
+            log.info("wzShikouOri=[{}],wzShituiOri=[{}],orderNo=[{}],memNo=[{}]",wzShikouOri,wzShituiOri,orderNo,renterNo);
+            vo.setDepositWzCostShikou(wzShikouOri);
+            vo.setDepositWzCostShitui(wzShituiOri);
             
             // 获取实退 车俩押金
 //            int depositCostReal =  cashierRefundApplys.stream().filter(obj ->{
