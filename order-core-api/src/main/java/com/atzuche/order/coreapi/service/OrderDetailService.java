@@ -760,16 +760,16 @@ public class OrderDetailService {
                 renterDeliveryAddrDTO.setExpReturnCarAddr(renterGoodsDTO.getCarShowAddr());
                 renterDeliveryAddrDTO.setExpReturnCarLon(renterGoodsDTO.getCarShowLon());
                 renterDeliveryAddrDTO.setExpReturnCarLat(renterGoodsDTO.getCarShowLat());
-                renterDeliveryAddrDTO.setActReturnCarAddr(renterDeliveryAddrDTO.getExpGetCarAddr());
-                renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpGetCarLon());
-                renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpGetCarLat());
+                renterDeliveryAddrDTO.setActReturnCarAddr(renterDeliveryAddrDTO.getExpReturnCarAddr());
+                renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpReturnCarLon());
+                renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpReturnCarLat());
             }else{
                 renterDeliveryAddrDTO.setExpReturnCarAddr(renterGoodsDTO.getCarRealAddr());
                 renterDeliveryAddrDTO.setExpReturnCarLon(renterGoodsDTO.getCarRealLon());
                 renterDeliveryAddrDTO.setExpReturnCarLat(renterGoodsDTO.getCarRealLat());
-                renterDeliveryAddrDTO.setActReturnCarAddr(renterDeliveryAddrDTO.getExpGetCarAddr());
-                renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpGetCarLon());
-                renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpGetCarLat());
+                renterDeliveryAddrDTO.setActReturnCarAddr(renterDeliveryAddrDTO.getExpReturnCarAddr());
+                renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpReturnCarLon());
+                renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpReturnCarLat());
             }
         }
         return renterDeliveryAddrDTO;
