@@ -15,4 +15,9 @@ public class DebtDetailVO {
 	 * 会员订单欠款
 	 */
 	private Integer orderDebtAmt;
+	
+	/**
+	 * 未支付的补付
+	 */
+	private Integer noPaySupplementAmt;
 }

@@ -170,8 +170,8 @@ public class OrderCostController {
 		shortDetail.setShiFuWzDeposit(wzDepositEntity.getShishouDeposit());
 		shortDetail.setToPayDeposit(-(depositEntity.getYingfuDepositAmt()+depositEntity.getShifuDepositAmt()));
 		shortDetail.setToPayWzDeposit(-(wzDepositEntity.getYingshouDeposit()+wzDepositEntity.getShishouDeposit()));
-		shortDetail.setExpReturnDeposit(isAuthorize!=null&&isAuthorize == 1 ? depositEntity.getCreditPayAmt() : depositEntity.getShifuDepositAmt());
-		shortDetail.setExpReturnWzDeposit(wzIsAuthorize!=null&&wzIsAuthorize == 1 ? wzDepositEntity.getCreditPayAmt() : wzDepositEntity.getShishouDeposit());
+		shortDetail.setExpReturnDeposit(isAuthorize!=null&&isAuthorize == 1 ? depositEntity.getAuthorizeDepositAmt() : depositEntity.getShifuDepositAmt());
+		shortDetail.setExpReturnWzDeposit(wzIsAuthorize!=null&&wzIsAuthorize == 1 ? wzDepositEntity.getAuthorizeDepositAmt() : wzDepositEntity.getShishouDeposit());
 		shortDetail.setOrderNo(orderNo);
 
 		return ResponseData.success(shortDetail);

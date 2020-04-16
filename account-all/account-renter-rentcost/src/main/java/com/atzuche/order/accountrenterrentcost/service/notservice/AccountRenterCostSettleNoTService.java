@@ -24,6 +24,11 @@ public class AccountRenterCostSettleNoTService {
     @Autowired
     private AccountRenterCostSettleMapper accountRenterCostSettleMapper;
 
+
+    public AccountRenterCostSettleEntity getByOrderNo(String orderNo,String memNo){
+        return accountRenterCostSettleMapper.selectByOrderNo(orderNo,memNo);
+    }
+
     /**
      * 查询订单 已付租车费用
      */
