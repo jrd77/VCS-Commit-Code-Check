@@ -416,7 +416,7 @@ public class RenterCostFacadeService {
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();
         carDepositStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositCostYingshou();
         carDepositStatisticsDTO.realReceiveAmt = renterCostVO.getDepositCostShishou();
-        carDepositStatisticsDTO.freeAmt = getCarDepositFreeAmt(orderNo);
+        carDepositStatisticsDTO.freeAmt = renterCostVO.getDepositCostShishouAuth();
         carDepositStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositCostYingtui();
         carDepositStatisticsDTO.shouldDeductionAmt = renterCostVO.getDepositCostYingkou();
         carDepositStatisticsDTO.realRetreatAmt = renterCostVO.getDepositCostShitui();
@@ -432,7 +432,7 @@ public class RenterCostFacadeService {
         //3.2、统计
         CostStatisticsDTO wzCostStatisticsDTO = new CostStatisticsDTO();
         wzCostStatisticsDTO.shouldReceiveAmt = renterCostVO.getDepositWzCostYingshou();
-        wzCostStatisticsDTO.freeAmt = getWzDepositFreeAmt(orderNo);
+        wzCostStatisticsDTO.freeAmt = renterCostVO.getDepositWzCostShishouAuth();
         wzCostStatisticsDTO.realReceiveAmt = renterCostVO.getDepositWzCostShishou();
         wzCostStatisticsDTO.shouldRetreatAmt = renterCostVO.getDepositWzCostYingtui();
         wzCostStatisticsDTO.realRetreatAmt = renterCostVO.getDepositWzCostShitui();
@@ -471,35 +471,6 @@ public class RenterCostFacadeService {
         return costStatisticsDTO;
     }
 
-    /**
-     * 获取车辆芝麻/信用卡免押金额
-     * @return
-     */
-    private int getCarDepositFreeAmt(String orderNo){
-        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositNoTService.queryDeposit(orderNo);
-        if(accountRenterDepositEntity == null){
-            return 0;
-        }
-        if(FreeDepositTypeEnum.SESAME_FREE.getCode().equals(accountRenterDepositEntity.getFreeDepositType()) || FreeDepositTypeEnum.BIND_CARD_FREE.getCode().equals(accountRenterDepositEntity.getFreeDepositType())){
-            return accountRenterDepositEntity.getReductionAmt();
-        }
-        return 0;
-    }
-
-    /**
-     * 获取违章芝麻/信用卡免押金额
-     * @return
-     */
-    private int getWzDepositFreeAmt(String orderNo){
-        AccountRenterWzDepositEntity accountRenterWZDepositByOrder = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
-        if(accountRenterWZDepositByOrder == null){
-            return 0;
-        }
-        if(FreeDepositTypeEnum.SESAME_FREE.getCode().equals(accountRenterWZDepositByOrder.getFreeDepositType()) || FreeDepositTypeEnum.BIND_CARD_FREE.getCode().equals(accountRenterWZDepositByOrder.getFreeDepositType())){
-            return 0;
-        }
-        return 0;
-    }
 
     /**
      * 取绝对值
