@@ -19,6 +19,7 @@ import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
@@ -29,6 +30,7 @@ import com.atzuche.order.settle.service.notservice.OrderWzSettleNoTService;
 import com.atzuche.order.settle.vo.req.RentCostsWz;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
+import com.atzuche.order.settle.vo.res.OrderSettleResVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
@@ -70,13 +72,18 @@ public class OrderWzSettleNewService {
 	private OwnerOrderService ownerOrderService;
 	@Autowired
 	private CashierService cashierService;
-	// 违章押金
-	private static final String WZ_DEPOSIT_PAY_KIND = "02";
-	// 虚拟支付
-	private static final int PAY_LINE_VIRTUAL = 2;
 	@Autowired
     private OrderWzSettleSupplementHandleService orderWzSettleSupplementHandleService;
+	@Autowired
+    private RenterMemberService renterMemberService;
+	@Autowired
+    private OrderSettleHandleService orderSettleHandleService;
 
+
+    // 违章押金
+    private static final String WZ_DEPOSIT_PAY_KIND = "02";
+    // 虚拟支付
+    private static final int PAY_LINE_VIRTUAL = 2;
     /**
      * 初始化结算对象
      *
@@ -93,6 +100,8 @@ public class OrderWzSettleNewService {
             throw new OrderSettleFlatAccountException();
         }
 
+        //是否企业级用户订单
+        settleOrdersWz.setEnterpriseUserOrder(renterMemberService.isEnterpriseUserOrder(renterOrder.getRenterOrderNo()));
         //发送mq发送车主会员号信息预留。
         OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         if (!Objects.isNull(ownerOrder)) {
@@ -284,18 +293,24 @@ public class OrderWzSettleNewService {
                 GsonUtils.toJson(settleOrdersAccount));
         orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
-		log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
-
-		// 2.1租客剩余违章押金 结余历史欠款
-		orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
-		// 2.2违章押金抵扣老系统欠款
-		int totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
+        log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
+        int totalwzDebtAmt;
+        if(Objects.nonNull(settleOrders.getEnterpriseUserOrder()) && settleOrders.getEnterpriseUserOrder()) {
+            OrderSettleResVO resVO = orderSettleHandleService.wzDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
+                    settleOrdersAccount.getOrderNo());
+            totalwzDebtAmt = resVO.getOldTotalRealDebtAmt();
+            orderStatusDTO.setWzSettleStatus(resVO.getSettleStatus().getCode());
+        } else {
+            // 2.1租客剩余违章押金 结余历史欠款
+            orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
+            // 2.2违章押金抵扣老系统欠款
+            totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
+        }
 		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
 		// 违章押金 退还
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
-
 
 		//更新应扣违章押金
         int yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
