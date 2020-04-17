@@ -105,7 +105,7 @@ public class CashierRefundApplyNoTService {
     /**
      * 退款回调信息
      */
-    public void updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
+    public CashierRefundApplyEntity updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
         //1 校验
         String refundIdStr = notifyDataVo.getRefundId();
         int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
@@ -114,7 +114,8 @@ public class CashierRefundApplyNoTService {
         if(Objects.nonNull(cashierRefundApplyEntity) 
         		&& CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode().equals(cashierRefundApplyEntity.getStatus()) //当前的状态，避免重复操作。
         		&& CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())){  //退款成功
-        
+        	
+        	log.info("updateRefundDepositSuccess params=[{}],cashierRefundApplyEntity=[{}]",GsonUtils.toJson(notifyDataVo),GsonUtils.toJson(cashierRefundApplyEntity));
             //3 更新退款成功
             CashierRefundApplyEntity cashierRefundApplyUpdate = new CashierRefundApplyEntity();
             cashierRefundApplyUpdate.setStatus(notifyDataVo.getTransStatus());
@@ -145,6 +146,8 @@ public class CashierRefundApplyNoTService {
 				}
             }
         }
+        //返回退款申请表的对象
+        return cashierRefundApplyEntity;
     }
 
     /**
