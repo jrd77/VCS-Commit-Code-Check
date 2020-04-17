@@ -28,7 +28,12 @@ public class OrderDetailController {
         return respData;
     }
 
-
+    @PostMapping("/queryAndOwnerIncom")
+    public ResponseData<OrderDetailRespDTO> queryAndOwnerIncom(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
+        ResponseData<OrderDetailRespDTO> respData = orderDetailService.queryAndOwnerIncom(orderDetailReqDTO);
+        return respData;
+    }
     @PostMapping("/orderAccountDetail")
     public ResponseData<OrderAccountDetailRespDTO> orderAccountDetail(@Valid @RequestBody OrderDetailReqDTO orderDetailReqDTO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);

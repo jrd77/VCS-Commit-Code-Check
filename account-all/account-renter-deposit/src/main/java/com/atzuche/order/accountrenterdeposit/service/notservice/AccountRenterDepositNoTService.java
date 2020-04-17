@@ -56,6 +56,14 @@ public class AccountRenterDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterDepositReqVO payedOrderRenterDeposit) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(payedOrderRenterDeposit.getOrderNo(),payedOrderRenterDeposit.getMemNo());
+        //二次验证
+        //免押方式(1:绑卡减免,2:芝麻减免,3:支付押金)
+        if(accountRenterDepositEntity != null && accountRenterDepositEntity.getFreeDepositType() == 2) {  //芝麻免押，才会存在一半一半的情况
+        	if(payedOrderRenterDeposit.getIsAuthorize() == 1) {  //普通预授权
+        		payedOrderRenterDeposit.setIsAuthorize(2); //转化为 信用预授权。
+        	}
+        }
+        
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
@@ -74,11 +82,12 @@ public class AccountRenterDepositNoTService {
             throw new PayOrderRenterDepositDBException();
         }
         //计算剩余可扣金额押金总和
-        int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt();
-        if (-detainRenterDepositReqVO.getAmt() + surplusAmt < 0) {
-            //可用 剩余押金 不足
-            throw new PayOrderRenterDepositDBException();
-        }
+//        int surplusAmt = accountRenterDepositEntity.getSurplusDepositAmt();
+//        if (-detainRenterDepositReqVO.getAmt() + surplusAmt < 0) {
+//            //可用 剩余押金 不足
+//            throw new PayOrderRenterDepositDBException();
+//        }
+        
         AccountRenterDepositEntity accountRenterDeposit = new AccountRenterDepositEntity();
         accountRenterDeposit.setId(accountRenterDepositEntity.getId());
         accountRenterDeposit.setVersion(accountRenterDepositEntity.getVersion());

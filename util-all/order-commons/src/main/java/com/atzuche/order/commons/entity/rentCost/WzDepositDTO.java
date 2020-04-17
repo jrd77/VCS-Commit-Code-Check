@@ -28,23 +28,7 @@ public class WzDepositDTO {
     public Integer expAndActFlg;
     @AutoDocProperty("抵扣历史欠款")
     public Integer deductionRentHistoricalAmt = 0;
-
-    public Integer getOther(WzDepositDTO wzDepositDTO){
-        return
-                nullToSero(wzDepositDTO.wzFineAmt)+
-                nullToSero(wzDepositDTO.wzServiceCostAmt)+
-                nullToSero(wzDepositDTO.wzDysFineAmt)+
-                nullToSero(wzDepositDTO.wzStopCostAmt)+
-                nullToSero(wzDepositDTO.wzOtherAmt)+
-                nullToSero(wzDepositDTO.wzInsuranceAmt)+
-                nullToSero(wzDepositDTO.deductionRentHistoricalAmt);
-    }
-
-    private int nullToSero(Integer amt){
-        if(amt == null){
-            return 0;
-        }
-        return amt;
-    }
+    @AutoDocProperty("是否违章暂扣 0,否 1,是,2-撤销暂扣")
+    public Integer isWzDetain;
 
 }

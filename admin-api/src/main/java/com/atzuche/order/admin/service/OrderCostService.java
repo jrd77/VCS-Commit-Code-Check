@@ -446,6 +446,8 @@ public class OrderCostService {
 		//add
 		realVo.setVehicleDepositYingkou(String.valueOf(costVo.getDepositCostYingkou()));
 		realVo.setVehicleDepositShikou(String.valueOf(costVo.getDepositCostShikou()));
+		//add 200416
+		realVo.setVehicleDepositShishouAuth(String.valueOf(costVo.getDepositCostShishouAuth()));
 		
 		
 		//直接从海豹那边的调用
@@ -456,6 +458,8 @@ public class OrderCostService {
 		//add
 		realVo.setViolationDepositYingkou(String.valueOf(costVo.getDepositWzCostYingkou()));
 		realVo.setViolationDepositShikou(String.valueOf(costVo.getDepositWzCostShikou()));
+		//add 200416
+		realVo.setViolationDepositShishouAuth(String.valueOf(costVo.getDepositWzCostShishouAuth()));
 		
 	}
 
@@ -807,7 +811,7 @@ public class OrderCostService {
          oilAmtInt = data.getOwnerOilDifferenceCrashAmt();
 		 beyondMileAmtInt = data.getMileageAmt();
          //车主油费和超里程费用，是可正可负。
-		 beyondMileAmt = String.valueOf(beyondMileAmtInt);
+		 beyondMileAmt = String.valueOf(Math.abs(beyondMileAmtInt));
 		 oilAmt = String.valueOf(oilAmtInt);
 		 
 		 //统计

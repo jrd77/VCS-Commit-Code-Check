@@ -1,6 +1,10 @@
 package com.atzuche.order.settle.service;
 
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
+import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
@@ -32,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /*
@@ -53,6 +58,10 @@ public class RenterOrderSettleService {
     private CashierService cashierService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private AccountRenterCostSettleService accountRenterCostSettleService;
+    @Autowired
+    private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
     /*
      * @Author ZhangBin
@@ -96,7 +105,7 @@ public class RenterOrderSettleService {
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
 
             //10 修改订单状态表
-            updateOrderStatus(orderStatusDTO,renterOrderNo);
+            updateOrderStatus(orderStatusDTO,settleOrders,settleCancelOrdersAccount);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -105,7 +114,7 @@ public class RenterOrderSettleService {
         }
     }
 
-    private void updateOrderStatus(OrderStatusDTO orderStatusDTO,String renterOrder){
+    private void updateOrderStatus(OrderStatusDTO orderStatusDTO,SettleOrders settleOrders,SettleCancelOrdersAccount settleCancelOrdersAccount){
         //1更新 订单流转状态
         LocalDateTime now = LocalDateTime.now();
         orderStatusDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
@@ -116,8 +125,32 @@ public class RenterOrderSettleService {
         orderStatusDTO.setWzSettleTime(now);
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
 
+        //更新应扣
+        AccountRenterCostSettleEntity byOrderNo = accountRenterCostSettleNoTService.getByOrderNo(orderStatusDTO.getOrderNo(), settleOrders.getRenterMemNo());
+        if(byOrderNo != null){
+            int rentCostAmt = settleCancelOrdersAccount.getRentCostAmt();
+            int rentSurplusCostAmt = settleCancelOrdersAccount.getRentSurplusCostAmt();
+            int rentDepositAmt = settleCancelOrdersAccount.getRentDepositAmt();
+            int rentSurplusDepositAmt = settleCancelOrdersAccount.getRentSurplusDepositAmt();
+            int rentWzDepositAmt = settleCancelOrdersAccount.getRentWzDepositAmt();
+            int rentSurplusWzDepositAmt = settleCancelOrdersAccount.getRentSurplusWzDepositAmt();
+            int renWalletAmt = settleCancelOrdersAccount.getRenWalletAmt();
+            int rentSurplusWalletAmt = settleCancelOrdersAccount.getRentSurplusWalletAmt();
+
+            int yingKou = (rentCostAmt + rentDepositAmt + rentWzDepositAmt + renWalletAmt)
+                    -(rentSurplusCostAmt + rentSurplusDepositAmt + rentSurplusWzDepositAmt + rentSurplusWalletAmt);
+
+            AccountRenterCostSettleEntity accountRenterCostSettleEntity = new AccountRenterCostSettleEntity();
+            accountRenterCostSettleEntity.setId(byOrderNo.getId());
+            accountRenterCostSettleEntity.setVersion(byOrderNo.getVersion());
+            accountRenterCostSettleEntity.setYingkouAmt(yingKou);
+            accountRenterCostSettleNoTService.updateAccountRenterCostSettle(accountRenterCostSettleEntity);
+                 /*log.error("订单结算-获取租客结算表数据失败，数据为空 orderNo={}",orderStatusDTO.getOrderNo());
+            throw  new RenterCancelSettleException();*/
+        }
+
         //更新租客订单状态
-        renterOrderService.updateChildStatusByRenterOrderNo(renterOrder, RenterChildStatusEnum.SETTLED);
+        renterOrderService.updateChildStatusByRenterOrderNo(settleOrders.getRenterOrderNo(), RenterChildStatusEnum.SETTLED);
     }
 
     private SettleCancelOrdersAccount initRenterSettleCancelOrdersAccount(SettleOrders settleOrders) {
@@ -274,6 +307,10 @@ public class RenterOrderSettleService {
             rentFineTotal = rentDepositAmt + rentFineTotal;
             settleCancelOrdersAccount.setRentSurplusDepositAmt(settleCancelOrdersAccount.getRentSurplusDepositAmt()+amt);
         }
+        /**
+         * 1、不取消的情况下，车辆押金抵扣欠平台的租车费用，车辆押金不够的情况下，会将欠款记录到历史欠款，到违章结算的时候才去抵扣历史欠款
+         * 2、当取消订单的情况下，车辆押金结算，违章押金结算是同时进行的，但是基本不会走到这一个if判断
+         */
         //2.2 违章押金抵扣
         if(rentWzDepositAmt>0 && rentFineTotal<0){
             RenterCancelWZDepositCostReqVO vo = new RenterCancelWZDepositCostReqVO();
@@ -285,7 +322,6 @@ public class RenterOrderSettleService {
             vo.setAmt(amt);
             //押金抵扣抵扣 罚金
             //insert account_renter_wz_deposit_detail 违章押金进出明细表
-            //TODO zhangbin account_renter_wz_deposit  不管么？？ 结算状态、结算金额、应付金额、实付金额是否需要变化
             cashierSettleService.deductRentWzDepositToRentFine(vo);
             rentFineTotal = rentWzDepositAmt + rentFineTotal;
             settleCancelOrdersAccount.setRentSurplusWzDepositAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()+amt);
