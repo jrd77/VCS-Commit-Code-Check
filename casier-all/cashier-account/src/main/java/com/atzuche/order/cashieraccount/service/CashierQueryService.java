@@ -136,7 +136,6 @@ public class CashierQueryService {
         int wzDepositSurplusAmt = list.stream().mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
         //结算时候抵扣历史欠款
         int debtAmt = list.stream().filter(obj ->
-            RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT.getCashNo().equals(obj.getCostCode()) ||
                     RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT.getCashNo().equals(obj.getCostCode())
         ).mapToInt(AccountRenterWzDepositDetailEntity::getAmt).sum();
 
@@ -209,13 +208,14 @@ public class CashierQueryService {
 //            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
         }
 
+
         //查询车主罚金
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
         // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
             //油费
             int oilCost=  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return OwnerCashCodeEnum.OIL_COST_OWNER.getCashNo().equals(obj.getSourceCode());
+                return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //取消订单罚金
             int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{

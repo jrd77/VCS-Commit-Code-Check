@@ -1475,10 +1475,10 @@ public class ModifyOrderService {
 		 * changeCodeList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode())))
 		 * { return; }
 		 */
-		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
-			// 换车操作
-			return;
-		}
+		/*
+		 * if (modifyOrderDTO.getTransferFlag() != null &&
+		 * modifyOrderDTO.getTransferFlag()) { // 换车操作 return; }
+		 */
 		UpdateOrderDeliveryVO updateFlowOrderVO = new UpdateOrderDeliveryVO();
 		// 配送地址
 		RenterDeliveryAddrDTO deliveryAddr = getRenterDeliveryAddrDTO(modifyOrderDTO);
@@ -1549,6 +1549,8 @@ public class ModifyOrderService {
 		if (modifyOrderDTO == null) {
 			return delivMap;
 		}
+		// 商品信息
+		RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
 		// 提前延后时间
 		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderDTO.getCarRentTimeRangeResVO();
 		OrderDeliveryDTO getDelivery = new OrderDeliveryDTO();
@@ -1567,6 +1569,9 @@ public class ModifyOrderService {
 			getDelivery.setIsNotifyRenyun(1);
 		} else {
 			getDelivery.setIsNotifyRenyun(0);
+			getDelivery.setRenterGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
+			getDelivery.setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
+			getDelivery.setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
 		}
 		
 		delivMap.put(SrvGetReturnEnum.SRV_GET_TYPE.getCode(), getDelivery);
@@ -1586,6 +1591,9 @@ public class ModifyOrderService {
 			returnDelivery.setIsNotifyRenyun(1);
 		} else {
 			returnDelivery.setIsNotifyRenyun(0);
+			returnDelivery.setRenterGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
+			returnDelivery.setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
+			returnDelivery.setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
 		}
 		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
