@@ -222,12 +222,19 @@ public class CashierNoTService {
         PayedOrderRenterDepositReqVO vo = new PayedOrderRenterDepositReqVO();
         BeanUtils.copyProperties(notifyDataVo,vo);
         vo.setPayStatus(notifyDataVo.getTransStatus());
-        vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
+        if(StringUtils.isNoneBlank(notifyDataVo.getOrderTime())) {
+        	vo.setPayTime(LocalDateTimeUtils.parseStringToDateTime(notifyDataVo.getOrderTime(),LocalDateTimeUtils.YYYYMMDDHHMMSSS_PATTERN));
+        }else {
+        	vo.setPayTime(LocalDateTime.now()); //默认当前时间
+        }
         //容错处理，07微信的一定是消费  200413
-        if(DataPaySourceConstant.WEIXIN_APP.equals(notifyDataVo.getPaySource()) 
-        		|| DataPaySourceConstant.WEIXIN_H5.equals(notifyDataVo.getPaySource())
-        		|| DataPaySourceConstant.WEIXIN_MP.equals(notifyDataVo.getPaySource()) ) {
-        	notifyDataVo.setPayType(DataPayTypeConstant.PAY_PUR);
+        //基于支付的提前
+        if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
+	        if(DataPaySourceConstant.WEIXIN_APP.equals(notifyDataVo.getPaySource()) 
+	        		|| DataPaySourceConstant.WEIXIN_H5.equals(notifyDataVo.getPaySource())
+	        		|| DataPaySourceConstant.WEIXIN_MP.equals(notifyDataVo.getPaySource()) ) {
+	        	notifyDataVo.setPayType(DataPayTypeConstant.PAY_PUR);
+	        }
         }
         //"01"：消费
         if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType())){
