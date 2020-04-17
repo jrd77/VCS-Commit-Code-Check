@@ -373,13 +373,10 @@ public class RenterCostFacadeService {
         int carDeductionRentAmt = 0;//车辆抵扣的租车费用
         int carDeductionRentHistoricalAmt = 0;
         if(orderStatusEntity.getSettleStatus() == SettleStatusEnum.SETTLED.getCode()){//车辆押金已经结算
-            //车辆押金
-            List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetailEntities = accountRenterCostSettleService.getAccountRenterCostSettleDetail(orderNo);
-            carDeductionRentAmt = Optional.ofNullable(accountRenterCostSettleDetailEntities).orElseGet(ArrayList::new).stream()
-                    .filter(x -> RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.equals(x.getCostCode()))
-                    .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
             carExpAndActFlg = 2;
+            //车辆押金
             List<AccountRenterDepositDetailEntity> accountRenterDepositDetailEntities = accountRenterDepositDetailNoTService.findByOrderNo(orderNo);
+            carDeductionRentAmt = AccountRenterDepositUtils.getDepositSettleDeductionDebtAmt(accountRenterDepositDetailEntities, RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST);
             carDeductionRentHistoricalAmt = AccountRenterDepositUtils.getDepositSettleDeductionDebtAmt(accountRenterDepositDetailEntities,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
         }else{//未结算
             carDeductionRentAmt = renterCostVO.getDepositCostYingkou();
