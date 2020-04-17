@@ -302,7 +302,7 @@
         select `order_no` from `order`
     </select>
     <select id="getOrderByRenterMemNo" resultMap="BaseResultMap">
-        select  <include refid="Base_Column_List" /> from `order`  where mem_no_renter =#{renterMemNo} limit 20
+        select  <include refid="Base_Column_List" /> from `order`  where mem_no_renter =#{renterMemNo} and is_delete = 0 order by id desc
     </select>
 
 </mapper>
