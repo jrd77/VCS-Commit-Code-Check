@@ -1714,7 +1714,7 @@ public class OrderDetailService {
                     RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(curOrderNo,renterOrderNo);
 
                     OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
-                    orderHistoryDTO.orderNo = orderNo;
+                    orderHistoryDTO.orderNo = curOrderNo;
                     orderHistoryDTO.category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
                     orderHistoryDTO.ownerName = ownerMemberDTO.getRealName();
                     orderHistoryDTO.ownerPhone = ownerMemberDTO.getPhone();
