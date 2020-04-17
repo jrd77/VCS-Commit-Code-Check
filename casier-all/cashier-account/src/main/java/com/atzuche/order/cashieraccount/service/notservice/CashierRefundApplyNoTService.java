@@ -76,13 +76,13 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setPayMd5(payMd5);
         Integer payLine = cashierRefundApplyReq.getPayLine();
         // 0-线上支付，1-线下支付，2-虚拟支付
-        if (payLine != null && payLine == PayLineEnum.OFF_LINE_PAY.getCode()) {
+        if (payLine != null && payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode())) {
         	// 线下支付
         	OfflineRefundApplyEntity record = new OfflineRefundApplyEntity();
         	BeanUtils.copyProperties(cashierRefundApplyEntity, record);
         	offlineRefundApplyMapper.insertSelective(record);
         	return record.getId();
-        } else if (payLine != null && payLine == PayLineEnum.VIRTUAL_PAY.getCode()) {
+        } else if (payLine != null && payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
         	// 虚拟支付
         	int virtualId = insertVirtualPayDetail(cashierRefundApplyReq);
         	updateVirtualPay(cashierRefundApplyReq);
