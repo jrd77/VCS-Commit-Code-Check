@@ -324,6 +324,16 @@
 		limit 1
 	</select>
 	
+	<select id="getRenterOrderByOrderNoAndWaitPayAfter" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
+		and child_status in (3,4)
+		and is_cancle = 0
+		and is_delete = 0
+		and is_effective = 1  
+		order by id desc
+		limit 1
+	</select>
+	
 	<!-- 		and is_effective = 1  APP修改订单需要支付成功之后才是有效订单。。-->
 	<select id="getRenterOrderByOrderNoAndWaitPayIncrement" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}
