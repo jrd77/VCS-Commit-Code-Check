@@ -245,33 +245,27 @@ public class OrderWzSettleNewService {
 	@Transactional(rollbackFor = Exception.class)
 	public void settleOrderAfter(SettleOrdersWz settleOrders) {
 		// 7.1 违章费用 总费用 信息落库 并返回最新租车费用 实付
-		/**
-		 * 违章费用总表及其结算总表 account_renter_wz_deposit_cost
-		 */
+        // 违章费用总表及其结算总表 account_renter_wz_deposit_cost
 		AccountRenterWzDepositCostEntity accountRenterCostSettle = cashierWzSettleService.updateWzRentSettleCost(settleOrders.getOrderNo(), settleOrders.getRenterMemNo(), settleOrders.getRenterOrderCostWz());
 		log.info("OrderSettleService updateRentSettleCost 更新违章费用总表的应收，实收，欠款。 [{}]", GsonUtils.toJson(accountRenterCostSettle));
 		Cat.logEvent("updateWzRentSettleCost", GsonUtils.toJson(accountRenterCostSettle));
 
 		// 8 获取租客 实付 违章押金
-		//account_renter_wz_deposit_detail 动态统计。
+		// account_renter_wz_deposit_detail 动态统计。
 		int wzDepositAmt = cashierWzSettleService.getSurplusWZDepositCostAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		log.info("(统计违章押金的资金明细表)当前订单和会员的累计支付的违章押金金额 [{}], orderNo=[{}],renterMemNo=[{}]",wzDepositAmt,settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		
 		SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
 		BeanUtils.copyProperties(settleOrders, settleOrdersAccount);
-		settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getYingfuAmt()); // 应付 违章费用
-		settleOrdersAccount.setRentCostPayAmt(0); // 实付 0,没有违章押金的单独支付
-		/**
-		 * 保持一致。
-		 */
+        // 应付 违章费用
+		settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getYingfuAmt());
+        // 实付 0,没有违章押金的单独支付
+		settleOrdersAccount.setRentCostPayAmt(OrderConstant.ZERO);
 		settleOrdersAccount.setDepositAmt(wzDepositAmt);
 		settleOrdersAccount.setDepositSurplusAmt(wzDepositAmt);
 
 		// 按0处理，违章费用没有单独支付。
-		int rentCostSurplusAmt = 0;// (accountRenterCostSettle.getYingfuAmt() +
-									// accountRenterCostSettle.getShifuAmt())<=0?0:(accountRenterCostSettle.getRentAmt()
-									// + accountRenterCostSettle.getShifuAmt());
-		settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
+		settleOrdersAccount.setRentCostSurplusAmt(OrderConstant.ZERO);
 
 		log.info("(各费用赋值，应付，实收，违章押金，剩余违章押金) OrderSettleService settleOrderAfter settleOrdersAccount one [{}]",GsonUtils.toJson(settleOrdersAccount));
 		Cat.logEvent("settleOrdersAccount", GsonUtils.toJson(settleOrdersAccount));
@@ -288,23 +282,26 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
 
 
-		//抵扣未支付的补付费用
+		// 抵扣未支付的补付费用
         log.info("OrderSettleService supplementCostHandle 抵扣补付记录。settleOrdersAccount [{}]",
                 GsonUtils.toJson(settleOrdersAccount));
         orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
         log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
         int totalwzDebtAmt;
+        int yingkouAmt;
         if(Objects.nonNull(settleOrders.getEnterpriseUserOrder()) && settleOrders.getEnterpriseUserOrder()) {
             OrderSettleResVO resVO = orderSettleHandleService.wzDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
                     settleOrdersAccount.getOrderNo());
             totalwzDebtAmt = resVO.getOldTotalRealDebtAmt();
             orderStatusDTO.setWzSettleStatus(resVO.getSettleStatus().getCode());
+            yingkouAmt = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
         } else {
             // 2.1租客剩余违章押金 结余历史欠款
             orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
             // 2.2违章押金抵扣老系统欠款
             totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
+            yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
         }
 		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
@@ -312,8 +309,7 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.refundWzDepositAmt(settleOrdersAccount, orderStatusDTO);
 		log.info("OrderSettleService 结算结束 settleOrdersAccount [{}],orderStatusDTO [{}]", GsonUtils.toJson(settleOrdersAccount),GsonUtils.toJson(orderStatusDTO));
 
-		//更新应扣违章押金
-        int yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+		// 更新应扣违章押金
         AccountRenterWzDepositCostEntity entity = new AccountRenterWzDepositCostEntity();
         entity.setOrderNo(settleOrders.getOrderNo());
         entity.setMemNo(settleOrders.getRenterMemNo());
