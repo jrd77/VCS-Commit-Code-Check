@@ -19,7 +19,7 @@ public class OrderUtil {
         if(orderNo==null){
             throw new IllegalArgumentException("orderNo cannot be null :"+orderNo);
         }
-        if(orderNo.length()>10&&orderNo.endsWith("99")){
+        if(orderNo.length()>12&&orderNo.endsWith("99")){
             return true;
         }
         return false;

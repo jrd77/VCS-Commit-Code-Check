@@ -109,6 +109,14 @@ public class CashierNoTService {
         return renterOrderEntity;
     }
     
+    public RenterOrderEntity getRenterOrderNoByOrderNoAfter(String orderNo){
+        RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPayAfter(orderNo);
+        if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
+           return new RenterOrderEntity();
+        }
+        return renterOrderEntity;
+    }
+    
     public RenterOrderEntity getRenterOrderNoByOrderNoIncrement(String orderNo){
         RenterOrderEntity renterOrderEntity =  renterOrderService.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
         if(Objects.isNull(renterOrderEntity) || StringUtil.isBlank(renterOrderEntity.getRenterOrderNo())){
