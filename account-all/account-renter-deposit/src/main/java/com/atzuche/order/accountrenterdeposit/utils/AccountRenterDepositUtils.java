@@ -19,7 +19,7 @@ public class AccountRenterDepositUtils {
                 .orElseGet(ArrayList::new)
                 .stream()
                 .filter(x -> renterCashCodeEnum.getCashNo().equals(x.getSourceCode()))
-                .mapToInt(x -> x.getAmt())
+                .mapToInt(x -> x.getAmt()==null?0:x.getAmt())
                 .sum();
         return sum;
     }

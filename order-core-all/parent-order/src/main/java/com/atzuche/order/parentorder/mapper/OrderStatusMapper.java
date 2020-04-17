@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface OrderStatusMapper{
 
-    OrderStatusEntity selectByOrderNo(String orderNo);
+    OrderStatusEntity selectByOrderNo(@Param("orderNo") String orderNo);
 
     int insert(OrderStatusEntity record);
     

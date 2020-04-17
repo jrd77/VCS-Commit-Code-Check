@@ -87,6 +87,14 @@ public class AccountRenterWzDepositNoTService {
      */
     public void updateRenterDeposit(PayedOrderRenterWZDepositReqVO payedOrderWZRenterDeposit) {
         AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(payedOrderWZRenterDeposit.getOrderNo(),payedOrderWZRenterDeposit.getMemNo());
+        //二次验证
+        //免押方式(1:绑卡减免,2:芝麻减免,3:支付押金)
+        if(accountRenterDepositEntity != null && accountRenterDepositEntity.getFreeDepositType() == 2) {  //芝麻免押，才会存在一半一半的情况
+        	if(payedOrderWZRenterDeposit.getIsAuthorize() == 1) {  //普通预授权
+        		payedOrderWZRenterDeposit.setIsAuthorize(2); //转化为 信用预授权。
+        	}
+        }
+        
         BeanUtils.copyProperties(payedOrderWZRenterDeposit,accountRenterDepositEntity);
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
