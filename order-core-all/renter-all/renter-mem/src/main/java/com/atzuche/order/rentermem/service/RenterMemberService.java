@@ -2,10 +2,13 @@ package com.atzuche.order.rentermem.service;
 
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
+import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.mapper.RenterMemberMapper;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
+import com.atzuche.order.rentermem.utils.RenterMemUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,20 @@ public class RenterMemberService{
     private RenterMemberMapper renterMemberMapper;
     @Autowired
     private RenterMemberRightMapper renterMemberRightMapper;
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/17 10:45
+     * @Description: 是否是企业用户 true:是 false：不是
+     * renterOrderNo: 租客子订单号
+     **/
+    public boolean isEnterpriseUserOrder(String renterOrderNo){
+        List<RenterMemberRightEntity> renterMemberRightEntityList = getRenterMemRightByRenterOrderNo(renterOrderNo);
+        RenterMemberRightEntity renterMemberRightEntity = RenterMemUtils.filterRight(renterMemberRightEntityList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        if(renterMemberRightEntity == null){
+            return false;
+        }
+        return true;
+    }
     /**
      * 保存租客用户信息
      */
@@ -70,6 +86,11 @@ public class RenterMemberService{
         });
         renterMemberDto.setRenterMemberRightDTOList(list);
         return renterMemberDto;
+    }
+
+    public List<RenterMemberRightEntity> getRenterMemRightByRenterOrderNo(String renterOrderNo){
+        List<RenterMemberRightEntity> dbList = renterMemberRightMapper.selectByRenterOrderNo(renterOrderNo);
+        return dbList;
     }
 
     public String getRenterNoByOrderNo(String orderNo) {
