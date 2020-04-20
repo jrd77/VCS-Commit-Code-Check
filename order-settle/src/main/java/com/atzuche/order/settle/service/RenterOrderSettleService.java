@@ -307,6 +307,10 @@ public class RenterOrderSettleService {
             rentFineTotal = rentDepositAmt + rentFineTotal;
             settleCancelOrdersAccount.setRentSurplusDepositAmt(settleCancelOrdersAccount.getRentSurplusDepositAmt()+amt);
         }
+        /**
+         * 1、不取消的情况下，车辆押金抵扣欠平台的租车费用，车辆押金不够的情况下，会将欠款记录到历史欠款，到违章结算的时候才去抵扣历史欠款
+         * 2、当取消订单的情况下，车辆押金结算，违章押金结算是同时进行的，但是基本不会走到这一个if判断
+         */
         //2.2 违章押金抵扣
         if(rentWzDepositAmt>0 && rentFineTotal<0){
             RenterCancelWZDepositCostReqVO vo = new RenterCancelWZDepositCostReqVO();
@@ -318,7 +322,6 @@ public class RenterOrderSettleService {
             vo.setAmt(amt);
             //押金抵扣抵扣 罚金
             //insert account_renter_wz_deposit_detail 违章押金进出明细表
-            //TODO zhangbin account_renter_wz_deposit  不管么？？ 结算状态、结算金额、应付金额、实付金额是否需要变化
             cashierSettleService.deductRentWzDepositToRentFine(vo);
             rentFineTotal = rentWzDepositAmt + rentFineTotal;
             settleCancelOrdersAccount.setRentSurplusWzDepositAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()+amt);

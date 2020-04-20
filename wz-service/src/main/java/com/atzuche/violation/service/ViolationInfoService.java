@@ -122,7 +122,7 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO : violationResDesVOList) {
             ViolationExportResVO violationExportResVO = new ViolationExportResVO();
             CommonUtil.copyPropertiesIgnoreNull(violationResVO, violationExportResVO);
-            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.findDetailByOrderNo(violationReqVO.getOrderNo(), violationReqVO.getCarNo());
+            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(), violationReqVO.getCarNo());
             if (!CollectionUtils.isEmpty(renterOrderWzDetailEntities)) {
                 renterOrderWzDetailEntities.stream().forEach(r -> {
                     violationExportResVO.setIllegalAddr(r.getIllegalAddr());
@@ -146,6 +146,14 @@ public class ViolationInfoService {
                     violationExportResVOS.add(violationExportResVO);
                 });
             } else {
+                OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationExportResVO.getOrderNo());
+                String orderDetain = "未暂扣";
+                if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                    orderDetain = "未暂扣";
+                } else {
+                    orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                }
+                violationExportResVO.setIllegalPauseCost(orderDetain);
                 violationExportResVOS.add(violationExportResVO);
             }
         }

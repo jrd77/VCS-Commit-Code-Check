@@ -449,6 +449,8 @@ public class OrderCostService {
 		//add
 		realVo.setVehicleDepositYingkou(String.valueOf(costVo.getDepositCostYingkou()));
 		realVo.setVehicleDepositShikou(String.valueOf(costVo.getDepositCostShikou()));
+		//add 200416
+		realVo.setVehicleDepositShishouAuth(String.valueOf(costVo.getDepositCostShishouAuth()));
 		
 		
 		//直接从海豹那边的调用
@@ -459,6 +461,8 @@ public class OrderCostService {
 		//add
 		realVo.setViolationDepositYingkou(String.valueOf(costVo.getDepositWzCostYingkou()));
 		realVo.setViolationDepositShikou(String.valueOf(costVo.getDepositWzCostShikou()));
+		//add 200416
+		realVo.setViolationDepositShishouAuth(String.valueOf(costVo.getDepositWzCostShishouAuth()));
 		
 	}
 

@@ -244,6 +244,7 @@ public class OrderWzSettleNewService {
 		Cat.logEvent("updateWzRentSettleCost", GsonUtils.toJson(accountRenterCostSettle));
 
 		// 8 获取租客 实付 违章押金
+		//account_renter_wz_deposit_detail 动态统计。
 		int wzDepositAmt = cashierWzSettleService.getSurplusWZDepositCostAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		log.info("(统计违章押金的资金明细表)当前订单和会员的累计支付的违章押金金额 [{}], orderNo=[{}],renterMemNo=[{}]",wzDepositAmt,settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		
@@ -251,6 +252,9 @@ public class OrderWzSettleNewService {
 		BeanUtils.copyProperties(settleOrders, settleOrdersAccount);
 		settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getYingfuAmt()); // 应付 违章费用
 		settleOrdersAccount.setRentCostPayAmt(0); // 实付 0,没有违章押金的单独支付
+		/**
+		 * 保持一致。
+		 */
 		settleOrdersAccount.setDepositAmt(wzDepositAmt);
 		settleOrdersAccount.setDepositSurplusAmt(wzDepositAmt);
 

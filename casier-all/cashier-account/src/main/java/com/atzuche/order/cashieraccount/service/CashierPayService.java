@@ -466,17 +466,26 @@ public class CashierPayService{
         //1 查询子单号
         RenterOrderEntity renterOrderEntity = null;
         //查询子订单有关：进行中的子订单，其他的无关(针对结算后的补付功能。)。200410
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
 	        renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
 	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
 	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
 	        }
+	        
+        }else if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)) {
+        	//包括租客子订单状态3，4
+        	renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoAfter(orderPayReqVO.getOrderNo());
+	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
+	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
+	        }
+	        
         }else if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)) {
         	//未支付不是有效订单
         	renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNoIncrement(orderPayReqVO.getOrderNo());
 	        if(StringUtils.isBlank(renterOrderEntity.getRenterOrderNo())) {
 	        	 throw new OrderNotFoundException(orderPayReqVO.getOrderNo()+"支付子订单号");
 	        }
+	        
         }
         
         OrderPayableAmountResVO result = new OrderPayableAmountResVO();
@@ -1076,7 +1085,7 @@ public class CashierPayService{
             cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
             //2 构造退款参数
             RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
-           //3退款
+            //3退款
             AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
             if(Objects.nonNull(vo)){
             	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));

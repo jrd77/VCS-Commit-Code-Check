@@ -144,7 +144,11 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPay(orderNo);
     }
-
+    
+    public RenterOrderEntity getRenterOrderByOrderNoAndWaitPayAfter(String orderNo) {
+        return renterOrderMapper.getRenterOrderByOrderNoAndWaitPayAfter(orderNo);
+    }
+    
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPayIncrement(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
     }
