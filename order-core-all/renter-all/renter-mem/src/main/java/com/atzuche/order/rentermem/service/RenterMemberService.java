@@ -37,8 +37,14 @@ public class RenterMemberService{
      **/
     public boolean isEnterpriseUserOrder(String renterOrderNo){
         List<RenterMemberRightEntity> renterMemberRightEntityList = getRenterMemRightByRenterOrderNo(renterOrderNo);
-        RenterMemberRightEntity renterMemberRightEntity = RenterMemUtils.filterRight(renterMemberRightEntityList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
-        if(renterMemberRightEntity == null){
+        List<RenterMemberRightDTO> renterMemberRightDTOS = new ArrayList<>();
+        renterMemberRightEntityList.forEach(x->{
+            RenterMemberRightDTO renterMemberRightDto = new RenterMemberRightDTO();
+            BeanUtils.copyProperties(x,renterMemberRightDto);
+            renterMemberRightDTOS.add(renterMemberRightDto);
+        });
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        if(renterMemberRightDTO == null){
             return false;
         }
         return true;

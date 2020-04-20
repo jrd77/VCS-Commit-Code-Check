@@ -202,9 +202,9 @@ public class CashierQueryService {
         if(!CollectionUtils.isEmpty(accountOwnerIncomeExamines)){
             int incomeExamineAmt = accountOwnerIncomeExamines.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
             resVO.setIncomeExamineAmt(incomeExamineAmt);
-            List<AccountOwnerIncomeExamineEntity> ownerIncomeExaminesPassed = accountOwnerIncomeExamines.stream().filter(obj ->{
+/*            List<AccountOwnerIncomeExamineEntity> ownerIncomeExaminesPassed = accountOwnerIncomeExamines.stream().filter(obj ->{
                 return AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus()==obj.getStatus();
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toList());*/
 //            exsitPassed = !CollectionUtils.isEmpty(ownerIncomeExaminesPassed);
         }
 
@@ -213,7 +213,7 @@ public class CashierQueryService {
         List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetails(orderNo,memNo);
         // 车主结算记录存在 且 车主收益 已审核通过  返回  罚金 金额
         if(!CollectionUtils.isEmpty(accountOwnerCostSettleDetails)){
-            //油费
+            //车主油费
             int oilCost=  accountOwnerCostSettleDetails.stream().filter(obj ->{
                 return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();

@@ -1892,7 +1892,7 @@ public class OrderDetailService {
                 .collect(Collectors.toList());
         int maxLen = 2000;
         int size = orderNos.size();
-        log.info("当前订单条数size={}",size);
+        log.info("查询非正常结束订单，当前订单条数size={}",size);
         int count = size%maxLen==0?(size / maxLen):(size / maxLen) + 1;
         List<OrderDTO> orderDTOS = new ArrayList<>();
         for(int i=0;i<count;i++){
