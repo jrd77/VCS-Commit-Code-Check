@@ -60,6 +60,10 @@ public class AccountDebtReceivableaDetailEntity implements Serializable {
 	 * 备注
 	 */
 	private String remark;
+    /**
+     * 收款方式:0,押金 1,钱包
+     */
+	private Integer payWay;
 	/**
 	 * 创建时间
 	 */

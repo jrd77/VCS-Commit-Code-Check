@@ -196,7 +196,10 @@ public class OrderSettleService{
         	depositYingtuiOri = depositShishouOri - depositYingkouOri;
         } else {  
         	//应扣大于实收,应扣小于等于实收
-        	depositYingkouOri = depositShishouOri;
+        	//处理预授权的情况。200420
+        	if(accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
+        		depositYingkouOri = depositShishouOri;
+        	}
         }
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],depositYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,depositYingtuiOri,orderNo,renterNo);
 
@@ -257,7 +260,10 @@ public class OrderSettleService{
         	wzYingtuiOri = wzShishouOri - wzYingkouOri;
         } else {
         	//应扣大于实收,应扣小于等于实收
-        	wzYingkouOri = wzShishouOri;
+        	//处理预授权的情况。200420
+        	if(accountRenterWZDeposit.getIsAuthorize().intValue() != 0) {
+        		wzYingkouOri = wzShishouOri;
+        	}
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],wzYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,wzYingtuiOri,orderNo,renterNo);
         

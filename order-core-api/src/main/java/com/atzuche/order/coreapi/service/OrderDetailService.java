@@ -39,7 +39,6 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
 import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
-import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
@@ -86,7 +85,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+<<<<<<< HEAD
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+=======
 import java.util.*;
+>>>>>>> 2544eab16609a0fcf3e95d6fbb8bed6c199eb1b2
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -1678,12 +1685,15 @@ public class OrderDetailService {
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         String renterMemNo = orderEntity.getMemNoRenter();
         List<OrderEntity> orderEntityList = orderService.getOrderByRenterMemNo(renterMemNo);
+        AtomicInteger count = new AtomicInteger();
         Optional.ofNullable(orderEntityList)
                 .orElseGet(ArrayList::new)
-                .stream()
                 .forEach(x->{
+                    if(count.get() >= 20){
+                        return;
+                    }
                     String curOrderNo = x.getOrderNo();
-                    OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+                    OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(curOrderNo);
                     if(orderStatusEntity == null || orderStatusEntity.getSettleStatus()==null || orderStatusEntity.getSettleStatus() != SettleStatusEnum.SETTLED.getCode()){
                         log.info("dispatchHistory 获取不到订单状态或者未车辆结算（租车费用结算），跳过查询 orderNo={}",curOrderNo);
                         return;
@@ -1709,7 +1719,7 @@ public class OrderDetailService {
                     RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(curOrderNo,renterOrderNo);
 
                     OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
-                    orderHistoryDTO.orderNo = orderNo;
+                    orderHistoryDTO.orderNo = curOrderNo;
                     orderHistoryDTO.category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
                     orderHistoryDTO.ownerName = ownerMemberDTO.getRealName();
                     orderHistoryDTO.ownerPhone = ownerMemberDTO.getPhone();
@@ -1746,6 +1756,8 @@ public class OrderDetailService {
                         orderHistoryDTO.totalInsurance = 0;
                     }
                     orderHistoryDTOS.add(orderHistoryDTO);
+                    count.getAndIncrement();
+
                 });
         OrderHistoryListDTO orderHistoryListDTO = new OrderHistoryListDTO();
         orderHistoryListDTO.setOrderHistoryList(orderHistoryDTOS);
