@@ -214,6 +214,7 @@ public class AdminPreOrderController {
 	 * @return boolean
 	 */
 	public Integer getNoAbatementFlagByCarNo(Integer inmsrp, Integer guidePrice, Integer carLevel) {
+		logger.info("getNoAbatementFlagByCarNo inmsrp=[{}],guidePrice=[{}],carLevel=[{}]", inmsrp,guidePrice,carLevel);
 		if (inmsrp == null) {
 			inmsrp = guidePrice;
 		}
