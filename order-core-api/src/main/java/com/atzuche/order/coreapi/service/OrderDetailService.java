@@ -85,7 +85,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+<<<<<<< HEAD
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+=======
 import java.util.*;
+>>>>>>> 2544eab16609a0fcf3e95d6fbb8bed6c199eb1b2
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -1712,7 +1719,7 @@ public class OrderDetailService {
                     RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(curOrderNo,renterOrderNo);
 
                     OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
-                    orderHistoryDTO.orderNo = orderNo;
+                    orderHistoryDTO.orderNo = curOrderNo;
                     orderHistoryDTO.category = CategoryEnum.getNameByCode(orderSourceStatEntity.getCategory());
                     orderHistoryDTO.ownerName = ownerMemberDTO.getRealName();
                     orderHistoryDTO.ownerPhone = ownerMemberDTO.getPhone();

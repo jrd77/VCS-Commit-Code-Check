@@ -21,10 +21,14 @@ public class RenterMemberServiceTest {
     @Test
     public void isEnterpriseUserOrder(){
 
-        boolean enterpriseUserOrder = renterMemberService.isEnterpriseUserOrder("9293927110029910010");
-        log.info("是否企业用户："+enterpriseUserOrder);
-
-        boolean enterpriseUserOrder1 = renterMemberService.isEnterpriseUserOrder("7175537140029910010");
-        log.info("是否企业用户："+enterpriseUserOrder1);
+		/*
+		 * boolean enterpriseUserOrder =
+		 * renterMemberService.isEnterpriseUserOrder("9293927110029910010");
+		 * log.info("是否企业用户："+enterpriseUserOrder);
+		 * 
+		 * boolean enterpriseUserOrder1 =
+		 * renterMemberService.isEnterpriseUserOrder("7175537140029910010");
+		 * log.info("是否企业用户："+enterpriseUserOrder1);
+		 */
     }
 }
