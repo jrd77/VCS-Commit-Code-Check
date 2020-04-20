@@ -32,6 +32,9 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class OrderSettleHandleService {
+	
+	public static final int DEPOSIT_SETTLE_TYPE = 1;
+	public static final int DEPOSIT_WZ_SETTLE_TYPE = 2;
 
     @Autowired
     private WalletProxyService walletProxyService;
@@ -49,13 +52,22 @@ public class OrderSettleHandleService {
 
     /**
      * 违章押金结算抵扣欠款处理
+     * type = 1 租车押金结算
+     * type = 2 违章押金结算
      */
-    public OrderSettleResVO wzDeductionDebtHandle(String memNo, String orderNo) {
+    public OrderSettleResVO commonDeductionDebtHandle(String memNo, String orderNo, int type) {
+    	int newTotalRealDebtAmt = 0;
+    	int oldTotalRealDebtAmt = 0;
         // 新系统欠款信息处理
-        int newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
-        // 老系统欠款信息处理
-        int oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo,
-                RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT);
+    	if(type == DEPOSIT_SETTLE_TYPE) {
+    		newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+    		// 老系统欠款信息处理
+    		oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT);
+    	}else if(type == DEPOSIT_WZ_SETTLE_TYPE){
+    		newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
+    		// 老系统欠款信息处理
+    		oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo,RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT);
+    	}
 
         SettleStatusEnum settleStatus = SettleStatusEnum.SETTLED;
         if (newTotalRealDebtAmt == OrderConstant.SPECIAL_MARK || oldTotalRealDebtAmt == OrderConstant.SPECIAL_MARK) {
@@ -96,9 +108,11 @@ public class OrderSettleHandleService {
                 log.info("Deduction wallet. balance is zero!");
                 return OrderConstant.ZERO;
             }
-            realDeductionAmt = balance >= deductionAmt ? deductionAmt : balance;
+            int newDeductionAmt = balance >= deductionAmt ? deductionAmt : balance;
             log.info("Deduction wallet.realDeductionAmt:[{}],balance:[{}],deductionAmt:[{}]", realDeductionAmt, balance, deductionAmt);
-            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt);
+//            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt);
+            //按新的钱包金额来抵扣。
+            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, newDeductionAmt);
         }
         log.info("Deduction wallet.result is,realDeductionAmt:[{}]", realDeductionAmt);
         return realDeductionAmt;

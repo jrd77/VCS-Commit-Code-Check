@@ -290,9 +290,10 @@ public class OrderWzSettleNewService {
         log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
         int totalwzDebtAmt;
         int yingkouAmt;
+        
         if(Objects.nonNull(settleOrders.getEnterpriseUserOrder()) && settleOrders.getEnterpriseUserOrder()) {
-            OrderSettleResVO resVO = orderSettleHandleService.wzDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
-                    settleOrdersAccount.getOrderNo());
+            OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
+                    settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_WZ_SETTLE_TYPE);
             totalwzDebtAmt = resVO.getOldTotalRealDebtAmt();
             orderStatusDTO.setWzSettleStatus(resVO.getSettleStatus().getCode());
             yingkouAmt = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
