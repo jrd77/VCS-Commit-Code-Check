@@ -37,6 +37,8 @@ public interface RenterOrderMapper{
     Integer updateRenterOrderEffective(@Param("id") Integer id, @Param("effectiveFlag") Integer effectiveFlag);
     
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPay(@Param("orderNo") String orderNo);
+    
+    RenterOrderEntity getRenterOrderByOrderNoAndWaitPayAfter(@Param("orderNo") String orderNo);
     //
     RenterOrderEntity getRenterOrderByOrderNoAndWaitPayIncrement(@Param("orderNo") String orderNo);
     
