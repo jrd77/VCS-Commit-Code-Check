@@ -40,6 +40,11 @@ public class OrderConstant {
      */
     public static final int THREE = 3;
 
+    /**
+     * -999999
+     */
+    public static final int SPECIAL_MARK = -999999;
+
 
 
 
