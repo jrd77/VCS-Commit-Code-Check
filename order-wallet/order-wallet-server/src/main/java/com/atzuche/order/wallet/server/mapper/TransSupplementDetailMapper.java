@@ -1,7 +1,9 @@
 package com.atzuche.order.wallet.server.mapper;
 
+import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,4 +24,8 @@ public interface TransSupplementDetailMapper {
     List<TransSupplementDetailEntity>  findDebtByMemNo(String memNo);
 
     int updatePayStatus(Integer id);
+    
+    List<DepositDebtVO> listRentDepositDebt(@Param("memNo") String memNo);
+    
+    List<DepositDebtVO> listIllegalDepositDebt(@Param("memNo") String memNo);
 }

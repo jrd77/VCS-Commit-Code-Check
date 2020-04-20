@@ -696,18 +696,24 @@ public class OrderSettleNoTService {
         //7.2 车主 费用 落库表
 //        cashierSettleService.insertAccountOwnerCostSettle(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersDefinition.getAccountOwnerCostSettleDetails());
         //8 获取租客 实付 车辆押金  
-        //从AccountRenterDepositDetail租车押金资金明细表中求和。
+        //从AccountRenterDepositDetail租车押金资金明细表中求和。  account_renter_deposit_detail
         int depositAmt = cashierSettleService.getRentDeposit(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
-        //从租车押金accountRenterDeposit总表中查询 shifu
+        //从租车押金accountRenterDeposit总表中查询 shifu  shifuDepositAmt
         int depositAmtRealPay = cashierSettleService.getRentDepositRealPay(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
         
         SettleOrdersAccount settleOrdersAccount = new SettleOrdersAccount();
         BeanUtils.copyProperties(settleOrders,settleOrdersAccount);
         //查询订单剩余应付
-        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());
+        settleOrdersAccount.setRentCostAmtFinal(accountRenterCostSettle.getRentAmt());  //租车费用（总）
         settleOrdersAccount.setRentCostPayAmt(accountRenterCostSettle.getShifuAmt());
         
-        settleOrdersAccount.setDepositAmt(depositAmtRealPay);
+        //暂时去掉，跟动态统计的保持一致。200416
+//        settleOrdersAccount.setDepositAmt(depositAmtRealPay);
+        /**
+         * 保持一致
+         */
+        settleOrdersAccount.setDepositAmt(depositAmt);
+        //动态求和，考虑到退款的情况。真实剩余。
         settleOrdersAccount.setDepositSurplusAmt(depositAmt);
         
 //        settleOrdersAccount.setOwnerCostAmtFinal(settleOrdersDefinition.getOwnerCostAmtFinal());
@@ -718,7 +724,7 @@ public class OrderSettleNoTService {
                 ?(accountRenterCostSettle.getRentAmt() + accountRenterCostSettle.getShifuAmt())
                 :0;
         settleOrdersAccount.setRentCostSurplusAmt(rentCostSurplusAmt);
-        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
+        log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}],depositAmtRealPay=[{}]", GsonUtils.toJson(settleOrdersAccount),depositAmtRealPay);
         Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
@@ -757,9 +763,15 @@ public class OrderSettleNoTService {
         log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
         
         //更新应扣account_renter_cost_settle yingkou_amt   200407
-        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();
+//        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();  // rentCostPayAmt在抵扣欠款的过程中发生了变更。
+        int yingkouAmt1 = accountRenterCostSettle.getShifuAmt() - settleOrdersAccount.getRentCostSurplusAmt();  //需要根据实际的实收来计算。
         int yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
         int yingkouAmt = yingkouAmt1 + yingkouAmt2;
+        log.info("rentCostPayAmt=[{}],rentCostSurplusAmt=[{}],depositAmt=[{}],depositSurplusAmt=[{}],yingkouAmt1=[{}],yingkouAmt2=[{}],yingkouAmt=[{}],orderNo=[{}]",
+        		settleOrdersAccount.getRentCostPayAmt() , settleOrdersAccount.getRentCostSurplusAmt(),
+        		settleOrdersAccount.getDepositAmt() , settleOrdersAccount.getDepositSurplusAmt(),
+        		yingkouAmt1,yingkouAmt2,yingkouAmt,settleOrders.getOrderNo());
+        
         //单独修改
         AccountRenterCostSettleEntity entity = new AccountRenterCostSettleEntity();
         //根据ID来修改
@@ -1395,7 +1407,7 @@ public class OrderSettleNoTService {
             CashierDeductDebtReqVO cashierDeductDebtReq = new CashierDeductDebtReqVO();
             BeanUtils.copyProperties(settleOrders,cashierDeductDebtReq);
             cashierDeductDebtReq.setAmt(settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
-            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_WZ_DEPOSIT_TO_HISTORY_AMT);
+            cashierDeductDebtReq.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
             cashierDeductDebtReq.setMemNo(settleOrders.getRenterMemNo());
             CashierDeductDebtResVO result = cashierWzSettleService.deductWZDebt(cashierDeductDebtReq);
             if(Objects.nonNull(result)){

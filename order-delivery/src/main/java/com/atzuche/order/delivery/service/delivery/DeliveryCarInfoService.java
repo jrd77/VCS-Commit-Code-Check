@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.transport.service.GetReturnCarCostService;
 import com.atzuche.order.transport.vo.GetReturnResponseVO;
 import com.autoyol.platformcost.CommonUtils;
@@ -76,6 +78,8 @@ public class DeliveryCarInfoService {
     GetReturnCarCostService getReturnCarCostService;
     @Value("${auto.cost.configHours}")
     private Integer configHours;
+    @Autowired
+    RenterOrderService renterOrderService;
 
     /**
      * 获取配送相关信息（待优化）
@@ -117,15 +121,9 @@ public class DeliveryCarInfoService {
             if (renterOrderDeliveryEntity.getType().intValue() == 1) {
                 getReturnCarCostReqDto.setIsGetCarCost(true);
                 deliveryCarVO.setIsGetCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
-                if (renterOrderDeliveryEntity.getIsNotifyRenyun() != 0) {
-                    ownerGetAndReturnCarDTO.setRealGetTime(DateUtils.formate(renterOrderDeliveryEntity.getRentTime().minusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()), DateUtils.DATE_DEFAUTE_4));
-                }
             } else { //还车
                 getReturnCarCostReqDto.setIsReturnCarCost(true);
                 deliveryCarVO.setIsReturnCar(renterOrderDeliveryEntity.getIsNotifyRenyun());
-                if (renterOrderDeliveryEntity.getIsNotifyRenyun() != 0) {
-                    ownerGetAndReturnCarDTO.setRealReturnTime(DateUtils.formate(renterOrderDeliveryEntity.getRevertTime().plusMinutes(renterOrderDeliveryEntity.getAheadOrDelayTime() == null ? 0 : renterOrderDeliveryEntity.getAheadOrDelayTime()), DateUtils.DATE_DEFAUTE_4));
-                }
             }
             getReturnCarCostReqDto.setCityCode(Integer.valueOf(renterOrderDeliveryEntity.getCityCode()));
             getReturnCarCostReqDto.setIsPackageOrder(false);

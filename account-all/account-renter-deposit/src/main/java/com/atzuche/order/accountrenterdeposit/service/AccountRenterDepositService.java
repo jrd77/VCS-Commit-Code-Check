@@ -154,8 +154,8 @@ public class AccountRenterDepositService{
         accountRenterDepositDetailEntity.setOrderNo(vo.getOrderNo());
         accountRenterDepositDetailEntity.setMemNo(vo.getMemNo());
         accountRenterDepositDetailEntity.setAmt(vo.getAmt());
-        accountRenterDepositDetailEntity.setSourceCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getCashNo());
-        accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_COST_TO_FINE.getTxt());
+        accountRenterDepositDetailEntity.setSourceCode(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(RenterCashCodeEnum.SETTLE_DEPOSIT_TO_RENT_COST.getTxt());
         accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
 
         AccountRenterDepositEntity entity = accountRenterDepositNoTService.getAccountRenterDepositEntity(vo.getOrderNo(),vo.getMemNo());

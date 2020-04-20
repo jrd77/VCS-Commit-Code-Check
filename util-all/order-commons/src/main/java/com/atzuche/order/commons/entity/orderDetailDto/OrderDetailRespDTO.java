@@ -54,5 +54,7 @@ public class OrderDetailRespDTO {
     public RenterOrderChangeApplyDTO renterOrderChangeApplyDTO;
     //预计收益金额
     public Integer changeApplyPreIncomAmt;
+    //车主预计收益
+    public Integer ownerPreIncom;
 
 }

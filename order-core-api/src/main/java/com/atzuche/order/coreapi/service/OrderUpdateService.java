@@ -17,14 +17,18 @@ public class OrderUpdateService {
     private OrderStatusService orderStatusService;
 
     public void  rentCityAndRiskAccident(RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO) {
-        OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
-        orderEntity.setRentCity(rentCityAndRiskAccidentReqDTO.getRentCity());
-        orderService.updateOrderByOrderNo(orderEntity);
+        if(rentCityAndRiskAccidentReqDTO.getRentCity() != null){
+            OrderEntity orderEntity = new OrderEntity();
+            orderEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
+            orderEntity.setRentCity(rentCityAndRiskAccidentReqDTO.getRentCity());
+            orderService.updateOrderByOrderNo(orderEntity);
+        }
+        if(rentCityAndRiskAccidentReqDTO.getIsRiskAccident() != null){
+            OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
+            orderStatusEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
+            orderStatusEntity.setIsRiskAccident(rentCityAndRiskAccidentReqDTO.getIsRiskAccident());
+            orderStatusService.updateRenterOrderByOrderNo(orderStatusEntity);
+        }
 
-        OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
-        orderStatusEntity.setOrderNo(rentCityAndRiskAccidentReqDTO.getOrderNo());
-        orderStatusEntity.setIsRiskAccident(rentCityAndRiskAccidentReqDTO.getIsRiskAccident());
-        orderStatusService.updateRenterOrderByOrderNo(orderStatusEntity);
     }
 }

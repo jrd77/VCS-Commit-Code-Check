@@ -2,6 +2,7 @@ package com.atzuche.order.wallet.server.service;
 
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
+import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import com.atzuche.order.wallet.server.mapper.MemberMapper;
 import com.atzuche.order.wallet.server.mapper.TransSupplementDetailMapper;
@@ -116,7 +117,7 @@ public class DebtService {
     
     
     /**
-     * 返回用户名下的欠款(区分历史欠款和订单欠款)
+     * 返回用户名下的欠款(区分历史欠款和订单欠款还包含违章押金和车辆押金循环扣不下来的欠款)
      * @param memNo
      * @return DebtDetailVO
      */
@@ -133,6 +134,24 @@ public class DebtService {
         if(balanceEntity!=null&&balanceEntity.getBalance()!=null&&balanceEntity.getBalance()<0){
         	historyDebtAmt = -balanceEntity.getBalance();
         }
+        // 车辆押金欠款
+ 		List<DepositDebtVO> rentList = transSupplementDetailMapper.listRentDepositDebt(memNo);
+ 		if (rentList != null && !rentList.isEmpty()) {
+ 			for (DepositDebtVO ddebt:rentList) {
+ 				if (ddebt != null && ddebt.getTransAmt() != null) {
+ 					historyDebtAmt += ddebt.getTransAmt();
+ 				}
+ 			}
+ 		}
+ 		// 违章押金欠款
+ 		List<DepositDebtVO> wzList = transSupplementDetailMapper.listIllegalDepositDebt(memNo);
+ 		if (wzList != null && !wzList.isEmpty()) {
+ 			for (DepositDebtVO ddebt:wzList) {
+ 				if (ddebt != null && ddebt.getTransAmt() != null) {
+ 					historyDebtAmt += ddebt.getTransAmt();
+ 				}
+ 			}
+ 		}
         DebtDetailVO debtDetailVO = new DebtDetailVO();
         debtDetailVO.setHistoryDebtAmt(historyDebtAmt);
         debtDetailVO.setOrderDebtAmt(orderDebtAmt);

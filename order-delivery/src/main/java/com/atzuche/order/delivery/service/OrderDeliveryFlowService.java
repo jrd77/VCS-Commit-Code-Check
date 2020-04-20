@@ -40,7 +40,7 @@ public class OrderDeliveryFlowService {
     }
 
     public Integer updateOrderDeliveryFlow(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
-        return orderDeliveryFlowMapper.updateByPrimaryKey(orderDeliveryFlowEntity);
+        return orderDeliveryFlowMapper.updateByPrimaryKeySelective(orderDeliveryFlowEntity);
     }
 
 
