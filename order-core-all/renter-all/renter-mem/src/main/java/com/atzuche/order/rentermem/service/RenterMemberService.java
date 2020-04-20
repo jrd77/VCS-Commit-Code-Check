@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -38,10 +39,7 @@ public class RenterMemberService{
     public boolean isEnterpriseUserOrder(String renterOrderNo){
         List<RenterMemberRightEntity> renterMemberRightEntityList = getRenterMemRightByRenterOrderNo(renterOrderNo);
         RenterMemberRightEntity renterMemberRightEntity = RenterMemUtils.filterRight(renterMemberRightEntityList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
-        if(renterMemberRightEntity == null){
-            return false;
-        }
-        return true;
+        return Objects.nonNull(renterMemberRightEntity);
     }
     /**
      * 保存租客用户信息
