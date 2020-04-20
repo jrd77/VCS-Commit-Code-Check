@@ -87,6 +87,7 @@ public class OrderSettleHandleService {
             return OrderConstant.ZERO;
         }
 
+        deductionAmt = Math.abs(deductionAmt);
         int realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt);
         if (realDeductionAmt == OrderConstant.ZERO) {
             //扣减失败,重新计算抵扣金额并再次扣减

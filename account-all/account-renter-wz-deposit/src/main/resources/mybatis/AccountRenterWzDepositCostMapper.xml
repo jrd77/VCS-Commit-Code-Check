@@ -74,7 +74,7 @@
 				<if test="createOp != null">`create_op` = #{createOp}, </if>
 				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
 				<if test="updateOp != null">`update_op` = #{updateOp}, </if>
-				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+				<if test="isDelete != null">`is_delete` = #{isDelete},</if>
                 version = version + 1,
 			</set>
 		where id = #{id} and version = #{version}
