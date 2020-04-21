@@ -200,7 +200,7 @@ public class OrderSettleHandleService {
             return OrderConstant.ZERO;
         }
 
-        List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
+        List<AccountOldDebtReqVO> oldDebtList = new ArrayList<>();
         AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
         accountOldDebtReqVO.setOrderNo(orderNo);
         accountOldDebtReqVO.setMemNo(memNo);
