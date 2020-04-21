@@ -13,6 +13,7 @@ import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
+import com.atzuche.order.coreapi.filter.LongOrderFilterChain;
 import com.atzuche.order.coreapi.filter.OrderFilterChain;
 import com.atzuche.order.coreapi.service.PayCallbackService;
 import com.atzuche.order.coreapi.service.SubmitOrderInitContextService;
@@ -75,7 +76,8 @@ public class SubmitOrderController {
     private PayCallbackService payCallbackService;
     @Autowired
     private CashierPayService cashierPayService;
-
+    @Autowired
+    private LongOrderFilterChain longOrderFilterChain;
     
 
     @AutoDocMethod(description = "提交订单", value = "提交订单", response = OrderResVO.class)
@@ -106,6 +108,7 @@ public class SubmitOrderController {
 
         try{
             if(StringUtils.isNotBlank(normalOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(normalOrderReqVO.getOrderCategory(),"3")) {
+                longOrderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitLongOrder(context);
             } else {
                 orderFilterChain.validate(context);
@@ -222,6 +225,7 @@ public class SubmitOrderController {
 
         try{
             if(StringUtils.isNotBlank(adminOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(adminOrderReqVO.getOrderCategory(),"3")) {
+                longOrderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitLongOrder(context);
             } else {
                 orderFilterChain.validate(context);
