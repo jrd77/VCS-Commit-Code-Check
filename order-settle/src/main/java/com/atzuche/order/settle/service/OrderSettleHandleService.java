@@ -272,7 +272,7 @@ public class OrderSettleHandleService {
             // 新增account_renter_wz_deposit_detail
             accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
             // 更新account_renter_wz_deposit.shishou_deposit
-            accountRenterWzDepositNoTService.updateShishouDepositSettle(reqVO.getOrderNo(), reqVO.getMemNo(),
+            accountRenterWzDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),
                     reqVO.getRealDeductAmt());
         }
         int yingkouAmt = shouldTakeAmt;

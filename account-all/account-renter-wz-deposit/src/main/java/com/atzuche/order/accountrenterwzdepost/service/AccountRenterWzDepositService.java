@@ -168,5 +168,5 @@ public class AccountRenterWzDepositService{
 		accountRenterWzDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
 	}
 
-    
+
 }
