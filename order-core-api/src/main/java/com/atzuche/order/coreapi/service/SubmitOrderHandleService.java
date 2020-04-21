@@ -148,7 +148,11 @@ public class SubmitOrderHandleService {
                 context.getOrderReqVO());
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
         // 订单流程处理(orderFlow)
-        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
+        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
+        if (replyFlag) {
+            orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
+        }
+
         // 换车记录初始化(orderTransferRecordService.saveOrderTransferRecord)
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
         return parentOrderDTO.getOrderStatusDTO().getStatus();
@@ -278,9 +282,9 @@ public class SubmitOrderHandleService {
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
         if (replyFlag) {
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
-        } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+        } else {
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
         }
 
         parentOrderDTO.setOrderDTO(orderDTO);
