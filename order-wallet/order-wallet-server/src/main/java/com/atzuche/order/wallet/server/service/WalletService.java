@@ -23,12 +23,12 @@ public class WalletService {
 
 
     /**
-     * 租客订单扣减凹凸币
+     * 租客订单扣减钱包
      * @param memNo
      * @param orderNo
      * @param amt
      */
-    public int deductWallet(String memNo,String orderNo,Integer amt){
+    public int deductWallet(String memNo,String orderNo,Integer amt,String expDesc){
         WalletEntity entity = walletMapper.getWalletByMemNo(memNo);
         if(entity==null){
             throw new RuntimeException("wallet canot be null for mem_no="+memNo);
@@ -48,7 +48,7 @@ public class WalletService {
                 expenseGiveBalance = amt-payBalance;
             }
             try {
-                baseService.doUpdateWallet(memNo, orderNo, expensePayBalance, expenseGiveBalance);
+                baseService.doUpdateWallet(memNo, orderNo, expensePayBalance, expenseGiveBalance,expDesc);
                 return amt;
             }catch (RuntimeException e){
                 logger.error("扣减失败：memNo={},orderNo={},amt={}",memNo,orderNo,amt);
@@ -72,12 +72,12 @@ public class WalletService {
      * @param orderNo
      * @param amt
      */
-    public void returnOrCharge(String memNo,String orderNo,int amt){
+    public void returnOrCharge(String memNo,String orderNo,int amt,String expDesc){
          int expenseGive = baseService.getExpenseGiveBalance(memNo,orderNo);
          if(amt<=expenseGive){
-             baseService.doUpdateWallet(memNo,orderNo,0,-amt);
+             baseService.doUpdateWallet(memNo,orderNo,0,-amt,expDesc);
          }else{
-             baseService.doUpdateWallet(memNo,orderNo,-(amt-expenseGive),-expenseGive);
+             baseService.doUpdateWallet(memNo,orderNo,-(amt-expenseGive),-expenseGive,expDesc);
          }
     }
 

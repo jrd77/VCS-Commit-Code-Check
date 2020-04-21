@@ -1,5 +1,6 @@
 package com.atzuche.order.wallet.api;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -17,4 +18,6 @@ public class DeductWalletVO {
     private String orderNo;
     @NotNull(message = "amt不能为空")
     private Integer amt;
+    @AutoDocProperty(value = "消费信息描述")
+    private String expDesc;
 }

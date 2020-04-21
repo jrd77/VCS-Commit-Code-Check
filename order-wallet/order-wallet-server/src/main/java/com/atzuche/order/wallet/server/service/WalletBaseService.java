@@ -23,7 +23,7 @@ public class WalletBaseService {
     private WalletLogMapper walletLogMapper;
 
     @Transactional(rollbackFor = RuntimeException.class)
-    public void doUpdateWallet(String memNo, String orderNo, int expensePayBalance, int expenseGiveBalance){
+    public void doUpdateWallet(String memNo, String orderNo, int expensePayBalance, int expenseGiveBalance,String expDesc){
         int count = walletMapper.updateWallet(memNo,expensePayBalance,expenseGiveBalance);
         if(count==0){
             throw new RuntimeException("update wallet version error");
@@ -32,7 +32,7 @@ public class WalletBaseService {
             WalletLogEntity logEntity = new WalletLogEntity();
             logEntity.setAmt(-expensePayBalance);
             logEntity.setFlag("21");
-            logEntity.setFlagTxt("租车消费");
+            logEntity.setFlagTxt(expDesc);
             logEntity.setMemNo(memNo);
             logEntity.setOrderNo(orderNo);
             walletLogMapper.insertWalletLog(logEntity);
@@ -41,7 +41,7 @@ public class WalletBaseService {
             WalletLogEntity logEntity = new WalletLogEntity();
             logEntity.setAmt(-expenseGiveBalance);
             logEntity.setFlag("22");
-            logEntity.setFlagTxt("租车消费");
+            logEntity.setFlagTxt(expDesc);
             logEntity.setMemNo(memNo);
             logEntity.setOrderNo(orderNo);
             walletLogMapper.insertWalletLog(logEntity);
