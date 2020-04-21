@@ -668,7 +668,9 @@ public class CashierService {
                 //2支付成功回调
                 if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
                 	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
-                	if(settleAmount.intValue() == 0) {
+                	//负数1 特殊情况。
+                	//企业用户金额为0,允许通过。
+                	if(settleAmount.intValue() == -1) {
                 		//金额为0的异常情况。
                 		Cat.logError("params="+GsonUtils.toJson(notifyDataVo),new SettleAmountException());
                 		log.error("支付异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));

@@ -548,7 +548,7 @@ public class CashierNoTService {
 
     /**
      * 构造参数 PayVo (押金、违章押金)
-     * @param cashierEntity
+     * @param cashierEntity   计算paySn，是在异步通知支付成功的时候落库的。
      * @param orderPaySign
      * @param freeDepositType  免押方式(1:绑卡减免,2:芝麻减免,3:消费) 
      * @return
