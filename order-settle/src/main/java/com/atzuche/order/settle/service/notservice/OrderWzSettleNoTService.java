@@ -85,6 +85,7 @@ public class OrderWzSettleNoTService {
         rentCostsWz.setRenterOrderWzCostDetails(renterOrderWzCostDetails);
         settleOrders.setRenterOrderCostWz(renterOrderCostWz);
         settleOrders.setRentCostsWz(rentCostsWz);
+        settleOrders.setShouldTakeWzCost(renterOrderCostWz);
     }
     
     
