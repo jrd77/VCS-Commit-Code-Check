@@ -125,9 +125,9 @@ public class SubmitOrderHandleService {
         // 车主订单处理
         ownerOrderService.generateRenterOrderInfo(buildOwnerOrderReqDTO(context, costContext));
         // 车主商品处理
-        ownerGoodsService.save(baseReqDTO.getOrderNo(), baseReqDTO.getRenterOrderNo(), context.getOwnerGoodsDetailDto());
+        ownerGoodsService.save(baseReqDTO.getOrderNo(), baseReqDTO.getOwnerOrderNo(), context.getOwnerGoodsDetailDto());
         // 车主会员处理
-        ownerMemberService.save(baseReqDTO.getOrderNo(), baseReqDTO.getRenterOrderNo(), context.getOwnerMemberDto());
+        ownerMemberService.save(baseReqDTO.getOrderNo(), baseReqDTO.getOwnerOrderNo(), context.getOwnerMemberDto());
         // 违章信息初始化
         String operator = StringUtils.isNotBlank(context.getOrderReqVO().getOperator()) ?
                 context.getRenterMemberDto().getRealName() : context.getOrderReqVO().getOperator();
