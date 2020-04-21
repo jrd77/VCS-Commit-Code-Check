@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterwzdepost.service;
 
 import java.util.Objects;
 
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
+import com.atzuche.order.commons.constant.OrderConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +13,6 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDeta
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -172,6 +168,31 @@ public class AccountRenterWzDepositService{
 		accountRenterWzDepositDetailNoTService.updateRenterDepositUniqueNo(uniqueNo,renterDepositDetailId);
 	}
 
+
+    /**
+     * 租客押金处理并返回应扣金额
+     *
+     * @param reqVO 参数
+     * @return int yingkouAmt
+     */
+    public int accountRentetDepositHandle(SettleOrderRenterDepositReqVO reqVO) {
+        int realDeductAmt = Objects.nonNull(reqVO.getRealDeductAmt()) ? reqVO.getRealDeductAmt() : OrderConstant.ZERO;
+        int shouldTakeAmt = Objects.nonNull(reqVO.getShouldTakeAmt()) ? reqVO.getShouldTakeAmt() : OrderConstant.ZERO;
+
+        if(realDeductAmt > OrderConstant.ZERO) {
+            //todo 获取uniqueNo
+
+            //todo 新增account_renter_wz_deposit_detail
+
+            //todo 更新account_renter_wz_deposit.shishou_deposit
+
+        }
+        int yingkouAmt = shouldTakeAmt;
+        if(realDeductAmt >= shouldTakeAmt) {
+            yingkouAmt = realDeductAmt;
+        }
+        return yingkouAmt;
+    }
 
     
     
