@@ -118,7 +118,9 @@ public enum RenterCashCodeEnum {
 //    ACCOUNT_RENTER_DELIVERY_MILEAGE_COST_PROXY("21130029","交接车-获取代管车超里程费用"),
     
   //第四区域块 看第4位，从4开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。
-    
+    SETTLE_WALLET_TO_RENT_COST("11130032","钱包余额转租车费用"),
+    SETTLE_WALLET_TO_WZ_COST("11130033","钱包余额转违章费用"),
+
     ;
 	
 	/**
