@@ -203,29 +203,29 @@ public class OrderCostService {
 	private void putRentFeeBase(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		//租客租金
-		int rentAmt = Integer.valueOf(realVo.getRentAmount());
+		int rentAmt = Integer.valueOf(realVo.getRentAmount()==null?"0":realVo.getRentAmount());
 		//基础保障费
-		int insure = Integer.valueOf(realVo.getInsuranceAmount());
+		int insure = Integer.valueOf(realVo.getInsuranceAmount()==null?"0":realVo.getInsuranceAmount());
 //		附加驾驶员险
-		int drive = Integer.valueOf(realVo.getAdditionalDriverInsuranceAmount());
-		//违约罚金
-		int fine = Integer.valueOf(realVo.getCarServiceFine());
-		//调价
-		int adjust = Integer.valueOf(realVo.getAdjustAmt());
-		//油费
-		int oil = Integer.valueOf(realVo.getOilAmt());
-		//手续费
-		int fee = Integer.valueOf(realVo.getServiceCharge());
-		//全面保障
-		int insureAll = Integer.valueOf(realVo.getSupperInsuranceAmount());
-		//配送
-		int getReturnFee = Integer.valueOf(realVo.getCarServiceFee());
-		//租客需支付给平台的费用
-		int rentPayToPlatform = Integer.valueOf(realVo.getRenterPayToPlatform());
+		int drive = Integer.valueOf(realVo.getAdditionalDriverInsuranceAmount()==null?"0":realVo.getAdditionalDriverInsuranceAmount());
+        //违约罚金
+        int fine = Integer.valueOf(realVo.getCarServiceFine()==null?"0":realVo.getCarServiceFine());
+        //调价
+        int adjust = Integer.valueOf(realVo.getAdjustAmt()==null?"0":realVo.getAdjustAmt());
+        //油费
+        int oil = Integer.valueOf(realVo.getOilAmt()==null?"0":realVo.getOilAmt());
+        //手续费
+        int fee = Integer.valueOf(realVo.getServiceCharge()==null?"0":realVo.getServiceCharge());
+        //全面保障
+        int insureAll = Integer.valueOf(realVo.getSupperInsuranceAmount()==null?"0":realVo.getSupperInsuranceAmount());
+        //配送
+        int getReturnFee = Integer.valueOf(realVo.getCarServiceFee()==null?"0":realVo.getCarServiceFee());
+        //租客需支付给平台的费用
+        int rentPayToPlatform = Integer.valueOf(realVo.getRenterPayToPlatform()==null?"0":realVo.getRenterPayToPlatform());
 		//超里程
 		int beyondMile = StringUtils.isNotBlank(realVo.getBeyondMileAmt())?Integer.valueOf(realVo.getBeyondMileAmt()):0;
 		//加油服务费
-		int addOil = Integer.valueOf(realVo.getAddOilSrvAmt());
+		int addOil = Integer.valueOf(realVo.getAddOilSrvAmt()==null?"0":realVo.getAddOilSrvAmt());
 		
 		int base = rentAmt + insure + drive + fine + adjust + oil + fee + insureAll + getReturnFee + rentPayToPlatform + beyondMile + addOil;
 		
