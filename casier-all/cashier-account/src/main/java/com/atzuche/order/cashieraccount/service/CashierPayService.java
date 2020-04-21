@@ -285,7 +285,8 @@ public class CashierPayService{
         	//order_supplement_detail  支付欠款的逻辑处理,否则结算后补付会修改订单状态。分离。
         	//rentAmountAfterRenterOrderNo 暂不处理。
         	if( !CollectionUtils.isEmpty(vo.getSupplementIds()) || !CollectionUtils.isEmpty(vo.getDebtIds()) ) {
-        		////补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
+        		//补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
+        		//支付欠款，不更新订单状态。
         		callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
         	}else {
 	            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
@@ -297,6 +298,7 @@ public class CashierPayService{
 	                //记录订单流程
 	                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
 	            }
+	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
 	            
 	            //更新配送 订单补付等信息 只有订单状态为已支付
@@ -318,6 +320,7 @@ public class CashierPayService{
     private Boolean isChangeOrderStatus(OrderStatusDTO orderStatusDTO){
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
         boolean getCar = false;
+        //以参数的为准。
         Integer rentCarPayStatus = Objects.isNull(orderStatusDTO.getRentCarPayStatus())?entity.getRentCarPayStatus():orderStatusDTO.getRentCarPayStatus();
         Integer depositPayStatus = Objects.isNull(orderStatusDTO.getDepositPayStatus())?entity.getDepositPayStatus():orderStatusDTO.getDepositPayStatus();
         Integer wzPayStatus = Objects.isNull(orderStatusDTO.getWzPayStatus())?entity.getWzPayStatus():orderStatusDTO.getWzPayStatus();
@@ -516,7 +519,8 @@ public class CashierPayService{
         int amtDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
             amtDeposit = cashierService.getRenterDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-           if(amtDeposit < 0){
+            //兼容企业用户的情况，押金为0的情况。200421
+           if(amtDeposit <= 0){
                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getTxt()));
            }
         }
@@ -525,10 +529,12 @@ public class CashierPayService{
         int amtWZDeposit = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
             amtWZDeposit = cashierService.getRenterWZDeposit(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-            if(amtWZDeposit < 0){
+            ////兼容企业用户的情况，押金为0的情况。200421
+            if(amtWZDeposit <= 0){
                 accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
             }
         }
+        
         
         //已付租车费用(shifu  租车费用的实付)
         //放在外面，对结果产生了影响。需要内置。
@@ -755,6 +761,10 @@ public class CashierPayService{
 //            countdown = DateUtils.getDateLatterCompareNowScoend(renterOrderEntity.getCreateTime(),1);
 //        }
         String costText ="";
+        
+        int carDepositAmt = Math.abs(result.getAmtDeposit());
+        int wzDepositAmt = Math.abs(result.getAmtWzDeposit());
+        int totalDepositAmt = carDepositAmt + wzDepositAmt;
         //租车费用
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)){
             costText =costText+"租车费用"+ Math.abs(result.getAmtRent()+result.getAmtIncrementRent());
@@ -799,8 +809,9 @@ public class CashierPayService{
             result.setCountdown(countdown);
           
         }
-        //车辆押金
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)){
+        
+        //车辆押金，单笔支付必须金额大于0
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && carDepositAmt > 0){
             costText =costText+"车辆押金"+ Math.abs(result.getAmtDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
             
@@ -814,8 +825,9 @@ public class CashierPayService{
             }
             result.setCountdown(countdown);
         }
-        //违章押金
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+        
+        //违章押金，单笔支付必须金额大于0
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT) && wzDepositAmt > 0){
             costText =costText+" 违章押金"+Math.abs(result.getAmtWzDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
             
@@ -830,16 +842,29 @@ public class CashierPayService{
             result.setCountdown(countdown);
             
         }
+        
+        //合并
         //车辆押金 + 违章押金
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)){
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT) && totalDepositAmt > 0){
             costText ="车辆押金"+ Math.abs(result.getAmtDeposit()) + " + " + " 违章押金"+Math.abs(result.getAmtWzDeposit());
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
         }
-        //车辆押金 + 租车费用 一起支付
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) &&
+        
+        //车辆押金 + 违章押金 + 租车费用 一起支付
+        //合并支付(企业用户)
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && totalDepositAmt > 0 &&
+                (orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT))
+            ){
+                costText ="租车费用"+ Math.abs(result.getAmtRent()+result.getAmtIncrementRent()) + " + " + " 押金" + totalDepositAmt;
+                result.setHints("交易结束后24小时内，押金将返还到支付账户");
+                result.setCountdown(countdown);
+            }
+        
+        //租车费用和车辆押金
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && carDepositAmt > 0 &&
             (orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT))
         ){
-            costText ="租车费用"+ Math.abs(result.getAmtRent()+result.getAmtIncrementRent()) + " + " + " 车辆押金"+Math.abs(result.getAmtDeposit());
+            costText ="租车费用"+ Math.abs(result.getAmtRent()+result.getAmtIncrementRent()) + " + " + " 车辆押金" + carDepositAmt;
             result.setHints("交易结束后24小时内，车辆押金将返还到支付账户");
             result.setCountdown(countdown);
         }
