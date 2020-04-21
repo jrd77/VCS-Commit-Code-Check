@@ -304,9 +304,9 @@
     <update id="updateByMemeNo">
         update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
     </update>
-    <delete id="updateChildStatusByOwnerOrderNo">
+    <update id="updateChildStatusByOwnerOrderNo">
         update owner_order set `child_status` = #{childStatus}  where `owner_order_no` = #{ownerOrderNo}
-    </delete>
+    </update>
 
     <select id="queryByOwnerOrderNoAndMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo}
