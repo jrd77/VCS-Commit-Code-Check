@@ -104,6 +104,9 @@ public class LongOrderOwnerCouponFilter implements OrderCostFilter {
                         renterOrderCostHandleService.handleLongOwnerCoupon(holidayAverageResultList.get(i).getActRentUnitPriceAmt(),
                                 detailEntity.getCount(), detailEntity.getTotalAmount());
                 if (null != subsidyDetailDTO) {
+                    subsidyDetailDTO.setOrderNo(baseReqDTO.getOrderNo());
+                    subsidyDetailDTO.setRenterOrderNo(baseReqDTO.getRenterOrderNo());
+                    subsidyDetailDTO.setMemNo(baseReqDTO.getMemNo());
                     subsidyDetails.add(subsidyDetailDTO);
                 }
             }
