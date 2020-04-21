@@ -17,6 +17,7 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 @MapperScan("com.atzuche.order.sms")
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order"})
 public class ShortMessageApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(ShortMessageApplication.class, args);
     }

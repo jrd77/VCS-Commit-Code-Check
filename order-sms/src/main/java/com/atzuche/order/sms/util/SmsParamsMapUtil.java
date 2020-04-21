@@ -8,6 +8,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Map;
 
 /**
+ * @author 胡春林
  * 短信基础参数参数
  */
 @Slf4j
