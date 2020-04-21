@@ -206,5 +206,22 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
     }
-	
+
+
+    public int updateShishouDepositSettle(String memNo, String orderNo, int shishouDeposit) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo, memNo);
+        if (Objects.isNull(accountRenterDepositEntity)) {
+            throw new PayOrderRenterWZDepositException();
+        }
+
+        AccountRenterWzDepositEntity entity = new AccountRenterWzDepositEntity();
+        entity.setId(accountRenterDepositEntity.getId());
+        entity.setVersion(accountRenterDepositEntity.getVersion());
+        entity.setShishouDeposit(shishouDeposit);
+        int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(entity);
+        if (result == 0) {
+            throw new PayOrderRenterWZDepositException();
+        }
+        return result;
+    }
 }

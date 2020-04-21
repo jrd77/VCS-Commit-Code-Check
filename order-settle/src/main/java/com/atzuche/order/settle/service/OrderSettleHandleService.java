@@ -1,5 +1,9 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
+import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -10,18 +14,21 @@ import com.atzuche.order.settle.service.notservice.AccountDebtNoTService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
+import com.atzuche.order.settle.vo.req.SettleOrderRenterDepositReqVO;
 import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.atzuche.order.settle.vo.res.OrderSettleResVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 订单结算钱包抵扣相关操作
@@ -32,9 +39,9 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class OrderSettleHandleService {
-	
-	public static final int DEPOSIT_SETTLE_TYPE = 1;
-	public static final int DEPOSIT_WZ_SETTLE_TYPE = 2;
+
+    public static final int DEPOSIT_SETTLE_TYPE = 1;
+    public static final int DEPOSIT_WZ_SETTLE_TYPE = 2;
 
     @Autowired
     private WalletProxyService walletProxyService;
@@ -46,9 +53,12 @@ public class OrderSettleHandleService {
     private AccountDebtNoTService accountDebtNoTService;
     @Autowired
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
-
     @Autowired
     private RemoteOldSysDebtService remoteOldSysDebtService;
+    @Autowired
+    private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
+    @Autowired
+    private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
 
     /**
      * 违章押金结算抵扣欠款处理
@@ -56,18 +66,18 @@ public class OrderSettleHandleService {
      * type = 2 违章押金结算
      */
     public OrderSettleResVO commonDeductionDebtHandle(String memNo, String orderNo, int type) {
-    	int newTotalRealDebtAmt = 0;
-    	int oldTotalRealDebtAmt = 0;
+        int newTotalRealDebtAmt = 0;
+        int oldTotalRealDebtAmt = 0;
         // 新系统欠款信息处理
-    	if(type == DEPOSIT_SETTLE_TYPE) {
-    		newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
-    		// 老系统欠款信息处理
-    		oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo,RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT);
-    	}else if(type == DEPOSIT_WZ_SETTLE_TYPE){
-    		newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
-    		// 老系统欠款信息处理
-    		oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo,RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT);
-    	}
+        if (type == DEPOSIT_SETTLE_TYPE) {
+            newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT);
+            // 老系统欠款信息处理
+            oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT);
+        } else if (type == DEPOSIT_WZ_SETTLE_TYPE) {
+            newTotalRealDebtAmt = deductionNewDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT);
+            // 老系统欠款信息处理
+            oldTotalRealDebtAmt = deductionOldDebtHandle(memNo, orderNo, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT);
+        }
 
         SettleStatusEnum settleStatus = SettleStatusEnum.SETTLED;
         if (newTotalRealDebtAmt == OrderConstant.SPECIAL_MARK || oldTotalRealDebtAmt == OrderConstant.SPECIAL_MARK) {
@@ -221,5 +231,78 @@ public class OrderSettleHandleService {
         return totalRealDebtAmt;
     }
 
+
+    /**
+     * 租客押金处理并返回应扣金额(钱包抵扣)
+     *
+     * @param reqVO 参数
+     * @return int yingkouAmt
+     */
+    public int accountRentetDepositHandle(SettleOrderRenterDepositReqVO reqVO) {
+        int realDeductAmt = Objects.nonNull(reqVO.getRealDeductAmt()) ? reqVO.getRealDeductAmt() : OrderConstant.ZERO;
+        int shouldTakeAmt = Objects.nonNull(reqVO.getShouldTakeAmt()) ? reqVO.getShouldTakeAmt() : OrderConstant.ZERO;
+
+        if (realDeductAmt > OrderConstant.ZERO) {
+            // 获取uniqueNo
+            List<AccountDebtReceivableaDetailEntity> list =
+                    accountDebtReceivableaDetailNoTService.getByOrderNoAndMemNo(reqVO.getOrderNo(), reqVO.getMemNo());
+            String uniqueNo = null;
+            if (CollectionUtils.isNotEmpty(list)) {
+                List<Integer> ids;
+
+                if (StringUtils.equals(reqVO.getCostEnum().getCashNo(), RenterCashCodeEnum.SETTLE_WALLET_TO_WZ_COST.getCashNo())) {
+                    ids = list.stream()
+                            .filter(x -> Objects.nonNull(x.getPayWay()) && x.getPayWay() == OrderConstant.ONE)
+                            .filter(x -> StringUtils.equals(x.getSourceCode(),
+                                    RenterCashCodeEnum.SETTLE_WZ_TO_HISTORY_AMT.getCashNo()) || StringUtils.equals(x.getSourceCode(),
+                                    RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT.getCashNo()))
+                            .map(AccountDebtReceivableaDetailEntity::getId)
+                            .collect(Collectors.toList());
+                } else {
+                    ids = list.stream()
+                            .filter(x -> Objects.nonNull(x.getPayWay()) && x.getPayWay() == OrderConstant.ONE)
+                            .filter(x -> StringUtils.equals(x.getSourceCode(),
+                                    RenterCashCodeEnum.SETTLE_DEPOSIT_TO_HISTORY_AMT.getCashNo()) || StringUtils.equals(x.getSourceCode(),
+                                    RenterCashCodeEnum.SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT.getCashNo()))
+                            .map(AccountDebtReceivableaDetailEntity::getId)
+                            .collect(Collectors.toList());
+                }
+                uniqueNo = ListUtil.reduce(ids, ",");
+            }
+            // 新增account_renter_wz_deposit_detail
+            accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
+            // 更新account_renter_wz_deposit.shishou_deposit
+            accountRenterWzDepositNoTService.updateShishouDepositSettle(reqVO.getOrderNo(), reqVO.getMemNo(),
+                    reqVO.getRealDeductAmt());
+        }
+        int yingkouAmt = shouldTakeAmt;
+        if (realDeductAmt >= shouldTakeAmt) {
+            yingkouAmt = realDeductAmt;
+        }
+        return yingkouAmt;
+    }
+
+    /**
+     * 构建AccountRenterWzDepositDetailEntity
+     *
+     * @param reqVO 参数
+     * @return AccountRenterWzDepositDetailEntity
+     */
+    private AccountRenterWzDepositDetailEntity buildAccountRenterWzDepositDetailEntity(SettleOrderRenterDepositReqVO reqVO, String uniqueNo) {
+        if (Objects.isNull(reqVO.getRealDeductAmt()) || reqVO.getRealDeductAmt() == OrderConstant.ZERO) {
+            return null;
+        }
+        AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity =
+                new AccountRenterWzDepositDetailEntity();
+        accountRenterDepositDetailEntity.setOrderNo(reqVO.getOrderNo());
+        accountRenterDepositDetailEntity.setMemNo(reqVO.getMemNo());
+        accountRenterDepositDetailEntity.setCostCode(reqVO.getCostEnum().getCashNo());
+        accountRenterDepositDetailEntity.setCostDetail(reqVO.getCostEnum().getTxt());
+        accountRenterDepositDetailEntity.setSourceCode(reqVO.getSourceEnum().getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(reqVO.getSourceEnum().getTxt());
+        accountRenterDepositDetailEntity.setUniqueNo(uniqueNo);
+        accountRenterDepositDetailEntity.setAmt(Math.abs(reqVO.getRealDeductAmt()));
+        return accountRenterDepositDetailEntity;
+    }
 
 }

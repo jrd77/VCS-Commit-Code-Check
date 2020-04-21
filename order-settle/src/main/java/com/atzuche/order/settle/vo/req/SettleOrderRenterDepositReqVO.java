@@ -1,4 +1,4 @@
-package com.atzuche.order.accountrenterwzdepost.vo.req;
+package com.atzuche.order.settle.vo.req;
 
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import lombok.Data;

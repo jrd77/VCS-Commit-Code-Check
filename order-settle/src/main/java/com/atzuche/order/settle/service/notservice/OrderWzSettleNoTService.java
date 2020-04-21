@@ -274,6 +274,8 @@ public class OrderWzSettleNoTService {
         orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_CLAIM_SETTLE);
+        //2记录订单流传信息
+        orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.COMPLETED);
     }
 
     

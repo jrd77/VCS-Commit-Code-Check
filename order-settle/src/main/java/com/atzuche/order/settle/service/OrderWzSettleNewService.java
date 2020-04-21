@@ -12,6 +12,7 @@ import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -28,6 +29,7 @@ import com.atzuche.order.renterwz.service.RenterOrderWzSettleFlagService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.notservice.OrderWzSettleNoTService;
 import com.atzuche.order.settle.vo.req.RentCostsWz;
+import com.atzuche.order.settle.vo.req.SettleOrderRenterDepositReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 import com.atzuche.order.settle.vo.res.OrderSettleResVO;
@@ -274,7 +276,7 @@ public class OrderWzSettleNewService {
 		orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
 		/// add
 		orderStatusDTO.setWzSettleTime(LocalDateTime.now());
-		orderStatusDTO.setStatus(OrderStatusEnum.TO_CLAIM_SETTLE.getStatus());
+		orderStatusDTO.setStatus(OrderStatusEnum.COMPLETED.getStatus());
 		orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
 
 		// 1 租客违章费用 结余处理
@@ -296,7 +298,15 @@ public class OrderWzSettleNewService {
                     settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_WZ_SETTLE_TYPE);
             totalwzDebtAmt = resVO.getOldTotalRealDebtAmt();
             orderStatusDTO.setWzSettleStatus(resVO.getSettleStatus().getCode());
-            yingkouAmt = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
+
+            SettleOrderRenterDepositReqVO reqVO = new SettleOrderRenterDepositReqVO();
+            reqVO.setOrderNo(settleOrders.getOrderNo());
+            reqVO.setMemNo(settleOrders.getRenterMemNo());
+            reqVO.setCostEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_WZ_COST);
+            reqVO.setSourceEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_WZ_COST);
+            reqVO.setShouldTakeAmt(settleOrders.getShouldTakeWzCost());
+            reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
+            yingkouAmt = orderSettleHandleService.accountRentetDepositHandle(reqVO);
         } else {
             // 2.1租客剩余违章押金 结余历史欠款
             orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
