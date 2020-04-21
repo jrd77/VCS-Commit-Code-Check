@@ -81,10 +81,10 @@ public class OwnerOrderCalCostService {
         }
 
         //平台服务费
-        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(realRentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
+        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
         int serviceExpense = null == serviceExpenseEntity ? OrderConstant.ZERO : serviceExpenseEntity.getTotalAmount();
         //代管车服务费
-        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(realRentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
+        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
         int proxyServiceExpense = null == proxyServiceExpenseEntity ? OrderConstant.ZERO : proxyServiceExpenseEntity.getTotalAmount();
         //GPS服务费
         List<Integer> lsGpsSerialNumber = ListUtil.parse(ownerOrderCostReqDTO.getGpsSerialNumber(),",");
