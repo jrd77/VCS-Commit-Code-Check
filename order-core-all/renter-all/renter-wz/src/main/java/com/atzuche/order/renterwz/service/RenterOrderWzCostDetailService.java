@@ -160,4 +160,7 @@ public class RenterOrderWzCostDetailService {
     public RenterOrderWzCostDetailEntity queryInfoWithSumAmountByOrderAndCode(String orderNo, String costCode) {
         return renterOrderWzCostDetailMapper.queryInfoWithSumAmountByOrderAndCode(orderNo,costCode);
     }
+
+
+
 }
