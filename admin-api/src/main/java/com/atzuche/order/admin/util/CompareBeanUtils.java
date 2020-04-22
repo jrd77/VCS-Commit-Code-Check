@@ -47,7 +47,7 @@ public class CompareBeanUtils<T> {
     /**
      * 需要对比字段描述
      */
-    private Map<Class, PropertyEditor> propEditorMap = new HashMap<Class, PropertyEditor>();
+    private Map<Class, PropertyEditor> propEditorMap = new HashMap<>();
 
 
     public CompareBeanUtils() {
@@ -89,7 +89,7 @@ public class CompareBeanUtils<T> {
         content = new StringBuffer();
         this.clazz = clazz;
         //注册日期类型
-        register(java.util.Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));
+        propEditorMap.put(java.util.Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));
     }
 
 
@@ -184,12 +184,6 @@ public class CompareBeanUtils<T> {
     }
 
 
-    /**
-     * 注册转换器
-     */
-    private <CC> void register(Class<CC> clazz, PropertyEditor pe) {
-        propEditorMap.put(clazz, pe);
-    }
 
     /**
      * 改前后知否相同
