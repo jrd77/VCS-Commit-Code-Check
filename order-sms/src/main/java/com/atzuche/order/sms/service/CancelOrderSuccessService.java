@@ -1,6 +1,5 @@
 package com.atzuche.order.sms.service;
 
-import com.atzuche.order.sms.common.annatation.Push;
 import com.atzuche.order.sms.common.annatation.SMS;
 import com.atzuche.order.sms.interfaces.IOrderRouteKeyMessage;
 
@@ -13,8 +12,7 @@ import java.util.Map;
 public class CancelOrderSuccessService implements IOrderRouteKeyMessage<Map> {
 
     @Override
-    @SMS(renterFlag = "",ownerFlag = "")
-    @Push(renterFlag = "",ownerFlag = "")
+    @SMS(ownerFlag = "PayRentCarIllegalDepositCancelOwner")
     public void sendOrderMessageWithNo() {
 
     }

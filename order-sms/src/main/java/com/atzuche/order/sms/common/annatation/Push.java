@@ -1,7 +1,5 @@
 package com.atzuche.order.sms.common.annatation;
 
-import org.springframework.stereotype.Component;
-
 import java.lang.annotation.*;
 
 /**
@@ -11,7 +9,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component
 public @interface Push {
 
     String renterFlag() default "";
