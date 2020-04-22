@@ -1273,7 +1273,8 @@ public class CashierPayService{
 		vo.setOpenId("");
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
-		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
+//		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
+		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
 		return vo;
 	}
     
@@ -1303,7 +1304,8 @@ public class CashierPayService{
 		vo.setOpenId("");
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
-		vo.setPaySource(DataPaySourceConstant.ALIPAY);
+//		vo.setPaySource(DataPaySourceConstant.ALIPAY);
+		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
 		return vo;
 	}
 
