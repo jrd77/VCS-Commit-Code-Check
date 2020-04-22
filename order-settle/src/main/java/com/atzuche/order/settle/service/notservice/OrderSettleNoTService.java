@@ -97,6 +97,7 @@ import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
+import com.atzuche.order.settle.vo.req.SettleOrderRenterDepositReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
@@ -777,7 +778,18 @@ public class OrderSettleNoTService {
             totalOldRealDebtAmt = resVO.getOldTotalRealDebtAmt();
             orderStatusDTO.setSettleStatus(resVO.getSettleStatus().getCode());
             orderStatusDTO.setCarDepositSettleStatus(resVO.getSettleStatus().getCode());
-            yingkouAmt2 = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
+            
+            //
+            SettleOrderRenterDepositReqVO reqVO = new SettleOrderRenterDepositReqVO();
+            reqVO.setOrderNo(settleOrders.getOrderNo());
+            reqVO.setMemNo(settleOrders.getRenterMemNo());
+            reqVO.setCostEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_RENT_COST);
+            reqVO.setSourceEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_RENT_COST);
+            reqVO.setShouldTakeAmt(settleOrdersDefinition.getRenterCostAmtFinal());  //总计消费，应收=应扣
+            reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
+            yingkouAmt2 = orderSettleHandleService.accountRentetDepositHandle(reqVO);
+            
+//            yingkouAmt2 = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
             
         } else {
 	        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
