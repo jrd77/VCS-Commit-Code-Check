@@ -457,7 +457,7 @@ public class RenterOrderCalCostService {
         getCarFeeDiscoupon.setAmount(0);
         getCarFeeDiscoupon.setStatus(OrderConstant.NO);
         if (null != response) {
-            getCarFeeDiscoupon.setAmount(response.getDisAmt());
+            getCarFeeDiscoupon.setAmount(response.getRealCouponOffset() == null ? 0:response.getRealCouponOffset());
             //绑定后变更为已使用
             getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
         }
@@ -488,7 +488,7 @@ public class RenterOrderCalCostService {
         getCarFeeDiscoupon.setAmount(0);
         getCarFeeDiscoupon.setStatus(OrderConstant.NO);
         if (null != response) {
-            getCarFeeDiscoupon.setAmount(response.getDisAmt());
+            getCarFeeDiscoupon.setAmount(response.getRealCouponOffset() == null ? 0:response.getRealCouponOffset());
             //绑定后变更为已使用
             getCarFeeDiscoupon.setStatus(getCarFeeDiscoupon.getAmount() > 0 ? OrderConstant.YES : OrderConstant.NO);
         }
