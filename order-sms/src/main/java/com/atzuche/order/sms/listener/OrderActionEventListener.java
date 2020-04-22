@@ -33,14 +33,6 @@ import java.util.Objects;
 @Slf4j
 public class OrderActionEventListener extends OrderSendMessageManager {
 
-//    @Autowired
-//    OwnerOrderService ownerOrderService;
-//    @Autowired
-//    OwnerGoodsService ownerGoodsService;
-//    @Autowired
-//    RenterMemberService renterMemberService;
-//    @Autowired
-//    RenterOrderService renterOrderService;
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_08", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")

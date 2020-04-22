@@ -54,7 +54,6 @@ public class SendShortMessageDataService {
         paramsMap.put("PayType", typeName);
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, null, null, paramsMap);
         smsOrderBaseEventService.sendShortMessage(map);
-        //发送push
         Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
         orderSendMessageFactory.sendPushMessage(pushMap);
     }
@@ -66,7 +65,6 @@ public class SendShortMessageDataService {
     public void sendNoPayIllegalDepositShortMessageData(String orderNo) {
         Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.DISTRIBUTE_PAYILLEGAL_DEPOSIT_CANCEL_RENTER.getValue(), ShortMessageTypeEnum.PAY_ILLEGAL_DEPOSIT_CANCEL_OWNER.getValue(), null);
         smsOrderBaseEventService.sendShortMessage(map);
-        //发送push
         Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
         orderSendMessageFactory.sendPushMessage(pushMap);
     }
