@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 比较对象之间属性是否变化，并以指定标签返回字符串
@@ -20,19 +21,41 @@ import java.util.Map;
  */
 public class CompareBeanUtils<T> {
 
+    /**
+     * 修改前数据
+     */
     private T oldObject;
+    /**
+     * 修改后数据
+     */
     private T newObject;
+
+    /**
+     * 数据对象类型
+     */
     private Class<T> clazz;
-    private Map<Class, PropertyEditor> propEditorMap = new HashMap<Class, PropertyEditor>();
+
+    /**
+     * 是否新增
+     */
     private boolean isNew = true;
 
+    /**
+     * 变更内容
+     */
     private StringBuffer content;
+
+    /**
+     * 需要对比字段描述
+     */
+    private Map<Class, PropertyEditor> propEditorMap = new HashMap<Class, PropertyEditor>();
 
     /**
      * 构造
      *
-     * @param oldObject 老对象
-     * @param newObject 新的对象
+     * @param clazz     数据对象类型
+     * @param oldObject 修改后数据
+     * @param newObject 修改前数据
      */
     public CompareBeanUtils(Class<T> clazz, T oldObject, T newObject) {
         this(clazz);
@@ -42,19 +65,29 @@ public class CompareBeanUtils<T> {
     }
 
     /**
-     * @param newObject
+     * 构造
+     *
+     * @param clazz     数据对象类型
+     * @param newObject 修改后数据
      */
     public CompareBeanUtils(Class<T> clazz, T newObject) {
         this(clazz);
         this.newObject = newObject;
     }
 
+    /**
+     * 构造
+     *
+     * @param clazz 数据对象类型
+     */
     protected CompareBeanUtils(Class<T> clazz) {
         super();
         content = new StringBuffer();
         this.clazz = clazz;
-        register(java.util.Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));//注册日期类型
+        //注册日期类型
+        register(java.util.Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));
     }
+
 
     public static <T> CompareBeanUtils<T> newInstance(T newObj) {
         if (null == newObj) {
@@ -132,6 +165,11 @@ public class CompareBeanUtils<T> {
         content.append(";");
     }
 
+    /**
+     * 数据删除
+     *
+     * @param propLabel 字段标题
+     */
     private void comparedIsdel(String propLabel) {
         content.append("删除了[");
         content.append(propLabel);
@@ -139,8 +177,12 @@ public class CompareBeanUtils<T> {
         content.append(";");
     }
 
-    /*
-     记录变更数据
+    /**
+     * 记录变更数据
+     *
+     * @param propLabel 字段标题
+     * @param oldValue 修改前的值
+     * @param newValue 修改后的值
      */
     private void comparedIsEdit(String propLabel, Object oldValue, Object newValue) {
 
@@ -157,8 +199,8 @@ public class CompareBeanUtils<T> {
     /**
      * 格式化数据类型
      *
-     * @param obj
-     * @return
+     * @param obj 数据
+     * @return Object
      */
     private Object format(Object obj) {
         if (isNullOrEmpty(obj)) {
@@ -174,15 +216,29 @@ public class CompareBeanUtils<T> {
         }
     }
 
+    /**
+     * 判断数据是否为null或是空值
+     *
+     * @param val 数据对象
+     * @return boolean
+     */
     private boolean isNullOrEmpty(Object val) {
+        if(Objects.isNull(val)) {
+            return true;
+        }
+
         if (val instanceof String) {
-            return (StringUtils.isEmpty(String.class.cast(val)));
+            return (StringUtils.isEmpty(String.valueOf(val)));
         } else {
-            return val == null;
+            return false;
         }
     }
 
-    //拿回结果
+    /**
+     * 获取更新内容
+     *
+     * @return String
+     */
     public String toResult() {
         return content.toString();
     }
