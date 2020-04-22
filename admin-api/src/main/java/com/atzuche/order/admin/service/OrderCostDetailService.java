@@ -17,9 +17,11 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
@@ -33,7 +35,9 @@ import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
@@ -118,6 +122,9 @@ public class OrderCostDetailService {
     private OwnerGoodsService ownerGoodsService;
     @Autowired
     private OwnerMemberService ownerMemberService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
 	     //根据订单号查询会员号
@@ -352,7 +359,11 @@ public class OrderCostDetailService {
 	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
 	          throw new Exception("获取订单数据为空");
 	      }
-	      
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
 	    //封装对象
 	      ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
 	      CostBaseDTO costBaseDTO = new CostBaseDTO();
@@ -592,6 +603,12 @@ public class OrderCostDetailService {
 	            throw new Exception("获取订单数据(车主)为空");
 	        }
 	    }
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
+
 //	    else {
 //	    	//否则根据主订单号查询
 //	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
@@ -726,7 +743,11 @@ public class OrderCostDetailService {
         	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
             throw new Exception("获取订单数据为空");
         }
-        
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
 		//封装订单号和会员号
 		costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
 		costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
@@ -1097,7 +1118,16 @@ public class OrderCostDetailService {
         	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
             throw new Exception("获取订单数据为空");
         }
-        
+        if(orderEntity == null){
+            logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+            throw new Exception("获取订单数据为空");
+        }
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
+
 //    	车主会员号查询。
     	OwnerOrderEntity orderEntityOwner = null;  
     	//否则根据主订单号查询,有效的车主记录。
@@ -1203,7 +1233,11 @@ public class OrderCostDetailService {
 	    	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
 	        throw new Exception("获取订单数据为空");
 	    }
-	    
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
 	    int dispatching = renterCostReqVO.getDispatchingSubsidy()!=null?Integer.valueOf(renterCostReqVO.getDispatchingSubsidy()):0;
 	    int oil = renterCostReqVO.getOilSubsidy()!=null?Integer.valueOf(renterCostReqVO.getOilSubsidy()):0;
 	    int cleancar = renterCostReqVO.getCleanCarSubsidy()!=null?Integer.valueOf(renterCostReqVO.getCleanCarSubsidy()):0;
@@ -1393,7 +1427,11 @@ public class OrderCostDetailService {
 //	    	logger.error("获取订单数据(租客)为空orderNo={}",ownerCostReqVO.getOrderNo());
 //	        throw new Exception("获取订单数据为空");
 //	    }
-	    
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(ownerCostReqVO.getOrderNo());
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",ownerCostReqVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
 		/**
 		 * 查询有效的租客子订单
 		 */
