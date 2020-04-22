@@ -27,6 +27,12 @@ public class OrderPayableAmountResVO {
      */
     @AutoDocProperty("主订单号")
     private String orderNo;
+    
+    @AutoDocProperty("租客子订单号")
+    private String renterOrderNo;
+    
+    @AutoDocProperty("是否企业用户")
+    private boolean isEnterpriseUserOrder;
     /**
      * 总待付款项
      */
@@ -354,6 +360,22 @@ public class OrderPayableAmountResVO {
 
 	public void setPayKind(String payKind) {
 		this.payKind = payKind;
+	}
+
+	public String getRenterOrderNo() {
+		return renterOrderNo;
+	}
+
+	public void setRenterOrderNo(String renterOrderNo) {
+		this.renterOrderNo = renterOrderNo;
+	}
+
+	public boolean isEnterpriseUserOrder() {
+		return isEnterpriseUserOrder;
+	}
+
+	public void setEnterpriseUserOrder(boolean isEnterpriseUserOrder) {
+		this.isEnterpriseUserOrder = isEnterpriseUserOrder;
 	}
     
     
