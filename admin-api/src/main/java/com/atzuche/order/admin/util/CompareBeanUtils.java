@@ -128,29 +128,29 @@ public class CompareBeanUtils<T> {
     /**
      * 数据比较
      *
-     * @param prop      数据对应的属性字段名
-     * @param propLabel 字段标题
+     * @param fieldName   数据对应的属性字段名
+     * @param fieldChName 数据对应的属性字段中文名
      */
-    public void compare(String prop, String propLabel) {
+    public void compare(String fieldName, String fieldChName) {
         try {
-            Field field = clazz.getDeclaredField(prop);
+            Field field = clazz.getDeclaredField(fieldName);
             ReflectionUtils.makeAccessible(field);
             Object newValue = field.get(newObject == null ? oldObject : newObject);
             if (isNew) {
                 if (!isNullOrEmpty(newValue)) {
-                    comparedIsAdd(propLabel, newValue);
+                    comparedIsAdd(fieldChName, newValue);
                 }
             } else {
                 if (null == oldObject) {
                     return;
                 }
                 if (null == newObject) {
-                    comparedIsdel(propLabel);
+                    comparedIsdel(fieldChName);
                     return;
                 }
                 Object oldValue = field.get(oldObject);
                 if (notEquals(oldValue, newValue)) {
-                    comparedIsEdit(propLabel, oldValue, newValue);
+                    comparedIsEdit(fieldChName, oldValue, newValue);
                 }
             }
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class CompareBeanUtils<T> {
     /**
      * 数据比较
      *
-     * <p>不建议使用，后续可以考虑初始化一个MAP:FieldName->Desc</p>
+     * <p>不可和其他方法(compare)组合使用</p>
      */
     public void compare() {
         if (null == oldObject || null == newObject) {
@@ -169,7 +169,58 @@ public class CompareBeanUtils<T> {
         }
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            compare(field.getName(), field.getName());
+            String fieldChName = PropertitesUtil.getFieldChName(field.getName());
+            compare(field.getName(), StringUtils.isNotBlank(fieldChName) ? fieldChName : field.getName());
+        }
+    }
+
+    /**
+     * 数据比较
+     *
+     * @param fieldName 数据对应的属性字段名
+     */
+    public void compare(String fieldName) {
+        if (null == oldObject || null == newObject) {
+            return;
+        }
+        String fieldChName = PropertitesUtil.getFieldChName(fieldName);
+        compare(fieldName, StringUtils.isNotBlank(fieldChName) ? fieldChName : fieldName);
+    }
+
+    /**
+     * 数据比较
+     *
+     * @param fieldNames 字段名集合
+     */
+    public void compare(String[] fieldNames) {
+        if (null == fieldNames || fieldNames.length == 0) {
+            return;
+        }
+        for (String fieldName : fieldNames) {
+            compare(fieldName);
+        }
+    }
+
+    /**
+     * 数据比较
+     *
+     * @param fieldNames 字段名集合
+     */
+    public void compare(String[] fieldNames, String[] fieldChNames) {
+        if (null == fieldNames || fieldNames.length == 0) {
+            return;
+        }
+
+        if (null == fieldChNames || fieldChNames.length == 0) {
+            return;
+        }
+
+        if (fieldNames.length != fieldChNames.length) {
+            return;
+        }
+
+        for (int i = 0; i < fieldNames.length; i++) {
+            compare(fieldNames[i], fieldChNames[i]);
         }
     }
 
@@ -182,7 +233,6 @@ public class CompareBeanUtils<T> {
     public String toResult() {
         return content.toString();
     }
-
 
 
     /**
@@ -210,12 +260,12 @@ public class CompareBeanUtils<T> {
     /**
      * 记录新值
      *
-     * @param propLabel 字段标题
-     * @param newValue  修改后的值
+     * @param fieldChName 字段标题
+     * @param newValue    修改后的值
      */
-    private void comparedIsAdd(String propLabel, Object newValue) {
+    private void comparedIsAdd(String fieldChName, Object newValue) {
         content.append("新增[");
-        content.append(propLabel);
+        content.append(fieldChName);
         content.append("],值为:");
         content.append(format(newValue));
         content.append(";");
@@ -224,11 +274,11 @@ public class CompareBeanUtils<T> {
     /**
      * 数据删除
      *
-     * @param propLabel 字段标题
+     * @param fieldChName 字段标题
      */
-    private void comparedIsdel(String propLabel) {
+    private void comparedIsdel(String fieldChName) {
         content.append("删除[");
-        content.append(propLabel);
+        content.append(fieldChName);
         content.append("]");
         content.append(";");
     }
@@ -236,14 +286,14 @@ public class CompareBeanUtils<T> {
     /**
      * 记录变更数据
      *
-     * @param propLabel 字段标题
-     * @param oldValue  修改前的值
-     * @param newValue  修改后的值
+     * @param fieldChName 字段标题
+     * @param oldValue    修改前的值
+     * @param newValue    修改后的值
      */
-    private void comparedIsEdit(String propLabel, Object oldValue, Object newValue) {
+    private void comparedIsEdit(String fieldChName, Object oldValue, Object newValue) {
 
         content.append("将【");
-        content.append(propLabel);
+        content.append(fieldChName);
         content.append("】");
         content.append("从'");
         content.append(format(oldValue));
