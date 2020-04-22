@@ -102,7 +102,7 @@ public class RenterOrderCostCombineService {
     @Value("${auto.cost.unitExtraDriverInsure}")
     private Integer unitExtraDriverInsure;
     
-    private static final Integer [] ORDER_TYPES = {1,2};
+    private static final Integer [] ORDER_TYPES = {1,2,3};
 	
 	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
 
@@ -1261,7 +1261,7 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
                     log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,revertTimeLong);
                     returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
-                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(revertTimeLong));
+                    log.info("判断是否超运能入参:cityCode={},revertTimeLong={}，结果：returnFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(returnFlgResponse));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
                     if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
                         throw new ReturnCarOverCostFailException();
