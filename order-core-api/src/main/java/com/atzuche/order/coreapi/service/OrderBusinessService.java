@@ -3,10 +3,12 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
+import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
@@ -160,13 +162,19 @@ public class OrderBusinessService {
             log.error("找不到有效的车主子订单 orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
+        OwnerPreAndSettleIncomRespDTO ownerPreAndSettleIncomRespDTO = new OwnerPreAndSettleIncomRespDTO();
         int ownerIncomAmt = 0;
-        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getCarDepositSettleStatus()){//已结算
-            List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineByOrderNo = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+            List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineStatus.PASS_EXAMINE);
+            ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
+            ownerPreAndSettleIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         }else{
             OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
             ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
+            ownerPreAndSettleIncomRespDTO.setSettleStatus(orderStatusEntity.getSettleStatus());
         }
-        return null;
+        ownerPreAndSettleIncomRespDTO.setOwnerIncomAmt(ownerIncomAmt);
+        return ownerPreAndSettleIncomRespDTO;
     }
 }

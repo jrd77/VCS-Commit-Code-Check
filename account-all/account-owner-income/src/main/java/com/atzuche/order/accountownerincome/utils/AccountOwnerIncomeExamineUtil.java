@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class AccountOwnerIncomeExamineUtil {
 
-    public List<AccountOwnerIncomeExamineEntity> filterByType(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineType accountOwnerIncomeExamineType){
+    public static List<AccountOwnerIncomeExamineEntity> filterByType(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineType accountOwnerIncomeExamineType){
         List<AccountOwnerIncomeExamineEntity> collect = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
@@ -21,13 +21,21 @@ public class AccountOwnerIncomeExamineUtil {
         return collect;
     }
 
-    public List<AccountOwnerIncomeExamineEntity> filterByStatus(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineStatus accountOwnerIncomeExamineStatus){
+    public static List<AccountOwnerIncomeExamineEntity> filterByStatus(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineStatus accountOwnerIncomeExamineStatus){
         List<AccountOwnerIncomeExamineEntity> collect = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> accountOwnerIncomeExamineStatus.getStatus() == x.getType())
+                .filter(x -> accountOwnerIncomeExamineStatus.getStatus() == x.getStatus())
                 .collect(Collectors.toList());
         return collect;
+    }
+
+    public static int statisticsAmt(List<AccountOwnerIncomeExamineEntity> list){
+        int totalAmt = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
+        return totalAmt;
     }
 
 }
