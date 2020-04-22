@@ -1,5 +1,18 @@
 package com.atzuche.order.settle.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
+import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
+import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
@@ -19,16 +32,8 @@ import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.atzuche.order.settle.vo.res.OrderSettleResVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.dianping.cat.Cat;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 订单结算钱包抵扣相关操作
@@ -59,7 +64,12 @@ public class OrderSettleHandleService {
     private AccountRenterWzDepositDetailNoTService accountRenterWzDepositDetailNoTService;
     @Autowired
     private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
-
+    @Autowired
+    private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
+    @Autowired
+    private AccountRenterDepositNoTService accountRenterDepositNoTService;
+    
+    
     /**
      * 违章押金结算抵扣欠款处理
      * type = 1 租车押金结算
@@ -269,11 +279,19 @@ public class OrderSettleHandleService {
                 }
                 uniqueNo = ListUtil.reduce(ids, ",");
             }
-            // 新增account_renter_wz_deposit_detail
-            accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
-            // 更新account_renter_wz_deposit.shishou_deposit
-            accountRenterWzDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),
-                    reqVO.getRealDeductAmt());
+            
+            if (StringUtils.equals(reqVO.getCostEnum().getCashNo(), RenterCashCodeEnum.SETTLE_WALLET_TO_WZ_COST.getCashNo())) {
+	            // 新增account_renter_wz_deposit_detail
+	            accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
+	            // 更新account_renter_wz_deposit.shishou_deposit
+	            accountRenterWzDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),reqVO.getRealDeductAmt());
+            }else {
+            	//车辆押金
+	            // 新增account_renter_wz_deposit_detail
+	            accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterDepositDetailEntity(reqVO, uniqueNo));// .insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
+	            // 更新account_renter_wz_deposit.shishou_deposit
+	            accountRenterDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),reqVO.getRealDeductAmt());
+            }
         }
         int yingkouAmt = shouldTakeAmt;
         if (realDeductAmt >= shouldTakeAmt) {
@@ -304,5 +322,23 @@ public class OrderSettleHandleService {
         accountRenterDepositDetailEntity.setAmt(Math.abs(reqVO.getRealDeductAmt()));
         return accountRenterDepositDetailEntity;
     }
-
+    
+    
+    private AccountRenterDepositDetailEntity buildAccountRenterDepositDetailEntity(SettleOrderRenterDepositReqVO reqVO, String uniqueNo) {
+        if (Objects.isNull(reqVO.getRealDeductAmt()) || reqVO.getRealDeductAmt() == OrderConstant.ZERO) {
+            return null;
+        }
+        AccountRenterDepositDetailEntity accountRenterDepositDetailEntity = new AccountRenterDepositDetailEntity();
+        accountRenterDepositDetailEntity.setOrderNo(reqVO.getOrderNo());
+        accountRenterDepositDetailEntity.setMemNo(reqVO.getMemNo());
+//        accountRenterDepositDetailEntity.setCostCode(reqVO.getCostEnum().getCashNo());
+//        accountRenterDepositDetailEntity.setCostDetail(reqVO.getCostEnum().getTxt());
+        accountRenterDepositDetailEntity.setSourceCode(reqVO.getSourceEnum().getCashNo());
+        accountRenterDepositDetailEntity.setSourceDetail(reqVO.getSourceEnum().getTxt());
+        accountRenterDepositDetailEntity.setUniqueNo(uniqueNo);
+        accountRenterDepositDetailEntity.setAmt(Math.abs(reqVO.getRealDeductAmt()));
+        return accountRenterDepositDetailEntity;
+    }
+    
+    
 }
