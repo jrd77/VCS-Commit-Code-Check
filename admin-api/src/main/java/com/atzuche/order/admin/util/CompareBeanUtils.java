@@ -13,9 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 比较对象之间属性是否变化，并以指定标签返回字符串
+ * 比较对象之间属性是否变化，并以指定标签返回变化内容
  *
- * @param <T>
  * @author pengcheng.fu
  * @date 2020/04/22 11:32
  */
@@ -49,6 +48,11 @@ public class CompareBeanUtils<T> {
      * 需要对比字段描述
      */
     private Map<Class, PropertyEditor> propEditorMap = new HashMap<Class, PropertyEditor>();
+
+
+    public CompareBeanUtils() {
+
+    }
 
     /**
      * 构造
@@ -89,6 +93,12 @@ public class CompareBeanUtils<T> {
     }
 
 
+    /**
+     * 初始化
+     *
+     * @param newObj 修改后的数据
+     * @return CompareBeanUtils
+     */
     public static <T> CompareBeanUtils<T> newInstance(T newObj) {
         if (null == newObj) {
             return null;
@@ -98,6 +108,13 @@ public class CompareBeanUtils<T> {
     }
 
 
+    /**
+     * 初始化
+     *
+     * @param oldObj 修改前的数据
+     * @param newObj 修改后的数据
+     * @return CompareBeanUtils
+     */
     public static <T> CompareBeanUtils<T> newInstance(T oldObj, T newObj) {
         if (null == oldObj && null == newObj) {
             return null;
@@ -107,12 +124,14 @@ public class CompareBeanUtils<T> {
         return new CompareBeanUtils<T>(clazz, oldObj, newObj);
     }
 
-    public <CC> void register(Class<CC> clazz, PropertyEditor pe) {
-        propEditorMap.put(clazz, pe);
-    }
 
+    /**
+     * 数据比较
+     *
+     * @param prop      数据对应的属性字段名
+     * @param propLabel 字段标题
+     */
     public void compare(String prop, String propLabel) {
-
         try {
             Field field = clazz.getDeclaredField(prop);
             ReflectionUtils.makeAccessible(field);
@@ -139,6 +158,46 @@ public class CompareBeanUtils<T> {
         }
     }
 
+    /**
+     * 数据比较
+     *
+     * <p>不建议使用，后续可以考虑初始化一个MAP:FieldName->Desc</p>
+     */
+    public void compare() {
+        if (null == oldObject || null == newObject) {
+            return;
+        }
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            compare(field.getName(), field.getName());
+        }
+    }
+
+
+    /**
+     * 获取更新内容
+     *
+     * @return String
+     */
+    public String toResult() {
+        return content.toString();
+    }
+
+
+    /**
+     * 注册转换器
+     */
+    private <CC> void register(Class<CC> clazz, PropertyEditor pe) {
+        propEditorMap.put(clazz, pe);
+    }
+
+    /**
+     * 改前后知否相同
+     *
+     * @param oldValue 修改前的值
+     * @param newValue 修改后的值
+     * @return boolean
+     */
     private boolean notEquals(Object oldValue, Object newValue) {
         String tmpOld, tmpNew;
         if (isNullOrEmpty(oldValue)) {
@@ -154,13 +213,16 @@ public class CompareBeanUtils<T> {
         return !StringUtils.equals(tmpNew, tmpOld);
     }
 
-    /*
-    记录新值
+    /**
+     * 记录新值
+     *
+     * @param propLabel 字段标题
+     * @param newValue  修改后的值
      */
     private void comparedIsAdd(String propLabel, Object newValue) {
-        content.append("创建了[");
+        content.append("新增[");
         content.append(propLabel);
-        content.append("],新值为:");
+        content.append("],值为:");
         content.append(format(newValue));
         content.append(";");
     }
@@ -171,7 +233,7 @@ public class CompareBeanUtils<T> {
      * @param propLabel 字段标题
      */
     private void comparedIsdel(String propLabel) {
-        content.append("删除了[");
+        content.append("删除[");
         content.append(propLabel);
         content.append("]");
         content.append(";");
@@ -181,19 +243,19 @@ public class CompareBeanUtils<T> {
      * 记录变更数据
      *
      * @param propLabel 字段标题
-     * @param oldValue 修改前的值
-     * @param newValue 修改后的值
+     * @param oldValue  修改前的值
+     * @param newValue  修改后的值
      */
     private void comparedIsEdit(String propLabel, Object oldValue, Object newValue) {
 
-        content.append("修改了[");
+        content.append("将【");
         content.append(propLabel);
-        content.append("],");
-        content.append("旧值为:");
+        content.append("】");
+        content.append("从'");
         content.append(format(oldValue));
-        content.append(",新值为:");
+        content.append("'改成'");
         content.append(format(newValue));
-        content.append(";");
+        content.append("';");
     }
 
     /**
@@ -223,7 +285,7 @@ public class CompareBeanUtils<T> {
      * @return boolean
      */
     private boolean isNullOrEmpty(Object val) {
-        if(Objects.isNull(val)) {
+        if (Objects.isNull(val)) {
             return true;
         }
 
@@ -234,12 +296,4 @@ public class CompareBeanUtils<T> {
         }
     }
 
-    /**
-     * 获取更新内容
-     *
-     * @return String
-     */
-    public String toResult() {
-        return content.toString();
-    }
 }

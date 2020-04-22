@@ -73,7 +73,7 @@ public class CarDepositReturnDetailController {
 
         renterWzService.saveCarDepositTemporaryRefund(req);
         try{
-            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(),req.toString());
+            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(), JSON.toJSONString(req));
         }catch (Exception e){
             log.warn("暂扣租车押金日志记录失败",e);
         }

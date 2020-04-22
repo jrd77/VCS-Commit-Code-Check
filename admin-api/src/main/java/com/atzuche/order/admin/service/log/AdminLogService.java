@@ -23,20 +23,21 @@ public class AdminLogService {
 
     @Autowired
     private AdminOperateLogMapper adminOperateLogMapper;
+
     /**
      * 插入日志
-     * @param type
-     * @param desc
+     *
+     * @param type    操作类型
+     * @param orderNo 订单号
+     * @param desc    操作内容
      */
-    public void insertLog(AdminOpTypeEnum type,String orderNo,String desc){
+    public void insertLog(AdminOpTypeEnum type, String orderNo, String desc) {
         AdminOperateLogEntity entity = new AdminOperateLogEntity();
         entity.setOrderNo(orderNo);
         entity.setDesc(desc);
         entity.setOpType(type.getOpCode());
         entity.setOpTypeDesc(type.getOpType());
-        entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
-        entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthName());
-
+        entity.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         adminOperateLogMapper.insertLog(entity);
     }
 
