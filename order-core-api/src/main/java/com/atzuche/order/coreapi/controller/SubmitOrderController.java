@@ -111,7 +111,7 @@ public class SubmitOrderController {
             if(StringUtils.isNotBlank(normalOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(normalOrderReqVO.getOrderCategory(),"3")) {
                 longOrderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitLongOrder(context);
-            } else if(StringUtils.equals(normalOrderReqVO.getOrderCategory(),"2")){
+            } else if(StringUtils.equals(normalOrderReqVO.getOrderCategory(),"1")){
                 orderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitOrder(context);
             }else{
@@ -230,7 +230,7 @@ public class SubmitOrderController {
             if(StringUtils.isNotBlank(adminOrderReqVO.getLongOwnerCouponNo()) && StringUtils.equals(adminOrderReqVO.getOrderCategory(),"3")) {
                 longOrderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitLongOrder(context);
-            } else if(StringUtils.equals(adminOrderReqVO.getOrderCategory(),"2")){
+            } else if(StringUtils.equals(adminOrderReqVO.getOrderCategory(),"1")){
                 orderFilterChain.validate(context);
                 orderResVO = submitOrderService.submitOrder(context);
             }else{
