@@ -3,7 +3,6 @@ package com.atzuche.order.admin.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.validation.constraints.Min;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +22,6 @@ public class PropertitesUtil {
     }
 
     public static Properties readPropertiesFile(String filePath) {
-        log.info("filePath:[{}]",filePath);
         try {
             ClassPathResource classPathResource = new ClassPathResource(filePath);
             InputStream inputStream = classPathResource.getInputStream();
