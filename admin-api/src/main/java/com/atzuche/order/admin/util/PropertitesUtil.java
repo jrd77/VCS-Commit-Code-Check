@@ -46,4 +46,17 @@ public class PropertitesUtil {
         return props.getProperty(fieldName);
     }
 
+
+    public static void main(String[] args) {
+        log.info("orderNo ->{}",getFieldChName("orderNo") );
+        log.info("tempWzFine ->{}",getFieldChName("tempWzFine") );
+        log.info("tempWzStopCharge ->{}",getFieldChName("tempWzStopCharge") );
+        log.info("tempClaimRepairCharge ->{}",getFieldChName("tempClaimRepairCharge") );
+        log.info("tempClaimStopCharge ->{}",getFieldChName("tempClaimStopCharge") );
+        log.info("tempRiskRepairCharge ->{}",getFieldChName("tempRiskRepairCharge") );
+        log.info("tempRiskStopCharge ->{}",getFieldChName("tempRiskStopCharge") );
+        log.info("tempRiskCollectCharge ->{}",getFieldChName("tempRiskCollectCharge") );
+
+    }
+
 }
