@@ -109,4 +109,13 @@ public class OwnerGoodsService{
     public OwnerGoodsEntity getOwnerGoodsByCarNoAndOrderNo(Integer carNo,String orderNo){
         return ownerGoodsMapper.getOwnerGoodsByCarNoAndOrderNo(carNo,orderNo);
     }
+    
+    /**
+     * 根据车辆号获取主订单号列表
+     * @param carNo
+     * @return List<OwnerGoodsEntity>
+     */
+    public List<String> listOrderNoByCarNo(Integer carNo) {
+    	return ownerGoodsMapper.listOrderNoByCarNo(carNo);
+    }
 }
