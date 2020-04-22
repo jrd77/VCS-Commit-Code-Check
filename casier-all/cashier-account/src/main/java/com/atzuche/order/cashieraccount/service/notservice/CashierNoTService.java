@@ -478,6 +478,15 @@ public class CashierNoTService {
      * @param vo
      */
 	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO vo) {
+		//按0处理
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeCreditAmount())) {
+			notifyDataVo.setTotalFreezeCreditAmount("0");
+		}
+		//按0处理
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeFundAmount())) {
+			notifyDataVo.setTotalFreezeFundAmount("0");
+		}
+		
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   
 			//预授权方式
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
