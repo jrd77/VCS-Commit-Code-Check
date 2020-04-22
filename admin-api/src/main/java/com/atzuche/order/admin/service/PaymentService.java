@@ -81,11 +81,15 @@ public class PaymentService {
 		 * 租车费用结算时间
 		 */
 		LocalDateTime settleTime = null;
-
+		LocalDateTime depositSettleTime = null;
 		//租车费用结算状态:0,否 1,是 
 		if(orderStatus != null && orderStatus.getSettleStatus().intValue() != 0) {
 			settleTime = orderStatus.getSettleTime();
 		}
+
+		if(orderStatus != null && orderStatus.getCarDepositSettleStatus().intValue() != 0){
+            depositSettleTime = orderStatus.getCarDepositSettleTime();
+        }
 //		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
 //			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
 //		}
@@ -121,12 +125,24 @@ public class PaymentService {
 					 * 根据支付时间来切换
 					 */
 					LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-					//未结算
-					if(settleTime == null) {
+                    if(wzSettleTime != null){
+                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                        violationDepositSettlementPaymentList.add(vo);
+                    }
+                    if(settleTime != null || depositSettleTime != null){
+                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                        afterDepositSettlementPaymentList.add(vo);
+                    }
+                    PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                    beforeDepositSettlementPaymentList.add(vo);
+
+
+					/*if(settleTime == null) {
 						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 						beforeDepositSettlementPaymentList.add(vo);
 					}else {
-						if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
+
+						if(settleTime != null &&  payTimeLdt.isBefore(settleTime)) {
 							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 							beforeDepositSettlementPaymentList.add(vo);
 						}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
@@ -137,7 +153,7 @@ public class PaymentService {
 							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 							afterDepositSettlementPaymentList.add(vo);
 						}
-					}
+					}*/
 				}
 			}
 		}
