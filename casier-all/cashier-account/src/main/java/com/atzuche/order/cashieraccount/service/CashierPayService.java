@@ -444,6 +444,7 @@ public class CashierPayService{
     /**
      * 获取支付验签数据
      * 下单和车主自动接单同意的时候，刷新钱包抵扣。
+     * 内部方法
      *
      * @param orderPaySign     支付签名
      * @param orderPayCallBack 回调函数
@@ -575,6 +576,15 @@ public class CashierPayService{
         }
         //企业用户标识
         result.setEnterpriseUserOrder(isEnterpriseUserOrder);
+        //扩展paykind,容错处理
+        if(isEnterpriseUserOrder) {
+        	if(!orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT)) {
+        		orderPayReqVO.getPayKind().add(DataPayKindConstant.DEPOSIT);
+        	}
+        	if(!orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT)) {
+        		orderPayReqVO.getPayKind().add(DataPayKindConstant.RENT);
+        	}
+        }
         
         // 判断是否支持 钱包支付 、页面传入是否使用钱包标记 优先
         Integer isUseWallet = 0;
@@ -1249,6 +1259,13 @@ public class CashierPayService{
 		
 		List<String> payKinds = new ArrayList<String>();
 		payKinds.add(DataPayKindConstant.RENT_AMOUNT);
+		boolean isEnterpriseUserOrder = renterMemberService.isEnterpriseUserOrder(renterOrderEntity.getRenterOrderNo());
+		//扩展paykind
+        if(isEnterpriseUserOrder) {
+        	payKinds.add(DataPayKindConstant.RENT);
+        	payKinds.add(DataPayKindConstant.DEPOSIT);
+        }
+		
 		vo.setPayKind(payKinds);
 		//////////////////////////// 以上为公共参数
 		vo.setOperator(1);
@@ -1269,6 +1286,16 @@ public class CashierPayService{
 		
 		List<String> payKinds = new ArrayList<String>();
 		payKinds.add(DataPayKindConstant.RENT_AMOUNT);
+		//
+		RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+		if(renterOrderEntity != null) {
+			boolean isEnterpriseUserOrder = renterMemberService.isEnterpriseUserOrder(renterOrderEntity.getRenterOrderNo());
+			//扩展paykind
+	        if(isEnterpriseUserOrder) {
+	        	payKinds.add(DataPayKindConstant.RENT);
+	        	payKinds.add(DataPayKindConstant.DEPOSIT);
+	        }
+		}
 		vo.setPayKind(payKinds);
 		//////////////////////////// 以上为公共参数
 		vo.setOperator(1);
