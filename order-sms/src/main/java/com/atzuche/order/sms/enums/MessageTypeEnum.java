@@ -1,4 +1,4 @@
-package com.atzuche.order.mq.enums;
+package com.atzuche.order.sms.enums;
 
 /**
  * @author ：weixu.chen

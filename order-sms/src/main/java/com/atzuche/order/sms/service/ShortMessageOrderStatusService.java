@@ -1,17 +1,17 @@
-package com.atzuche.order.coreapi.service;
+package com.atzuche.order.sms.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.ProcessRespDTO;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
-import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
-import com.atzuche.order.coreapi.utils.SMSIcsocVoiceUtils;
-import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.open.service.FeignOrderDetailService;
+import com.atzuche.order.sms.common.base.OrderSendMessageFactory;
+import com.atzuche.order.sms.common.sms.SMSOrderBaseEventService;
+import com.atzuche.order.sms.enums.PushMessageTypeEnum;
+import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
+import com.atzuche.order.sms.utils.SMSIcsocVoiceUtils;
+import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,9 +30,9 @@ import java.util.*;
  * @author 胡春林
  */
 @Service
-public class RemindPayIllegalCrashService {
+public class ShortMessageOrderStatusService {
 
-    private Logger logger = LoggerFactory.getLogger(RemindPayIllegalCrashService.class);
+    private Logger logger = LoggerFactory.getLogger(ShortMessageOrderStatusService.class);
     @Autowired
     SMSOrderBaseEventService smsOrderBaseEventService;
     @Autowired
@@ -122,13 +121,13 @@ public class RemindPayIllegalCrashService {
      * @param orderNo
      */
     public void sendNoPayShortMessageData(String orderNo,String typeName) {
-//        Map paramsMap = Maps.newHashMap();
-//        paramsMap.put("PayType", typeName);
-//        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.CANCEL_ORDER_2_RENTER.getValue(), null, paramsMap);
-//        smsOrderBaseEventService.sendShortMessage(map);
-//        //发送push
-//        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
-//        orderSendMessageFactory.sendPushMessage(pushMap);
+        Map paramsMap = Maps.newHashMap();
+        paramsMap.put("PayType", typeName);
+        Map map = SmsParamsMapUtil.getParamsMap(orderNo, null, null, paramsMap);
+        smsOrderBaseEventService.sendShortMessage(map);
+        //发送push
+        Map pushMap = SmsParamsMapUtil.getParamsMap(orderNo, PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_CANCEL.getValue(), PushMessageTypeEnum.RENTER_NO_PAY_ILLEGAL_2_OWNER.getValue(), null);
+        orderSendMessageFactory.sendPushMessage(pushMap);
     }
 
     /**
@@ -179,15 +178,15 @@ public class RemindPayIllegalCrashService {
      * 發送用戶未支付違章押金語音提醒
      * @param renterMobilePhone
      */
-    public void sendVoiceRemindVoicePayIllegalCrashWithHoursData(boolean condition,String mainOrderNo,String renterMobilePhone,String expReterTime){
+    public void sendVoiceRemindVoicePayIllegalCrashWithHoursData(boolean condition, String mainOrderNo, String renterMobilePhone, String expReterTime) {
         if (!condition) {
             return;
         }
-        Map<String,Object> paramMap=new HashMap<>();
-        String orderNo=mainOrderNo;
-        String jobId=mainOrderNo;
-        String renterPhone=renterMobilePhone;
-        StringBuilder content=new StringBuilder();
+        Map<String, Object> paramMap = new HashMap<>();
+        String orderNo = mainOrderNo;
+        String jobId = mainOrderNo;
+        String renterPhone = renterMobilePhone;
+        StringBuilder content = new StringBuilder();
         content.append("您还未支付预定车辆的押金，请在").append(expReterTime).append("前完成支付。否则该订单将被取消，并扣除您的违约费用");
         paramMap.put("content", content.toString());
         paramMap.put("renterPhone", renterPhone);
@@ -199,7 +198,7 @@ public class RemindPayIllegalCrashService {
         paramMap.put("platform", 1);
         paramMap.put("jobId", jobId);
         paramMap.put("order_change_wel", "凹凸租车提醒您");
-        paramMap.put("delayTips", content.toString() );
+        paramMap.put("delayTips", content.toString());
         ErrorCode errorCode = SMSIcsocVoiceUtils.getIcsocNewServer(paramMap);
         logger.info("发送语音短信,参数--->>>>:", JSONObject.toJSONString(paramMap));
         if (Objects.nonNull(errorCode) && errorCode.getCode().equals(ErrorCode.SUCCESS.getCode())) {

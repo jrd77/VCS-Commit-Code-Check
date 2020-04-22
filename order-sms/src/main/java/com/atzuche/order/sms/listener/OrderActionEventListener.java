@@ -1,24 +1,14 @@
-package com.atzuche.order.coreapi.listener.sms;
+package com.atzuche.order.sms.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageManager;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.rentermem.service.RenterMemberService;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.sms.common.base.OrderSendMessageManager;
+import com.atzuche.order.sms.enums.PushMessageTypeEnum;
+import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
+import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
@@ -30,9 +20,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -45,15 +33,14 @@ import java.util.Objects;
 @Slf4j
 public class OrderActionEventListener extends OrderSendMessageManager {
 
-    @Autowired
-    OwnerOrderService ownerOrderService;
-    @Autowired
-    OwnerGoodsService ownerGoodsService;
-    @Autowired
-    RenterMemberService renterMemberService;
-    @Autowired
-    RenterOrderService renterOrderService;
-
+//    @Autowired
+//    OwnerOrderService ownerOrderService;
+//    @Autowired
+//    OwnerGoodsService ownerGoodsService;
+//    @Autowired
+//    RenterMemberService renterMemberService;
+//    @Autowired
+//    RenterOrderService renterOrderService;
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_08", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
@@ -111,9 +98,10 @@ public class OrderActionEventListener extends OrderSendMessageManager {
      * @return
      */
     public Integer getCarOwnerType(String orderNo) {
-        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
-        return ownerGoodsDetailDTO.getCarOwnerType();
+//        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+//        OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
+//        return ownerGoodsDetailDTO.getCarOwnerType();
+        return null;
     }
 
     /**
@@ -121,8 +109,9 @@ public class OrderActionEventListener extends OrderSendMessageManager {
      * @return
      */
     public String getRenterRealName(String orderNo){
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
-        return renterMemberDTO.getRealName();
+//        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+//        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
+//        return renterMemberDTO.getRealName();
+        return null;
     }
 }

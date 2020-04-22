@@ -1,12 +1,8 @@
-package com.atzuche.order.coreapi.listener.sms;
+package com.atzuche.order.sms.common.sms;
 
 import com.alibaba.fastjson.JSONObject;
-import com.atzuche.order.coreapi.listener.push.OrderBaseEventService;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
-import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.common.sms.MQSendPlatformSmsService;
-import com.atzuche.order.mq.common.sms.ShortMessageSendService;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
+import com.atzuche.order.sms.common.base.OrderBaseEventService;
+import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +19,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service(value = "smsOrderBaseEventService")
-public class SMSOrderBaseEventService  extends OrderBaseEventService{
+public class SMSOrderBaseEventService extends OrderBaseEventService {
 
     @Resource(name = "smsMQSendPlatformSmsService")
     MQSendPlatformSmsService sendPlatformSmsService;

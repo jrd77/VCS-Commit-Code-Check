@@ -1,4 +1,4 @@
-package com.atzuche.order.sms.util;
+package com.atzuche.order.sms.utils;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import java.util.Map;
  */
 @Slf4j
 public class SmsParamsMapUtil {
-
 
     /**
      * 组装基础数据

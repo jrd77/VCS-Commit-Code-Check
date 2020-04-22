@@ -1,4 +1,4 @@
-package com.atzuche.order.mq.common.sms;
+package com.atzuche.order.sms.common.base;
 
 
 /**

@@ -1,9 +1,7 @@
-package com.atzuche.order.mq.common.sms;
+package com.atzuche.order.sms.common.sms;
 
 import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.enums.PushParamsTypeEnum;
-import com.autoyol.commons.utils.DateUtil;
+import com.atzuche.order.sms.enums.PushParamsTypeEnum;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;

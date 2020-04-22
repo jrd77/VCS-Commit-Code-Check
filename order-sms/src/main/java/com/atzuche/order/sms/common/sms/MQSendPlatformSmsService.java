@@ -1,7 +1,8 @@
-package com.atzuche.order.mq.common.sms;
+package com.atzuche.order.sms.common.sms;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.sms.common.base.SMS;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

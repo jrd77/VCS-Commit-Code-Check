@@ -3,6 +3,7 @@ server:
   port: 8081
 undertow:
   io-threads: 8
+  worker-threads: 16
   buffer-size: 1024
   max-http-post-size: -1
 

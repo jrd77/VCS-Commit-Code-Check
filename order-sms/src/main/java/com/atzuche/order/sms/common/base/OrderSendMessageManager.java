@@ -1,4 +1,4 @@
-package com.atzuche.order.coreapi.listener.push;
+package com.atzuche.order.sms.common.base;
 
 import com.atzuche.order.mq.common.base.OrderMessage;
 import lombok.extern.slf4j.Slf4j;

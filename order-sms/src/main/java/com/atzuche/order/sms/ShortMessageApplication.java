@@ -12,7 +12,7 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
  * 主函数入口
  */
 @EnableHystrix
-@EnableFeignClients
+@EnableFeignClients({"com.atzuche"})
 @EnableEurekaClient
 @MapperScan("com.atzuche.order.sms")
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order"})

@@ -1,7 +1,7 @@
-package com.atzuche.order.coreapi.listener.push;
+package com.atzuche.order.sms.common.push;
 
 import com.alibaba.fastjson.JSONObject;
-import com.atzuche.order.renterwz.aliyunmq.AliyunMnsService;
+import com.autoyol.aliyunmq.AliyunMnsService;
 import com.autoyol.commons.utils.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
