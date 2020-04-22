@@ -158,21 +158,6 @@ public class CompareBeanUtils<T> {
         }
     }
 
-    /**
-     * 数据比较
-     *
-     * <p>不可和其他方法(compare)组合使用</p>
-     */
-    public void compare() {
-        if (null == oldObject || null == newObject) {
-            return;
-        }
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            String fieldChName = PropertitesUtil.getFieldChName(field.getName());
-            compare(field.getName(), StringUtils.isNotBlank(fieldChName) ? fieldChName : field.getName());
-        }
-    }
 
     /**
      * 数据比较
@@ -188,40 +173,64 @@ public class CompareBeanUtils<T> {
     }
 
     /**
-     * 数据比较
+     * 数据比较(全量比较)
+     *
+     * <p>不可和其他方法(compare)组合使用</p>
+     * @return String
+     */
+    public String compare() {
+        if (null == oldObject || null == newObject) {
+            return null;
+        }
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            String fieldChName = PropertitesUtil.getFieldChName(field.getName());
+            compare(field.getName(), StringUtils.isNotBlank(fieldChName) ? fieldChName : field.getName());
+        }
+
+        return toResult();
+    }
+
+    /**
+     * 数据比较(批量比较)
      *
      * @param fieldNames 字段名集合
+     * @return String
      */
-    public void compare(String[] fieldNames) {
+    public String compare(String[] fieldNames) {
         if (null == fieldNames || fieldNames.length == 0) {
-            return;
+            return null;
         }
         for (String fieldName : fieldNames) {
             compare(fieldName);
         }
+
+        return toResult();
     }
 
     /**
-     * 数据比较
+     * 数据比较(批量比较)
      *
      * @param fieldNames 字段名集合
+     * @return String
      */
-    public void compare(String[] fieldNames, String[] fieldChNames) {
+    public String compare(String[] fieldNames, String[] fieldChNames) {
         if (null == fieldNames || fieldNames.length == 0) {
-            return;
+            return null;
         }
 
         if (null == fieldChNames || fieldChNames.length == 0) {
-            return;
+            return null;
         }
 
         if (fieldNames.length != fieldChNames.length) {
-            return;
+            return null;
         }
 
         for (int i = 0; i < fieldNames.length; i++) {
             compare(fieldNames[i], fieldChNames[i]);
         }
+        return toResult();
     }
 
 
