@@ -125,8 +125,9 @@ public enum ErrorCode {
     WZ_DEPOSIT_NOT_FOUNT_ERR("700152","找不到违章押金记录"),
     RENT_TIME_LESS_CURR_TIME_2HOUR("500055","起租时间应晚于当前时间2小时"),
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
-    RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),
-    NOT_ALLOWED_EDIT("500057","不允许编辑"),
+    RENT_TIME_LESS_CURR_TIME("5000057","起租时间应晚于当前时间"),
+    NOT_ALLOWED_EDIT("500058","不允许编辑"),
+    NOT_FOUNT_ORDER_STATUS_ERR("500059","订单状态查询失败"),
     NO_RANGE_POINT("600040","地址不在范围内"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
 

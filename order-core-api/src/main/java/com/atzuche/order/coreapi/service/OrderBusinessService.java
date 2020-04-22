@@ -1,18 +1,24 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderNoticeEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -41,6 +47,10 @@ public class OrderBusinessService {
     private RenterMemberService renterMemberService;
     @Autowired
     private OrderSettleService orderSettleService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+    @Autowired
+    private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -139,4 +149,24 @@ public class OrderBusinessService {
         return returnCarIncomeResultDTO;
     }
 
+    public OwnerPreAndSettleIncomRespDTO queryOwnerPreAndSettleIncom(String orderNo) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity == null){
+            log.error("订单状态查询失败orderNo={}",orderNo);
+            throw new OrderStatusNotFoundException();
+        }
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+            log.error("找不到有效的车主子订单 orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+        int ownerIncomAmt = 0;
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getCarDepositSettleStatus()){//已结算
+            List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineByOrderNo = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+        }else{
+            OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
+            ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
+        }
+        return null;
+    }
 }
