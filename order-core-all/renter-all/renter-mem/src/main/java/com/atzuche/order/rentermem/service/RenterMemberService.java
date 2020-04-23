@@ -65,10 +65,11 @@ public class RenterMemberService{
             renterMemberRightEntity.setOrderNo(renterMemberDto.getOrderNo());
             renterMemberRightEntity.setRenterOrderNo(renterMemberDto.getRenterOrderNo());
             renterMemberRightEntity.setMemNo(renterMemberDto.getMemNo());
-            if(renterMemberDto.getOrderCategory()!=null
-                && !renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())
-                && RightTypeEnum.MEMBER_FLAG.getCode() == x.getRightType()
-                && MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode())){
+            if(RightTypeEnum.MEMBER_FLAG.getCode() == x.getRightType()
+                    && MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode())
+                    && renterMemberDto.getOrderCategory()!=null
+                    && (!renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode()) || !renterMemberDto.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))
+                ){
                 renterMemberRightEntity.setRightValue("0");
             }
             list.add(renterMemberRightEntity);

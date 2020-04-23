@@ -62,7 +62,9 @@ public class RenterMemberRightService{
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
         log.info("会员权益-企业用户权益-renterMemberRightDTO={}", JSON.toJSONString(renterMemberRightDTO));
         if(renterMemberRightDTO != null){
-            if(memRightCarDepositAmtReqDTO.getOrderCategory()!= null && memRightCarDepositAmtReqDTO.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())){
+            if(memRightCarDepositAmtReqDTO.getOrderCategory()!= null &&
+                    (memRightCarDepositAmtReqDTO.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())
+                            || memRightCarDepositAmtReqDTO.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))){
                 log.info("会员权益-企业用户权益-是企业用户-OrderCategory={}", memRightCarDepositAmtReqDTO.getOrderCategory());
                 memRightCarDepositAmtRespDTO.setReductionRate(GlobalConstant.ENTERPRISE_REDUCTION_RATE);
                 memRightCarDepositAmtRespDTO.setReductionDepositAmt((int)(originalDepositAmt*GlobalConstant.ENTERPRISE_REDUCTION_RATE));
@@ -125,7 +127,7 @@ public class RenterMemberRightService{
         //企业用户
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
         if(renterMemberRightDTO != null){
-            if(orderCategory!= null && orderCategory.equals(CategoryEnum.ORDINARY.getCode())){
+            if(orderCategory!= null && (orderCategory.equals(CategoryEnum.ORDINARY.getCode()) || orderCategory.equals(CategoryEnum.LONG_ORDER.getCode()))){
                 return GlobalConstant.MEMBER_RIGHT_QYYH_WZ_DEPOSIT;
             }
         }
