@@ -1,5 +1,8 @@
 package com.atzuche.order.sms.interfaces;
 
+import com.atzuche.order.mq.common.base.OrderMessage;
+import org.springframework.amqp.core.Message;
+
 import java.util.Map;
 
 /**
@@ -11,7 +14,7 @@ public interface IOrderRouteKeyMessage<T> {
     /**
      * 发送订单短消息数据
      */
-    void sendOrderMessageWithNo();
+    OrderMessage sendOrderMessageWithNo(Message message);
 
     /**
      * 是否有特殊参数

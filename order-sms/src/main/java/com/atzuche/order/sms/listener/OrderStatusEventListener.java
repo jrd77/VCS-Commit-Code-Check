@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OrderStatusEventListener extends OrderSendMessageManager {
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_08", durable = "true"),
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_status_11", durable = "true"),
             exchange = @Exchange(value = "auto-order-status", durable = "true", type = "topic"), key = "status.#")
     },containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {

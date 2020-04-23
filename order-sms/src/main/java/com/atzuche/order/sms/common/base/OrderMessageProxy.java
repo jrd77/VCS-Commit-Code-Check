@@ -1,5 +1,7 @@
 package com.atzuche.order.sms.common.base;
 
+import com.atzuche.order.sms.common.annatation.Push;
+import com.atzuche.order.sms.common.annatation.SMS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
@@ -39,12 +41,21 @@ public class OrderMessageProxy<T> implements InvocationHandler, Serializable {
             throw ExceptionUtil.unwrapThrowable(var5);
         }
         //获取method注解
+        method = orderRouteKeyMessage.getDeclaredMethod(method.getName(), method.getParameterTypes());
         Annotation[] annotations = method.getDeclaredAnnotations();
         if (Objects.isNull(annotations) || annotations.length == 0) {
             throw new RuntimeException("该service方法没有标明注解无法获取短信标识串，请确认");
         }
+        Annotation push = method.getDeclaredAnnotation(Push.class);
+        if (Objects.nonNull(push)) {
 
 
+        }
+        Annotation sms = method.getDeclaredAnnotation(SMS.class);
+        if (Objects.nonNull(sms)) {
+
+
+        }
         return null;
     }
 

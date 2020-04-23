@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.atzuche.order.sms.common.OrderMessageServiceScanner;
 import com.atzuche.order.sms.common.base.OrderSendMessageManager;
+import com.atzuche.order.sms.enums.MessageServiceTypeEnum;
 import com.atzuche.order.sms.enums.PushMessageTypeEnum;
 import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
+import com.atzuche.order.sms.interfaces.IOrderRouteKeyMessage;
 import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
@@ -20,6 +23,8 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -33,14 +38,16 @@ import java.util.Objects;
 @Slf4j
 public class OrderActionEventListener extends OrderSendMessageManager {
 
+    @Autowired
+    OrderMessageServiceScanner orderMessageServiceScanner;
 
-    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_08", durable = "true"),
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_11", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
     }, containerFactory = "orderRabbitListenerContainerFactory")
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
         try {
-            OrderMessage orderMessage = handlerOrderPayRentCostSuccessMq(message);
+            OrderMessage orderMessage = createOrderMessageService(message);
             if (Objects.nonNull(orderMessage)) {
                 sendSMSMessageData(orderMessage);
                 sendPushMessageData(orderMessage);
@@ -49,6 +56,33 @@ public class OrderActionEventListener extends OrderSendMessageManager {
             log.info("新订单动作总事件监听发生异常,msg：[{}]", e);
             Cat.logError("新订单动作总事件监听发生异常", e);
         }
+    }
+
+
+    /**
+     * 获取对应得service
+     * @param message
+     * @return
+     */
+    public OrderMessage createOrderMessageService(Message message){
+        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
+        log.info("新订单动作总事件监听,入参orderMessage:[{}]", orderMessage.toString());
+        String routeKeyName = message.getMessageProperties().getReceivedRoutingKey();
+        String serviceName = MessageServiceTypeEnum.getSmsServiceTemplate(routeKeyName);
+        if(StringUtils.isBlank(serviceName))
+        {
+            log.info("该事件没有需要发送得短信,routeKeyName:[{}]",routeKeyName);
+            return orderMessage;
+        }
+        serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
+        IOrderRouteKeyMessage orderRouteKeyMessage = orderMessageServiceScanner.getBean(serviceName);
+        if(Objects.isNull(orderRouteKeyMessage))
+        {
+            log.info("该事件没有对应的短信服务,routeKeyName:[{}]",routeKeyName);
+            return orderMessage;
+        }
+         orderMessage = orderRouteKeyMessage.sendOrderMessageWithNo(message);
+        return orderMessage;
     }
 
     /**

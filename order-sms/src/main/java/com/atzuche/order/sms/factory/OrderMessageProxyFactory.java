@@ -19,6 +19,6 @@ public class OrderMessageProxyFactory {
 
     private static <T> T newInstance(OrderMessageProxy orderMessageProxy) {
         iOrderRouteKeyMessage = orderMessageProxy.getOrderRouteKeyMessage();
-        return (T) Proxy.newProxyInstance(iOrderRouteKeyMessage.getClassLoader(), new Class[]{iOrderRouteKeyMessage}, orderMessageProxy);
+        return (T) Proxy.newProxyInstance(iOrderRouteKeyMessage.getClassLoader(),iOrderRouteKeyMessage.getInterfaces(), orderMessageProxy);
     }
 }

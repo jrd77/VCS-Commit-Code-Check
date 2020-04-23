@@ -1,8 +1,10 @@
 package com.atzuche.order.sms.service;
 
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.sms.common.annatation.OrderService;
 import com.atzuche.order.sms.common.annatation.SMS;
 import com.atzuche.order.sms.interfaces.IOrderRouteKeyMessage;
+import org.springframework.amqp.core.Message;
 
 import java.util.Map;
 
@@ -15,8 +17,7 @@ public class OwnerReturnCarSuccessService implements IOrderRouteKeyMessage<Map> 
 
     @Override
     @SMS(renterFlag = "CarRentalEnd2Renter")
-    public void sendOrderMessageWithNo() {
-
+    public OrderMessage sendOrderMessageWithNo(Message message) { return null;
     }
 
     @Override

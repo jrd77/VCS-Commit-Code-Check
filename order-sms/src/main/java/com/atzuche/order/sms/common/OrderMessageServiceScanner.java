@@ -1,5 +1,6 @@
 package com.atzuche.order.sms.common;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author 胡春林
- * 挂载mapper
+ * 挂载Service
  */
 @Component
 @Slf4j
@@ -36,5 +37,13 @@ public class OrderMessageServiceScanner implements BeanDefinitionRegistryPostPro
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
         this.applicationContext = applicationContext;
+    }
+
+    public <T> T getBean(String beanName) {
+        if (applicationContext.containsBean(beanName)) {
+            return (T) applicationContext.getBean(beanName);
+        } else {
+            return null;
+        }
     }
 }
