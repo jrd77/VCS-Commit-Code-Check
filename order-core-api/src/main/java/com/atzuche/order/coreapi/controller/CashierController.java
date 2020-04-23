@@ -99,7 +99,9 @@ public class CashierController {
         	 */
         	try {
             	//检查是否企业用户订单，刷新钱包,押金为0的情况。
-                if(result != null && result.isEnterpriseUserOrder() && result.getAmt() < 0) {  //否则无需抵扣
+//        		result.getAmt() < 0  //避免为0的情况多次刷新，导致支付双押金为0的情况，多次回调。
+        		//result.getAmtWallet() 第一步：计算，第二步：抵扣。分开处理。
+                if(result != null && result.isEnterpriseUserOrder() && result.getAmtWallet() > 0) {  //否则无需抵扣
                 	//默认按使用钱包处理。
                 	OrderPaySignReqVO orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
                 	log.info("commonWalletDebt params=[{}]",GsonUtils.toJson(orderPaySign));

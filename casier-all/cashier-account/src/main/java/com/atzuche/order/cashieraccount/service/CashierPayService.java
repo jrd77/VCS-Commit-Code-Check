@@ -616,15 +616,22 @@ public class CashierPayService{
         	if(renterOrderEntity != null) {
         		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
         	}
-        	//如果已经使用过钱包抵扣，不允许再次做抵扣。
-        	int walletAmt = accountRenterCostDetailNoTService.getRentCostPayByWallet(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
-        	if(walletAmt > 0) {
-        		isUseWallet = 0;
-        		log.info("当前订单已经使用过钱包抵扣，无需再次抵扣。orderNo=[{}],walletAmt=[{}]",orderPayReqVO.getOrderNo(),walletAmt);
+        	
+        	if(isEnterpriseUserOrder==false) {
+	        	//如果已经使用过钱包抵扣，不允许再次做抵扣。
+	        	int walletAmt = accountRenterCostDetailNoTService.getRentCostPayByWallet(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
+	        	if(walletAmt > 0) {
+	        		isUseWallet = 0;
+	        		log.info("当前订单已经使用过钱包抵扣，无需再次抵扣。orderNo=[{}],walletAmt=[{}]",orderPayReqVO.getOrderNo(),walletAmt);
+	        	}
+        	}else {
+        		isUseWallet = 1;
+        		log.info("当前订单企业用户钱包允许多次抵扣。orderNo=[{}]",orderPayReqVO.getOrderNo());
         	}
         	
         }
         result.setIsUseWallet(isUseWallet);
+        
 
         //待支付金额明细
         List<AccountPayAbleResVO> accountPayAbles = new ArrayList<>();
