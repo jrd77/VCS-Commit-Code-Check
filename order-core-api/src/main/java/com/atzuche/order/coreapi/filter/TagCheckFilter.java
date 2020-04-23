@@ -25,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 @Service("tagCheckFilter")
 public class TagCheckFilter implements OrderFilter {
-    public static final String LONG_TAG = "";
+    public static final String LONG_TAG = "389";
 
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
