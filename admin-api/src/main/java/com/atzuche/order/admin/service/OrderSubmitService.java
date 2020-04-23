@@ -133,8 +133,12 @@ public class OrderSubmitService {
         param.setFreeDoubleTypeId("3");
         param.setSpecialConsole("1");
         param.setOfflineOrderStatus("0");
-
         param.setPlatformParentType("7");
+
+        if(StringUtils.isNotBlank(reqVO.getLongOwnerCouponNo())) {
+            param.setOrderCategory("3");
+            param.setBusinessParentType("6");
+        }
 
         return param;
     }
