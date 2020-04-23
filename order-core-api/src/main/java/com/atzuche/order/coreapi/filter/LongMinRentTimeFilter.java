@@ -27,8 +27,8 @@ public class LongMinRentTimeFilter implements OrderFilter {
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
         OrderReqVO orderReqVO = context.getOrderReqVO();
-        LocalDate rentTime = orderReqVO.getRentTime().toLocalDate();
-        LocalDate revertTime = orderReqVO.getRevertTime().toLocalDate();
+        LocalDateTime rentTime = orderReqVO.getRentTime();
+        LocalDateTime revertTime = orderReqVO.getRevertTime();
         long durationDay = Duration.between(rentTime, revertTime).toDays();
         if(durationDay < MIN_RENT_DAY){
             throw new RentTimeException("最短租期:"+MIN_RENT_DAY+"天");
