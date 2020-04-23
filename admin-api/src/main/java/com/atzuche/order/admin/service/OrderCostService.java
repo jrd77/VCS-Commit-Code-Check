@@ -566,8 +566,7 @@ public class OrderCostService {
 
         OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
         if(ownerCouponLongDTO != null){
-            int discounRatio = ownerCouponLongDTO.getDiscounRatio() == null ? 0 : (int)(ownerCouponLongDTO.getDiscounRatio() * 100);
-            realVo.setOwnerLongRentDeduct(discounRatio+"%折扣");
+            realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
@@ -1217,8 +1216,7 @@ public class OrderCostService {
 
         OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
         if(ownerCouponLongDTO != null){
-            int discounRatio = ownerCouponLongDTO.getDiscounRatio() == null ? 0 : (int)(ownerCouponLongDTO.getDiscounRatio() * 100);
-            realVo.setOwnerLongRentDeduct(discounRatio+"%折扣");
+            realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
     }
