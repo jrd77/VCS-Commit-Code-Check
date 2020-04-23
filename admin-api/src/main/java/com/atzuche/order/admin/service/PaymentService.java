@@ -125,19 +125,7 @@ public class PaymentService {
 					 * 根据支付时间来切换
 					 */
 					LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-                    if(wzSettleTime != null){
-                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-                        violationDepositSettlementPaymentList.add(vo);
-                    }
-                    if(settleTime != null || depositSettleTime != null){
-                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-                        afterDepositSettlementPaymentList.add(vo);
-                    }
-                    PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-                    beforeDepositSettlementPaymentList.add(vo);
-
-
-					/*if(settleTime == null) {
+					if(settleTime == null) {
 						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 						beforeDepositSettlementPaymentList.add(vo);
 					}else {
@@ -153,7 +141,7 @@ public class PaymentService {
 							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 							afterDepositSettlementPaymentList.add(vo);
 						}
-					}*/
+					}
 				}
 			}
 		}
