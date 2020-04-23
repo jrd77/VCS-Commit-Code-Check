@@ -2,10 +2,7 @@ package com.atzuche.order.rentermem.service;
 
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
-import com.atzuche.order.commons.enums.MemberFlagEnum;
-import com.atzuche.order.commons.enums.MemberRightValueEnum;
-import com.atzuche.order.commons.enums.MemRightEnum;
-import com.atzuche.order.commons.enums.RightTypeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtReqDTO;
 import com.atzuche.order.rentermem.entity.dto.MemRightCarDepositAmtRespDTO;
@@ -61,9 +58,11 @@ public class RenterMemberRightService{
         //企业用户
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
         if(renterMemberRightDTO != null){
-            memRightCarDepositAmtRespDTO.setReductionRate(GlobalConstant.ENTERPRISE_REDUCTION_RATE);
-            memRightCarDepositAmtRespDTO.setReductionDepositAmt((int)(originalDepositAmt*GlobalConstant.ENTERPRISE_REDUCTION_RATE));
-            return memRightCarDepositAmtRespDTO;
+            if(memRightCarDepositAmtReqDTO.getOrderCategory()!= null && memRightCarDepositAmtReqDTO.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())){
+                memRightCarDepositAmtRespDTO.setReductionRate(GlobalConstant.ENTERPRISE_REDUCTION_RATE);
+                memRightCarDepositAmtRespDTO.setReductionDepositAmt((int)(originalDepositAmt*GlobalConstant.ENTERPRISE_REDUCTION_RATE));
+                return memRightCarDepositAmtRespDTO;
+            }
         }
 
         List<RenterMemberRightDTO> staff = renterMemberRightDTOList
@@ -112,7 +111,7 @@ public class RenterMemberRightService{
      * @param wzDepositAmt 违章押金
      * @return 会员权益违章押金计算
      */
-    public int wzDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer wzDepositAmt){
+    public int wzDepositAmt(List<RenterMemberRightDTO> renterMemberRightDTOList, Integer wzDepositAmt,String orderCategory){
         if(wzDepositAmt == null){
             CalWzDepositAmtException calWzDepositAmtException = new CalWzDepositAmtException();
             Cat.logError(calWzDepositAmtException);
@@ -121,7 +120,9 @@ public class RenterMemberRightService{
         //企业用户
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
         if(renterMemberRightDTO != null){
-            return GlobalConstant.MEMBER_RIGHT_QYYH_WZ_DEPOSIT;
+            if(orderCategory!= null && orderCategory.equals(CategoryEnum.ORDINARY.getCode())){
+                return GlobalConstant.MEMBER_RIGHT_QYYH_WZ_DEPOSIT;
+            }
         }
         //内部员工
         List<RenterMemberRightDTO> staff = renterMemberRightDTOList
