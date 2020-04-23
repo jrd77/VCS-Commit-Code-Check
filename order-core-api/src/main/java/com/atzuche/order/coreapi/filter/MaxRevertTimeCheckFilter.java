@@ -25,7 +25,7 @@ public class MaxRevertTimeCheckFilter implements OrderFilter {
     public void validate(OrderReqContext context) throws OrderFilterException {
         OrderReqVO orderReqVO = context.getOrderReqVO();
         LocalDate revertTime = orderReqVO.getRevertTime().toLocalDate();
-        LocalDate maxRentDay = revertTime.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());//下下个月的最后一天
+        LocalDate maxRentDay = LocalDate.now().plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());//下下个月的最后一天
         if(revertTime.isAfter(maxRentDay)){
             String maxRentDayStr = maxRentDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             throw new RentTimeException("最长租期截至:"+maxRentDayStr);
