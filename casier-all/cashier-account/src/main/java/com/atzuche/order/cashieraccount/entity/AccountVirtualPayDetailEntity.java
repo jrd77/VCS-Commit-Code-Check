@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -48,7 +49,7 @@ public class AccountVirtualPayDetailEntity implements Serializable {
     /**
      * 操作时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作人名称

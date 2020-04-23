@@ -23,8 +23,7 @@ public class VirtualPayService {
     private AccountVirtualPayService accountVirtualPayService;
 
     @Autowired CashierPayService cashierPayService;
-    @Autowired
-    AccountVirtualPayDetailMapper accountVirtualPayDetailMapper;
+
 
     @Transactional
     public void pay(VirtualPayDTO virtualPayDTO, OrderPayCallBack orderPayCallBack) {
@@ -35,9 +34,5 @@ public class VirtualPayService {
     @Transactional
     public void offlinePay(OfflinePayDTO virtualPayDTO, OrderPayCallBack orderPayCallBack) {
         cashierPayService.offlinePay(virtualPayDTO,orderPayCallBack);
-    }
-
-    public List<AccountVirtualPayDetailEntity> getVirtualPayByOrderNo(String orderNo){
-        return null;//accountVirtualPayDetailMapper.
     }
 }
