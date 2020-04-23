@@ -2,6 +2,7 @@ package com.atzuche.order.rentermem.service;
 
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
+import com.atzuche.order.commons.enums.CategoryEnum;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
@@ -64,6 +65,12 @@ public class RenterMemberService{
             renterMemberRightEntity.setOrderNo(renterMemberDto.getOrderNo());
             renterMemberRightEntity.setRenterOrderNo(renterMemberDto.getRenterOrderNo());
             renterMemberRightEntity.setMemNo(renterMemberDto.getMemNo());
+            if(renterMemberDto.getOrderCategory()!=null
+                && !renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())
+                && RightTypeEnum.MEMBER_FLAG.getCode() == x.getRightType()
+                && MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode())){
+                renterMemberRightEntity.setRightValue("0");
+            }
             list.add(renterMemberRightEntity);
         });
         renterMemberRightMapper.insertList(list);
