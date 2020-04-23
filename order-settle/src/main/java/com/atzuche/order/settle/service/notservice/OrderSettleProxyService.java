@@ -142,7 +142,7 @@ public class OrderSettleProxyService {
         List<CashierRefundApplyReqVO> cashierRefundApplys = new ArrayList<>();
         //1 租车费用
         //11
-        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
+        CashierEntity cashierEntity = cashierNoTService.getCashierEntityNoWallet(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId()) && refundAmt<0){
             CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
             BeanUtils.copyProperties(cashierEntity,vo);

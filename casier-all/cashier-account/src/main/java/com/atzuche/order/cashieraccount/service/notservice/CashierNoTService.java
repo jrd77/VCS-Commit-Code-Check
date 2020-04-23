@@ -169,7 +169,15 @@ public class CashierNoTService {
         CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
         return cashierEntity;
     }
-
+    
+    /**
+     * 收银台支付记录，不含钱包支付记录
+     */
+    public CashierEntity getCashierEntityNoWallet(String orderNo,String memNo,String payKind){
+        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKindNoWallet(orderNo,memNo,payKind);
+        return cashierEntity;
+    }
+    
     /**
      * 收银台记录应收违章押金
      * @param createOrderRenterWZDepositReq
