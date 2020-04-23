@@ -380,57 +380,61 @@ public class CashierPayService{
         OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         log.info("getOrderPayableAmount result=[{}],params=[{}]",GsonUtils.toJson(orderPayable),GsonUtils.toJson(orderPaySign));
         //4 抵扣钱包
-        boolean isWalletDebtRentCost = false;
-        if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
-           int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
-           //判断余额大于0
-           if(payBalance>0){
-               //5 抵扣钱包落库 （收银台落库、费用落库）
-               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmtWallet());
-               //6收银台 钱包支付落库
-               cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
-               //钱包未抵扣部分
-               int amtPaying =0;
-               if(amtWallet<orderPayable.getAmtWallet()){
-                   amtPaying = amtWallet - orderPayable.getAmtWallet();
-               }
-               orderPayable.setAmtWallet(amtWallet);
-               orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
-               orderPayable.setAmtRent(orderPayable.getAmtRent() + amtPaying);
-               // 钱包支付完租车费用  租车费用为0 状态变更
-               if(orderPayable.getAmtRent()==0){
-                   cashierService.saveWalletPaylOrderStatusInfo(orderPaySign.getOrderNo());
-               }
-
-               //如果待支付 金额等于 0 即 钱包抵扣完成
-               if(orderPayable.getAmt()==0){
-                   List<String> payKind = orderPaySign.getPayKind();
-                   // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
-                   if(!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
-                       //修改子订单费用信息
-                       String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                       orderPayCallBack.callBack(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain(),YesNoEnum.NO);
-                       
-                       //扩展EXT>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                       isWalletDebtRentCost = true;
-                       //目前限定只有企业用户的时候，才继续通过押金为0的支付。否则条件：必须支付第一笔。或第一笔附带两笔押金为0的支付。经过支付平台。
-                       //APPserver第一道拦截
-                       //该处第二道拦截。
-                       //在拉取押金金额的时候，根据企业用户标识来拉取。
-                       //避免押金为0的支付，绕过支付平台。
-                       if(orderPayable.getAccountPayAbles() != null && orderPayable.getAccountPayAbles().size() > 1 
-                    		   && orderPayable.isEnterpriseUserOrder()) { //含多笔的情况。
-                    	   //押金继续支付，含押金为0的情况。
-                    	   log.info("押金继续支付，含押金为0的情况,params=[{}]",GsonUtils.toJson(orderPayable));
-                       }else {
-                    	   //提前返回。
-                    	   return "";
-                       }
-                   }
-               }
-           }
-
-        }
+        boolean isWalletDebtRentCost = false;  //默认值
+        /**
+         * 选择某个支付方式的时候，再去抵扣钱包，有些不合适？后续改成“钱包支付选择项”    200423
+         */
+//        if(YesNoEnum.YES.getCode()==orderPayable.getIsUseWallet()){
+//           int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
+//           //判断余额大于0
+//           if(payBalance>0){
+//               //5 抵扣钱包落库 （收银台落库、费用落库）
+//               int amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),orderPayable.getAmtWallet());
+//               //6收银台 钱包支付落库
+//               cashierNoTService.insertRenterCostByWallet(orderPaySign,amtWallet);
+//               //钱包未抵扣部分
+//               int amtPaying =0;
+//               if(amtWallet<orderPayable.getAmtWallet()){
+//                   amtPaying = amtWallet - orderPayable.getAmtWallet();
+//               }
+//               orderPayable.setAmtWallet(amtWallet);
+//               orderPayable.setAmt(orderPayable.getAmt() + amtPaying);
+//               orderPayable.setAmtRent(orderPayable.getAmtRent() + amtPaying);
+//               // 钱包支付完租车费用  租车费用为0 状态变更
+//               if(orderPayable.getAmtRent()==0){
+//                   cashierService.saveWalletPaylOrderStatusInfo(orderPaySign.getOrderNo());
+//               }
+//
+//               //如果待支付 金额等于 0 即 钱包抵扣完成
+//               if(orderPayable.getAmt()==0){
+//                   List<String> payKind = orderPaySign.getPayKind();
+//                   // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
+//                   if(!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
+//                       //修改子订单费用信息
+//                       String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
+//                       orderPayCallBack.callBack(orderPaySign.getMenNo(),orderPaySign.getOrderNo(),renterOrderNo,orderPayable.getIsPayAgain(),YesNoEnum.NO);
+//                       
+//                       //扩展EXT>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//                       isWalletDebtRentCost = true;
+//                       //目前限定只有企业用户的时候，才继续通过押金为0的支付。否则条件：必须支付第一笔。或第一笔附带两笔押金为0的支付。经过支付平台。
+//                       //APPserver第一道拦截
+//                       //该处第二道拦截。
+//                       //在拉取押金金额的时候，根据企业用户标识来拉取。
+//                       //避免押金为0的支付，绕过支付平台。
+//                       if(orderPayable.getAccountPayAbles() != null && orderPayable.getAccountPayAbles().size() > 1 
+//                    		   && orderPayable.isEnterpriseUserOrder()) { //含多笔的情况。
+//                    	   //押金继续支付，含押金为0的情况。
+//                    	   log.info("押金继续支付，含押金为0的情况,params=[{}]",GsonUtils.toJson(orderPayable));
+//                       }else {
+//                    	   //提前返回。
+//                    	   return "";
+//                       }
+//                   }
+//               }
+//           }
+//        }
+        
+        
         //7 签名串
         List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable,isWalletDebtRentCost);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
@@ -458,7 +462,20 @@ public class CashierPayService{
         BeanUtils.copyProperties(orderPaySign, orderPayReqVO);
         OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO);
         log.info("getOrderPayableAmount new result=[{}],params=[{}]",GsonUtils.toJson(orderPayable),GsonUtils.toJson(orderPaySign));
-        //4 抵扣钱包
+        //公共的钱包抵扣方法。
+        commonWalletDebt(orderPaySign, orderPayCallBack, orderPayable);
+    }
+
+    
+    /**
+     * 公共方法
+     * @param orderPaySign
+     * @param orderPayCallBack
+     * @param orderPayReqVO
+     * @param orderPayable
+     */
+	public void commonWalletDebt(OrderPaySignReqVO orderPaySign, OrderPayCallBack orderPayCallBack,OrderPayableAmountResVO orderPayable) {
+		//4 抵扣钱包
         boolean isWalletDebtRentCost = false;
         if (YesNoEnum.YES.getCode() == orderPayable.getIsUseWallet()) {
             int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
@@ -485,7 +502,7 @@ public class CashierPayService{
                 if (orderPayable.getAmt() == 0) {
                     List<String> payKind = orderPaySign.getPayKind();
                     // 如果 支付款项 只有租车费用一个  并且使用钱包支付 ，当待支付金额完全被 钱包抵扣直接返回支付完成
-                    if (!CollectionUtils.isEmpty(payKind) && orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
+                    if (!CollectionUtils.isEmpty(payKind) && orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
                         //修改子订单费用信息
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
                         orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
@@ -536,7 +553,7 @@ public class CashierPayService{
             }
 
         }
-    }
+	}
 
     /**
      * 查询支付款项信息
@@ -843,10 +860,10 @@ public class CashierPayService{
         
         result.setAmtDeposit(amtDeposit);
         result.setAmtWzDeposit(amtWZDeposit);
-        result.setAmtTotal(amtTotal);
+//        result.setAmtTotal(amtTotal);  //amt字段
         //已经支付的金额
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtTotal);  //result.getAmt()取值。
+        result.setAmt(amtTotal);  //result.getAmt()取值。 APPSERVER取值
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNo());
         result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
