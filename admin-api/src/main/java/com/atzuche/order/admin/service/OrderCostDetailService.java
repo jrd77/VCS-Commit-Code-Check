@@ -495,11 +495,15 @@ public class OrderCostDetailService {
 			}
 		}
 
+
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo());
         int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList);
         int renterSubsidyAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
         int abatementInsureAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE);
-
+        int longGetReturnCarCostSubsidy = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
         //数据封装
 		resVo.setDispatchingSubsidy(String.valueOf(dispatching));
         resVo.setDispatchingSubsidySystem(String.valueOf(renterUpateSubsidyAmt));
@@ -515,6 +519,7 @@ public class OrderCostDetailService {
 	 	resVo.setAbatementSubsidy(String.valueOf(abatement));
         resVo.setAbatementSubsidySystem(String.valueOf(abatementInsureAmt));
 	 	resVo.setFeeSubsidy(String.valueOf(fee));
+        resVo.setLongGetReturnCarCostSubsidy(String.valueOf(-longGetReturnCarCostSubsidy));//长租特有字段
 		return resVo;
 	}
 	

@@ -69,7 +69,7 @@ public class StockFilter implements OrderFilter {
     }
 
     public static int isLongRent(String orderCategory){
-        if(OrderCategoryEnum.LONG_ORDER.getCategory().equals(orderCategory)){
+        if(orderCategory!=null && OrderCategoryEnum.LONG_ORDER.getCategory().equals(orderCategory)){
             return 1;
         }else{
             return 0;

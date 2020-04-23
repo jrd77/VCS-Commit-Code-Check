@@ -56,6 +56,7 @@ public class CarProxyService {
     public static class CarPriceDetail{
         private List<CarPriceOfDayVO> carPriceOfDayVOList;
         private String plateNum;
+        private Integer ownerNo;
     }
 
     /**
@@ -83,6 +84,7 @@ public class CarProxyService {
             CarPriceDetail carPriceDetail = new CarPriceDetail();
             carPriceDetail.setCarPriceOfDayVOList(responseObject.getData().getDaysPrice());
             carPriceDetail.setPlateNum(responseObject.getData().getCarBaseVO().getPlateNum());
+            carPriceDetail.setOwnerNo(responseObject.getData().getCarBaseVO().getOwnerNo());
             t.setStatus(Transaction.SUCCESS);
 
             return carPriceDetail;

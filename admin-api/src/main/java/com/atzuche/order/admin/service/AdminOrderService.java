@@ -12,6 +12,7 @@ import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.*;
@@ -32,6 +33,8 @@ import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,6 +89,13 @@ public class AdminOrderService {
                     memAvailableCouponVO.setCarOwnerCouponDetailVOList(availableCouponList);
                 }
             }
+
+            if(CollectionUtils.isNotEmpty(resVO.getCostItemList())) {
+                Double count = resVO.getCostItemList().stream().filter(x -> StringUtils.equals(x.getCostCode(),
+                        RenterCashCodeEnum.RENT_AMT.getCashNo())).mapToDouble(CostItemVO::getCount).sum();
+                memAvailableCouponVO.setCountDays(String.valueOf(count));
+            }
+
             return memAvailableCouponVO;
 
         }catch (Exception e){

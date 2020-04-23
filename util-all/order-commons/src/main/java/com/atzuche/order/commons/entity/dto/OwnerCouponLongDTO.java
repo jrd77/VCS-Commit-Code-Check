@@ -47,6 +47,10 @@ public class OwnerCouponLongDTO implements Serializable {
 	 * 折扣比例
 	 */
 	private Double discounRatio;
+    /**
+     * 折扣文案描述
+     */
+    private String discountDesc;
 
 
 
