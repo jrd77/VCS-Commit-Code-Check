@@ -61,30 +61,15 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
-        try {
-        	//检查是否企业用户订单，刷新钱包,押金为0的情况。
-            if(result != null && result.isEnterpriseUserOrder()) {
-            	log.info("企业用户订单>>>");
-            	//默认按使用钱包处理。
-            	OrderPaySignReqVO orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
-            	log.info("commonWalletDebt params=[{}]",GsonUtils.toJson(orderPaySign));
-            	cashierPayService.commonWalletDebt(orderPaySign, payCallbackService, result);
-            	
-            }else {
-            	log.info("非企业用户订单>>>");
-            }
-		} catch (Exception e) {
-			log.error("钱包抵扣异常:params=[{}]",GsonUtils.toJson(result),e);
-		}
-        
         //支付金额大于0
         //入参未传递的化，不考虑收银台的数据获取。兼容该接口之前的支付宝小程序的调用。
+        /**
+         * 拉取收银台配置信息。
+         */
         if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId())) {  //带支付 为负数
         	//AppServer端调用，小程序没有收银台。
 //        	if(result.getAmtTotal() < 0) {
         	if(result.getAmt() < 0) {
-        		
-        		
 		        //调起支付平台获取收银台信息
 		        PrePlatformRequest reqData = new PrePlatformRequest();
 		        //赋值
@@ -95,15 +80,38 @@ public class CashierController {
 		        	BeanUtils.copyProperties(payResVo, result);
 		        }
         	}else {
-        		if(result.isEnterpriseUserOrder() && result.getAmt() == 0) {
-        			log.info("企业用户订单钱包全部抵扣，正常返回，参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
-        		}else {
+//        		if(result.isEnterpriseUserOrder() && result.getAmt() == 0) {
+//        			log.info("企业用户订单钱包全部抵扣，正常返回，参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
+//        		}else {
 //        			//返回提示信息
 	        		//金额异常的情况，  提示“没有待支付记录”
 	        		return ResponseData.createErrorCodeResponse(ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getText());
-        		}
+//        		}
         	}
         }else {
+        	/**
+        	 * 基本原则：
+        	 * 进入收银台和拉取tn不能抵扣，否则显示金额和实际支付金额不一致。
+        	 */
+        	
+        	/**
+        	 * 刷新订单详情的时候。
+        	 */
+        	try {
+            	//检查是否企业用户订单，刷新钱包,押金为0的情况。
+                if(result != null && result.isEnterpriseUserOrder() && result.getAmt() < 0) {  //否则无需抵扣
+                	//默认按使用钱包处理。
+                	OrderPaySignReqVO orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
+                	log.info("commonWalletDebt params=[{}]",GsonUtils.toJson(orderPaySign));
+                	//默认按使用钱包处理。
+                	result.setIsUseWallet(1);
+                	cashierPayService.commonWalletDebt(orderPaySign, payCallbackService, result);
+                	
+                }
+    		} catch (Exception e) {
+    			log.error("刷新订单详情钱包抵扣异常:params=[{}]",GsonUtils.toJson(result),e);
+    		}
+        	
         	log.info("无需收银台参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
         }
         
