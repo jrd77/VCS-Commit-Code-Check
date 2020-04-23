@@ -106,6 +106,11 @@ public class ModifyOrderCheckService {
 		returnCarAddress.setLon(modifyOrderDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderDTO.getRevertCarLon()):null);
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
+		orderInfoDTO.setLongRent(0);
+		if (StringUtils.isNotBlank(modifyOrderDTO.getLongCouponCode())) {
+			// 长租订单
+			orderInfoDTO.setLongRent(1);
+		}
 		stockService.checkCarStock(orderInfoDTO);
 	}
 	
