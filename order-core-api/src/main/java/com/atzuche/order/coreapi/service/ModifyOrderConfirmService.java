@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,9 @@ import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -85,6 +89,8 @@ public class ModifyOrderConfirmService {
 	private ModifyOrderRabbitMQService modifyOrderRabbitMQService;
 	@Autowired
 	private OrderFlowService orderFlowService;
+	@Autowired
+	private OrderSourceStatService orderSourceStatService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -253,6 +259,11 @@ public class ModifyOrderConfirmService {
 		List<String> changeItemList = orderChangeItemService.listChangeCodeByRenterOrderNo(renterOrderNo);
 		// 封装车主同意需要的对象
 		ModifyOrderOwnerDTO modifyOrderOwnerDTO = modifyOrderForOwnerService.getModifyOrderOwnerDTO(renterOrder, deliveryList);
+		// 获取订单来源信息
+        OrderSourceStatEntity osse = orderSourceStatService.selectByOrderNo(orderNo);
+        if (osse != null) {
+        	modifyOrderOwnerDTO.setLongCouponCode(osse.getLongRentCouponCode());
+        }
 		// 获取租客补贴有和车主关联的
 		List<RenterOrderSubsidyDetailEntity> renterSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
 		// 获取同意前有效的租客子订单
@@ -532,6 +543,11 @@ public class ModifyOrderConfirmService {
 			// 换车要释放上一辆车的库存
 			orderInfoDTO.setOldCarNo(modifyOrderOwnerDTO.getOldCarNo());
 			orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDHC.getType());
+		}
+		orderInfoDTO.setLongRent(0);
+		if (StringUtils.isNotBlank(modifyOrderOwnerDTO.getLongCouponCode())) {
+			// 长租订单
+			orderInfoDTO.setLongRent(1);
 		}
 		stockService.cutCarStock(orderInfoDTO);
 	}
