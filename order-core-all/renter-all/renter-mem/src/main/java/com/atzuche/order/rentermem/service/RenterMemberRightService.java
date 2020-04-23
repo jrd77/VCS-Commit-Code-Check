@@ -1,5 +1,6 @@
 package com.atzuche.order.rentermem.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.*;
@@ -11,6 +12,7 @@ import com.atzuche.order.rentermem.exception.CalWzDepositAmtException;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
 import com.atzuche.order.rentermem.utils.RenterMemUtils;
 import com.dianping.cat.Cat;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
  * @author ZhangBin
  * @date 2019-12-14 17:27:28
  */
+@Slf4j
 @Service
 public class RenterMemberRightService{
     @Autowired
@@ -57,8 +60,10 @@ public class RenterMemberRightService{
         }
         //企业用户
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        log.info("会员权益-企业用户权益-renterMemberRightDTO={}", JSON.toJSONString(renterMemberRightDTO));
         if(renterMemberRightDTO != null){
             if(memRightCarDepositAmtReqDTO.getOrderCategory()!= null && memRightCarDepositAmtReqDTO.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode())){
+                log.info("会员权益-企业用户权益-是企业用户-OrderCategory={}", memRightCarDepositAmtReqDTO.getOrderCategory());
                 memRightCarDepositAmtRespDTO.setReductionRate(GlobalConstant.ENTERPRISE_REDUCTION_RATE);
                 memRightCarDepositAmtRespDTO.setReductionDepositAmt((int)(originalDepositAmt*GlobalConstant.ENTERPRISE_REDUCTION_RATE));
                 return memRightCarDepositAmtRespDTO;
