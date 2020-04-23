@@ -1,7 +1,6 @@
 package com.atzuche.order.coreapi.filter;
 
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.exceptions.LongRentTimeException;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import org.springframework.beans.BeansException;
@@ -37,22 +36,22 @@ public class LongOrderFilterChain implements OrderFilter, ApplicationContextAwar
         orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
         /*平台显示校验*/
         orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
+        /*长租标签校验*/
+        orderFilterList.add(applicationContext.getBean(TagCheckFilter.class));
+        /*长租订单租期必须大于30天*/
+        orderFilterList.add(applicationContext.getBean(LongMinRentTimeFilter.class));
+        /*最大租期校验*/
+        orderFilterList.add(applicationContext.getBean(MaxRevertTimeCheckFilter.class));
         /*取还车时间校验*/
         orderFilterList.add(applicationContext.getBean(RentRevertTimeCheckFilter.class));
         /*长租-取还车服务校验*/
         orderFilterList.add(applicationContext.getBean(LongSrvGetReturnFilter.class));
-        /*长租订单租期必须大于30天 最多3个月*/
-        //orderFilterList.add(applicationContext.getBean(LongRentTimeFilter.class));
-        /*取还车服务起租时间需大于4小时校验*/
-        //orderFilterList.add(applicationContext.getBean(RenterTime4HourFilter.class));
         /*车辆设置校验*/
-        //orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
+        orderFilterList.add(applicationContext.getBean(CarSettingCheckFilter.class));
         /*城市凹凸服务点判断*/
         orderFilterList.add(applicationContext.getBean(CityLonLatFilter.class));
         /*机场服务点校验*/
         orderFilterList.add(applicationContext.getBean(AirportServiceFilter.class));
-        /*15分钟内重复下单校验*/
-        /* orderFilterList.add(applicationContext.getBean(WaitOwner15minuteReplyFilter.class));*/
         /*准驾车型校验*/
         orderFilterList.add(applicationContext.getBean(CheckSuitCarAndDriLicFilter.class));
         /* 库存检查 */
