@@ -61,14 +61,21 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
-        //检查是否企业用户订单，刷新钱包,押金为0的情况。
-        if(result.isEnterpriseUserOrder()) {
-        	OrderPaySignReqVO orderPaySign = new OrderPaySignReqVO();
-        	//默认按使用钱包处理。
-        	orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
-        	cashierPayService.commonWalletDebt(orderPaySign, payCallbackService, result);
-        	
-        }
+        try {
+        	//检查是否企业用户订单，刷新钱包,押金为0的情况。
+            if(result != null && result.isEnterpriseUserOrder()) {
+            	log.info("企业用户订单>>>");
+            	//默认按使用钱包处理。
+            	OrderPaySignReqVO orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
+            	log.info("commonWalletDebt params=[{}]",GsonUtils.toJson(orderPaySign));
+            	cashierPayService.commonWalletDebt(orderPaySign, payCallbackService, result);
+            	
+            }else {
+            	log.info("非企业用户订单>>>");
+            }
+		} catch (Exception e) {
+			log.error("钱包抵扣异常:params=[{}]",GsonUtils.toJson(result),e);
+		}
         
         //支付金额大于0
         //入参未传递的化，不考虑收银台的数据获取。兼容该接口之前的支付宝小程序的调用。
