@@ -1342,8 +1342,9 @@ public class OrderSettleNoTService {
         }
         //2 退还 钱包金额
         if(settleCancelOrdersAccount.getRentSurplusWalletAmt()>0){
+        	///
             walletProxyService.returnOrChargeWallet(settleOrders.getRenterMemNo(),settleOrders.getOrderNo(),settleCancelOrdersAccount.getRentSurplusWalletAmt());
-            //记录退还
+        	//记录退还
             AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO ();
             accountRenterCostDetail.setMemNo(settleOrders.getRenterMemNo());
             accountRenterCostDetail.setOrderNo(settleOrders.getOrderNo());
@@ -1351,7 +1352,9 @@ public class OrderSettleNoTService {
             accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
             accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
             accountRenterCostDetail.setAmt(-settleCancelOrdersAccount.getRentSurplusWalletAmt());
-            accountRenterCostDetail.setPayType(PayTypeEnum.PAY_PUR.getCode());
+            accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getCode());
+            accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getText());
+            
             cashierService.refundRentCostWallet(accountRenterCostDetail);
         }
         //3 租车费用 退还
