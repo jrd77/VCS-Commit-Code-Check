@@ -300,6 +300,8 @@
         and is_cancel = 0
         and is_delete = 0
         and mem_no = #{ownerMemNo}
+        order by id desc
+        limit 1
     </select>
     <update id="updateByMemeNo">
         update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
