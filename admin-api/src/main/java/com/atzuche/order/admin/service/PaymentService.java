@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ public class PaymentService {
 	OrderStatusService orderStatusService;
 	@Autowired
 	FeignPaymentService feignPaymentService;
+    @Autowired
+    CashierRefundApplyNoTService cashierRefundApplyNoTService;
 	
 //	@Autowired
 //	PaymentCashierService paymentCashierService;
@@ -143,9 +146,15 @@ public class PaymentService {
                             String payKind = cashierEntity.getPayKind();
                             String paySource = cashierEntity.getPaySource();
                             if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
-                                /*if(PaySourceEnum){
+                                if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
+                                    cashierRefundApplyNoTService.
 
-                                }*/
+
+                                }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
+
+                                }else{
+
+                                }
                             }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金
 
                             }
