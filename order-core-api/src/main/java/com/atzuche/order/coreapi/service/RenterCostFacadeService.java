@@ -244,7 +244,10 @@ public class RenterCostFacadeService {
         detail.setRenter2PlatformAmt(OrderSubsidyDetailUtils.getOrderConsoleCostDetail(orderConsoleCostDetailEntityList,SubsidySourceCodeEnum.RENTER,SubsidySourceCodeEnum.PLATFORM));
 
         detail.setLongRentDecutAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RENT_AMT)));
-
+        detail.setLongGetReturnCarCostSubsidy(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
+                OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
         return detail;
     }
 
@@ -362,6 +365,7 @@ public class RenterCostFacadeService {
         platformSubsidyDTO.rentSubsidy = renterSubsidyDetail.getRentSubsidyAmt();
         platformSubsidyDTO.ServiceSubsidy = renterSubsidyDetail.getFeeSubsidyAmt();
         platformSubsidyDTO.otherSubsidy = renterSubsidyDetail.getOtherSubsidyAmt();
+        platformSubsidyDTO.longGetReturnCarCostSubsidy = renterSubsidyDetail.getLongGetReturnCarCostSubsidy();
         rentCarCostDTO.platformSubsidyDTO = platformSubsidyDTO;
         //1.4、车主给租客的补贴
         rentCarCostDTO.rentAmtSubsidy =  renterSubsidyDetail.getOwner2RenterRentSubsidyAmt();
