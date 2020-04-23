@@ -50,6 +50,7 @@ public class CashierController {
     
     /**
      * 查询支付款项信息
+     * 类同获取支付金额和调起收银台getTransPlatform接口，对应APPSERVER
      * @param orderPayReqVO
      * @return
      */
@@ -60,12 +61,23 @@ public class CashierController {
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderPayableAmountResVO result = cashierPayService.getOrderPayableAmount(orderPayReqVO);
         log.info("CashierController getOrderPayableAmount end param [{}],result [{}]", GsonUtils.toJson(orderPayReqVO),GsonUtils.toJson(result));
+        //检查是否企业用户订单，刷新钱包,押金为0的情况。
+        if(result.isEnterpriseUserOrder()) {
+        	OrderPaySignReqVO orderPaySign = new OrderPaySignReqVO();
+        	//默认按使用钱包处理。
+        	orderPaySign = cashierPayService.buildOrderPaySignReqVO(result.getOrderNo(), result.getMemNo(), 1);
+        	cashierPayService.commonWalletDebt(orderPaySign, payCallbackService, result);
+        	
+        }
         
         //支付金额大于0
         //入参未传递的化，不考虑收银台的数据获取。兼容该接口之前的支付宝小程序的调用。
         if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId())) {  //带支付 为负数
         	//AppServer端调用，小程序没有收银台。
-        	if(result.getAmtTotal() < 0) {
+//        	if(result.getAmtTotal() < 0) {
+        	if(result.getAmt() < 0) {
+        		
+        		
 		        //调起支付平台获取收银台信息
 		        PrePlatformRequest reqData = new PrePlatformRequest();
 		        //赋值
@@ -76,12 +88,18 @@ public class CashierController {
 		        	BeanUtils.copyProperties(payResVo, result);
 		        }
         	}else {
-        		//金额异常的情况，  提示“没有待支付记录”
-        		return ResponseData.createErrorCodeResponse(ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getText());
+        		if(result.isEnterpriseUserOrder() && result.getAmt() == 0) {
+        			log.info("企业用户订单钱包全部抵扣，正常返回，参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
+        		}else {
+//        			//返回提示信息
+	        		//金额异常的情况，  提示“没有待支付记录”
+	        		return ResponseData.createErrorCodeResponse(ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getCode(), ErrorCode.CASHIER_PAY_SIGN_FAIL_ERRER.getText());
+        		}
         	}
         }else {
         	log.info("无需收银台参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
         }
+        
         return ResponseData.success(result);
     }
 
@@ -90,7 +108,8 @@ public class CashierController {
 		reqData.setAtappId(orderPayReqVO.getAtappId());
         reqData.setInternalNo(orderPayReqVO.getInternalNo());
         //正数
-        reqData.setPayAmt(String.valueOf(Math.abs(result.getAmtTotal())));  //支付金额
+//        reqData.setPayAmt(String.valueOf(Math.abs(result.getAmtTotal())));  //支付金额
+        reqData.setPayAmt(String.valueOf(Math.abs(result.getAmt())));  //支付金额
         reqData.setPayKind(orderPayReqVO.getPayKind().get(0)); //默认取第一个。
         reqData.setPayType(orderPayReqVO.getPayType());  //消费
         reqData.setOrderNo(orderPayReqVO.getOrderNo());
@@ -98,6 +117,7 @@ public class CashierController {
     
     /**
      * 收银支付获取支付签名串
+     * 类同获取支付金额和getTransTn接口(第一部分，第二部分是直接请求 支付平台网关。/public/paygw/routingrules/payBatch)，对应APPSERVER
      * @param orderPaySign
      * @return
      */
