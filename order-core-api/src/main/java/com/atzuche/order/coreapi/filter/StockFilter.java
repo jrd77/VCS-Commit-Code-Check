@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.filter;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.enums.OrderCategoryEnum;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
@@ -60,8 +61,18 @@ public class StockFilter implements OrderFilter {
             returnCarAddress.setLon(orderReqVO.getSrvReturnLon()==null?0.0:Double.valueOf(orderReqVO.getSrvReturnLon()));
             returnCarAddress.setCarAddress(orderReqVO.getSrvReturnAddr());
         }
+        String orderCategory = orderReqVO.getOrderCategory();
+        orderInfoDTO.setLongRent(isLongRent(orderCategory));
         orderInfoDTO.setGetCarAddress(getCarAddress);
         orderInfoDTO.setReturnCarAddress(returnCarAddress);
         return orderInfoDTO;
+    }
+
+    public static int isLongRent(String orderCategory){
+        if(OrderCategoryEnum.LONG_ORDER.getCategory().equals(orderCategory)){
+            return 1;
+        }else{
+            return 0;
+        }
     }
 }

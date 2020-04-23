@@ -16,6 +16,7 @@ import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
+import com.atzuche.order.coreapi.filter.StockFilter;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.submit.filter.cost.LongOrderCostFilterChain;
@@ -349,6 +350,7 @@ public class SubmitOrderService {
         }
         orderInfoDTO.setGetCarAddress(getCarAddress);
         orderInfoDTO.setReturnCarAddress(returnCarAddress);
+        orderInfoDTO.setLongRent(StockFilter.isLongRent(orderReqVO.getOrderCategory()));
         return orderInfoDTO;
     }
 
