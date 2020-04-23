@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +139,18 @@ public class PaymentService {
 							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 							violationDepositSettlementPaymentList.add(vo);
 						}else {
-							//中间段的。
+						    //退款线下+虚拟支付
+                            String payKind = cashierEntity.getPayKind();
+                            String paySource = cashierEntity.getPaySource();
+                            if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
+                                /*if(PaySourceEnum){
+
+                                }*/
+                            }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金
+
+                            }
+
+                            //中间段的。
 							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
 							afterDepositSettlementPaymentList.add(vo);
 						}
