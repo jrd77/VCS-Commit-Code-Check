@@ -21,4 +21,7 @@ public class MemAvailableCouponVO {
     private List<DisCouponMemInfoVO> platCouponList;
     @AutoDocProperty(value = "取还车优惠券列表")
     private List<DisCouponMemInfoVO> getCarCouponList;
+
+    @AutoDocProperty(value = "总租期")
+    private String countDays;
 }
