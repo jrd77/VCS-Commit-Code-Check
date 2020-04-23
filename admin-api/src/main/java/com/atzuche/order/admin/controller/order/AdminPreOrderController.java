@@ -114,6 +114,7 @@ public class AdminPreOrderController {
         OwnerMemberDTO ownerMemberDTO = memProxyService.getOwnerMemberInfo(carPriceDetail.getOwnerNo().toString());
         responseVO.setOwnerMemNo(ownerMemberDTO.getMemNo());
         responseVO.setOwnerName(ownerMemberDTO.getRealName());
+        responseVO.setOwnerMobile(ownerMemberDTO.getPhone());
         responseVO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE1));
         responseVO.setRevertTime(DateUtils.formate(revertTime, DateUtils.DATE_DEFAUTE1));
         List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();

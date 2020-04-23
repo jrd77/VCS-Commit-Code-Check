@@ -32,6 +32,8 @@ public class PreOrderAdminResponseVO {
     private String ownerName;
     @AutoDocProperty(value="车主会员号")
     private String ownerMemNo;
+    @AutoDocProperty(value="车主手机号")
+    private String ownerMobile;
     @AutoDocProperty(value = "起租时间,格式yyyy-MM-dd HH:mm:ss")
     private String rentTime;
     @AutoDocProperty(value = "结束时间,格式yyyy-MM-dd HH:mm:ss")
