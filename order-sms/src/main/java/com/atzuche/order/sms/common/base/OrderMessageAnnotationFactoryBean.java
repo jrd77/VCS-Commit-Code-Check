@@ -1,6 +1,8 @@
 package com.atzuche.order.sms.common.base;
 
 import com.atzuche.order.sms.factory.OrderMessageProxyFactory;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @author 胡春林
  * 实现Factorybean  引进代理
  */
+@Data
+@Accessors(chain = true)
 public class OrderMessageAnnotationFactoryBean<T> implements FactoryBean<T>,InitializingBean {
 
     private Class<T> orderRouteKeyMessage = null;

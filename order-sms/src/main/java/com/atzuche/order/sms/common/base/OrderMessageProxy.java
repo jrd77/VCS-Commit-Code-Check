@@ -12,17 +12,17 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
+ * @param <T>
  * @author 胡春林
  * OrderMessage代理类
- * @param <T>
  */
 @Slf4j
-public class OrderMessageProxy<T> implements InvocationHandler,Serializable {
+public class OrderMessageProxy<T> implements InvocationHandler, Serializable {
 
-    private  Class<T> orderRouteKeyMessage;
+    private Class<T> orderRouteKeyMessage;
 
     public OrderMessageProxy(Class<T> iOrderRouteKeyMessage) {
-        this.orderRouteKeyMessage =iOrderRouteKeyMessage;
+        this.orderRouteKeyMessage = iOrderRouteKeyMessage;
     }
 
     @Override
@@ -45,7 +45,6 @@ public class OrderMessageProxy<T> implements InvocationHandler,Serializable {
         }
 
 
-
         return null;
     }
 
@@ -58,6 +57,7 @@ public class OrderMessageProxy<T> implements InvocationHandler,Serializable {
         Class<?> declaringClass = method.getDeclaringClass();
         return (constructor.newInstance(declaringClass, 15)).unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
     }
+
     private boolean isDefaultMethod(Method method) {
         return (method.getModifiers() & 1033) == 1 && method.getDeclaringClass().isInterface();
     }
