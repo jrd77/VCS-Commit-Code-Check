@@ -25,7 +25,5 @@ public interface OrderConsoleCostDetailMapper{
     
     int updateByPrimaryKeySelective(OrderConsoleCostDetailEntity record);
 
-//    List<OrderConsoleCostDetailEntity> selectByOrderNo(@Param("orderNo")String orderNo);
-
     List<OrderConsoleCostDetailEntity> selectByOrderNoAndMemNo(@Param("orderNo")String orderNo,@Param("memNo")String memNo);
 }
