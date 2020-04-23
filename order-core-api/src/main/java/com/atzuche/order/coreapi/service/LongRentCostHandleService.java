@@ -72,7 +72,7 @@ public class LongRentCostHandleService {
 			RenterOrderCostDetailEntity entity = it.next();  
 	        if(RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(entity.getCostCode()) || 
 	        		RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(entity.getCostCode())){  
-	        	renterOrderCostDetailDTOList.remove(entity);  
+	        	it.remove();  
 	        }  
 	     }
 		return renterOrderCostRespDTO;
