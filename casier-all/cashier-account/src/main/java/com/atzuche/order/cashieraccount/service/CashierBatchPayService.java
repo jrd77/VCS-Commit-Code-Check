@@ -233,9 +233,9 @@ public class CashierBatchPayService {
         
         result.setAmtDeposit(amtTotalDeposit);
         result.setAmtWzDeposit(amtTotalWZDeposit);
-        result.setAmtTotal(amtTotal);
+//        result.setAmtTotal(amtTotal);  // amt字段
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtTotal);  //result.getAmt()取值。
+        result.setAmt(amtTotal);  //result.getAmt()取值。 对外appserver
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNos().get(0));  //默认取第一个
         result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());

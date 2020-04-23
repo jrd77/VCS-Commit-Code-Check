@@ -36,8 +36,8 @@ public class OrderPayableAmountResVO {
     /**
      * 总待付款项
      */
-    @AutoDocProperty("总待付款项")
-    private int amtTotal;
+//    @AutoDocProperty("总待付款项")
+//    private int amtTotal;
     /**
      * 已付款项
      */
@@ -169,13 +169,13 @@ public class OrderPayableAmountResVO {
 		this.orderNo = orderNo;
 	}
 
-	public int getAmtTotal() {
-		return amtTotal;
-	}
-
-	public void setAmtTotal(int amtTotal) {
-		this.amtTotal = amtTotal;
-	}
+//	public int getAmtTotal() {
+//		return amtTotal;
+//	}
+//
+//	public void setAmtTotal(int amtTotal) {
+//		this.amtTotal = amtTotal;
+//	}
 
 	public int getAmtPay() {
 		return amtPay;
