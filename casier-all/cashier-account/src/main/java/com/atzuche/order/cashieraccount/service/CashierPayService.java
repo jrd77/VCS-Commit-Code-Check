@@ -479,6 +479,7 @@ public class CashierPayService{
         boolean isWalletDebtRentCost = false;
         if (YesNoEnum.YES.getCode() == orderPayable.getIsUseWallet()) {
             int payBalance = walletProxyService.getWalletByMemNo(orderPaySign.getMenNo());
+            log.info("当前钱包金额payBalance=[{}],params=[{}]",payBalance,GsonUtils.toJson(orderPaySign));
             //判断余额大于0
             if (payBalance > 0) {
                 //5 抵扣钱包落库 （收银台落库、费用落库）
@@ -497,7 +498,8 @@ public class CashierPayService{
                 if (orderPayable.getAmtRent() == 0) {
                     cashierService.saveWalletPaylOrderStatusInfo(orderPaySign.getOrderNo());
                 }
-
+                
+                log.info("当前orderPayable=[{}],params=[{}]",GsonUtils.toJson(orderPayable),GsonUtils.toJson(orderPaySign));
                 //如果待支付 金额等于 0 即 钱包抵扣完成
                 if (orderPayable.getAmt() == 0) {
                     List<String> payKind = orderPaySign.getPayKind();
