@@ -17,14 +17,21 @@ import java.util.Map;
 public class OrderPayRentCostSuccessService implements IOrderRouteKeyMessage<Map> {
 
     @Override
-    @SMS(renterFlag = "SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE",ownerFlag = "PayRentCarDeposit2Owner")
-    @Push(renterFlag = "287",ownerFlag = "10")
-    public OrderMessage sendOrderMessageWithNo(Message message) {
-return null;
+    @SMS(renterFlag = "SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE", ownerFlag = "PayRentCarDeposit2Owner")
+    @Push(renterFlag = "287", ownerFlag = "10")
+    public OrderMessage sendOrderMessageWithNo(OrderMessage orderMessage) {
+        return null;
+    }
+
+
+    @Override
+    public Map hasSMSElseOtherParams(Map map) {
+        return null;
     }
 
     @Override
-    public Map hasElseOtherParams(Map map) {
+    public Map hasPushElseOtherParams(Map map) {
         return null;
     }
+
 }

@@ -17,12 +17,18 @@ public class CancelOrderSuccessService implements IOrderRouteKeyMessage<Map> {
 
     @Override
     @SMS(ownerFlag = "PayRentCarIllegalDepositCancelOwner")
-    public OrderMessage sendOrderMessageWithNo(Message message) {
+    public OrderMessage sendOrderMessageWithNo(OrderMessage orderMessage) {
 return null;
     }
 
     @Override
-    public Map hasElseOtherParams(Map map) {
+    public Map hasSMSElseOtherParams(Map map) {
         return null;
     }
+
+    @Override
+    public Map hasPushElseOtherParams(Map map) {
+        return null;
+    }
+
 }

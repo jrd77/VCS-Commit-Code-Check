@@ -2,6 +2,7 @@ package com.atzuche.order.sms.service;
 
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.sms.common.annatation.OrderService;
+import com.atzuche.order.sms.common.annatation.Push;
 import com.atzuche.order.sms.common.annatation.SMS;
 import com.atzuche.order.sms.interfaces.IOrderRouteKeyMessage;
 import org.springframework.amqp.core.Message;
@@ -17,13 +18,18 @@ public class CreateOrderSuccessService implements IOrderRouteKeyMessage<Map> {
 
     @Override
     @SMS(renterFlag = "NotifyRenterTransReqAcceptedPackage")
-    public OrderMessage sendOrderMessageWithNo(Message message) {
+    @Push
+    public OrderMessage sendOrderMessageWithNo(OrderMessage orderMessage) {
+        return orderMessage;
+    }
 
+    @Override
+    public Map hasSMSElseOtherParams(Map map) {
         return null;
     }
 
     @Override
-    public Map hasElseOtherParams(Map paramsMap) {
+    public Map hasPushElseOtherParams(Map map) {
         return null;
     }
 }

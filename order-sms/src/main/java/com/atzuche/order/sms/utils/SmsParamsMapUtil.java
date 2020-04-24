@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -40,5 +41,30 @@ public class SmsParamsMapUtil {
             map.putAll(paramsMap);
         }
         return map;
+    }
+
+    /**
+     * 单个对象的某个键的值
+     * @return Object 键在对象中所对应得值 没有查到时返回空字符串
+     */
+    public static Object getValueByKey(Object obj, String key) {
+        Class userCla = (Class) obj.getClass();
+        Field[] fs = userCla.getDeclaredFields();
+        for (int i = 0; i < fs.length; i++) {
+            Field f = fs[i];
+            f.setAccessible(true);
+            try {
+                if (f.getName().endsWith(key)) {
+                    System.out.println("单个对象的某个键的值==反射==" + f.get(obj));
+                    return f.get(obj);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        // 没有查到时返回空字符串
+        return "";
     }
 }

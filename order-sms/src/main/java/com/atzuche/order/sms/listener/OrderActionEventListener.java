@@ -81,40 +81,37 @@ public class OrderActionEventListener extends OrderSendMessageManager {
             log.info("该事件没有对应的短信服务,routeKeyName:[{}]",routeKeyName);
             return orderMessage;
         }
-         orderMessage = orderRouteKeyMessage.sendOrderMessageWithNo(message);
+         orderMessage = orderRouteKeyMessage.sendOrderMessageWithNo(orderMessage);
+        if (NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS.routingKey.equals(routeKeyName)) {
+            orderMessage = handlerOrderPayRentCostSuccessMq(orderMessage);
+        }
         return orderMessage;
     }
 
     /**
-     * 处理支付租车费用事件（凹凸自营）
-     * @param message
+     * 处理支付租车费用事件（凹凸自营 await）
      */
-    public OrderMessage handlerOrderPayRentCostSuccessMq(Message message) {
-        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
-        log.info("新订单动作总事件监听,入参orderMessage:[{}]", orderMessage.toString());
-        String routeKeyName = message.getMessageProperties().getReceivedRoutingKey();
-        if (!NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS.routingKey.equals(routeKeyName)) {
+    public OrderMessage handlerOrderPayRentCostSuccessMq(OrderMessage orderMessage) {
+        log.info("----开始处理支付租车费用事件-----");
+
+        JSONObject jsonObject = (JSONObject)orderMessage.getMessage();
+        if(Objects.isNull(jsonObject) || !jsonObject.containsKey("type"))
+        {
             return orderMessage;
         }
-        OrderMessage<OrderRenterPaySuccessMq> orderRenterPayMessage = JSON.parseObject(new String(message.getBody()), new TypeReference<OrderMessage<OrderRenterPaySuccessMq>>(){});
-        log.info("----开始处理支付租车费用事件-----");
-        if (1 == orderRenterPayMessage.getMessage().getType().intValue()) {
-            String renterRealName = getRenterRealName(orderRenterPayMessage.getMessage().getOrderNo());
+        if (1 == Integer.valueOf(jsonObject.get("type").toString())) {
+            String renterRealName = getRenterRealName(jsonObject.get("orderNo").toString());
             Map paramsMap = Maps.newHashMap();
             if (StringUtils.isNotEmpty(renterRealName)) {
                 paramsMap.put("renterRealName", renterRealName);
             }
-            if (CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(orderRenterPayMessage.getMessage().getOrderNo()))) {
-                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), ShortMessageTypeEnum.SELF_SUPPORT_RENT_DEPOSIT_PAID_NOTICE.getValue(), ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), paramsMap);
+            if (!CarOwnerTypeEnum.isAuToByCode(getCarOwnerType(jsonObject.get("orderNo").toString()))) {
+                Map smsMap = SmsParamsMapUtil.getParamsMap(jsonObject.get("orderNo").toString(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), paramsMap);
                 orderMessage.setMap(smsMap);
-                Map map = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), PushMessageTypeEnum.RENTER_PAY_CAR_SUCCESS.getValue(), PushMessageTypeEnum.RENTER_PAY_CAR_2_OWNER.getValue(), null);
-                orderMessage.setPushMap(map);
-            } else {
-                Map smsMap = SmsParamsMapUtil.getParamsMap(orderRenterPayMessage.getMessage().getOrderNo(), null, ShortMessageTypeEnum.PAY_RENT_CAR_DEPOSIT_2_OWNER.getValue(), paramsMap);
-                orderMessage.setMap(smsMap);
+                orderMessage.setPushMap(null);
             }
         }
-        log.info("----处理支付租车费用事件完成 发送参数：[{}]", JSONObject.toJSONString(orderRenterPayMessage));
+        log.info("----处理支付租车费用事件完成 发送参数：[{}]", JSONObject.toJSONString(orderMessage));
         return orderMessage;
     }
 
