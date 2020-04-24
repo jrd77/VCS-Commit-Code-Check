@@ -340,10 +340,6 @@ public class OrderSettleService{
     	
     	int depositShituiOri = 0;
     	int depositShikouOri = 0;
-            	
-        //钱包退款目前不在退款申请表中，单独查询。200423  查询的是租车费用表。
-        int walletRefundAmt = accountRenterCostDetailNoTService.getRentCostRefundByWallet(orderNo, renterNo);
-        feeShituiOri += Math.abs(walletRefundAmt);
         
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
@@ -394,6 +390,13 @@ public class OrderSettleService{
             //实扣
             //只有结算后才有退款记录
             if(SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus()) {  //已结算
+            	
+                //钱包退款目前不在退款申请表中，单独查询。200423  查询的是租车费用表。
+                int walletRefundAmt = accountRenterCostDetailNoTService.getRentCostRefundByWallet(orderNo, renterNo);
+                log.info("1.getRentCostRefundByWallet params orderNo=[{}],renterNo=[{}],walletRefundAmt=[{}]",orderNo,renterNo,walletRefundAmt);
+                feeShituiOri += Math.abs(walletRefundAmt);
+                log.info("2.getRentCostRefundByWallet params orderNo=[{}],renterNo=[{}],walletRefundAmt=[{}],feeShituiOri=[{}]",orderNo,renterNo,walletRefundAmt,feeShituiOri);
+                
 	            if(feeShishou > 0 && feeShituiOri >= 0) {  //只有消费的情况。   feeShituiOri等于0代表的是没有退款记录，实扣
 	            	//全退的情况
 	            	if(feeShishou >= feeShituiOri) {
