@@ -55,7 +55,7 @@ public class CashierUtils {
                 .stream()
                 .filter(x -> renterCashCodeEnum.getCashNo().equals(x.getSourceCode()))
                 .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
-                .filter(x -> endTime == null ? true : x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .filter(x -> endTime == null ? true : (x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime)))
                 .findFirst();
         if(first.isPresent()){
             return first.get();
