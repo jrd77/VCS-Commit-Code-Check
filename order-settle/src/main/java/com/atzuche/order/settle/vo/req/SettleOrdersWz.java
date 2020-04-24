@@ -59,6 +59,17 @@ public class SettleOrdersWz {
 	 * 违章押金是否虚拟支付
 	 */
 	private Boolean wzCostVirtualFlag;
+
+
+    /**
+     * 是否企业级用户订单
+     */
+	private Boolean isEnterpriseUserOrder;
+
+    /**
+     * 应该收取的违章费用(违章费用 + 未支付补付记录金额 - 无需支付的补付金额)
+     */
+	private int shouldTakeWzCost;
 	
 	
 	public String getOwnerOrderNo() {
@@ -149,4 +160,19 @@ public class SettleOrdersWz {
 		this.wzCostVirtualFlag = wzCostVirtualFlag;
 	}
 
+    public Boolean getEnterpriseUserOrder() {
+        return isEnterpriseUserOrder;
+    }
+
+    public void setEnterpriseUserOrder(Boolean enterpriseUserOrder) {
+        isEnterpriseUserOrder = enterpriseUserOrder;
+    }
+
+    public int getShouldTakeWzCost() {
+        return shouldTakeWzCost;
+    }
+
+    public void setShouldTakeWzCost(int shouldTakeWzCost) {
+        this.shouldTakeWzCost = shouldTakeWzCost;
+    }
 }

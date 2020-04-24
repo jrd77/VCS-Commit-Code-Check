@@ -47,7 +47,7 @@ public class PayCallbackService implements OrderPayCallBack {
      */
     @Override
     public void callBack(String menNo,String orderNo,String renterOrderNo,Integer isPayAgain,YesNoEnum isGetCar){
-        log.info("PayCallbackService callBack start param [{}] [{}] [{}]  [{}] [{}]",menNo,orderNo,renterOrderNo,isPayAgain,isGetCar);
+        log.info("PayCallbackService callBack start param menNo=[{}],orderNo=[{}],renterOrderNo=[{}],isPayAgain=[{}],isGetCar=[{}]",menNo,orderNo,renterOrderNo,isPayAgain,isGetCar);
         //APP修改订单补付
         if(YesNoEnum.YES.getCode().equals(isPayAgain) && !StringUtil.isBlank(renterOrderNo)){
             // 修改订单补付成功后回调
@@ -57,7 +57,7 @@ public class PayCallbackService implements OrderPayCallBack {
         //发送MQ-仁云
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
         if(YesNoEnum.YES.equals(isGetCar)){
-            log.info("PayCallbackService sendOrderStatusByOrderNo");
+            log.info("PayCallbackService sendOrderStatusByOrderNo to_get_car orderStatus,orderNo=[{}]",orderNo);
             orderStatusMqService.sendOrderStatusByOrderNo(orderNo,OrderStatusEnum.TO_GET_CAR.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREGETCAR);
         }
         log.info("PayCallbackService sendDataMessageToRenYun param [{}]", GsonUtils.toJson(entity));

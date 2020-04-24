@@ -3,6 +3,7 @@ package com.atzuche.order.accountrenterwzdepost.service.notservice;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -111,7 +112,10 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
         //消费方式
-        if(accountRenterDepositEntity.getIsAuthorize() != null && accountRenterDepositEntity.getIsAuthorize() == 0 && payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit()<0){
+        if(accountRenterDepositEntity.getIsAuthorize() != null
+                && accountRenterDepositEntity.getIsAuthorize() == OrderConstant.ZERO
+                && accountRenterDepositEntity.getShishouDeposit() != OrderConstant.ZERO
+                && payedOrderRenterWZDepositDetail.getAmt() + accountRenterDepositEntity.getShishouDeposit() < OrderConstant.ZERO ){
             //可用 剩余押金 不足
             throw new PayOrderRenterWZDepositException();
         }
@@ -123,7 +127,7 @@ public class AccountRenterWzDepositNoTService {
         accountRenterDeposit.setRealReturnDeposit(accountRenterDepositEntity.getRealReturnDeposit());
 
         //实退，是在退款的环节来考虑的。
-        if(Objects.nonNull(accountRenterDeposit.getRealReturnDeposit()) || accountRenterDeposit.getRealReturnDeposit()>Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
+        if(accountRenterDeposit.getRealReturnDeposit() > Math.abs(payedOrderRenterWZDepositDetail.getAmt())){
             accountRenterDeposit.setShouldReturnDeposit(accountRenterDeposit.getRealReturnDeposit() + payedOrderRenterWZDepositDetail.getAmt());
         }
         int result =  accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDeposit);
@@ -202,5 +206,22 @@ public class AccountRenterWzDepositNoTService {
             throw new PayOrderRenterWZDepositException();
         }
     }
-	
+
+
+    public int updateShishouDepositSettle(String memNo, String orderNo, int shishouDeposit) {
+        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo, memNo);
+        if (Objects.isNull(accountRenterDepositEntity)) {
+            throw new PayOrderRenterWZDepositException();
+        }
+
+        AccountRenterWzDepositEntity entity = new AccountRenterWzDepositEntity();
+        entity.setId(accountRenterDepositEntity.getId());
+        entity.setVersion(accountRenterDepositEntity.getVersion());
+        entity.setShishouDeposit(shishouDeposit);
+        int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(entity);
+        if (result == 0) {
+            throw new PayOrderRenterWZDepositException();
+        }
+        return result;
+    }
 }

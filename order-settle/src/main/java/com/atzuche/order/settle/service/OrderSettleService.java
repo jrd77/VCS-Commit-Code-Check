@@ -17,6 +17,7 @@ import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
@@ -25,7 +26,6 @@ import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -81,6 +81,8 @@ public class OrderSettleService{
     private AccountRenterWzDepositCostNoTService accountRenterWzDepositCostNoTService;
     @Autowired
     private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
+    @Autowired
+    private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     
     /**
      * 查询所以费用
@@ -196,7 +198,10 @@ public class OrderSettleService{
         	depositYingtuiOri = depositShishouOri - depositYingkouOri;
         } else {  
         	//应扣大于实收,应扣小于等于实收
-        	depositYingkouOri = depositShishouOri;
+        	//处理预授权的情况。200420
+        	if(accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
+        		depositYingkouOri = depositShishouOri;
+        	}
         }
         log.info("depositShishouOri=[{}],depositYingshouOri=[{}],depositShishouAuthOri=[{}],depositYingkouOri=[{}],depositYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",depositShishouOri,depositYingshouOri,depositShishouAuthOri,depositYingkouOri,depositYingtuiOri,orderNo,renterNo);
 
@@ -257,7 +262,10 @@ public class OrderSettleService{
         	wzYingtuiOri = wzShishouOri - wzYingkouOri;
         } else {
         	//应扣大于实收,应扣小于等于实收
-        	wzYingkouOri = wzShishouOri;
+        	//处理预授权的情况。200420
+        	if(accountRenterWZDeposit.getIsAuthorize().intValue() != 0) {
+        		wzYingkouOri = wzShishouOri;
+        	}
         }
         log.info("wzShishouOri=[{}],wzYingshouOri=[{}],wzShishouAuthOri=[{}],wzYingkouOri=[{}],wzYingtuiOri=[{}],orderNo=[{}],memNo=[{}]",wzShishouOri,wzYingshouOri,wzShishouAuthOri,wzYingkouOri,wzYingtuiOri,orderNo,renterNo);
         
@@ -324,6 +332,15 @@ public class OrderSettleService{
 //        }
             
         //===================================== 退款部分 yingtui shitui  =====================================
+    	int feeShituiOri = 0;
+    	int feeShikouOri = 0;
+    	
+    	int wzShituiOri = 0;
+    	int wzShikouOri = 0;
+    	
+    	int depositShituiOri = 0;
+    	int depositShikouOri = 0;
+        
         List<CashierRefundApplyEntity> cashierRefundApplys = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         if(!CollectionUtils.isEmpty(cashierRefundApplys)){
            // 获取实退 租车费用
@@ -331,16 +348,6 @@ public class OrderSettleService{
 //                return DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind());
 //            }).mapToInt(CashierRefundApplyEntity::getAmt).sum();
             
-        	
-        	int feeShituiOri = 0;
-        	int feeShikouOri = 0;
-        	
-        	int wzShituiOri = 0;
-        	int wzShikouOri = 0;
-        	
-        	int depositShituiOri = 0;
-        	int depositShikouOri = 0;
-        	
             for (CashierRefundApplyEntity obj : cashierRefundApplys) {
             	//一级分类
             	if(DataPayKindConstant.RENT_AMOUNT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_INCREMENT.equals(obj.getPayKind()) || DataPayKindConstant.RENT_AMOUNT_AFTER.equals(obj.getPayKind())) {
@@ -383,6 +390,13 @@ public class OrderSettleService{
             //实扣
             //只有结算后才有退款记录
             if(SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus()) {  //已结算
+            	
+                //钱包退款目前不在退款申请表中，单独查询。200423  查询的是租车费用表。
+                int walletRefundAmt = accountRenterCostDetailNoTService.getRentCostRefundByWallet(orderNo, renterNo);
+                log.info("1.getRentCostRefundByWallet params orderNo=[{}],renterNo=[{}],walletRefundAmt=[{}]",orderNo,renterNo,walletRefundAmt);
+                feeShituiOri += Math.abs(walletRefundAmt);
+                log.info("2.getRentCostRefundByWallet params orderNo=[{}],renterNo=[{}],walletRefundAmt=[{}],feeShituiOri=[{}]",orderNo,renterNo,walletRefundAmt,feeShituiOri);
+                
 	            if(feeShishou > 0 && feeShituiOri >= 0) {  //只有消费的情况。   feeShituiOri等于0代表的是没有退款记录，实扣
 	            	//全退的情况
 	            	if(feeShishou >= feeShituiOri) {

@@ -326,7 +326,7 @@ public class RenterCostFacadeService {
         baseCostDTO.distributionCost = abs(RenterOrderCostDetailUtils.getDistributionCost(renterOrderCostDetailEntityList));
         baseCostDTO.penaltyBreachContract = renterFineVO.getTotalFine();
         baseCostDTO.extraMileageFee = abs(extraMileageFee);
-        baseCostDTO.oilFee = abs(oilFee);
+        baseCostDTO.oilFee = -oilFee;
         baseCostDTO.payToPlatFormFee = abs(renterSubsidyDetail.getRenter2PlatformAmt());
         baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         rentCarCostDTO.baseCostDTO = baseCostDTO;

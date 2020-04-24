@@ -2,6 +2,8 @@ package com.atzuche.order.accountrenterwzdepost.service;
 
 import java.util.Objects;
 
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
+import com.atzuche.order.commons.constant.OrderConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +13,6 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDeta
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.DetainRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -149,7 +145,7 @@ public class AccountRenterWzDepositService{
         accountRenterWzDepositDetailNoTService.insertRenterDepositDetailEntity(accountRenterDepositDetailEntity);
     }
 
-	
+
 	/**
      * 账户违章押金转出
      * @param detainRenterDepositReqVO
@@ -157,14 +153,14 @@ public class AccountRenterWzDepositService{
     public int detainRenterWzDeposit(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
         //1 参数校验
         Assert.notNull(detainRenterDepositReqVO, ErrorCode.PARAMETER_ERROR.getText());
-        detainRenterDepositReqVO.check();  
+        detainRenterDepositReqVO.check();
         //2更新违章押金  剩余押金 金额
         accountRenterWzDepositNoTService.updateRenterWzDepositChange(detainRenterDepositReqVO);
         //添加违章押金资金进出明细
         int id = accountRenterWzDepositDetailNoTService.insertRenterDepositDetail(detainRenterDepositReqVO);
         return id;
     }
-    
+
 	public void updateOrderDepositSettle(DetainRenterWZDepositReqVO detainRenterDepositReqVO) {
 		accountRenterWzDepositNoTService.updateOrderDepositSettle(detainRenterDepositReqVO.getMemNo(),detainRenterDepositReqVO.getOrderNo());
 	}
@@ -173,6 +169,4 @@ public class AccountRenterWzDepositService{
 	}
 
 
-    
-    
 }

@@ -65,6 +65,7 @@ Temporary Items
 # .idea/modules
 # *.iml
 # *.ipr
+order-center.iml
 
 # CMake
 cmake-build-*/
