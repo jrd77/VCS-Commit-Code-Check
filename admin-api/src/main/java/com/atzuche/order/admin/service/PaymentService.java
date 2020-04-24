@@ -143,7 +143,13 @@ public class PaymentService {
         List<AccountVirtualPayDetailEntity> accountVirtualPayDetailEntityList = accountVirtualPayService.queryVirtualPayByOrderNo(orderNo);
         List<CashierRefundApplyEntity> refundApplyList = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
         for (CashierResVO cashierEntity : lst) {
+            String payKind = cashierEntity.getPayKind();
+            String paySource = cashierEntity.getPaySource();
             String payTime = cashierEntity.getPayTime();
+            if(DataPayKindConstant.RENT_AMOUNT.equals(payKind) && PaySourceEnum.WALLET_PAY.getCode().equals(paySource)){
+                payTime = LocalDateTimeUtils.formatDateTime(cashierEntity.getCreateTime(),"yyyyMMddHHmmss") ;
+            }
+
             if(StringUtils.isBlank(payTime)) {
                 LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
                 PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
@@ -170,8 +176,7 @@ public class PaymentService {
                         afterDepositSettlementPaymentList.add(vo);
                     }
                     //退款（线下+虚拟支付+真实支付）
-                    String payKind = cashierEntity.getPayKind();
-                    String paySource = cashierEntity.getPaySource();
+
                     if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
                             OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT, null, wzSettleTime);

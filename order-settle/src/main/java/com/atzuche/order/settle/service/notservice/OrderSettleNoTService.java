@@ -1292,7 +1292,8 @@ public class OrderSettleNoTService {
             accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
             accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT);
             accountRenterCostDetail.setAmt(-settleCancelOrdersAccount.getRentSurplusWalletAmt());
-            accountRenterCostDetail.setPayType(PayTypeEnum.PAY_PUR.getCode());
+            accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getCode());
+            accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getText());
             cashierService.refundRentCostWallet(accountRenterCostDetail);
         }
         //3 租车费用 退还

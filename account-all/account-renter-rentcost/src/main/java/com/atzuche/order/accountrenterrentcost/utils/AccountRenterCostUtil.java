@@ -25,10 +25,10 @@ public class AccountRenterCostUtil {
         Optional<AccountRenterCostDetailEntity> first = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> paySourceEnum.getCode().equals(x.getPaySource()))
-                .filter(x -> payTypeEnum.getCode().equals(x.getPayType()))
+                .filter(x -> paySourceEnum.getCode().equals(x.getPaySourceCode()))
+                .filter(x -> payTypeEnum.getCode().equals(x.getPayTypeCode()))
                 .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
-                .filter(x -> endTime == null ? true : x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .filter(x -> endTime == null ? true : (x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime)))
                 .findFirst();
         if(first.isPresent()){
             return first.get();

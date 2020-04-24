@@ -668,7 +668,7 @@ public class OrderSettleService{
      **/
     @Transactional(rollbackFor=Exception.class)
     public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
-        log.info("订单取消结算cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
+        log.info("订单取消结算-START-cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         String orderNo = cancelOrderReqDTO.getOrderNo();
         String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();
         String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
@@ -695,6 +695,7 @@ public class OrderSettleService{
         }else{
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
         }
+        log.info("订单取消结算-END-cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
     }
 
 }
