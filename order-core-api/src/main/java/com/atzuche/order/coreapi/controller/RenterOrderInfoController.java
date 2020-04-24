@@ -1,13 +1,21 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.CashierDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author 胡春林
@@ -30,6 +40,10 @@ public class RenterOrderInfoController {
     RenterMemberService renterMemberService;
     @Autowired
     RenterOrderService renterOrderService;
+    @Autowired
+    OrderStatusService orderStatusService;
+    @Resource
+    CashierMapper cashierMapper;
 
     /**
      * 获取租客商品信息
@@ -73,5 +87,41 @@ public class RenterOrderInfoController {
         RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
         BeanUtils.copyProperties(renterOrderEntity, renterOrderDTO);
         return ResponseData.success(renterOrderDTO);
+    }
+
+    /**
+     * 获取订单状态
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/getByOrderNo")
+    public ResponseData<OrderStatusDTO> getByOrderNo(@RequestParam("orderNo") String orderNo) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if (orderStatusEntity == null) {
+            throw new OrderNotFoundException(orderNo);
+        }
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        BeanUtils.copyProperties(orderStatusEntity, orderStatusDTO);
+        return ResponseData.success(orderStatusDTO);
+    }
+
+
+    /**
+     * 获取收银表数据
+     * @param orderNo
+     * @param memNo
+     * @param amount
+     * @param payPur
+     * @return
+     */
+    @GetMapping("/getCashier")
+    public ResponseData<CashierDTO> getCashier(@RequestParam("orderNo") String orderNo, @RequestParam("memNo") String memNo, @RequestParam("amount") String amount, @RequestParam("payPur") String payPur) {
+        CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo, memNo, amount, payPur);
+        if (cashierEntity == null) {
+            throw new OrderNotFoundException(orderNo);
+        }
+        CashierDTO cashierDTO = new CashierDTO();
+        BeanUtils.copyProperties(cashierEntity, cashierDTO);
+        return ResponseData.success(cashierDTO);
     }
 }
