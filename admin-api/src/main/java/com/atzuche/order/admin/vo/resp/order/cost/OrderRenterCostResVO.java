@@ -77,7 +77,10 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="优惠抵扣")
 	private String deductionAmount;
 	//--------------------------------------------
-	
+	@AutoDocProperty(value="长租租金折扣文案")
+	private String longDiscountDesc;
+	@AutoDocProperty(value="长租租金折扣抵扣金额")
+	private String longRentDeductAmt;
 	@AutoDocProperty(value="车主券")  ///
 	private String ownerCouponTitle; 
 	

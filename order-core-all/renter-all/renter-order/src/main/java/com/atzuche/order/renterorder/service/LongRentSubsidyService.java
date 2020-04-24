@@ -99,7 +99,7 @@ public class LongRentSubsidyService {
 		if (getRealAmt == null || getRealAmt == 0) {
 			return null;
 		}
-		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, -getRealAmt, SubsidyTypeCodeEnum.GET_CAR,
+		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, Math.abs(getRealAmt), SubsidyTypeCodeEnum.GET_CAR,
                 SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.SRV_GET_COST, "长租订单取车费用补贴");
 	}
 	
@@ -122,7 +122,7 @@ public class LongRentSubsidyService {
 		if (returnRealAmt == null || returnRealAmt == 0) {
 			return null;
 		}
-		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, -returnRealAmt, SubsidyTypeCodeEnum.RETURN_CAR,
+		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, Math.abs(returnRealAmt), SubsidyTypeCodeEnum.RETURN_CAR,
                 SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.SRV_RETURN_COST, "长租订单还车费用补贴");
 	}
 	
@@ -145,7 +145,7 @@ public class LongRentSubsidyService {
 		if (getOverAmt == null || getOverAmt == 0) {
 			return null;
 		}
-		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, -getOverAmt, SubsidyTypeCodeEnum.GET_CAR,
+		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, Math.abs(getOverAmt), SubsidyTypeCodeEnum.GET_CAR,
                 SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT, "长租订单取车超运能费用补贴");
 	} 
 	
@@ -168,7 +168,7 @@ public class LongRentSubsidyService {
 		if (returnOverAmt == null || returnOverAmt == 0) {
 			return null;
 		}
-		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, -returnOverAmt, SubsidyTypeCodeEnum.RETURN_CAR,
+		return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, Math.abs(returnOverAmt), SubsidyTypeCodeEnum.RETURN_CAR,
                 SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT, "长租订单还车超运能费用补贴");
 	} 
 	

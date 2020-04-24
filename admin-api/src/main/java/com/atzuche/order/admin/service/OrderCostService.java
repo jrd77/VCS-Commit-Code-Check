@@ -32,7 +32,9 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
@@ -79,6 +81,8 @@ public class OrderCostService {
     private AdminDeliveryCarService deliveryCarInfoService;
 	@Autowired
 	private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+	@Autowired
+	private OwnerCouponLongService ownerCouponLongService;
 	
 	/**
 	 * 
@@ -480,6 +484,8 @@ public class OrderCostService {
 		String aotuCoinCashNo =  RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo();
 		//送取服务券
 		String getReturnCouponCashNo = RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo();
+		// 长租租金折扣抵扣
+		String longRentDeductNo = RenterCashCodeEnum.RENT_AMT.getCashNo();
 		
 		
 		
@@ -488,6 +494,7 @@ public class OrderCostService {
 		int ownerCoupon = 0;
 		int aotuCoin = 0;
 		int getReturnCoupon = 0;
+		int longRentDeductAmt = 0;
 				
 		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
 			//12120010  12120051  12120012
@@ -499,12 +506,16 @@ public class OrderCostService {
 				aotuCoin +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}else if(getReturnCouponCashNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
 				getReturnCoupon +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
+			}else if(longRentDeductNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
+				longRentDeductAmt +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}
 		}
-		int deductionAmount = platformCoupon + ownerCoupon + aotuCoin + walletAmt + getReturnCoupon;
+		int deductionAmount = platformCoupon + ownerCoupon + aotuCoin + walletAmt + getReturnCoupon + longRentDeductAmt;
 		
 		/*负数表示*/
 		realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));
+		// 长租租金折扣
+		realVo.setLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(longRentDeductAmt)));
 		//车主券
 		realVo.setOwnerCouponAmt(String.valueOf(NumberUtils.convertNumberToFushu(ownerCoupon)));
 		//平台券
@@ -524,6 +535,10 @@ public class OrderCostService {
 		/*
 		 * 获取标题
 		 */
+		OwnerCouponLongEntity longCouponEnt = ownerCouponLongService.getByRenterOrderNo(entity.getRenterOrderNo());
+		if (longCouponEnt != null) {
+			realVo.setLongDiscountDesc(longCouponEnt.getDiscountDesc());
+		}
 		String platformCouponTitle = "";
 		String ownerCouponTitle = "";
 		String getReturnCouponTitle = ""; 
