@@ -63,7 +63,7 @@ public class OrderIllegalDepositAmtFilter implements OrderCostFilter {
 
         int realIllegalDepositAmt =
                 renterMemberRightService.wzDepositAmt(violationDepositAmtReqDTO.getRenterMemberRightDTOList(),
-                        illegalDepositAmt);
+                        illegalDepositAmt, violationDepositAmtReqDTO.getOrderCategory());
         log.info("订单费用计算-->违章押金.realIllegalDepositAmt:[{}]", realIllegalDepositAmt);
 
         RenterOrderIllegalResVO renterOrderIllegalResVO = new RenterOrderIllegalResVO();

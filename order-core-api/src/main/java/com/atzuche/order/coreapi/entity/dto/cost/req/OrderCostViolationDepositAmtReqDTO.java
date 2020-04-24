@@ -16,6 +16,10 @@ import java.util.List;
 public class OrderCostViolationDepositAmtReqDTO {
 
     /**
+     * 订单类型
+     */
+    private String orderCategory;
+    /**
      * 城市code
      */
     private Integer cityCode;

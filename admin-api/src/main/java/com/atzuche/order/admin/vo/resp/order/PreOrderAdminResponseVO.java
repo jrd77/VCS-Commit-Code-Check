@@ -5,7 +5,6 @@ import com.atzuche.order.commons.vo.res.order.DisCouponMemInfoVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +45,9 @@ public class PreOrderAdminResponseVO {
     private int totalWallet;
     @AutoDocProperty(value="凹凸币总额")
     private int totalAutoCoin;
+    @AutoDocProperty(value="是否禁用全面保障服务：1-是，0-否")
+    private Integer noAbatementFlag;
+
     @AutoDocProperty(value="特价车天单价")
     private List<CarDayPrice> carSpecialDayPrices = new ArrayList<>();
     @AutoDocProperty(value = "车主券列表")

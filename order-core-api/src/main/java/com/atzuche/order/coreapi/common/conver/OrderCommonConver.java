@@ -112,6 +112,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
         renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
+        renterOrderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         logger.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;
@@ -859,6 +860,7 @@ public class OrderCommonConver {
         violationDepositAmtReqDTO.setFreeDoubleTypeId(StringUtils.isBlank(context.getOrderReqVO().getFreeDoubleTypeId()) ? null : Integer.valueOf(context.getOrderReqVO().getFreeDoubleTypeId()));
         violationDepositAmtReqDTO.setCarPlateNum(context.getRenterGoodsDetailDto().getCarPlateNum());
         violationDepositAmtReqDTO.setRenterMemberRightDTOList(context.getRenterMemberDto().getRenterMemberRightDTOList());
+        violationDepositAmtReqDTO.setOrderCategory(context.getOrderReqVO().getOrderCategory());
         logger.info("Init OrderCostViolationDepositAmtReqDTO.result is,violationDepositAmtReqDTO:[{}]", JSON.toJSONString(violationDepositAmtReqDTO));
         return violationDepositAmtReqDTO;
     }

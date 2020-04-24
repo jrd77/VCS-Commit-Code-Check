@@ -1,20 +1,19 @@
 package com.atzuche.order.accountrenterdeposit.service.notservice;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
-import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.exception.PayOrderRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqVO;
-import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * 租车押金状态及其总表
@@ -133,5 +132,23 @@ public class AccountRenterDepositNoTService {
     public AccountRenterDepositEntity queryDeposit(String orderNo) {
         AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderNo(orderNo);
         return accountRenterDepositEntity;
+    }
+
+    
+	public int updateShishouDepositSettle(String memNo, String orderNo, int shishouDeposit) {
+        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositMapper.selectByOrderAndMemNo(orderNo, memNo);
+        if (Objects.isNull(accountRenterDepositEntity)) {
+            throw new PayOrderRenterDepositDBException();
+        }
+
+        AccountRenterDepositEntity entity = new AccountRenterDepositEntity();
+        entity.setId(accountRenterDepositEntity.getId());
+        entity.setVersion(accountRenterDepositEntity.getVersion());
+        entity.setShifuDepositAmt(shishouDeposit);
+        int result = accountRenterDepositMapper.updateByPrimaryKeySelective(entity);
+        if (result == 0) {
+            throw new PayOrderRenterDepositDBException();
+        }
+        return result;
     }
 }

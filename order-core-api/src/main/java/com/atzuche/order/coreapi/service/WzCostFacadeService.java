@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
+import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
@@ -66,11 +67,24 @@ public class WzCostFacadeService {
         if(accountRenterWzDepositEntity.getSettleTime()!=null){
             wzDepositDetailVO.setSettleTime(LocalDateTimeUtils.localDateTimeToDate(accountRenterWzDepositEntity.getSettleTime()));
         }
-
-
-        if(accountRenterWzDepositEntity.getIsAuthorize()!=null&&accountRenterWzDepositEntity.getIsAuthorize()!=0){
-            wzDepositDetailVO.setShishouDeposit(accountRenterWzDepositEntity.getCreditPayAmt()+accountRenterWzDepositEntity.getShishouDeposit());
+        Integer wzIsAuthorize = accountRenterWzDepositEntity.getIsAuthorize();
+        int expReturnWzDeposit = 0;
+        if(wzIsAuthorize == null){
+            expReturnWzDeposit = accountRenterWzDepositEntity.getShishouDeposit()==null?0:accountRenterWzDepositEntity.getShishouDeposit();
+        }else if(AuthorizeEnum.IS.getCode() == wzIsAuthorize){
+            expReturnWzDeposit =  accountRenterWzDepositEntity.getAuthorizeDepositAmt() == null?0: accountRenterWzDepositEntity.getAuthorizeDepositAmt();
+        }else if(AuthorizeEnum.NOT.getCode() == wzIsAuthorize){
+            expReturnWzDeposit =  accountRenterWzDepositEntity.getShishouDeposit()==null?0: accountRenterWzDepositEntity.getShishouDeposit();
+        }else if(AuthorizeEnum.CREDIT.getCode() == wzIsAuthorize){
+            int authorizeDepositAmt = accountRenterWzDepositEntity.getAuthorizeDepositAmt() == null ? 0 : accountRenterWzDepositEntity.getAuthorizeDepositAmt();
+            expReturnWzDeposit =  accountRenterWzDepositEntity.getCreditPayAmt()==null?0+authorizeDepositAmt: accountRenterWzDepositEntity.getCreditPayAmt()+authorizeDepositAmt;
+        }else{
+            expReturnWzDeposit =  accountRenterWzDepositEntity.getShishouDeposit()==null?0: accountRenterWzDepositEntity.getShishouDeposit();
         }
+        wzDepositDetailVO.setShishouDeposit(expReturnWzDeposit);
+        /*if(accountRenterWzDepositEntity.getIsAuthorize()!=null&&accountRenterWzDepositEntity.getIsAuthorize()!=0){
+            wzDepositDetailVO.setShishouDeposit(accountRenterWzDepositEntity.getCreditPayAmt()+accountRenterWzDepositEntity.getShishouDeposit());
+        }*/
 
         wzDepositDetailVO.setShouldReturnDeposit(wzDepositDetailVO.getShishouDeposit());
 

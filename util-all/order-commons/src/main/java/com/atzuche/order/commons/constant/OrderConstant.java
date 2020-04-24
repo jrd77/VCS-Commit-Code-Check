@@ -44,6 +44,12 @@ public class OrderConstant {
      * 0.0
      */
     public static final double D_ZERO = 0.0;
+    /**
+     * -999999
+     */
+    public static final int SPECIAL_MARK = -999999;
+
+
 
     /**
      * 1.0

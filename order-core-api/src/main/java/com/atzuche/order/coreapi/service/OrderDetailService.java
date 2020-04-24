@@ -37,7 +37,7 @@ import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
-import com.atzuche.order.coreapi.modifyorder.exception.NoEffectiveErrException;
+import com.atzuche.order.commons.exceptions.NoEffectiveErrException;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -1684,7 +1684,6 @@ public class OrderDetailService {
         AtomicInteger count = new AtomicInteger();
         Optional.ofNullable(orderEntityList)
                 .orElseGet(ArrayList::new)
-                .stream()
                 .forEach(x->{
                     if(count.get() >= 20){
                         return;
@@ -1901,7 +1900,7 @@ public class OrderDetailService {
                 .collect(Collectors.toList());
         int maxLen = 2000;
         int size = orderNos.size();
-        log.info("当前订单条数size={}",size);
+        log.info("查询非正常结束订单，当前订单条数size={}",size);
         int count = size%maxLen==0?(size / maxLen):(size / maxLen) + 1;
         List<OrderDTO> orderDTOS = new ArrayList<>();
         for(int i=0;i<count;i++){

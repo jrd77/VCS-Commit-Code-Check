@@ -161,6 +161,7 @@ public class SubmitOrderService {
         RenterMemberDTO renterMemberDTO = context.getRenterMemberDto();
         renterMemberDTO.setOrderNo(orderNo);
         renterMemberDTO.setRenterOrderNo(renterOrderNo);
+        renterMemberDTO.setOrderCategory(orderReqVO.getOrderCategory());
         renterMemberService.save(renterMemberDTO);
 
 

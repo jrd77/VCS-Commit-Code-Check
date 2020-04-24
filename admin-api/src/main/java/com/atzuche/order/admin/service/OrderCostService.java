@@ -381,7 +381,7 @@ public class OrderCostService {
 	private void putOilBeyondMile(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		int oilAmt = data.getOilAmt();
-		realVo.setOilAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(oilAmt)));
+		realVo.setOilAmt(String.valueOf(-oilAmt));
 
 		int mileageAmt = data.getMileageAmt();
 		realVo.setBeyondMileAmt(String.valueOf( NumberUtils.convertNumberToZhengshu(mileageAmt)));

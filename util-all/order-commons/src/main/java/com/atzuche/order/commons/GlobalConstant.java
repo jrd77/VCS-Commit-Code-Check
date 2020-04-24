@@ -5,12 +5,16 @@ import java.time.format.DateTimeFormatter;
 public class GlobalConstant {
     //会员权益-默认的guide_price临界值
     public static final int GUIDE_PRICE = 1500000;
+    //会员权益-车辆押金-企业用户减免比例
+    public static final double ENTERPRISE_REDUCTION_RATE = 1D;
     //会员权益-车辆押金-最大减免比例
     public static final int REDUCTION_RATE_MAX = 70;
     //会员权益-内部员工-车辆押金
     public static final int MEMBER_RIGHT_STAFF_CAR_DEPOSIT = 300;
     //会员权益-内部员工-违章押金
     public static final int MEMBER_RIGHT_STAFF_WZ_DEPOSIT = 1;
+    //会员权益-企业用户-外账押金
+    public static final int MEMBER_RIGHT_QYYH_WZ_DEPOSIT = 0;
 
     public static final int GET_RETURN_OVER_COST = 50;
 
