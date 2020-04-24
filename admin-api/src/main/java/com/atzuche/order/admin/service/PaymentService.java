@@ -172,7 +172,7 @@ public class PaymentService {
                                     if(vo != null)afterDepositSettlementPaymentList.add(vo);
                                 }else{
                                     List<CashierRefundApplyEntity> refundApplyList = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
-
+                                    CashierUtils.filterCashierRefound(refundApplyList,DataPayKindConstant.DEPOSIT)
                                     convertPaymentFromCashierRefundApply();
                                 }
                             }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金

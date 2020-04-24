@@ -2,9 +2,11 @@ package com.atzuche.order.cashieraccount.utils;
 
 import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.entity.OfflineRefundApplyEntity;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
@@ -67,16 +69,18 @@ public class CashierUtils {
      * @Description: 退款申请表
      *
      **/
-    public static OfflineRefundApplyEntity filter(List<OfflineRefundApplyEntity> list,
-                                                              RenterCashCodeEnum renterCashCodeEnum,
+    public static CashierRefundApplyEntity filterCashierRefound(List<CashierRefundApplyEntity> list,
+                                                                String dataPayKindConstant,
+                                                                PayTypeEnum payTypeEnum,
                                                               LocalDateTime startTime,
                                                               LocalDateTime endTime){
-        Optional<OfflineRefundApplyEntity> first = Optional.ofNullable(list)
+        Optional<CashierRefundApplyEntity> first = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> renterCashCodeEnum.getCashNo().equals(x.getSourceCode()))
-                .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
-                .filter(x -> endTime == null ? true : x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .filter(x ->dataPayKindConstant==null?true:dataPayKindConstant.equals(x.getPayKind()))
+                .filter(x->payTypeEnum.getCode().equals(x.getPayType()))
+                .filter(x->startTime==null?true:(x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x->endTime==null?true:x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
                 .findFirst();
         if(first.isPresent()){
             return first.get();
