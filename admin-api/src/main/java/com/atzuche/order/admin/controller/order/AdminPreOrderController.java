@@ -13,6 +13,7 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.HolidayTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.mem.MemProxyService;
@@ -114,6 +115,7 @@ public class AdminPreOrderController {
         OwnerMemberDTO ownerMemberDTO = memProxyService.getOwnerMemberInfo(carPriceDetail.getOwnerNo().toString());
         responseVO.setOwnerMemNo(ownerMemberDTO.getMemNo());
         responseVO.setOwnerName(ownerMemberDTO.getRealName());
+        responseVO.setOwnerMobile(ownerMemberDTO.getPhone());
         responseVO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE1));
         responseVO.setRevertTime(DateUtils.formate(revertTime, DateUtils.DATE_DEFAUTE1));
         List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();
@@ -124,11 +126,25 @@ public class AdminPreOrderController {
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
             carDayPrice.setDay(dto.getDateStr());
             carDayPrice.setPrice(String.valueOf(dto.getPrice()));
-            if(isWorkDay(LocalDateTimeUtils.parseStringToLocalDate(dto.getDateStr(), GlobalConstant.FORMAT_DATE_STR))) {
-                carDayPrice.setDesc("工作日");
-            }else{
-                carDayPrice.setDesc("周末");
+
+            String desc = "";
+            if(StringUtils.isNotBlank(dto.getHolidayType())) {
+                try {
+                    desc = HolidayTypeEnum.from(dto.getHolidayType()).getTitle();
+                } catch (Exception e) {
+                    logger.info("无效节假日标识.holidayType:[{}]", dto.getHolidayType());
+                }
             }
+            if(StringUtils.isBlank(desc)) {
+                if(isWorkDay(LocalDateTimeUtils.parseStringToLocalDate(dto.getDateStr(),
+                        GlobalConstant.FORMAT_DATE_STR))) {
+                    desc = "工作日";
+                } else {
+                    desc = "周末";
+                }
+            }
+            carDayPrice.setDesc(desc);
+
             if(dto.getPrice().equals(dto.getHolidayPrice())||dto.getPrice().equals(dto.getDayPrice())) {
                 logger.info("无特供价");
             }
