@@ -3,7 +3,9 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.commons.vo.res.consolecost.TempCarDepoistInfoResVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -11,9 +13,10 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +67,7 @@ public class OrderConsoleCostHandleService {
                 TempCarDepoistInfoResVO res;
                 if (cashNoList.contains(c)) {
                     res = buildTempCarDepoistInfoResVO(dataMap.get(c).getId(), dataMap.get(c).getSubsidyTypeCode(),
-                            dataMap.get(c).getSubsidyAmount());
+                            Math.abs(dataMap.get(c).getSubsidyAmount()));
                 } else {
                     res = buildTempCarDepoistInfoResVO(OrderConstant.ZERO, c, OrderConstant.ZERO);
                 }
@@ -89,6 +92,18 @@ public class OrderConsoleCostHandleService {
 
     }
 
+    /**
+     * 保存订单车辆押金暂扣扣款信息
+     *
+     * @param reqVO 请求参数
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveTempCarDeposit(SaveTempCarDepositInfoReqVO reqVO) {
+        int total = orderConsoleCostDetailService.saveOrderConsoleCostDetai(buildOrderConsoleCostDetailEntity(reqVO));
+        log.info("Save temp car depoist. result is, orderNo:[{}], memNo:[{}], total:[{}]", reqVO.getOrderNo(),
+                reqVO.getMemNo(), total);
+    }
+
 
     /**
      * 初始化费用列表
@@ -103,6 +118,7 @@ public class OrderConsoleCostHandleService {
             TempCarDepoistInfoResVO res = buildTempCarDepoistInfoResVO(OrderConstant.ZERO, c, amt);
             list.add(res);
         });
+        log.info("Init temp carDepoist list. result is,list:[{}]", JSON.toJSONString(list));
         return list;
     }
 
@@ -123,5 +139,50 @@ public class OrderConsoleCostHandleService {
         res.setCashNo(cashCodeEnum.getCashNo());
         res.setCashTitle(cashCodeEnum.getTxt());
         return res;
+    }
+
+    /**
+     * 构建OrderConsoleCostDetailEntity
+     *
+     * @param reqVO 请求参数
+     * @return List<OrderConsoleCostDetailEntity>
+     */
+    private List<OrderConsoleCostDetailEntity> buildOrderConsoleCostDetailEntity(SaveTempCarDepositInfoReqVO reqVO) {
+
+        List<OrderConsoleCostDetailEntity> list = new ArrayList<>();
+        List<TempCarDepoistInfoResVO> tempCarDepoists = reqVO.getTempCarDepoists();
+
+        if (CollectionUtils.isNotEmpty(tempCarDepoists)) {
+            tempCarDepoists.forEach(t -> {
+                OrderConsoleCostDetailEntity entity = new OrderConsoleCostDetailEntity();
+                if (t.getId() != OrderConstant.ZERO) {
+                    //更新
+                    entity.setId(t.getId());
+                    entity.setSubsidyAmount(-Math.abs(t.getCashAmt()));
+                    entity.setUpdateOp(reqVO.getOperatorName());
+                } else {
+                    //新增
+                    entity.setOrderNo(reqVO.getOrderNo());
+                    entity.setMemNo(reqVO.getMemNo());
+                    entity.setSubsidyTypeCode(t.getCashNo());
+                    entity.setSubsidTypeName(t.getCashTitle());
+                    entity.setSubsidyCostCode(t.getCashNo());
+                    entity.setSubsidyCostName(t.getCashTitle());
+                    entity.setSubsidySourceCode(SubsidySourceCodeEnum.RENTER.getCode());
+                    entity.setSubsidySourceName(SubsidySourceCodeEnum.RENTER.getDesc());
+                    entity.setSubsidyTargetCode(SubsidySourceCodeEnum.PLATFORM.getCode());
+                    entity.setSubsidyTargetName(SubsidySourceCodeEnum.PLATFORM.getDesc());
+                    entity.setSubsidyAmount(-Math.abs(t.getCashAmt()));
+                    entity.setCreateOp(reqVO.getOperatorName());
+                    entity.setUpdateOp(reqVO.getOperatorName());
+                }
+                entity.setOperatorId(reqVO.getOperatorName());
+                entity.setRemark("管理后台维护车辆押金暂扣扣款信息");
+                list.add(entity);
+            });
+
+        }
+        log.info("Build orderConsoleCostDetailEntity. result is, list:[{}]", JSON.toJSONString(list));
+        return list;
     }
 }

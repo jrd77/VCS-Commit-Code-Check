@@ -4,10 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
+import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.coreapi.service.OrderConsoleCostHandleService;
-import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,26 +37,34 @@ public class OrderConsoleCostHandleController {
     private OrderConsoleCostHandleService orderConsoleCostHandleService;
 
 
-    @AutoDocMethod(description = "获取订单暂扣车辆押金费用明细接口", value = "获取订单暂扣车辆押金费用明细接口")
-    @PostMapping("/order/temp/depoist/info")
-    public ResponseData getTempCarDepoists(@Valid @RequestBody GetTempCarDepositInfoReqVO reqVO,
+    @AutoDocMethod(description = "获取订单车辆押金暂扣扣款明细接口", value = "获取订单车辆押金暂扣扣款明细接口", response = GetTempCarDepositInfoResVO.class)
+    @PostMapping("/order/temp/get/deposit")
+    public ResponseData<GetTempCarDepositInfoResVO> getTempCarDepoists(@Valid @RequestBody GetTempCarDepositInfoReqVO reqVO,
                                            BindingResult bindingResult) {
         log.info("Get order temp car depoist info.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-
-        List<String> cashNos = new ArrayList<>(
-                Arrays.asList(ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_FINE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_STOPCHARGE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_REPAIRCHARGE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_STOPCHARGE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_REPAIRCHARGE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_STOPCHARGE.getCashNo(),
-                        ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_COLLECTCHARGE.getCashNo()
-                ));
+        //只能在此初始化
+        List<String> cashNos = Arrays.asList(
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_FINE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_STOPCHARGE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_REPAIRCHARGE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_STOPCHARGE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_REPAIRCHARGE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_STOPCHARGE.getCashNo(),
+                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_COLLECTCHARGE.getCashNo()
+            );
         GetTempCarDepositInfoResVO resVO = orderConsoleCostHandleService.getTempCarDepoistInfos(reqVO.getOrderNo(),
                 reqVO.getMemNo(), cashNos);
         return ResponseData.success(resVO);
     }
 
+    @AutoDocMethod(description = "保存订单车辆押金暂扣扣款信息接口", value = "保存订单车辆押金暂扣扣款信息接口")
+    @PostMapping("/order/temp/save/depoist")
+    public ResponseData saveTempCarDepoist(@Valid @RequestBody SaveTempCarDepositInfoReqVO reqVO, BindingResult bindingResult) {
+        log.info("Save order temp car depoist info.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        orderConsoleCostHandleService.saveTempCarDeposit(reqVO);
+        return ResponseData.success();
+    }
 
 }

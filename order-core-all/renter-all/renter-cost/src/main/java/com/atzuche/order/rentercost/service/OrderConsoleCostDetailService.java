@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -88,6 +90,31 @@ public class OrderConsoleCostDetailService{
     	
     	return 1;
     }
+
+    /**
+     * 新增/更新订单暂扣扣款信息
+     *
+     * @param records 暂扣扣款信息
+     * @return int
+     */
+    public int saveOrderConsoleCostDetai(List<OrderConsoleCostDetailEntity> records) {
+        if (CollectionUtils.isEmpty(records)) {
+            log.info("Save order console cost detail. records is empty!");
+            return OrderConstant.ZERO;
+        }
+
+        int total = OrderConstant.ZERO;
+        for (OrderConsoleCostDetailEntity record : records) {
+
+            if (Objects.isNull(record.getId())) {
+                total = total + orderConsoleCostDetailMapper.insertSelective(record);
+            } else {
+                total = total + orderConsoleCostDetailMapper.updateByPrimaryKeySelective(record);
+            }
+        }
+        return total;
+    }
+
     
     /**
      * 数据转化
