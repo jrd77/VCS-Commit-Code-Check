@@ -59,7 +59,7 @@ public class AccountVirtualPayDetailEntity implements Serializable {
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 修改人

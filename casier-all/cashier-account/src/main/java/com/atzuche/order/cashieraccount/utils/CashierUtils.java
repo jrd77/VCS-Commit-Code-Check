@@ -61,4 +61,28 @@ public class CashierUtils {
         return null;
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/23 19:23
+     * @Description: 退款申请表
+     *
+     **/
+    public static OfflineRefundApplyEntity filter(List<OfflineRefundApplyEntity> list,
+                                                              RenterCashCodeEnum renterCashCodeEnum,
+                                                              LocalDateTime startTime,
+                                                              LocalDateTime endTime){
+        Optional<OfflineRefundApplyEntity> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> renterCashCodeEnum.getCashNo().equals(x.getSourceCode()))
+                .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x -> endTime == null ? true : x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+
 }
