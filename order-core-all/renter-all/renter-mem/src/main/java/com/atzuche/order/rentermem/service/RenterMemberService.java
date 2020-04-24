@@ -72,7 +72,7 @@ public class RenterMemberService{
             if(RightTypeEnum.MEMBER_FLAG.getCode() == x.getRightType()
                     && MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode())
                     && renterMemberDto.getOrderCategory()!=null
-                    && (!renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode()) || !renterMemberDto.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))
+                    && !(renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode()) || renterMemberDto.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))
                 ){
                 log.info("非短租或者长租，企业用户权益为0 renterMemberDto={}",JSON.toJSONString(renterMemberDto));
                 renterMemberRightEntity.setRightValue("0");
