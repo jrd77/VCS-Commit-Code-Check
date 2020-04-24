@@ -1,20 +1,19 @@
 package com.atzuche.order.sms.listener;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.sms.common.OrderMessageServiceScanner;
+import com.atzuche.order.open.service.FeignSMSOwnerOrderService;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
 import com.atzuche.order.sms.common.base.OrderSendMessageManager;
-import com.atzuche.order.sms.enums.MessageServiceTypeEnum;
-import com.atzuche.order.sms.enums.PushMessageTypeEnum;
 import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
-import com.atzuche.order.sms.interfaces.IOrderRouteKeyMessage;
 import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
-import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,6 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +37,9 @@ import java.util.Objects;
 public class OrderActionEventListener extends OrderSendMessageManager {
 
     @Autowired
-    OrderMessageServiceScanner orderMessageServiceScanner;
+    FeignSMSOwnerOrderService smsOwnerOrderService;
+    @Autowired
+    FeignSMSRenterOrderService smsRenterOrderService;
 
     @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "order_action_11", durable = "true"),
             exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.#")
@@ -47,7 +47,11 @@ public class OrderActionEventListener extends OrderSendMessageManager {
     public void process(Message message) {
         log.info("receive order action message: " + new String(message.getBody()));
         try {
+            String routeKeyName = message.getMessageProperties().getReceivedRoutingKey();
             OrderMessage orderMessage = createOrderMessageService(message);
+            if (NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS.routingKey.equals(routeKeyName)) {
+                orderMessage = handlerOrderPayRentCostSuccessMq(orderMessage);
+            }
             if (Objects.nonNull(orderMessage)) {
                 sendSMSMessageData(orderMessage);
                 sendPushMessageData(orderMessage);
@@ -56,36 +60,6 @@ public class OrderActionEventListener extends OrderSendMessageManager {
             log.info("新订单动作总事件监听发生异常,msg：[{}]", e);
             Cat.logError("新订单动作总事件监听发生异常", e);
         }
-    }
-
-
-    /**
-     * 获取对应得service
-     * @param message
-     * @return
-     */
-    public OrderMessage createOrderMessageService(Message message){
-        OrderMessage orderMessage = JSONObject.parseObject(message.getBody(), OrderMessage.class);
-        log.info("新订单动作总事件监听,入参orderMessage:[{}]", orderMessage.toString());
-        String routeKeyName = message.getMessageProperties().getReceivedRoutingKey();
-        String serviceName = MessageServiceTypeEnum.getSmsServiceTemplate(routeKeyName);
-        if(StringUtils.isBlank(serviceName))
-        {
-            log.info("该事件没有需要发送得短信,routeKeyName:[{}]",routeKeyName);
-            return orderMessage;
-        }
-        serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
-        IOrderRouteKeyMessage orderRouteKeyMessage = orderMessageServiceScanner.getBean(serviceName);
-        if(Objects.isNull(orderRouteKeyMessage))
-        {
-            log.info("该事件没有对应的短信服务,routeKeyName:[{}]",routeKeyName);
-            return orderMessage;
-        }
-         orderMessage = orderRouteKeyMessage.sendOrderMessageWithNo(orderMessage);
-        if (NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS.routingKey.equals(routeKeyName)) {
-            orderMessage = handlerOrderPayRentCostSuccessMq(orderMessage);
-        }
-        return orderMessage;
     }
 
     /**
@@ -121,10 +95,9 @@ public class OrderActionEventListener extends OrderSendMessageManager {
      * @return
      */
     public Integer getCarOwnerType(String orderNo) {
-//        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-//        OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderEntity.getOwnerOrderNo(), false);
-//        return ownerGoodsDetailDTO.getCarOwnerType();
-        return null;
+        OwnerOrderDTO ownerOrderDTO = smsOwnerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo).getData();
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = smsOwnerOrderService.getOwnerGoodsDetail(ownerOrderDTO.getOwnerOrderNo()).getData();
+        return ownerGoodsDetailDTO.getCarOwnerType();
     }
 
     /**
@@ -132,9 +105,8 @@ public class OrderActionEventListener extends OrderSendMessageManager {
      * @return
      */
     public String getRenterRealName(String orderNo){
-//        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-//        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), false);
-//        return renterMemberDTO.getRealName();
-        return null;
+        RenterOrderDTO renterOrderDTO = smsRenterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo).getData();
+        RenterMemberDTO renterMemberDTO = smsRenterOrderService.selectrenterMemberByRenterOrderNo(renterOrderDTO.getRenterOrderNo()).getData();
+        return renterMemberDTO.getRealName();
     }
 }
