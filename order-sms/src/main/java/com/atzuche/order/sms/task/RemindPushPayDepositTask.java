@@ -1,26 +1,20 @@
-package com.atzuche.order.coreapi.task;
+package com.atzuche.order.sms.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
-import com.atzuche.order.coreapi.entity.SmsMsgSendLogEntity;
-import com.atzuche.order.coreapi.enums.ShortMessageCodeEnum;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
-import com.atzuche.order.coreapi.mapper.SmsMsgSendLogMapper;
-import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.coreapi.utils.SMSTaskDateTimeUtils;
-import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.autoyol.commons.utils.DateUtil;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
+import com.atzuche.order.sms.common.base.OrderSendMessageFactory;
+import com.atzuche.order.sms.entity.SmsMsgSendLogEntity;
+import com.atzuche.order.sms.enums.PushMessageTypeEnum;
+import com.atzuche.order.sms.enums.ShortMessageCodeEnum;
+import com.atzuche.order.sms.mapper.SmsMsgSendLogMapper;
+import com.atzuche.order.sms.service.ShortMessageOrderStatusService;
+import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
@@ -49,15 +43,11 @@ public class RemindPushPayDepositTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(RemindPushPayDepositTask.class);
     @Autowired
-    OrderStatusService orderStatusService;
+    FeignSMSRenterOrderService orderStatusService;
     @Resource
-    private RemindPayIllegalCrashService remindPayIllegalCrashService;
+    private ShortMessageOrderStatusService remindPayIllegalCrashService;
     @Autowired
     OrderSendMessageFactory orderSendMessageFactory;
-    @Autowired
-    RenterOrderService renterOrderService;
-    @Autowired
-    RenterGoodsService renterGoodsService;
     @Autowired
     @Resource
     SmsMsgSendLogMapper smsMsgSendLogMapper;
@@ -74,7 +64,7 @@ public class RemindPushPayDepositTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
-                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                OrderStatusDTO orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo()).getData();
                 if (orderStatusEntity.getStatus().intValue() != 0 && orderStatusEntity.getWzPayStatus().intValue() == 0 && orderStatusEntity.getStatus().intValue() < 8) {
                     SmsMsgSendLogEntity smsMsgSendLogEntity = smsMsgSendLogMapper.selectByOrderNoAndMemNo(violateBO.getOrderNo(), violateBO.getMemNoRenter(), ShortMessageCodeEnum.PUSH_DEPOSETID_COST_4_HOURS.getValue().intValue());
                     if (Objects.isNull(smsMsgSendLogEntity) || smsMsgSendLogEntity.getStatus().intValue() == 0) {
@@ -128,10 +118,9 @@ public class RemindPushPayDepositTask extends IJobHandler {
      * @return
      */
     public Integer getCarOwnerType(String orderNo) {
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterGoodsDetailDTO ownerGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        RenterOrderDTO renterOrderEntity = orderStatusService.getRenterOrderByOrderNoAndIsEffective(orderNo).getData();
+        RenterGoodsDetailDTO ownerGoodsDetailDTO = orderStatusService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo()).getData();
         return ownerGoodsDetailDTO.getCarOwnerType();
     }
-
 
 }

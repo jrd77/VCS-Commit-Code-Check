@@ -1,11 +1,11 @@
-package com.atzuche.order.coreapi.task;
+package com.atzuche.order.sms.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.coreapi.service.CancelOrderService;
-import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
+import com.atzuche.order.sms.service.SendShortMessageDataService;
+import com.atzuche.order.sms.service.ShortMessageOrderStatusService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -32,9 +32,11 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
     private Logger logger = LoggerFactory.getLogger(NoPayDepositBeforeRentTimeTask.class);
 
     @Autowired
-    OrderStatusService orderStatusService;
+    FeignSMSRenterOrderService orderStatusService;
     @Resource
-    private RemindPayIllegalCrashService remindPayIllegalCrashService;
+    private ShortMessageOrderStatusService remindPayIllegalCrashService;
+    @Autowired
+    SendShortMessageDataService sendShortMessageDataService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -49,10 +51,10 @@ public class NoPayDepositBeforeRentTimeTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
-                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
-                if (orderStatusEntity.getStatus().intValue() < 8 && (orderStatusEntity.getDepositPayStatus().intValue() == 0 || orderStatusEntity.getWzPayStatus().intValue() == 0)) {
+                OrderStatusDTO orderStatusDTO = orderStatusService.getByOrderNo(violateBO.getOrderNo()).getData();
+                if (orderStatusDTO.getStatus().intValue() < 8 && (orderStatusDTO.getDepositPayStatus().intValue() == 0 || orderStatusDTO.getWzPayStatus().intValue() == 0)) {
                     if (LocalDateTime.now().isBefore(violateBO.getExpRentTime()) && LocalDateTime.now().plusMinutes(5).isAfter(violateBO.getExpRentTime())) {
-                        remindPayIllegalCrashService.sendNoPayIllegalDepositShortMessageData(violateBO.getOrderNo());
+                        sendShortMessageDataService.sendNoPayIllegalDepositShortMessageData(violateBO.getOrderNo());
                     }
                 }
             }

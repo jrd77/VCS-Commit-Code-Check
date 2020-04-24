@@ -1,21 +1,13 @@
-package com.atzuche.order.coreapi.task;
+package com.atzuche.order.sms.task;
 
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.vo.req.CancelOrderReqVO;
-import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
-import com.atzuche.order.coreapi.service.CancelOrderService;
-import com.atzuche.order.coreapi.service.OrderSearchRemoteService;
-import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.coreapi.utils.SMSTaskDateTimeUtils;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
+import com.atzuche.order.sms.service.SendShortMessageDataService;
+import com.atzuche.order.sms.service.ShortMessageOrderStatusService;
+import com.atzuche.order.sms.utils.SMSTaskDateTimeUtils;
 import com.autoyol.commons.utils.DateUtil;
-import com.autoyol.search.entity.ViolateBO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -29,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author 胡春林
@@ -42,9 +32,11 @@ public class RemindPayIllegalCrashWithHoursTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(RemindPayIllegalCrashWithHoursTask.class);
     @Autowired
-    OrderStatusService orderStatusService;
+    FeignSMSRenterOrderService orderStatusService;
     @Resource
-    private RemindPayIllegalCrashService remindPayIllegalCrashService;
+    private ShortMessageOrderStatusService remindPayIllegalCrashService;
+    @Autowired
+    SendShortMessageDataService sendShortMessageDataService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -59,21 +51,21 @@ public class RemindPayIllegalCrashWithHoursTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
-                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                OrderStatusDTO orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo()).getData();
                 if (orderStatusEntity.getWzPayStatus().intValue() == 0 && orderStatusEntity.getStatus().intValue() < 8) {
                     //没有支付违章押金
                     boolean is24HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 24);
-                    remindPayIllegalCrashService.sendShortMessageData(is24HoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(is24HoursAgo, violateBO.getOrderNo());
                     boolean is12HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 12);
-                    remindPayIllegalCrashService.sendShortMessageData(is12HoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(is12HoursAgo, violateBO.getOrderNo());
                     boolean is6HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 6);
-                    remindPayIllegalCrashService.sendShortMessageData(is6HoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(is6HoursAgo, violateBO.getOrderNo());
                     boolean is2HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 2);
-                    remindPayIllegalCrashService.sendShortMessageData(is2HoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(is2HoursAgo, violateBO.getOrderNo());
                     boolean is1HoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 1);
-                    remindPayIllegalCrashService.sendShortMessageData(is1HoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(is1HoursAgo, violateBO.getOrderNo());
                     boolean isHoursAgo = SMSTaskDateTimeUtils.isArriveRentTime(DateUtil.asDateTime(violateBO.getExpRentTime()), 0.5);
-                    remindPayIllegalCrashService.sendShortMessageData(isHoursAgo, violateBO.getOrderNo());
+                    sendShortMessageDataService.sendShortMessageData(isHoursAgo, violateBO.getOrderNo());
                 }
             }
             logger.info("结束执行 取车时间前24小时、12小时、6小时、2小时、1小时、30分钟提醒支付违章押金 ");

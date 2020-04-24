@@ -1,12 +1,12 @@
-package com.atzuche.order.coreapi.task;
+package com.atzuche.order.sms.task;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.coreapi.utils.SMSTaskDateTimeUtils;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.autoyol.search.entity.ViolateBO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
+import com.atzuche.order.sms.service.SendShortMessageDataService;
+import com.atzuche.order.sms.service.ShortMessageOrderStatusService;
+import com.atzuche.order.sms.utils.SMSTaskDateTimeUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -29,9 +29,11 @@ public class NoPayRentCarHalfHoursTask extends IJobHandler {
     private Logger logger = LoggerFactory.getLogger(NoPayRentCarHalfHoursTask.class);
 
     @Autowired
-    OrderStatusService orderStatusService;
+    FeignSMSRenterOrderService orderStatusService;
     @Resource
-    private RemindPayIllegalCrashService remindPayIllegalCrashService;
+    private ShortMessageOrderStatusService remindPayIllegalCrashService;
+    @Autowired
+    SendShortMessageDataService sendShortMessageDataService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -46,10 +48,10 @@ public class NoPayRentCarHalfHoursTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
-                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                OrderStatusDTO orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo()).getData();
                 if (orderStatusEntity.getRentCarPayStatus().intValue() == 0) {
                     if (SMSTaskDateTimeUtils.getDateLatterCompareNowScoend(violateBO.getReqTime(), 60) == 30) {
-                        remindPayIllegalCrashService.sendNoPayCarShortMessageData(violateBO.getOrderNo());
+                        sendShortMessageDataService.sendNoPayCarShortMessageData(violateBO.getOrderNo());
                     }
                 }
             }

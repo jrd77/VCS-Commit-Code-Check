@@ -1,20 +1,19 @@
-package com.atzuche.order.coreapi.task;
+package com.atzuche.order.sms.task;
 
 import com.alibaba.fastjson.JSONObject;
-import com.atzuche.order.cashieraccount.entity.CashierEntity;
-import com.atzuche.order.cashieraccount.mapper.CashierMapper;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.entity.orderDetailDto.CashierDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.coreapi.entity.SmsMsgSendLogEntity;
-import com.atzuche.order.coreapi.enums.ShortMessageCodeEnum;
-import com.atzuche.order.coreapi.listener.push.OrderSendMessageFactory;
-import com.atzuche.order.coreapi.mapper.SmsMsgSendLogMapper;
-import com.atzuche.order.coreapi.service.RemindPayIllegalCrashService;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.open.service.FeignSMSRenterOrderService;
+import com.atzuche.order.sms.common.base.OrderSendMessageFactory;
+import com.atzuche.order.sms.entity.SmsMsgSendLogEntity;
+import com.atzuche.order.sms.enums.ShortMessageCodeEnum;
+import com.atzuche.order.sms.enums.ShortMessageTypeEnum;
+import com.atzuche.order.sms.mapper.SmsMsgSendLogMapper;
+import com.atzuche.order.sms.service.ShortMessageOrderStatusService;
+import com.atzuche.order.sms.utils.SmsParamsMapUtil;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.common.collect.Maps;
@@ -43,15 +42,13 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
 
     private Logger logger = LoggerFactory.getLogger(PayPreCarCost4HoursTask.class);
     @Resource
-    private RemindPayIllegalCrashService remindPayIllegalCrashService;
-    @Resource
-    CashierMapper cashierMapper;
+    private ShortMessageOrderStatusService remindPayIllegalCrashService;
     @Autowired
     OrderSendMessageFactory orderSendMessageFactory;
     @Resource
     SmsMsgSendLogMapper smsMsgSendLogMapper;
     @Autowired
-    OrderStatusService orderStatusService;
+    FeignSMSRenterOrderService orderStatusService;
 
     @Override
     public ReturnT<String> execute(String s) throws Exception {
@@ -66,11 +63,11 @@ public class PayPreCarCost4HoursTask extends IJobHandler {
                 return SUCCESS;
             }
             for (OrderDTO violateBO : orderNos) {
-                OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo());
+                OrderStatusDTO orderStatusEntity = orderStatusService.getByOrderNo(violateBO.getOrderNo()).getData();
                 if (Objects.isNull(orderStatusEntity) || orderStatusEntity.getStatus().intValue() != 0) {
                     continue;
                 }
-                CashierEntity cashierEntity = cashierMapper.getPayDeposit(violateBO.getOrderNo(), violateBO.getMemNoRenter(), "01", "02");
+                CashierDTO cashierEntity = orderStatusService.getCashier(violateBO.getOrderNo(), violateBO.getMemNoRenter(), "01", "02").getData();
                 if (Objects.isNull(cashierEntity)) {
                     continue;
                 }
