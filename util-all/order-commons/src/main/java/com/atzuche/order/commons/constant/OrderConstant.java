@@ -1,5 +1,10 @@
 package com.atzuche.order.commons.constant;
 
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 订单相关常量
  *
@@ -65,5 +70,18 @@ public class OrderConstant {
     public static String SYSTEM_OPERATOR = "System";
 
     public static String SPECIAL_ERROR_CODE_PREFIX = "11106";
+
+    /**
+     * 车辆押金暂扣扣款项
+     */
+    public static List<String> CASHNOS = Arrays.asList(
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_FINE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_STOPCHARGE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_REPAIRCHARGE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_STOPCHARGE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_REPAIRCHARGE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_STOPCHARGE.getCashNo(),
+            ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_COLLECTCHARGE.getCashNo()
+    );
 
 }

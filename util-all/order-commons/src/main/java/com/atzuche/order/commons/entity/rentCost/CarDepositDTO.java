@@ -1,8 +1,11 @@
 package com.atzuche.order.commons.entity.rentCost;
 
+import com.atzuche.order.commons.vo.res.consolecost.TempCarDepoistInfoResVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
+
+import java.util.List;
 
 
 @Data
@@ -24,4 +27,7 @@ public class CarDepositDTO {
     public Integer expAndActFlg;
     @AutoDocProperty("是否车辆押金暂扣  0-否，1-是,2-撤销暂扣")
     public Integer isDetain;
+    @AutoDocProperty(value = "车辆押金扣款费用列表")
+    public List<TempCarDepoistInfoResVO> tempCarDepoists;
+
 }

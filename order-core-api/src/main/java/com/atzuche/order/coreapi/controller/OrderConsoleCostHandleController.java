@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
@@ -43,18 +44,8 @@ public class OrderConsoleCostHandleController {
                                            BindingResult bindingResult) {
         log.info("Get order temp car depoist info.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-        //只能在此初始化
-        List<String> cashNos = Arrays.asList(
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_FINE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_WZ_STOPCHARGE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_REPAIRCHARGE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_CLAIM_STOPCHARGE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_REPAIRCHARGE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_STOPCHARGE.getCashNo(),
-                ConsoleCashCodeEnum.CAR_DEPOSIT_DETAIN_RISK_COLLECTCHARGE.getCashNo()
-            );
         GetTempCarDepositInfoResVO resVO = orderConsoleCostHandleService.getTempCarDepoistInfos(reqVO.getOrderNo(),
-                reqVO.getMemNo(), cashNos);
+                reqVO.getMemNo(), OrderConstant.CASHNOS);
         return ResponseData.success(resVO);
     }
 

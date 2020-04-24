@@ -18,6 +18,7 @@ import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.rentCost.*;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
@@ -105,6 +106,8 @@ public class RenterCostFacadeService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired
+    private OrderConsoleCostHandleService orderConsoleCostHandleService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -387,6 +390,8 @@ public class RenterCostFacadeService {
         carDepositDTO.expDeductionRentAmt = Math.abs(carDeductionRentAmt);
         carDepositDTO.expAndActFlg = carExpAndActFlg;
         carDepositDTO.isDetain = orderStatusEntity.getIsDetain();
+        carDepositDTO.tempCarDepoists =
+                orderConsoleCostHandleService.getTempCarDepoistInfos(orderNo, memNo, OrderConstant.CASHNOS).getTempCarDepoists();
 
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();
