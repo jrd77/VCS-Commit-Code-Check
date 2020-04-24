@@ -6,12 +6,15 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.dto.convert.CarDepositDetainOptLogDTO;
 import com.atzuche.order.admin.dto.convert.ConvertUtil;
+import com.atzuche.order.admin.entity.AdminOperateLogEntity;
+import com.atzuche.order.admin.mapper.log.QueryVO;
 import com.atzuche.order.admin.service.CarDepositReturnDetailService;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.admin.vo.req.car.CarDepositDetainInfoReqVO;
 import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
+import com.atzuche.order.admin.vo.req.log.LogQueryVO;
 import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
 import com.atzuche.order.commons.BindingResultUtil;
@@ -28,12 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -81,16 +83,16 @@ public class CarDepositReturnDetailController {
         return null;
     }*/
 
-    @AutoDocMethod(description = "暂扣/取消暂扣租车押金", value = "暂扣/取消暂扣租车押金",response = ResponseData.class)
+    @AutoDocMethod(description = "暂扣/取消暂扣租车押金", value = "暂扣/取消暂扣租车押金", response = ResponseData.class)
     @PostMapping("/console/save/carDeposit/temporaryRefund")
-    public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult){
+    public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
 
         renterWzService.saveCarDepositTemporaryRefund(req);
-        try{
-            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(), JSON.toJSONString(req));
-        }catch (Exception e){
-            log.warn("暂扣租车押金日志记录失败",e);
+        try {
+            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND, req.getOrderNo(), JSON.toJSONString(req));
+        } catch (Exception e) {
+            log.warn("暂扣租车押金日志记录失败", e);
         }
         return ResponseData.success();
     }
@@ -102,9 +104,9 @@ public class CarDepositReturnDetailController {
      * @param reqVO 请求参数
      * @return ResponseData<GetTempCarDepositInfoResVO>
      */
-    @AutoDocMethod(description = "获取订单车辆押金暂扣扣款明细接口", value = "获取订单车辆押金暂扣扣款明细接口",response = GetTempCarDepositInfoResVO.class)
+    @AutoDocMethod(description = "获取订单车辆押金暂扣扣款明细接口", value = "获取订单车辆押金暂扣扣款明细接口", response = GetTempCarDepositInfoResVO.class)
     @PostMapping("/console/get/carDpoist/detain")
-    public ResponseData<GetTempCarDepositInfoResVO> getTempCarDepoists(@Valid @RequestBody GetTempCarDepositInfoReqVO reqVO,BindingResult bindingResult) {
+    public ResponseData<GetTempCarDepositInfoResVO> getTempCarDepoists(@Valid @RequestBody GetTempCarDepositInfoReqVO reqVO, BindingResult bindingResult) {
         log.info("User [{}] get order carDepoist info.param is,reqVO:[{}]",
                 AdminUserUtil.getAdminUser().getAuthName(), JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
@@ -120,7 +122,7 @@ public class CarDepositReturnDetailController {
      */
     @AutoDocMethod(description = "保存订单车辆押金暂扣扣款信息接口", value = "保存订单车辆押金暂扣扣款信息接口")
     @PostMapping("/console/save/carDpoist/detain")
-    public ResponseData saveTempCarDepoist(@Valid @RequestBody CarDepositDetainInfoReqVO reqVO,BindingResult bindingResult){
+    public ResponseData saveTempCarDepoist(@Valid @RequestBody CarDepositDetainInfoReqVO reqVO, BindingResult bindingResult) {
         log.info("User [{}] save order carDepoist info.param is,reqVO:[{}]",
                 AdminUserUtil.getAdminUser().getAuthName(), JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
@@ -128,28 +130,42 @@ public class CarDepositReturnDetailController {
         GetTempCarDepositInfoReqVO infoReqVO = new GetTempCarDepositInfoReqVO();
         infoReqVO.setOrderNo(reqVO.getOrderNo());
         infoReqVO.setMemNo(reqVO.getMemNo());
-        ResponseData<GetTempCarDepositInfoResVO>  res = feignOrderCostService.getTempCarDepoists(infoReqVO);
+        ResponseData<GetTempCarDepositInfoResVO> res = feignOrderCostService.getTempCarDepoists(infoReqVO);
 
         //更新数据
-        SaveTempCarDepositInfoReqVO req  = new SaveTempCarDepositInfoReqVO();
+        SaveTempCarDepositInfoReqVO req = new SaveTempCarDepositInfoReqVO();
         BeanUtils.copyProperties(reqVO, req);
         req.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         ResponseData responseData = feignOrderCostService.saveTempCarDepoist(req);
-        if(Objects.nonNull(responseData) && StringUtils.equals(responseData.getResCode(),
+        if (Objects.nonNull(responseData) && StringUtils.equals(responseData.getResCode(),
                 ErrorCode.SUCCESS.getCode())) {
             // 记录操作日志
-            try{
+            try {
                 CarDepositDetainOptLogDTO oldData =
                         ConvertUtil.carDepositInfoListConvertDto(res.getData().getTempCarDepoists());
                 CarDepositDetainOptLogDTO newData = ConvertUtil.carDepositInfoListConvertDto(reqVO.getTempCarDepoists());
                 adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_CAR_DEPOSIT, req.getOrderNo(), CompareBeanUtils.newInstance(oldData, newData).compare());
-            }catch (Exception e){
-                log.warn("保存订单车辆押金暂扣扣款信息日志记录失败",e);
+            } catch (Exception e) {
+                log.warn("保存订单车辆押金暂扣扣款信息日志记录失败", e);
             }
         }
         return responseData;
     }
 
+
+    /**
+     * 获取订单车辆押金暂扣扣款操作日志
+     *
+     * @param orderNo 订单号
+     * @return ResponseData
+     */
+    @GetMapping("/console/get/carDpoist/log")
+    public ResponseData<List<AdminOperateLogEntity>> getTempCarDepoistOptLog(@RequestParam("orderNo") String orderNo) {
+        QueryVO vo = new QueryVO();
+        vo.setOrderNo(orderNo);
+        vo.setOpType(AdminOpTypeEnum.TEMPORARY_CAR_DEPOSIT.getOpCode());
+        return ResponseData.success(adminLogService.findByQueryVO(vo));
+    }
 
 
 }
