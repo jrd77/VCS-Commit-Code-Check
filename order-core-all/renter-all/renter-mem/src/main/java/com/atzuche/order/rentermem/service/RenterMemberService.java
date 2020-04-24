@@ -1,5 +1,6 @@
 package com.atzuche.order.rentermem.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.CategoryEnum;
@@ -10,6 +11,7 @@ import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.mapper.RenterMemberMapper;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
 import com.atzuche.order.rentermem.utils.RenterMemUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.util.List;
  * @author ZhangBin
  * @date 2019-12-14 17:27:28
  */
+@Slf4j
 @Service
 public class RenterMemberService{
     @Autowired
@@ -54,6 +57,7 @@ public class RenterMemberService{
      * 保存租客用户信息
      */
     public void save(RenterMemberDTO renterMemberDto){
+        log.info("RenterMemberService.save renterMemberDto={}", JSON.toJSONString(renterMemberDto));
         RenterMemberEntity renterMemberEntity = new RenterMemberEntity();
         BeanUtils.copyProperties(renterMemberDto,renterMemberEntity);
         renterMemberMapper.insert(renterMemberEntity);
@@ -70,6 +74,7 @@ public class RenterMemberService{
                     && renterMemberDto.getOrderCategory()!=null
                     && (!renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode()) || !renterMemberDto.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))
                 ){
+                log.info("非短租或者长租，企业用户权益为0 renterMemberDto={}",JSON.toJSONString(renterMemberDto));
                 renterMemberRightEntity.setRightValue("0");
             }
             list.add(renterMemberRightEntity);
