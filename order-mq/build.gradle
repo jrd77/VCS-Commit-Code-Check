@@ -27,14 +27,15 @@ task sourceJar(type: Jar) {
 }
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
+            groupId = 'com.atzuche'
+            artifactId = 'order-mq'
+            version = '0.0.2-SNAPSHOT'
             from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
+            artifact sourceJar
         }
     }
+
 }
 publishing {
     repositories {
