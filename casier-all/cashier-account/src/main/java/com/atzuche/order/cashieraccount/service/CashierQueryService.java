@@ -13,10 +13,8 @@ import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositCostNoTService;
 
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
@@ -25,19 +23,17 @@ import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
-import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
-import com.autoyol.platformcost.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,11 +215,11 @@ public class CashierQueryService {
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //取消订单罚金
             int cancelFineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return FineTypeEnum.CANCEL_FINE.getFineType().equals(Integer.valueOf(obj.getSourceCode())) && getOwnerFineCostType(obj.getCostType());
+                return FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(Integer.valueOf(obj.getSourceCode())) && getOwnerFineCostType(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //提前还车违约金
             int fineAmt =  accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return FineTypeEnum.RENTER_ADVANCE_RETURN.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
+                return FineTypeCashCodeEnum.RENTER_ADVANCE_RETURN.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //违约金收益
             int fineYield = accountOwnerCostSettleDetails.stream().filter(obj ->{
@@ -235,7 +231,7 @@ public class CashierQueryService {
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //取还车违约金
             int getCarAndReturnCarFineAmt = accountOwnerCostSettleDetails.stream().filter(obj ->{
-                return FineTypeEnum.GET_RETURN_CAR.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
+                return FineTypeCashCodeEnum.GET_RETURN_CAR.getFineType().equals(Integer.valueOf(obj.getSourceCode()))&& getOwnerFineCostType(obj.getCostType());
             }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
             //平台加油服务费
             int platformRefuelServiceCharge  = accountOwnerCostSettleDetails.stream().filter(obj ->{

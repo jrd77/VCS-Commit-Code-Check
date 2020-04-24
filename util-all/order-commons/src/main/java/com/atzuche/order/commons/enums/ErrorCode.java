@@ -127,6 +127,7 @@ public enum ErrorCode {
     REVERT_TIME_LESS_RENT_TIME_1HOUR("500056","“还车时间”应晚于“起租时间”1小时"),
     RENT_TIME_LESS_CURR_TIME("500006","起租时间应晚于当前时间"),
     NO_RANGE_POINT("600040","地址不在范围内"),
+
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
 
     ;

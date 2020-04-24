@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.SupplementCheckReqVO;
 import com.atzuche.order.commons.vo.req.SupplementReqVO;
@@ -103,14 +104,21 @@ public class OrderSupplementDetailController {
 	 * @return
 	 */
 	private boolean checkRentCarPayStatus(String orderNo) {
-		boolean rentCarPayStatus = false;
+		boolean rentCarPayStatusAndIsNoSettle = false;
 		
 		OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-		if(orderStatusEntity != null && orderStatusEntity.getRentCarPayStatus().intValue() == 1) {
-			rentCarPayStatus = true;
+		
+		//已经结算的不处理。
+		if(orderStatusEntity != null && ( SettleStatusEnum.SETTLEING.getCode() != orderStatusEntity.getSettleStatus() || SettleStatusEnum.SETTLEING.getCode() != orderStatusEntity.getCarDepositSettleStatus())
+				|| SettleStatusEnum.SETTLEING.getCode() != orderStatusEntity.getWzSettleStatus()) {
+			log.info("当前订单号已经结算，无需补付。orderNo=[{}]",orderNo);
+			rentCarPayStatusAndIsNoSettle = false;  //已结算
+		}else if(orderStatusEntity != null && orderStatusEntity.getRentCarPayStatus().intValue() == 1) {
+			//未结算
+			rentCarPayStatusAndIsNoSettle = true;
 		}
 		
-		return rentCarPayStatus;
+		return rentCarPayStatusAndIsNoSettle;
 	}
 	
 	@AutoDocMethod(description = "Check查询补付记录", value = "Check查询补付记录", response = OrderSupplementDetailEntity.class)
@@ -157,7 +165,7 @@ public class OrderSupplementDetailController {
 			//管理后台修改补付
 		    if(renterOrderEntity != null) {
 		    	String orderNo = renterOrderEntity.getOrderNo();
-		    	//是否支付租车费用
+		    	//是否支付租车费用 且 未结算。
 		    	if(checkRentCarPayStatus(orderNo)) {		    	
 			        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
 			        //应付租车费用（已经求和）

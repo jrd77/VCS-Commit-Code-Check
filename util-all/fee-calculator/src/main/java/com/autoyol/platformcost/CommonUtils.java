@@ -4,8 +4,8 @@ import com.atzuche.config.common.entity.OilAverageCostEntity;
 import com.autoyol.platformcost.model.AbatementConfig;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.SphericalDistanceCoefficient;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
 
 @Slf4j
 public class CommonUtils {

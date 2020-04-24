@@ -7,7 +7,7 @@ import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEnt
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
@@ -333,16 +333,16 @@ public class OwnerCostFacadeService {
 
     private OwnerFineVO getOwnerFile(List<ConsoleOwnerOrderFineDeatailEntity> consoleFineList, List<OwnerOrderFineDeatailEntity> orderFineList){
         OwnerFineVO ownerFineVO = new OwnerFineVO();
-        ownerFineVO.setModifyGetFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.MODIFY_GET_FINE));
-        ownerFineVO.setModifyReturnFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.MODIFY_RETURN_FINE));
-        ownerFineVO.setModifyAdvance(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.MODIFY_ADVANCE));
-        ownerFineVO.setCancelFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.CANCEL_FINE));
-        ownerFineVO.setDelayFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.DELAY_FINE));
-        ownerFineVO.setModifyAddressFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.MODIFY_ADDRESS_FINE));
-        ownerFineVO.setRenterAdvanceReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.RENTER_ADVANCE_RETURN));
+        ownerFineVO.setModifyGetFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.MODIFY_GET_FINE));
+        ownerFineVO.setModifyReturnFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.MODIFY_RETURN_FINE));
+        ownerFineVO.setModifyAdvance(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.MODIFY_ADVANCE));
+        ownerFineVO.setCancelFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.CANCEL_FINE));
+        ownerFineVO.setDelayFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.DELAY_FINE));
+        ownerFineVO.setModifyAddressFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE));
+        ownerFineVO.setRenterAdvanceReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.RENTER_ADVANCE_RETURN));
         //ownerFineVO.setRenterDelayReturn(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.RENTER_DELAY_RETURN));
-        ownerFineVO.setOwnerFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.OWNER_FINE));
-        ownerFineVO.setGetReturnCar(getOwnerFileByType(consoleFineList, orderFineList, FineTypeEnum.GET_RETURN_CAR));
+        ownerFineVO.setOwnerFine(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.OWNER_FINE));
+        ownerFineVO.setGetReturnCar(getOwnerFileByType(consoleFineList, orderFineList, FineTypeCashCodeEnum.GET_RETURN_CAR));
         return ownerFineVO;
     }
 
@@ -387,7 +387,7 @@ public class OwnerCostFacadeService {
                 .collect(Collectors.summingInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount));
         return (subsidyAmt==null?0:subsidyAmt) + (consoleSubsidyAmt==null?0:consoleSubsidyAmt);
     }
-    private Integer getOwnerFileByType(List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList, List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList, FineTypeEnum fineType){
+    private Integer getOwnerFileByType(List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailList, List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatailList, FineTypeCashCodeEnum fineType){
         Integer consoleFineAmt = consoleOwnerOrderFineDeatailList
                 .stream()
                 .filter(x -> fineType.getFineType().equals(x.getFineType()))

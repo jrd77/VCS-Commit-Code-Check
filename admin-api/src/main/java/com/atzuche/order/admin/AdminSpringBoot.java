@@ -12,7 +12,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/2 1:57 下午
  **/
-@SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.atzuche.config"})
+@SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.atzuche.config","com.autoyol"})
 @MapperScan({"com.atzuche.order"})
 
 

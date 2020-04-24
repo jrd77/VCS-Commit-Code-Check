@@ -8,20 +8,20 @@ import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.HolidayTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
+import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.car.api.model.vo.CarPriceOfDayVO;
-import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
-import com.atzuche.order.mem.MemProxyService;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
-import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,11 +83,19 @@ public class AdminPreOrderController {
             if(StringUtils.trimToNull(mobile)==null){
                 throw new RuntimeException("memNo or mobile cannot be null at same time");
             }
-
             memNo = memProxyService.getMemNoByMoile(mobile).toString();
         }
-
         responseVO.setMemNo(memNo);
+        RenterMemberDTO renterMember = memProxyService.getRenterMemberInfo(memNo);
+        if(StringUtils.isNotBlank(StringUtils.trimToNull(request.getMobile()))) {
+            responseVO.setMobile(request.getMobile());
+        } else {
+            responseVO.setMobile(renterMember.getPhone());
+        }
+        responseVO.setRenterName(renterMember.getRealName());
+        responseVO.setCityCode(request.getCityCode());
+        responseVO.setRentCity(request.getRentCity());
+
 
 
         CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
@@ -97,16 +105,19 @@ public class AdminPreOrderController {
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime rentTime = LocalDateTime.parse(request.getRentTime(),dateTimeFormatter);
-
         LocalDateTime revertTime = LocalDateTime.parse(request.getRevertTime(),dateTimeFormatter);
         carDetailReqVO.setRentTime(rentTime);
         carDetailReqVO.setRevertTime(revertTime);
 
-        CarProxyService.CarPriceDetail carPriceDetail = carProxyService.getCarPriceDetail(carDetailReqVO);
 
-//        RenterGoodsDetailDTO renterGoodsDetailDTO = carProxyService.getRenterGoodsDetail(carDetailReqVO);
-//
+        CarProxyService.CarPriceDetail carPriceDetail = carProxyService.getCarPriceDetail(carDetailReqVO);
         responseVO.setCarPlatNo(carPriceDetail.getPlateNum());
+        OwnerMemberDTO ownerMemberDTO = memProxyService.getOwnerMemberInfo(carPriceDetail.getOwnerNo().toString());
+        responseVO.setOwnerMemNo(ownerMemberDTO.getMemNo());
+        responseVO.setOwnerName(ownerMemberDTO.getRealName());
+        responseVO.setOwnerMobile(ownerMemberDTO.getPhone());
+        responseVO.setRentTime(DateUtils.formate(rentTime, DateUtils.DATE_DEFAUTE1));
+        responseVO.setRevertTime(DateUtils.formate(revertTime, DateUtils.DATE_DEFAUTE1));
         List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();
 
         List<PreOrderAdminResponseVO.CarDayPrice> carDayPrices = new ArrayList<>();
@@ -115,11 +126,25 @@ public class AdminPreOrderController {
             PreOrderAdminResponseVO.CarDayPrice carDayPrice = new PreOrderAdminResponseVO.CarDayPrice();
             carDayPrice.setDay(dto.getDateStr());
             carDayPrice.setPrice(String.valueOf(dto.getPrice()));
-            if(isWorkDay(LocalDateTimeUtils.parseStringToLocalDate(dto.getDateStr(), GlobalConstant.FORMAT_DATE_STR))) {
-                carDayPrice.setDesc("工作日");
-            }else{
-                carDayPrice.setDesc("周末");
+
+            String desc = "";
+            if(StringUtils.isNotBlank(dto.getHolidayType())) {
+                try {
+                    desc = HolidayTypeEnum.from(dto.getHolidayType()).getTitle();
+                } catch (Exception e) {
+                    logger.info("无效节假日标识.holidayType:[{}]", dto.getHolidayType());
+                }
             }
+            if(StringUtils.isBlank(desc)) {
+                if(isWorkDay(LocalDateTimeUtils.parseStringToLocalDate(dto.getDateStr(),
+                        GlobalConstant.FORMAT_DATE_STR))) {
+                    desc = "工作日";
+                } else {
+                    desc = "周末";
+                }
+            }
+            carDayPrice.setDesc(desc);
+
             if(dto.getPrice().equals(dto.getHolidayPrice())||dto.getPrice().equals(dto.getDayPrice())) {
                 logger.info("无特供价");
             }
@@ -142,19 +167,21 @@ public class AdminPreOrderController {
 
         normalOrderCostCalculateReqVO.setDisCouponId(request.getDisCouponIds());
 
-
         normalOrderCostCalculateReqVO.setMemNo(memNo);
-        normalOrderCostCalculateReqVO.setOrderCategory("1");
         normalOrderCostCalculateReqVO.setSceneCode("EX007");
         normalOrderCostCalculateReqVO.setSource("1");
         normalOrderCostCalculateReqVO.setPlatformParentType("7");
-
+        normalOrderCostCalculateReqVO.setOrderCategory("1");
+        normalOrderCostCalculateReqVO.setBusinessParentType("5");
+        if(StringUtils.isNotBlank(request.getLongOwnerCouponNo())) {
+            normalOrderCostCalculateReqVO.setOrderCategory("3");
+            normalOrderCostCalculateReqVO.setBusinessParentType("6");
+        }
         MemAvailableCouponVO memAvailableCouponVO = adminOrderService.getPreOrderCouponList(normalOrderCostCalculateReqVO);
-
         responseVO.setPlatCouponList(memAvailableCouponVO.getPlatCouponList());
         responseVO.setGetCarCouponList(memAvailableCouponVO.getGetCarCouponList());
         responseVO.setCarOwnerCouponDetailVOList(memAvailableCouponVO.getCarOwnerCouponDetailVOList());
-
+        responseVO.setCountDays(memAvailableCouponVO.getCountDays());
         return ResponseData.success(responseVO);
 
     }
@@ -187,9 +214,11 @@ public class AdminPreOrderController {
         normalOrderCostCalculateReqVO.setSceneCode("EX007");
         normalOrderCostCalculateReqVO.setSource("1");
         normalOrderCostCalculateReqVO.setPlatformParentType("7");
-
+        if(StringUtils.isNotBlank(request.getLongOwnerCouponNo())) {
+            normalOrderCostCalculateReqVO.setOrderCategory("3");
+            normalOrderCostCalculateReqVO.setBusinessParentType("6");
+        }
         MemAvailableCouponVO memAvailableCouponVO = adminOrderService.getPreOrderCouponList(normalOrderCostCalculateReqVO);
-
         return ResponseData.success(memAvailableCouponVO);
     }
 

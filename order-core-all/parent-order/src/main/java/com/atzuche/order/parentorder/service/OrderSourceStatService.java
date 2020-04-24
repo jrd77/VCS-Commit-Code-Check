@@ -1,6 +1,7 @@
 package com.atzuche.order.parentorder.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.mapper.OrderSourceStatMapper;
@@ -65,8 +66,8 @@ public class OrderSourceStatService {
         BeanCopier beanCopier = BeanCopier.create(OrderSourceStatDTO.class, OrderSourceStatEntity.class, false);
         beanCopier.copy(orderSourceStatDTO, record, null);
 
-        record.setCreateOp("");
-        record.setUpdateOp("");
+        record.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
+        record.setUpdateOp(OrderConstant.SYSTEM_OPERATOR);
 
         LOGGER.info("Build master order source stat information. result is, record:[{}]", JSON.toJSONString(record));
         return record;

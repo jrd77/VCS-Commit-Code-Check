@@ -1,7 +1,13 @@
 package com.atzuche.order.delivery.controller;
 
 import com.atzuche.order.delivery.common.DeliveryCarTask;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
+import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.utils.CodeUtils;
+import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.mq.enums.PushMessageTypeEnum;
@@ -11,12 +17,12 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -36,8 +42,50 @@ public class DeliveryController {
 
     @Autowired
     DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    HandoverCarService handoverCarService;
+    @Autowired
+    RenterOrderDeliveryService renterOrderDeliveryService;
+    @Autowired
+    CodeUtils codeUtils;
 
-    @PostMapping("/delivery/add")
+
+
+   // @GetMapping("/test")
+    public ResponseData addHandoverCarInfo(@RequestParam(value = "orderNo") String orderNo,@RequestParam(value = "type") Integer type){
+
+        //String orderNo = "83579391400299";
+        HandoverCarVO handoverCarVO = new HandoverCarVO();
+        RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(orderNo, type);
+        if (Objects.nonNull(lastOrderDeliveryEntity)) {
+            lastOrderDeliveryEntity.setIsDelete(1);
+            renterOrderDeliveryService.updateDeliveryByPrimaryKey(lastOrderDeliveryEntity);
+        }
+
+        RenterOrderDeliveryEntity orderDeliveryEntity = new RenterOrderDeliveryEntity();
+        BeanUtils.copyProperties(lastOrderDeliveryEntity,orderDeliveryEntity);
+        orderDeliveryEntity.setIsDelete(0);
+        orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
+        orderDeliveryEntity.setAheadOrDelayTimeInfo(null, null, null);
+        orderDeliveryEntity.setStatus(1);
+        orderDeliveryEntity.setIsNotifyRenyun(1);
+        renterOrderDeliveryService.insert(orderDeliveryEntity);
+
+        HandoverCarInfoDTO handoverCarInfoDTO = new HandoverCarInfoDTO();
+        handoverCarInfoDTO.setCreateOp("");
+        handoverCarInfoDTO.setOrderNo(orderDeliveryEntity.getOrderNo());
+        handoverCarInfoDTO.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
+        handoverCarInfoDTO.setAheadTimeAndType(0,0,orderDeliveryEntity);
+        handoverCarInfoDTO.setRealReturnAddr(orderDeliveryEntity.getRenterGetReturnAddr());
+        handoverCarInfoDTO.setRealReturnAddrLat(orderDeliveryEntity.getRenterGetReturnAddrLat());
+        handoverCarInfoDTO.setRealReturnAddrLon(orderDeliveryEntity.getRenterGetReturnAddrLon());
+        handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
+        handoverCarService.addHandoverCarInfo(handoverCarVO,1);
+        handoverCarService.addHandoverCarInfo(handoverCarVO,2);
+        return ResponseData.success();
+    }
+
+   // @PostMapping("/delivery/add")
     public ResponseData<?> add() {
 
         //给车主租客发送支付成功短信

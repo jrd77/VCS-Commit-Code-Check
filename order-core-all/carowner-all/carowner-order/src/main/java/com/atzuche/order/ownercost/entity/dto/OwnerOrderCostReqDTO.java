@@ -5,6 +5,8 @@ import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OwnerOrderCostReqDTO {
     /**
@@ -43,7 +45,7 @@ public class OwnerOrderCostReqDTO {
     /**
      * 租客端补贴对应的明细
      */
-    private OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity;
+    private List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails;
 
 
 }

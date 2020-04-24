@@ -76,6 +76,9 @@ public class PreOrderReqVO implements Serializable {
     @AutoDocProperty(value = "车主优惠券编码")
     private String carOwnerCouponNo;
 
+    @AutoDocProperty(value = "长租订单车主折扣券编码:(LONG_2020041518010000)")
+    private String longOwnerCouponNo;
+
     @AutoDocProperty(value = "是否使用凹凸币:0.否 1.是")
     private Integer useAutoCoin;
 

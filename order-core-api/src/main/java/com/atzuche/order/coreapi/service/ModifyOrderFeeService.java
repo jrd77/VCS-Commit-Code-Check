@@ -3,17 +3,14 @@ package com.atzuche.order.coreapi.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.atzuche.order.commons.entity.dto.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
@@ -28,7 +25,6 @@ import com.atzuche.order.open.vo.ModifyOrderFineVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -118,7 +114,7 @@ public class ModifyOrderFeeService {
 		// 获取修改前罚金
 		List<RenterOrderFineDeatailEntity> initFineList = renterOrderFineDeatailService.listRenterOrderFineDeatail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 提前延后时间计算
-		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderService.getCarRentTimeRangeResVO(modifyOrderDTO);
+		CarRentTimeRangeDTO carRentTimeRangeResVO = modifyOrderService.getCarRentTimeRangeResVO(modifyOrderDTO);
 		// 设置提前延后时间
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
@@ -237,7 +233,7 @@ public class ModifyOrderFeeService {
 		// 获取修改前补贴信息
 		List<RenterOrderSubsidyDetailEntity> initSubsidyList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(modifyOrderDTO.getOrderNo(), initRenterOrder.getRenterOrderNo());
 		// 提前延后时间计算
-		CarRentTimeRangeResVO carRentTimeRangeResVO = modifyOrderService.getCarRentTimeRangeResVO(modifyOrderDTO);
+		CarRentTimeRangeDTO carRentTimeRangeResVO = modifyOrderService.getCarRentTimeRangeResVO(modifyOrderDTO);
 		// 设置提前延后时间
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
@@ -401,11 +397,11 @@ public class ModifyOrderFeeService {
 			return null;
 		}
 		// 提前还车违约金
-		Integer penaltyAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_ADVANCE.getFineType());
+		Integer penaltyAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineType());
 		// 取车服务违约金 
-		Integer getFineAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_GET_FINE.getFineType());
+		Integer getFineAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_GET_FINE.getFineType());
 		// 还车服务违约金
-		Integer returnFineAmt = getFineAmtByCode(fineList, FineTypeEnum.MODIFY_RETURN_FINE.getFineType());
+		Integer returnFineAmt = getFineAmtByCode(fineList, FineTypeCashCodeEnum.MODIFY_RETURN_FINE.getFineType());
 		// 封装罚金对象
 		ModifyOrderFineVO modifyOrderFineVO = new ModifyOrderFineVO();
 		modifyOrderFineVO.setGetFineAmt(getFineAmt);
