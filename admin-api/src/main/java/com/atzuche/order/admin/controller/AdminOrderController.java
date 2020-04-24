@@ -11,11 +11,15 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.vo.request.TransferReq;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -53,6 +57,8 @@ public class AdminOrderController {
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
     @Autowired
+    private OrderStatusService orderStatusService;
+    @Autowired
     private CarService carService;
 
     @AutoDocVersion(version = "订单修改")
@@ -67,6 +73,12 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+            log.error("已经结算不允许编辑orderNo={}",orderNo);
+            throw new NotAllowedEditException();
+        }
+
         OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
         reqDTO.setOrderNo(orderNo);
 
