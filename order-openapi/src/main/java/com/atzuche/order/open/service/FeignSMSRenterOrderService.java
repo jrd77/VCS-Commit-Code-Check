@@ -2,6 +2,8 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.CashierDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -38,4 +40,24 @@ public interface FeignSMSRenterOrderService {
      */
     @GetMapping("/orderInfo")
     ResponseData<RenterOrderDTO> getRenterOrderByOrderNoAndIsEffective(@RequestParam("orderNo") String orderNo);
+
+    /**
+     * 获取订单状态
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/getByOrderNo")
+    ResponseData<OrderStatusDTO> getByOrderNo(@RequestParam("orderNo") String orderNo);
+
+    /**
+     * 获取收银数据
+     * @param orderNo
+     * @param memNo
+     * @param amount
+     * @param payPur
+     * @return
+     */
+    @GetMapping("/getCashier")
+    ResponseData<CashierDTO> getCashier(@RequestParam("orderNo") String orderNo, @RequestParam("memNo") String memNo, @RequestParam("amount") String amount, @RequestParam("payPur") String payPur);
+
 }
