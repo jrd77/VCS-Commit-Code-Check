@@ -310,7 +310,8 @@ public class SubmitOrderHandleService {
             return null;
         }
         return buildOwnerOrderSubsidyDetailEntity(orderNo, ownerOrderNo, memNo, ownerCoupon.getAmount(),
-                RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST, "使用车主券抵扣租金");
+                RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo(),
+                RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt(), "使用车主券抵扣租金");
     }
 
     /**
@@ -320,7 +321,8 @@ public class SubmitOrderHandleService {
      * @param ownerOrderNo 车主订单号
      * @param memNo 车主注册号
      * @param subsidyAmount 补贴金额
-     * @param subsidyCost 补贴费用项编码
+     * @param subsidyCostCode 补贴费用项编码
+     * @param subsidyCostName 补贴费用项名称
      * @param subsidyDesc 补贴费用项描述
      * @return OwnerOrderSubsidyDetailEntity
      */
@@ -328,7 +330,8 @@ public class SubmitOrderHandleService {
                                                                             String ownerOrderNo,
                                                                             String memNo,
                                                                             int subsidyAmount,
-                                                                            RenterCashCodeEnum subsidyCost,
+                                                                            String subsidyCostCode,
+                                                                            String subsidyCostName,
                                                                             String subsidyDesc) {
         if(OrderConstant.ZERO == subsidyAmount) {
             return null;
@@ -346,8 +349,8 @@ public class SubmitOrderHandleService {
 
         ownerOrderSubsidyDetailEntity.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
         ownerOrderSubsidyDetailEntity.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
-        ownerOrderSubsidyDetailEntity.setSubsidyCostCode(subsidyCost.getCashNo());
-        ownerOrderSubsidyDetailEntity.setSubsidyCostName(subsidyCost.getTxt());
+        ownerOrderSubsidyDetailEntity.setSubsidyCostCode(subsidyCostCode);
+        ownerOrderSubsidyDetailEntity.setSubsidyCostName(subsidyCostName);
         ownerOrderSubsidyDetailEntity.setSubsidyDesc(subsidyDesc);
 
         logger.info("Build ownerOrderSubsidyDetailEntity,result is ,ownerOrderSubsidyDetailEntity:[{}]",
@@ -432,7 +435,7 @@ public class SubmitOrderHandleService {
                         .sum();
         OwnerOrderSubsidyDetailEntity ownerOrderSubsidyDetailEntity = buildOwnerOrderSubsidyDetailEntity(ownerOrderReqDTO.getOrderNo(),
                 ownerOrderReqDTO.getOwnerOrderNo(), ownerOrderReqDTO.getMemNo(), subsidyAmt,
-                RenterCashCodeEnum.RENT_AMT, "长租订单租金折扣补贴");
+                OwnerCashCodeEnum.RENT_AMT.getCashNo(), OwnerCashCodeEnum.RENT_AMT.getTxt(), "长租订单租金折扣补贴");
         if(Objects.nonNull(ownerOrderSubsidyDetailEntity)) {
             ownerOrderSubsidyDetails.add(ownerOrderSubsidyDetailEntity);
         }
