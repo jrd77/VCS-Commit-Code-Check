@@ -79,7 +79,7 @@ public class CarDepositReturnDetailController {
         BindingResultUtil.checkBindingResult(bindingResult);
 
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getCarDepositSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getCarDepositSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",req.getOrderNo());
             throw new NotAllowedEditException();
         }
