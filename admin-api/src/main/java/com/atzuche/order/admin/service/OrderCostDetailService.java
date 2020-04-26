@@ -361,7 +361,7 @@ public class OrderCostDetailService {
 	          throw new Exception("获取订单数据为空");
 	      }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }
@@ -509,7 +509,7 @@ public class OrderCostDetailService {
 
 
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo());
-        int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList);
+        int renterUpateSubsidyAmt = OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidySystemAmt(consoleSubsidyList);
         int renterSubsidyAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
         int abatementInsureAmt = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.ABATEMENT_INSURE);
         int longGetReturnCarCostSubsidy = OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST) +
@@ -610,7 +610,7 @@ public class OrderCostDetailService {
 	        }
 	    }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }
@@ -750,7 +750,7 @@ public class OrderCostDetailService {
             throw new Exception("获取订单数据为空");
         }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }
@@ -1129,7 +1129,7 @@ public class OrderCostDetailService {
             throw new Exception("获取订单数据为空");
         }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }
@@ -1241,7 +1241,7 @@ public class OrderCostDetailService {
 	        throw new Exception("获取订单数据为空");
 	    }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }
@@ -1435,7 +1435,7 @@ public class OrderCostDetailService {
 //	        throw new Exception("获取订单数据为空");
 //	    }
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(ownerCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",ownerCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
         }

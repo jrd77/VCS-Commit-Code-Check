@@ -77,7 +77,7 @@ public class AdminOrderController {
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",orderNo);
             throw new NotAllowedEditException();
         }

@@ -94,7 +94,7 @@ public class AdminRenterWzController extends BaseController {
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getWzSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getWzSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",req.getOrderNo());
             throw new NotAllowedEditException();
         }
