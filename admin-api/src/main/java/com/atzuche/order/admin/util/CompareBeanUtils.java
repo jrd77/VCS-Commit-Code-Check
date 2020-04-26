@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.util;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.util.ReflectionUtils;
@@ -18,6 +19,7 @@ import java.util.Objects;
  * @author pengcheng.fu
  * @date 2020/04/22 11:32
  */
+@Slf4j
 public class CompareBeanUtils<T> {
 
     /**
@@ -154,7 +156,7 @@ public class CompareBeanUtils<T> {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           log.error("字段值对比异常.fieldName:[{}],fieldChName:[{}]", fieldName, fieldChName, e);
         }
     }
 
