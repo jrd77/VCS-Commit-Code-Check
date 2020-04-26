@@ -18,47 +18,70 @@ public class AdminOperateLogEntity implements Serializable {
 
     private static final long serialVersionUID = 3048425445744873323L;
 
-
-    private Integer id;
-
     /**
-     * 订单号
+     *
+     */
+    private Integer id;
+    /**
+     * 主订单号
      */
     private String orderNo;
-    /**
-     * 操作类型，
-     */
-    private int opType;
-
-    /**
-     * 操作类型描述
-     */
-    private String opTypeDesc;
-
-    /**
-     * 操作内容
-     */
-    private String desc;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
     /**
      * 操作人ID
      */
     private String operatorId;
-
     /**
-     * 操作人
+     * 操作人name
      */
     private String operatorName;
-
     /**
      * 部门ID
      */
-    private String deptId;
+    private Integer deptId;
+    /**
+     * 部门名称
+     */
+    private String deptName;
+    /**
+     * 操作类型
+     */
+    private Integer opTypeCode;
+    /**
+     * 操作类型描述
+     */
+    private String opTypeDesc;
+    /**
+     * 操作描述
+     */
+    private String desc;
+    /**
+     * 操作时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 操作人名称
+     */
+    private String createOp;
+    /**
+     * 修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 修改人
+     */
+    private String updateOp;
+    /**
+     * 0-正常，1-已逻辑删除
+     */
+    private Integer isDelete;
+    /**
+     * 租客子订单号
+     */
+    private String renterOrderNo;
+    /**
+     * 车主子订单号
+     */
+    private String ownerOrderNo;
 
 
 }
