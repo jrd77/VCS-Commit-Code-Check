@@ -29,6 +29,7 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNot
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderWaitReceiptException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferCarException;
+import com.atzuche.order.coreapi.modifyorder.exception.TransferRenterAndOwnerTheSameException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponException;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -365,6 +366,12 @@ public class ModifyOrderCheckService {
 				// 不能换同一辆车
 				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验不能换同一辆车", new TransferCarException());
 				throw new TransferCarException();
+			}
+			// 商品信息
+			RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
+			if (modifyOrderDTO.getMemNo() != null && modifyOrderDTO.getMemNo().equals(renterGoodsDetailDTO.getOwnerMemNo())) {
+				// 不能换自己的车
+				throw new TransferRenterAndOwnerTheSameException();
 			}
 		}
 	}

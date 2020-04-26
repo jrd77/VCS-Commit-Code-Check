@@ -27,6 +27,8 @@ import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -218,8 +220,11 @@ public class AdminOrderController {
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
     public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
+        if (StringUtils.isBlank(reqVO.getCarNo()) && StringUtils.isBlank(reqVO.getPlateNum())) {
+        	return ResponseData.createErrorCodeResponse("408508", "车辆号和车牌号二者必选其一");
+        }
         // 根据车牌号获取车辆注册号
-        String carNo = carService.getCarNoByPlateNum(reqVO.getPlateNum());
+        String carNo = StringUtils.isBlank(reqVO.getCarNo()) ? carService.getCarNoByPlateNum(reqVO.getPlateNum()):reqVO.getCarNo();
         TransferReq req = new TransferReq();
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         BeanUtils.copyProperties(reqVO,req);
