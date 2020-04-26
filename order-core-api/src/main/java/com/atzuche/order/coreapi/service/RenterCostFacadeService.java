@@ -472,6 +472,7 @@ public class RenterCostFacadeService {
     }
     private void longRentDeduct( CouponDeductionDTO couponDeductionDTO,String renterOrderNo,RenterSubsidyDetailVO renterSubsidyDetail) {
         OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+
         if(ownerCouponLongEntity != null){
             couponDeductionDTO.setOwnerLongRentDeduct(ownerCouponLongEntity.getDiscountDesc());
             couponDeductionDTO.setOwnerLongRentDeductAmt(renterSubsidyDetail.getLongRentDecutAmt());

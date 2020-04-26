@@ -531,7 +531,7 @@ public class OrderCostDetailService {
 	 	resVo.setAbatementSubsidy(String.valueOf(abatement));
         resVo.setAbatementSubsidySystem(String.valueOf(abatementInsureAmt));
 	 	resVo.setFeeSubsidy(String.valueOf(fee));
-        resVo.setLongGetReturnCarCostSubsidy(String.valueOf(-longGetReturnCarCostSubsidy));//长租特有字段
+        resVo.setLongGetReturnCarCostSubsidy(String.valueOf(longGetReturnCarCostSubsidy));//长租特有字段(运营习惯看到正数，取正值展示)
 		return resVo;
 	}
 	

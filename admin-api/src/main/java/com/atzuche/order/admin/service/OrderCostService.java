@@ -1149,6 +1149,13 @@ public class OrderCostService {
                 //平台给租客的补贴， 车主和租客的调价，车主给租客的租金补贴
                 putConsoleSubsidy(realVo,data);
 
+                //平台给租客的补贴（长租取还车补贴特殊处理）
+                List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+                int longGetReturnCarCostSubsidy = OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.SRV_GET_COST) +
+                        OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.SRV_RETURN_COST) +
+                        OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
+                        OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
+                realVo.setPlatformSubsidyAmt(String.valueOf(Integer.valueOf(realVo.getPlatformSubsidyAmt()) - longGetReturnCarCostSubsidy));
                 //补付费用
                 //需补付金额,跟修改订单的补付金额是同一个方法。
                 putSupplementAmt(realVo,data,costVo);
