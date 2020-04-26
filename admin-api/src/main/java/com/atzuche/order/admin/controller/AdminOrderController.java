@@ -11,6 +11,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
@@ -74,7 +75,7 @@ public class AdminOrderController {
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus()){
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",orderNo);
             throw new NotAllowedEditException();
         }

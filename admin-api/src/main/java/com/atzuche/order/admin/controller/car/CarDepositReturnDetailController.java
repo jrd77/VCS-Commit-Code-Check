@@ -9,6 +9,7 @@ import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -78,7 +79,7 @@ public class CarDepositReturnDetailController {
         BindingResultUtil.checkBindingResult(bindingResult);
 
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
-        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getCarDepositSettleStatus()){
+        if(SettleStatusEnum.SETTLEING.getCode() == orderStatusEntity.getCarDepositSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",req.getOrderNo());
             throw new NotAllowedEditException();
         }
