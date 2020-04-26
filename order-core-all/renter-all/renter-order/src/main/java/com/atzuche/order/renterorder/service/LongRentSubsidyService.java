@@ -77,7 +77,7 @@ public class LongRentSubsidyService {
 	        	renterSubsidyList.addAll(rentAmtSubsidyList);
 	        }
 		}
-		return renterSubsidyList;
+		return renterSubsidyList.stream().filter(obj -> obj != null).collect(Collectors.toList());
 	}
 	
 	

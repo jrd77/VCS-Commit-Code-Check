@@ -82,7 +82,7 @@ public class InsurAbamentDiscountService {
 	        	renterSubsidyList.addAll(abatementSubsidyList);
 	        }
 		}
-		return renterSubsidyList;
+		return renterSubsidyList.stream().filter(obj -> obj != null).collect(Collectors.toList());
 	}
 	
 	
