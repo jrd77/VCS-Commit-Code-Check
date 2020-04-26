@@ -38,4 +38,9 @@ public class ModifyOrderDeductVO implements Serializable{
      * 凹凸币抵扣金额
      */
     private Integer autoCoinDeductibleAmt;
+    
+    /**
+     * 长租折扣抵扣金额
+     */
+    private Integer longRentDeductAmt;
 }

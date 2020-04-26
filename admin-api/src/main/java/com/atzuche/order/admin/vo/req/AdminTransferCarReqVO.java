@@ -21,7 +21,6 @@ public class AdminTransferCarReqVO implements Serializable {
     @AutoDocProperty(value="车辆注册号")
     private String carNo;
     
-    @NotBlank(message="车牌号不能为空")
     @AutoDocProperty(value="车牌号",required=true)
     private String plateNum;
 

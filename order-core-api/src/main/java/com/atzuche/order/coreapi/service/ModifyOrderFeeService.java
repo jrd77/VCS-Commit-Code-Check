@@ -182,6 +182,7 @@ public class ModifyOrderFeeService {
 			totalRentCarFee += (modifyOrderDeductVO.getDiscouponAmt() == null ? 0:modifyOrderDeductVO.getDiscouponAmt());
 			totalRentCarFee += (modifyOrderDeductVO.getGetCarFeeDiscouponOffsetAmt() == null ? 0:modifyOrderDeductVO.getGetCarFeeDiscouponOffsetAmt());
 			totalRentCarFee += (modifyOrderDeductVO.getAutoCoinDeductibleAmt() == null ? 0:modifyOrderDeductVO.getAutoCoinDeductibleAmt());
+			totalRentCarFee += (modifyOrderDeductVO.getLongRentDeductAmt() == null ? 0:modifyOrderDeductVO.getLongRentDeductAmt());
 		}
 		ModifyOrderFineVO modifyOrderFineVO = updateModifyOrderFeeVO.getModifyOrderFineVO();
 		if (modifyOrderFineVO != null) {
@@ -326,7 +327,8 @@ public class ModifyOrderFeeService {
 			return null;
 		}
 		// 租金
-		Integer rentAmt = getCostAmtByCode(costList, RenterCashCodeEnum.RENT_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.RENT_AMT.getCashNo());
+		// Integer rentAmt = getCostAmtByCode(costList, RenterCashCodeEnum.RENT_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.RENT_AMT.getCashNo());
+		Integer rentAmt = getCostAmtByCode(costList, RenterCashCodeEnum.RENT_AMT.getCashNo());
 		// 手续费
 		Integer poundageAmt = getCostAmtByCode(costList, RenterCashCodeEnum.FEE.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.FEE.getCashNo());
 		// 平台保障费
@@ -376,6 +378,8 @@ public class ModifyOrderFeeService {
 		Integer getCarFeeDiscouponOffsetAmt = getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo());
 		// 凹凸币抵扣金额
 		Integer autoCoinDeductibleAmt = getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo());
+		// 长租折扣抵扣金额
+		Integer longRentDeductAmt = getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.RENT_AMT.getCashNo());
 		// 封装抵扣对象
 		ModifyOrderDeductVO modifyOrderDeductVO = new ModifyOrderDeductVO();
 		modifyOrderDeductVO.setAutoCoinDeductibleAmt(autoCoinDeductibleAmt);
@@ -383,6 +387,7 @@ public class ModifyOrderFeeService {
 		modifyOrderDeductVO.setGetCarFeeDiscouponOffsetAmt(getCarFeeDiscouponOffsetAmt);
 		modifyOrderDeductVO.setOwnerCouponOffsetCost(ownerCouponOffsetCost);
 		modifyOrderDeductVO.setReductionAmt(reductionAmt);
+		modifyOrderDeductVO.setLongRentDeductAmt(longRentDeductAmt);
 		return modifyOrderDeductVO;
 	}
 	

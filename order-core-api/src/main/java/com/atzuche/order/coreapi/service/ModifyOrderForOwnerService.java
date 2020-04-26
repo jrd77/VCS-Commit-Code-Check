@@ -107,6 +107,7 @@ public class ModifyOrderForOwnerService {
 		modifyOrderOwnerDTO.setOwnerMemberDTO(ownerMemberDTO);
 		// 封装新的车主子订单对象
 		OwnerOrderEntity ownerOrderEffective = convertToOwnerOrderEntity(modifyOrderOwnerDTO, ownerOrderEntity, ownerGoodsDetailDTO);
+		ownerOrderEffective.setRenterOrderNo(renterOrderNo);
 		// 设置车主订单信息
 		modifyOrderOwnerDTO.setOwnerOrderEffective(ownerOrderEffective);
 		// 封装基本对象
