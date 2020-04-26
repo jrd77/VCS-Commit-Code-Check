@@ -37,7 +37,8 @@ public class AdminLogService {
         entity.setDesc(desc);
         entity.setOpType(type.getOpCode());
         entity.setOpTypeDesc(type.getOpType());
-        entity.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        entity.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
+        entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
         adminOperateLogMapper.insertLog(entity);
     }
 

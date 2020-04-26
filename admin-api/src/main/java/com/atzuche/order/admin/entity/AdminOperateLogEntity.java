@@ -46,9 +46,14 @@ public class AdminOperateLogEntity implements Serializable {
     private LocalDateTime createTime;
 
     /**
+     * 操作人ID
+     */
+    private String operatorId;
+
+    /**
      * 操作人
      */
-    private String operator;
+    private String operatorName;
 
     /**
      * 部门ID

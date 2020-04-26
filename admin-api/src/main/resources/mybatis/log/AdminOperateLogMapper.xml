@@ -6,7 +6,8 @@
     <resultMap id="base" type="com.atzuche.order.admin.entity.AdminOperateLogEntity" >
         <id property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
-        <result property="operator" column="operator"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="operatorName" column="operator_name"/>
         <result property="deptId" column="dept_id"/>
         <result property="opType" column="op_type_code"/>
         <result property="opTypeDesc" column="op_type_desc"/>
@@ -15,34 +16,35 @@
     </resultMap>
 
 	<insert id="insertLog">
-        insert into order_console_operate_log(order_no,operator,dept_id,op_type_code,op_type_desc,`desc`)
-        values(#{orderNo},#{operator},#{deptId},#{opType},#{opTypeDesc},#{desc})
+        insert into
+        order_console_operate_log(order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`)
+        values(#{orderNo},#{operatorId},#{operatorName},#{deptId},#{opType},#{opTypeDesc},#{desc})
 
 	</insert>
 
 	<select id="findAll" resultMap="base">
 		select
-		    id,
-		    order_no,
-		    operator,
-		    dept_id,
-		    op_type_code,
-		    op_type_desc,
+		    `id`,
+		    `order_no`,
+		    `operator_name`,
+		    `dept_id`,
+		    `op_type_code`,
+		    `op_type_desc`,
 		    `desc`,
-		    create_time
+		    `create_time`
 		from order_console_operate_log where order_no=#{orderNo} and is_delete=0 order by create_time desc
 	</select>
 
     <select id="findByQuery" resultMap="base">
         select
-            id,
-            order_no,
-            operator,
-            dept_id,
-            op_type_code,
-            op_type_desc,
+            `id`,
+            `order_no`,
+            `operator_name`,
+            `dept_id`,
+            `op_type_code`,
+            `op_type_desc`,
             `desc`,
-            create_time
+            `create_time`
 		from
 		    order_console_operate_log
 		where
@@ -57,8 +59,8 @@
             <if test="opType != null and  opType != ''">
                 and op_type_code = #{opType}
             </if>
-            <if test="operator != null and  operator != ''">
-                and operator_name = #{operator}
+            <if test="operatorName != null and  operatorName != ''">
+                and operator_name = #{operatorName}
             </if>
     </select>
 
