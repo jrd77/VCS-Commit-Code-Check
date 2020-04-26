@@ -6,10 +6,12 @@
     <resultMap id="base" type="com.atzuche.order.admin.entity.AdminOperateLogEntity" >
         <id property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
+        <result property="ownerOrderNo" column="owner_order_no"/>
         <result property="operatorId" column="operator_id"/>
         <result property="operatorName" column="operator_name"/>
         <result property="deptId" column="dept_id"/>
-        <result property="opType" column="op_type_code"/>
+        <result property="opTypeCode" column="op_type_code"/>
         <result property="opTypeDesc" column="op_type_desc"/>
         <result property="desc" column="desc"/>
         <result property="createTime" column="create_time"/>
@@ -17,8 +19,8 @@
 
 	<insert id="insertLog">
         insert into
-        order_console_operate_log(order_no,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`)
-        values(#{orderNo},#{operatorId},#{operatorName},#{deptId},#{opType},#{opTypeDesc},#{desc})
+        order_console_operate_log(order_no,`renter_order_no`,`owner_order_no`,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`)
+        values(#{orderNo},#{renterOrderNo}, #{ownerOrderNo}	,#{operatorId},#{operatorName},#{deptId},#{opTypeCode},#{opTypeDesc},#{desc})
 
 	</insert>
 
@@ -26,6 +28,8 @@
 		select
 		    `id`,
 		    `order_no`,
+            `renter_order_no`,
+            `owner_order_no`,
 		    `operator_name`,
 		    `dept_id`,
 		    `op_type_code`,
@@ -39,6 +43,8 @@
         select
             `id`,
             `order_no`,
+            `renter_order_no`,
+            `owner_order_no`,
             `operator_name`,
             `dept_id`,
             `op_type_code`,

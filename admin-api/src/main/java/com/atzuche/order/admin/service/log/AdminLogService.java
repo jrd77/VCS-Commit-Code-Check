@@ -35,7 +35,7 @@ public class AdminLogService {
         AdminOperateLogEntity entity = new AdminOperateLogEntity();
         entity.setOrderNo(orderNo);
         entity.setDesc(desc);
-        entity.setOpType(type.getOpCode());
+        entity.setOpTypeCode(type.getOpCode());
         entity.setOpTypeDesc(type.getOpType());
         entity.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
