@@ -169,7 +169,7 @@ public class AdminOrderService {
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中心服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"FeignOrderUpdateService.adminPlatformCancelOrder");
-            log.info("Feign 开始修改订单,platVO={}", JSON.toJSONString(platVO));
+            log.info("Feign 开始取消订单,platVO={}", JSON.toJSONString(platVO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(platVO));
             AdminOrderPlatformCancelReqVO adminOrderCancelReqVO = new AdminOrderPlatformCancelReqVO();
             BeanUtils.copyProperties(platVO,adminOrderCancelReqVO);
