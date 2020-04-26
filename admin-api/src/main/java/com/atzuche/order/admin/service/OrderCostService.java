@@ -1155,7 +1155,9 @@ public class OrderCostService {
                         OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.SRV_RETURN_COST) +
                         OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
                         OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
-                realVo.setPlatformSubsidyAmt(String.valueOf(Integer.valueOf(realVo.getPlatformSubsidyAmt()) - longGetReturnCarCostSubsidy));
+                realVo.setPlatformSubsidyAmt(String.valueOf((realVo.getPlatformSubsidyAmt()==null?0:Integer.valueOf(realVo.getPlatformSubsidyAmt())) - longGetReturnCarCostSubsidy));
+
+                realVo.setPlatformSubsidyRealAmt(String.valueOf((realVo.getPlatformSubsidyRealAmt()==null?0:Integer.valueOf(realVo.getPlatformSubsidyRealAmt())) - longGetReturnCarCostSubsidy));
                 //补付费用
                 //需补付金额,跟修改订单的补付金额是同一个方法。
                 putSupplementAmt(realVo,data,costVo);
