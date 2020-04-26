@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
@@ -88,7 +89,7 @@ public class AdminRenterWzController extends BaseController {
 
         renterWzService.addTemporaryRefund(req);
         try{
-            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(),req.toString());
+            adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(), JSON.toJSONString(req));
         }catch (Exception e){
             log.warn("暂扣违章押金日志记录失败",e);
         }

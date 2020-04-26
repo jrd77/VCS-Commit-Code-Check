@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.OrderSubmitService;
 import com.atzuche.order.admin.service.log.AdminLogService;
@@ -43,7 +44,7 @@ public class AdminOrderSubmitController {
         }
         OrderResVO orderResVO = orderSubmitService.submit(adminOrderReqVO,request);
         try{
-            adminLogService.insertLog(AdminOpTypeEnum.SUBMIT_ORDER,orderResVO.getOrderNo(),adminOrderReqVO.toString());
+            adminLogService.insertLog(AdminOpTypeEnum.SUBMIT_ORDER,orderResVO.getOrderNo(), JSON.toJSONString(adminOrderReqVO));
         }catch (Exception e){
             logger.warn("后台日志记录错误",e);
         }
