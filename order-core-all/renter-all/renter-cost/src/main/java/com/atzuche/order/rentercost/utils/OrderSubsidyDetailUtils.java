@@ -2,6 +2,7 @@ package com.atzuche.order.rentercost.utils;
 
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
@@ -34,6 +35,15 @@ public class OrderSubsidyDetailUtils {
     public static int getRenterSubsidyAmt(List<RenterOrderSubsidyDetailEntity> all, RenterCashCodeEnum cashCodeEnum){
         int total=0;
         for(RenterOrderSubsidyDetailEntity detailEntity:all){
+            if(cashCodeEnum.getCashNo().equals(detailEntity.getSubsidyCostCode())&&detailEntity.getSubsidyAmount()!=null){
+                total = total+detailEntity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
+    public static int getRenterResvoSubsidyAmt(List<RenterOrderSubsidyDetailResVO> all, RenterCashCodeEnum cashCodeEnum){
+        int total=0;
+        for(RenterOrderSubsidyDetailResVO detailEntity:all){
             if(cashCodeEnum.getCashNo().equals(detailEntity.getSubsidyCostCode())&&detailEntity.getSubsidyAmount()!=null){
                 total = total+detailEntity.getSubsidyAmount();
             }
