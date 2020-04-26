@@ -13,6 +13,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -236,7 +237,7 @@ public class AdminOrderCostDetailController {
      */
     @AutoDocMethod(description = "租客车主互相调价 车主租客互相调价操作", value = "租客车主互相调价 车主租客互相调价操作",response = ResponseData.class)
     @PostMapping("renterPriceAdjustment/update")
-    public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody  RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+    public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response, BindingResult bindingResult) {
     	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());

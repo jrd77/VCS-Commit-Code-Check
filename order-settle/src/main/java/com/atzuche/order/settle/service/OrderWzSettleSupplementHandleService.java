@@ -61,7 +61,8 @@ public class OrderWzSettleSupplementHandleService {
         } else {
             List<OrderSupplementDetailEntity> debtList= new ArrayList<>();
             List<OrderSupplementDetailEntity> deductList = new ArrayList<>();
-            handleSupplementDetail(entityList, debtList, deductList, settleOrdersAccount);
+            int needPayAmt = handleSupplementDetail(entityList, debtList, deductList, settleOrdersAccount);
+            settleOrders.setShouldTakeWzCost(settleOrders.getShouldTakeWzCost() + needPayAmt);
             if (CollectionUtils.isNotEmpty(debtList)) {
                 debtList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
@@ -95,7 +96,7 @@ public class OrderWzSettleSupplementHandleService {
      * @param deductList 转款欠款记录
      * @param settleOrdersAccount 结算信息
      */
-    public void handleSupplementDetail(List<OrderSupplementDetailEntity> entityList,
+    public int handleSupplementDetail(List<OrderSupplementDetailEntity> entityList,
                                        List<OrderSupplementDetailEntity> debtList,
                                        List<OrderSupplementDetailEntity> deductList,
                                        SettleOrdersAccount settleOrdersAccount) {
@@ -175,6 +176,9 @@ public class OrderWzSettleSupplementHandleService {
                 deductList.addAll(noNeedPayList);
             }
         }
+
+        int needPayAmt = noNeedPayAmt + noPayAmt;
+        return needPayAmt > OrderConstant.ZERO ? OrderConstant.ZERO : Math.abs(needPayAmt);
     }
 
     /**

@@ -74,7 +74,8 @@ public class CashierBatchController {
 			PrePlatformRequest reqData) {
 		reqData.setAtappId(orderPayReqVO.getAtappId());
         reqData.setInternalNo(orderPayReqVO.getInternalNo());
-        reqData.setPayAmt(String.valueOf(result.getAmtTotal()));  //支付金额
+//        reqData.setPayAmt(String.valueOf(result.getAmtTotal()));  //支付金额
+        reqData.setPayAmt(String.valueOf(result.getAmt()));  //支付金额
         reqData.setPayKind(orderPayReqVO.getPayKind().get(0)); //默认取第一个。
         reqData.setPayType(orderPayReqVO.getPayType());  //消费
         reqData.setOrderNo(orderPayReqVO.getOrderNos().get(0)); //默认第一个

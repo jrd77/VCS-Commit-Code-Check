@@ -41,6 +41,7 @@ public interface CashierMapper{
      * @return
      */
     CashierEntity getPayAmtByPayKind(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
+    CashierEntity getPayAmtByPayKindNoWallet(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
 
     /**
      * 查询收银台应付金额

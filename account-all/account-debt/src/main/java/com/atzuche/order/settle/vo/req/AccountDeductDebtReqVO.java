@@ -77,4 +77,28 @@ public class AccountDeductDebtReqVO {
         Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getSourceCode(), ErrorCode.PARAMETER_ERROR.getText());
     }
+
+
+    public AccountDeductDebtReqVO() {
+    }
+
+    public AccountDeductDebtReqVO(int amt, String updateOp) {
+        this.amt = amt;
+        this.updateOp = updateOp;
+    }
+
+    public AccountDeductDebtReqVO(int amt, String sourceCode, String sourceDetail, String updateOp) {
+        this.amt = amt;
+        this.sourceCode = sourceCode;
+        this.sourceDetail = sourceDetail;
+        this.updateOp = updateOp;
+    }
+
+    public AccountDeductDebtReqVO(String memNo, int amt, String sourceCode, String sourceDetail, String updateOp) {
+        this.memNo = memNo;
+        this.amt = amt;
+        this.sourceCode = sourceCode;
+        this.sourceDetail = sourceDetail;
+        this.updateOp = updateOp;
+    }
 }

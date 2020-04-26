@@ -24,6 +24,8 @@ public class PreOrderAdminResponseVO {
     private int totalWallet;
     @AutoDocProperty(value="凹凸币总额")
     private int totalAutoCoin;
+    @AutoDocProperty(value="是否禁用全面保障服务：1-是，0-否")
+    private Integer noAbatementFlag;
 
     @AutoDocProperty(value="特价车天单价")
     private List<CarDayPrice> carSpecialDayPrices = new ArrayList<>();

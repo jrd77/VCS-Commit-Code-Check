@@ -95,6 +95,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
         renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
+        renterOrderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         logger.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;

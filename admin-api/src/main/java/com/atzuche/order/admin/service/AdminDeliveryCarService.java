@@ -97,13 +97,9 @@ public class AdminDeliveryCarService {
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
-        // 获取租客商品信息
-        RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(deliveryCarDTO.getOrderNo(),1);
-        if(null == renterOrderDeliveryEntity)
-        {
-            throw new DeliveryOrderException(DeliveryErrorCode.NO_DELIVERY_INFO);
-        }
-        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDeliveryEntity.getRenterOrderNo(), false);
+        //获取有效的子订单号
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(deliveryCarDTO.getOrderNo());
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
         ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(OilCostTypeEnum.getOilCostType(renterGoodsDetailDTO.getCarEngineType())));
         String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" :String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
@@ -111,7 +107,7 @@ public class AdminDeliveryCarService {
         ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume())+"L");
         boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
         int carType = renterGoodsDetailDTO.getCarType();
-        return deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderDeliveryEntity.getRenterOrderNo(),deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType,renterGoodsDetailDTO);
+        return deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(),deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType,renterGoodsDetailDTO);
     }
 
     /**

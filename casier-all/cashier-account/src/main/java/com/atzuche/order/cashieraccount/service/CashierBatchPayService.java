@@ -233,9 +233,9 @@ public class CashierBatchPayService {
         
         result.setAmtDeposit(amtTotalDeposit);
         result.setAmtWzDeposit(amtTotalWZDeposit);
-        result.setAmtTotal(amtTotal);
+//        result.setAmtTotal(amtTotal);  // amt字段
         result.setAmtPay(rentAmtPayed);
-        result.setAmt(amtTotal);  //result.getAmt()取值。
+        result.setAmt(amtTotal);  //result.getAmt()取值。 对外appserver
         result.setMemNo(orderPayReqVO.getMenNo());
         result.setOrderNo(orderPayReqVO.getOrderNos().get(0));  //默认取第一个
         result.setTitle("待支付金额：" +Math.abs(result.getAmt()) + "，订单号："  + result.getOrderNo());
@@ -245,6 +245,12 @@ public class CashierBatchPayService {
         return result;
 	}
 
+	/**
+	 * 应用场景：补付的多笔订单批量支付。不存在钱包抵扣的情况。
+	 * @param orderPaySign
+	 * @param payCallbackService
+	 * @return
+	 */
 	public String getPaySignStr(OrderPaySignBatchReqVO orderPaySign, OrderPayCallBack payCallbackService) {
 		//1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
@@ -259,7 +265,7 @@ public class CashierBatchPayService {
         BeanUtils.copyProperties(orderPaySign,orderPaySignSimple);
         orderPaySignSimple.setOrderNo(orderPaySign.getOrderNos().get(0));  //默认取第一个对象
         
-        List<PayVo> payVo = cashierPayService.getOrderPayVO(orderPaySignSimple,orderPayable);
+        List<PayVo> payVo = cashierPayService.getOrderPayVO(orderPaySignSimple,orderPayable,false);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
             throw new OrderPaySignFailException();
