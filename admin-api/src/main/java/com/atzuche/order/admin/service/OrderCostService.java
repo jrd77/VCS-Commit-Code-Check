@@ -1232,7 +1232,7 @@ public class OrderCostService {
         int sum = Optional.ofNullable(ownerOrderSubsidyDetail)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
+                .filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
                 .mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount)
                 .sum();
 
