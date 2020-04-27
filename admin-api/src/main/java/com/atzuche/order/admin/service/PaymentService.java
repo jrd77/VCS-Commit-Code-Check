@@ -5,6 +5,7 @@ package com.atzuche.order.admin.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -175,7 +176,7 @@ public class PaymentService {
 
                     if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT, null, wzSettleTime);
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList, Arrays.asList(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT), null, wzSettleTime);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
@@ -189,7 +190,7 @@ public class PaymentService {
                         }
                     }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT, null, wzSettleTime);
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT), null, wzSettleTime);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
@@ -203,7 +204,7 @@ public class PaymentService {
                         }
                     }else if(DataPayKindConstant.RENT_AMOUNT.equals(payKind)){//租车费用
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT, null, wzSettleTime);
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT), null, wzSettleTime);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
