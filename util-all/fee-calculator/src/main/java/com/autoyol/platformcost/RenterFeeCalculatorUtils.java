@@ -81,6 +81,41 @@ public class RenterFeeCalculatorUtils {
 	
 	
 	/**
+	 * 计算租金
+	 * @param rentTime 取车时间
+	 * @param revertTime 还车时间
+	 * @param configHours 配置小时数
+	 * @param carPriceOfDayList 车辆日期价格列表
+	 * @return FeeResult
+	 */
+	public static FeeResult calRentAmtByAverage(LocalDateTime rentTime, LocalDateTime revertTime, Integer configHours, Integer holidayAverage) {
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (holidayAverage == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.CAL_HOLIDAY_AVERAGE_PRICE_EXCEPTION);
+		}
+		// 计算总租期
+		Double rentDays = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (rentDays == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
+		// 总租金
+		Integer rentAmt = new BigDecimal(holidayAverage*rentDays).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+		rentAmt = (rentAmt == null || rentAmt < 1) ? 1 : rentAmt;
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(rentAmt);
+		feeResult.setUnitCount(rentDays);
+		feeResult.setUnitPrice(holidayAverage);
+		return feeResult;
+	}
+	
+	
+	
+	/**
 	 * 计算日均价
 	 * @param rentTime 取车时间
 	 * @param revertTime 还车时间
@@ -149,8 +184,7 @@ public class RenterFeeCalculatorUtils {
 	 * 平台手续费
 	 */
 	public static FeeResult calServiceChargeFee() {
-		FeeResult feeResult = new FeeResult(SERVICE_CHARGE_FEE, 1.0, SERVICE_CHARGE_FEE);
-		return feeResult;
+		return new FeeResult(SERVICE_CHARGE_FEE, 1.0, SERVICE_CHARGE_FEE);
 	}
 	
 	

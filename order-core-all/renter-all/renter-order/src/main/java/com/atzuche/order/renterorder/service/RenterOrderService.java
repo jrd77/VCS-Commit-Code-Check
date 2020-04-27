@@ -13,6 +13,9 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
+import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
+import com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper;
+import com.atzuche.order.renterorder.mapper.RenterDepositDetailMapper;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
 import com.atzuche.order.renterorder.vo.*;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
@@ -46,6 +49,10 @@ public class RenterOrderService {
 
     @Resource
     private RenterOrderMapper renterOrderMapper;
+    @Resource
+    private RenterDepositDetailMapper renterDepositDetailMapper;
+    @Resource
+    private OwnerCouponLongService ownerCouponLongService;
 
     @Resource
     private OrderCouponService orderCouponService;
@@ -145,7 +152,7 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderByOrderNoAndWaitPayIncrement(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndWaitPayIncrement(orderNo);
     }
-    
+
     //根据会员号查询
     public List<RenterOrderEntity> getRenterOrderByMemNoAndWaitPay(String memNo) {
         return renterOrderMapper.getRenterOrderByMemNoAndWaitPay(memNo);
@@ -168,6 +175,7 @@ public class RenterOrderService {
         // 获取平台保障费和全面保障费折扣补贴
   		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, null);
   		renterOrderCostReqDTO.setSubsidyOutList(insurDiscountSubsidyList);
+
         RenterOrderCostRespDTO renterOrderCostRespDTO =
                 renterOrderCalCostService.calcBasicRenterOrderCostAndDeailList(renterOrderCostReqDTO);
         renterOrderCostRespDTO.setMemNo(renterOrderReqVO.getMemNo());
@@ -229,7 +237,7 @@ public class RenterOrderService {
                 || StringUtils.isNotBlank(renterOrderReqVO.getGetCarFreeCouponId()) ? 1 : 0);
         record.setIsGetCar(renterOrderReqVO.getSrvGetFlag());
         record.setIsReturnCar(renterOrderReqVO.getSrvReturnFlag());
-        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:Integer.valueOf(renterOrderReqVO.getAbatement()));
+        record.setIsAbatement(renterOrderReqVO.getAbatement()==null?0:renterOrderReqVO.getAbatement());
         record.setIsUseSpecialPrice(Integer.valueOf(renterOrderReqVO.getUseSpecialPrice()==null?"0":renterOrderReqVO.getUseSpecialPrice()));
         record.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
@@ -264,6 +272,27 @@ public class RenterOrderService {
 
         renterOrderResVO.setCouponAndAutoCoinResVO(couponAndAutoCoinResVO);
         return renterOrderResVO;
+    }
+
+
+    /**
+     * 创建租客订单
+     *
+     * @param createRenterOrderDataReqDTO 租客订单数据
+     */
+    public void createRenterOrder(CreateRenterOrderDataReqDTO createRenterOrderDataReqDTO){
+        //租客订单信息落库
+        renterOrderMapper.insertSelective(createRenterOrderDataReqDTO.getRenterOrderEntity());
+        //租客订单费用、费用明细、补贴明细等落库
+        renterOrderCalCostService.saveOrderCostAndDeailList(createRenterOrderDataReqDTO.getRenterOrderCostRespDTO());
+        //订单优惠券信息落库
+        orderCouponService.insertBatch(createRenterOrderDataReqDTO.getOrderCouponList());
+        //附加驾驶人信息落库
+        renterAdditionalDriverService.insertBatchAdditionalDriver(createRenterOrderDataReqDTO.getRenterAdditionalDriverEntities());
+        //车辆押金明细落库
+        renterDepositDetailMapper.insertSelective(createRenterOrderDataReqDTO.getRenterDepositDetailEntity());
+        //长租订单折扣信息落库
+        int result = ownerCouponLongService.saveOwnerCouponLong(createRenterOrderDataReqDTO.getOwnerCouponLongEntity());
     }
 
 
@@ -561,7 +590,7 @@ public class RenterOrderService {
     public RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(String orderNo) {
         return renterOrderMapper.getRenterOrderNoByOrderNoAndFinish(orderNo);
     }
-    
+
     /**
      * 获取进行中的有效子订单
      * @param orderNo

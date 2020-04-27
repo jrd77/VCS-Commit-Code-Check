@@ -54,7 +54,7 @@ public class GetReturnRequestVO {
 	/**
      * 订单类型:1,短租订单 2,平台套餐订单
      */
-	@ApiModelProperty(value="订单类型:1,短租订单 2,平台套餐订单",required=true)
+	@ApiModelProperty(value="订单类型:1,短租订单 2,平台套餐订单 3,长租订单",required=true)
     @NotBlank(message="订单类型不能为空")
 	private String orderType;
     

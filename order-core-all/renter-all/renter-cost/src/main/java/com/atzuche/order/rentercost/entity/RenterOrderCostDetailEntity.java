@@ -2,6 +2,8 @@ package com.atzuche.order.rentercost.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 import lombok.Data;
 
 
@@ -52,6 +54,12 @@ public class RenterOrderCostDetailEntity implements Serializable {
 	 * 单价
 	 */
 	private Integer unitPrice;
+
+    /**
+     * 单价(展示)
+     */
+    private Integer showUnitPrice;
+
 	/**
 	 * 份数
 	 */
@@ -117,4 +125,13 @@ public class RenterOrderCostDetailEntity implements Serializable {
 		this.count = count;
 		this.totalAmount = totalAmount;
 	}
+
+
+    public Integer getShowUnitPrice() {
+	    if(Objects.isNull(showUnitPrice)) {
+	        return unitPrice;
+        }
+        return showUnitPrice;
+    }
+
 }

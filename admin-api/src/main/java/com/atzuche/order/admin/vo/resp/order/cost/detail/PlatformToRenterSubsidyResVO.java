@@ -52,5 +52,6 @@ public class PlatformToRenterSubsidyResVO {
     String abatementSubsidySystem;
 	@AutoDocProperty(value="手续费补贴")
     String feeSubsidy;
-	
+    @AutoDocProperty(value = "长租-取还车费用补贴")
+    String longGetReturnCarCostSubsidy;
 }

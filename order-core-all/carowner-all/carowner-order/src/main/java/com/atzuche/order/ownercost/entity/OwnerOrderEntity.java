@@ -31,6 +31,10 @@ public class OwnerOrderEntity implements Serializable {
 	 * 子订单号
 	 */
 	private String ownerOrderNo;
+    /**
+     * 租客子订单号
+     */
+    private String renterOrderNo;
 	/**
 	 * 会员号
 	 */

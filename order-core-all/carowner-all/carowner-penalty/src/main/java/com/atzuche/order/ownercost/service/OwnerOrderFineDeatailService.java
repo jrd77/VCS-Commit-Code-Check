@@ -3,7 +3,7 @@ package com.atzuche.order.ownercost.service;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.mapper.OwnerOrderFineDeatailMapper;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class OwnerOrderFineDeatailService{
      * @param type 罚金类型枚举
      * @return OwnerOrderFineDeatailEntity
      */
-    public OwnerOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeEnum type) {
+    public OwnerOrderFineDeatailEntity fineDataConvert(CostBaseDTO costBaseDTO, Integer fineAmt, FineSubsidyCodeEnum code, FineSubsidySourceCodeEnum source, FineTypeCashCodeEnum type) {
         if (fineAmt == null || fineAmt == 0) {
             return null;
         }

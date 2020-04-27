@@ -1,14 +1,13 @@
 package com.atzuche.order.coreapi.entity.dto;
 
+import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
-
 import lombok.Data;
 import lombok.ToString;
 
@@ -161,9 +160,13 @@ public class ModifyOrderDTO {
 	/**
 	 * 提前延后时间
 	 */
-	private CarRentTimeRangeResVO carRentTimeRangeResVO;
+	private CarRentTimeRangeDTO carRentTimeRangeResVO;
 	/**
      * 是否扫码还车的修改还车时间
      */
     private Boolean scanCodeFlag;
+    /**
+     * 长租优惠券码
+     */
+    private String longCouponCode;
 }

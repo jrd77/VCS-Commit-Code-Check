@@ -22,6 +22,11 @@ import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.open.service.FeignOrderCostService;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -51,6 +56,8 @@ public class CarDepositReturnDetailController {
     private AdminLogService adminLogService;
     @Resource
     private FeignOrderCostService feignOrderCostService;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     @AutoDocMethod(description = "【liujun】车辆押金信息", value = "车辆押金信息", response = CarDepositRespVo.class)
     @PostMapping(value = "/console/deposit/getCarDepositReturnDetail")
@@ -87,6 +94,12 @@ public class CarDepositReturnDetailController {
     @PostMapping("/console/save/carDeposit/temporaryRefund")
     public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
+
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getCarDepositSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+            log.error("已经结算不允许编辑orderNo={}",req.getOrderNo());
+            throw new NotAllowedEditException();
+        }
 
         renterWzService.saveCarDepositTemporaryRefund(req);
         try {

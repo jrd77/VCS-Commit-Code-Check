@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.CheckCarDispatchResDTO;
 import com.atzuche.order.coreapi.entity.vo.req.CarDispatchReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.CarRentTimeRangeReqVO;
-import com.atzuche.order.coreapi.entity.vo.res.CarRentTimeRangeResVO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
@@ -50,7 +50,7 @@ public class CarRentalTimeApiProxyService {
      * @param reqVO 请求参数
      * @return CarRentTimeRangeResVO 返回结果
      */
-    public CarRentTimeRangeResVO getCarRentTimeRange(CarRentTimeRangeReqVO reqVO) {
+    public CarRentTimeRangeDTO getCarRentTimeRange(CarRentTimeRangeReqVO reqVO) {
         LOGGER.info("提前延后时间计算. param is,reqVO:[{}]", JSON.toJSONString(reqVO));
 
         CarAddressDTO carAddressDTO = new CarAddressDTO();
@@ -83,7 +83,7 @@ public class CarRentalTimeApiProxyService {
 
 
             CarAddressDTO carAddress = responseObject.getData();
-            CarRentTimeRangeResVO carRentTimeRangeResVO = new CarRentTimeRangeResVO();
+            CarRentTimeRangeDTO carRentTimeRangeResVO = new CarRentTimeRangeDTO();
             carRentTimeRangeResVO.setGetMinutes(carAddress.getGetMinutes());
             carRentTimeRangeResVO.setReturnMinutes(carAddress.getReturnMinutes());
             carRentTimeRangeResVO.setAdvanceStartDate(LocalDateTimeUtils.dateToLocalDateTime(carAddress.getAdvanceStartDate()));
