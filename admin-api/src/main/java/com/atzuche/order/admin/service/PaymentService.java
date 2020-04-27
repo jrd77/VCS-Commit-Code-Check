@@ -20,6 +20,7 @@ import com.atzuche.order.cashieraccount.service.OfflineRefundApplyService;
 import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.utils.CashierUtils;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -174,6 +175,9 @@ public class PaymentService {
                     }
                     //退款（线下+虚拟支付+真实支付）
 
+                    if(orderStatus.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+                        wzSettleTime = null;
+                    }
                     if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
                             OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList, Arrays.asList(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT), null, wzSettleTime);
