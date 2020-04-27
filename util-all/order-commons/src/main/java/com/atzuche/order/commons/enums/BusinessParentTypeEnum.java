@@ -8,8 +8,8 @@ public enum BusinessParentTypeEnum {
     dbc("2","代步车"),
     lpk("3","礼品卡"),
     al("4","安联"),
-    zy("5","自有");
-
+    zy("5","自有"),
+    cz("6","长租");
     private String code;
 
     private String name;
