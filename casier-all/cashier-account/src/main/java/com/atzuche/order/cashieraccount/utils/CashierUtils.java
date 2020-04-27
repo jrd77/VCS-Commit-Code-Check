@@ -11,8 +11,10 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CashierUtils {
     /*
@@ -47,13 +49,16 @@ public class CashierUtils {
      * 
      **/
     public static OfflineRefundApplyEntity filterBySourceCode(List<OfflineRefundApplyEntity> list,
-                                                              RenterCashCodeEnum renterCashCodeEnum,
+                                                              List<RenterCashCodeEnum> renterCashCodeEnum,
                                                               LocalDateTime startTime,
                                                               LocalDateTime endTime){
+        List<String> renterCashCodeEnumList = Optional.ofNullable(renterCashCodeEnum)
+                .orElseGet(ArrayList::new).stream()
+                .map(x -> x.getCashNo()).collect(Collectors.toList());
         Optional<OfflineRefundApplyEntity> first = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> renterCashCodeEnum.getCashNo().equals(x.getSourceCode()))
+                .filter(x -> renterCashCodeEnumList.contains(x.getSourceCode()))
                 .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
                 .filter(x -> endTime == null ? true : (x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime)))
                 .findFirst();
