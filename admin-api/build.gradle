@@ -70,7 +70,7 @@ dependencies {
 	compile project(":order-core-all:parent-order")
 	compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-settle")
-    compile project(":order-detain")
+    //compile project(":order-detain")
     
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
