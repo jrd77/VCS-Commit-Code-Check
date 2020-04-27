@@ -412,8 +412,8 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setServiceTypeInfo(orderDeliveryFlowEntity);
         renYunFlowOrderDTO.setTermtime(DateUtils.formate(orderDeliveryFlowEntity.getTermTime(), DateUtils.DATE_DEFAUTE_4));
         renYunFlowOrderDTO.setReturntime(DateUtils.formate(orderDeliveryFlowEntity.getReturnTime(), DateUtils.DATE_DEFAUTE_4));
-        renYunFlowOrderDTO.setBeforeTime(DateUtils.formate(orderDeliveryFlowEntity.getTermTime(), DateUtils.DATE_DEFAUTE_1));
-        renYunFlowOrderDTO.setAfterTime(DateUtils.formate(orderDeliveryFlowEntity.getReturnTime(), DateUtils.DATE_DEFAUTE_1));
+        renYunFlowOrderDTO.setBeforeTime(orderDeliveryFlowEntity.getBeforeTime());
+        renYunFlowOrderDTO.setAfterTime(orderDeliveryFlowEntity.getAfterTime());
         renYunFlowOrderDTO.setVehicletype(orderDeliveryFlowEntity.getVehicleType());
         renYunFlowOrderDTO.setDeliverycarcity(orderDeliveryFlowEntity.getDeliveryCarCity());
         renYunFlowOrderDTO.setDefaultpickupcaraddr(orderDeliveryFlowEntity.getDefaultPickupCarAddr());
