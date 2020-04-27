@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.sms.mapper.SmsMsgSendLogMapper">
+
+    <resultMap type="com.atzuche.order.sms.entity.SmsMsgSendLogEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="memNo" column="mem_no"/>
+        <result property="msgType" column="msg_type"/>
+        <result property="sendParams" column="send_params"/>
+        <result property="sendTime" column="send_time"/>
+        <result property="sendTotal" column="send_total"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`, 	
+	`order_no`, 	
+	`mem_no`, 	
+	`msg_type`, 	
+	`send_params`, 	
+	`send_time`, 	
+	`send_total`, 	
+	`status`, 	
+	`create_time`, 	
+	`update_time`, 	
+	`is_delete`	
+
+	</sql>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from sms_msg_send_log where id = #{value}
+	</select>
+
+	<select id="selectByOrderNoAndMemNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from sms_msg_send_log where order_no = #{orderNo} and mem_no = #{memNo} and msg_type = #{msgType} and is_delete = 0
+	</select>
+
+
+
+	<insert id="insert" parameterType="com.atzuche.order.sms.entity.SmsMsgSendLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sms_msg_send_log
+		(
+				`order_no`,		
+				`mem_no`,		
+				`msg_type`,		
+				`send_params`,		
+				`send_time`,		
+				`send_total`,		
+				`status`,		
+				`create_time`,		
+				`update_time`,		
+				`is_delete`		
+			)
+		values
+		(
+				#{orderNo}, 		
+				#{memNo}, 		
+				#{msgType}, 		
+				#{sendParams}, 		
+				#{sendTime}, 		
+				#{sendTotal}, 		
+				#{status}, 		
+				#{createTime}, 		
+				#{updateTime}, 		
+				#{isDelete}		
+			)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="com.atzuche.order.sms.entity.SmsMsgSendLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sms_msg_send_log
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">`order_no`, </if>
+				<if test="memNo != null">`mem_no`, </if>
+				<if test="msgType != null">`msg_type`, </if>
+				<if test="sendParams != null">`send_params`, </if>
+				<if test="sendTime != null">`send_time`, </if>
+				<if test="sendTotal != null">`send_total`, </if>
+				<if test="status != null">`status`, </if>
+				<if test="createTime != null">`create_time`, </if>
+				<if test="updateTime != null">`update_time`, </if>
+				<if test="isDelete != null">`is_delete` </if>
+	        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="orderNo != null">#{orderNo},  </if>
+				<if test="memNo != null">#{memNo},  </if>
+				<if test="msgType != null">#{msgType},  </if>
+				<if test="sendParams != null">#{sendParams},  </if>
+				<if test="sendTime != null">#{sendTime},  </if>
+				<if test="sendTotal != null">#{sendTotal},  </if>
+				<if test="status != null">#{status},  </if>
+				<if test="createTime != null">#{createTime},  </if>
+				<if test="updateTime != null">#{updateTime},  </if>
+				<if test="isDelete != null">#{isDelete} </if>
+	        </trim>
+	</insert>
+	
+	 
+	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.sms.entity.SmsMsgSendLogEntity">
+		update sms_msg_send_log 
+		<set>
+				<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
+				<if test="msgType != null">`msg_type` = #{msgType}, </if>
+				<if test="sendParams != null">`send_params` = #{sendParams}, </if>
+				<if test="sendTime != null">`send_time` = #{sendTime}, </if>
+				<if test="sendTotal != null">`send_total` = #{sendTotal}, </if>
+				<if test="status != null">`status` = #{status}, </if>
+				<if test="createTime != null">`create_time` = #{createTime}, </if>
+				<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+			</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.sms.entity.SmsMsgSendLogEntity">
+		update sms_msg_send_log 
+		<set>
+				`order_no` = #{orderNo}, 		
+				`mem_no` = #{memNo}, 		
+				`msg_type` = #{msgType}, 		
+				`send_params` = #{sendParams}, 		
+				`send_time` = #{sendTime}, 		
+				`send_total` = #{sendTotal}, 		
+				`status` = #{status}, 		
+				`create_time` = #{createTime}, 		
+				`update_time` = #{updateTime}, 		
+				`is_delete` = #{isDelete}		
+	
+		</set>
+		where id = #{id}
+	</update>
+  	
+</mapper>
