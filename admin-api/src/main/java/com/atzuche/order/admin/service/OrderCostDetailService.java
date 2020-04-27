@@ -427,6 +427,17 @@ public class OrderCostDetailService {
         		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
         
         logger.info("保存附加驾驶人信息SUCCESS");
+
+        log.info("增加order_console_operate_log日志记录-START");
+        try{
+            //租客费用变更
+
+
+        }catch (Exception e){
+            log.error("增加order_console_operate_log日志记录失败",e);
+            e.printStackTrace();
+        }
+        log.info("增加order_console_operate_log日志记录-END");
 	}
 	
 	private CommUseDriverInfoDTO getCommUseDriverInfoDTOById(Integer id,
