@@ -104,15 +104,11 @@ public class PaymentService {
 		 * 租车费用结算时间
 		 */
 		LocalDateTime settleTime = null;
-		LocalDateTime depositSettleTime = null;
+
 		//租车费用结算状态:0,否 1,是 
 		if(orderStatus != null && orderStatus.getSettleStatus().intValue() != 0) {
 			settleTime = orderStatus.getSettleTime();
 		}
-
-		if(orderStatus != null && orderStatus.getCarDepositSettleStatus().intValue() != 0){
-            depositSettleTime = orderStatus.getCarDepositSettleTime();
-        }
 //		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
 //			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
 //		}

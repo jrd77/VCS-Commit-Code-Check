@@ -1,17 +1,18 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
-import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostDetailException;
-import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostDetailMapper;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.exception.AccountRenterRentCostDetailException;
+import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostDetailMapper;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 
 
 /**
@@ -75,6 +76,20 @@ public class AccountRenterCostDetailNoTService {
         int amt = result.stream().mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
         return amt;
     }
+    
+    /**
+     * 钱包退款金额
+     */
+    public int getRentCostRefundByWallet(String orderNo, String renterMemNo) {
+        List<AccountRenterCostDetailEntity> result = accountRenterCostDetailMapper.selectRenterCostSettleDetail(orderNo,renterMemNo, PaySourceEnum.WALLET_PAY.getCode());
+        if(CollectionUtils.isEmpty(result)){
+            return 0;
+        }
+        //过滤退款的。
+        int amt = result.stream().filter(x->PayTypeEnum.PUR_RETURN.getCode().equals(x.getPayTypeCode())).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
+        return amt;
+    }
+    
     /**
      * 根据订单号 和会员号 查询 订单 消费支付金额     非钱包支付
      * @param orderNo

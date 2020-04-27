@@ -107,6 +107,8 @@ public class AdminPreOrderController {
 //        RenterGoodsDetailDTO renterGoodsDetailDTO = carProxyService.getRenterGoodsDetail(carDetailReqVO);
 //
         responseVO.setCarPlatNo(carPriceDetail.getPlateNum());
+        // 设置是否禁用全面保障服务标记
+        responseVO.setNoAbatementFlag(getNoAbatementFlagByCarNo(carPriceDetail.getInmsrp(), carPriceDetail.getGuidePrice(), carPriceDetail.getCarLevel()));
         List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();
 
         List<PreOrderAdminResponseVO.CarDayPrice> carDayPrices = new ArrayList<>();
@@ -203,4 +205,23 @@ public class AdminPreOrderController {
             return true;
         }
     }
+    
+    /**
+	 * 获取不能使用不计免赔标记
+	 * 【车辆等级】字段为：跑车 并且
+	 * 【保费计算用购置价】字段值为：≥10万
+	 * @param carNo
+	 * @return boolean
+	 */
+	public Integer getNoAbatementFlagByCarNo(Integer inmsrp, Integer guidePrice, Integer carLevel) {
+		logger.info("getNoAbatementFlagByCarNo inmsrp=[{}],guidePrice=[{}],carLevel=[{}]", inmsrp,guidePrice,carLevel);
+		if (inmsrp == null) {
+			inmsrp = guidePrice;
+		}
+		inmsrp = inmsrp == null ? 0:inmsrp;
+		if (carLevel != null && carLevel.equals(22) && inmsrp >= 100000) {
+			return 1;
+		}
+		return 0;
+	} 
 }

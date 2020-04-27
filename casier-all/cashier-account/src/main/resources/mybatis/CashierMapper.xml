@@ -184,6 +184,13 @@
         select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc limit 1
 
     </select>
+    
+    
+    <select id="getPayAmtByPayKindNoWallet" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} and pay_source != '00' order by id desc limit 1
+
+    </select>
+    
     <select id="selectCashierEntity" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier where pay_md5 = #{payMd5} limit 1
 

@@ -4,43 +4,30 @@
 <mapper namespace="com.atzuche.order.settle.mapper.AccountDebtReceivableaDetailMapper">
 
     <resultMap type="com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity" id="BaseResultMap">
-                    <result property="id" column="id"/>
-                    <result property="memNo" column="mem_no"/>
-                    <result property="orderNo" column="order_no"/>
-                    <result property="amt" column="amt"/>
-                    <result property="time" column="time"/>
-                    <result property="sourceCode" column="source_code"/>
-                    <result property="sourceDetail" column="source_detail"/>
-                    <result property="uniqueNo" column="unique_no"/>
-                    <result property="debtDetailId" column="debt_detail_id"/>
-                    <result property="deptName" column="dept_name"/>
-                    <result property="remark" column="remark"/>
-                    <result property="createTime" column="create_time"/>
-                    <result property="createOp" column="create_op"/>
-                    <result property="updateTime" column="update_time"/>
-                    <result property="updateOp" column="update_op"/>
-                    <result property="isDelete" column="is_delete"/>
-            </resultMap>
+            <result property="id" column="id"/>
+            <result property="memNo" column="mem_no"/>
+            <result property="orderNo" column="order_no"/>
+            <result property="amt" column="amt"/>
+            <result property="time" column="time"/>
+            <result property="sourceCode" column="source_code"/>
+            <result property="sourceDetail" column="source_detail"/>
+            <result property="uniqueNo" column="unique_no"/>
+            <result property="debtDetailId" column="debt_detail_id"/>
+            <result property="deptName" column="dept_name"/>
+            <result property="remark" column="remark"/>
+            <result property="payWay" column="pay_way"/>
+            <result property="createTime" column="create_time"/>
+            <result property="createOp" column="create_op"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="updateOp" column="update_op"/>
+            <result property="isDelete" column="is_delete"/>
+    </resultMap>
 
 
     <sql id="Base_Column_List">
-	`id`, 
-    	`mem_no`, 
-    	`order_no`, 
-    	`amt`, 
-    	`time`, 
-    	`source_code`, 
-    	`source_detail`, 
-    	`unique_no`, 
-    	`debt_detail_id`, 
-    	`dept_name`, 
-    	`remark`, 
-    	`create_time`, 
-    	`create_op`, 
-    	`update_time`, 
-    	`update_op`, 
-    	`is_delete`
-    
+	    `id`, `mem_no`, `order_no`, `amt`, `time`, `source_code`,
+	    `source_detail`, `unique_no`, `debt_detail_id`, `dept_name`, `remark`, `pay_way`,
+	    `create_time`, `create_op`, `update_time`, `update_op`, `is_delete`
 	</sql>
 
 
@@ -50,40 +37,42 @@
 
     <insert id="insertSelective" parameterType="com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity" useGeneratedKeys="true" keyProperty="id">
         insert into account_debt_receivablea_detail
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="memNo != null">`mem_no`, </if>
-            <if test="orderNo != null">`order_no`, </if>
-            <if test="amt != null">`amt`, </if>
-            <if test="time != null">`time`, </if>
-            <if test="sourceCode != null">`source_code`, </if>
-            <if test="sourceDetail != null">`source_detail`, </if>
-            <if test="uniqueNo != null">`unique_no`, </if>
-            <if test="debtDetailId != null">`debt_detail_id`, </if>
-            <if test="deptName != null">`dept_name`, </if>
-            <if test="remark != null">`remark`, </if>
-            <if test="createTime != null">`create_time`, </if>
-            <if test="createOp != null">`create_op`, </if>
-            <if test="updateTime != null">`update_time`, </if>
-            <if test="updateOp != null">`update_op`, </if>
-            <if test="isDelete != null">`is_delete` </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="memNo != null">#{memNo},  </if>
-            <if test="orderNo != null">#{orderNo},  </if>
-            <if test="amt != null">#{amt},  </if>
-            <if test="time != null">#{time},  </if>
-            <if test="sourceCode != null">#{sourceCode},  </if>
-            <if test="sourceDetail != null">#{sourceDetail},  </if>
-            <if test="uniqueNo != null">#{uniqueNo},  </if>
-            <if test="debtDetailId != null">#{debtDetailId},  </if>
-            <if test="deptName != null">#{deptName},  </if>
-            <if test="remark != null">#{remark},  </if>
-            <if test="createTime != null">#{createTime},  </if>
-            <if test="createOp != null">#{createOp},  </if>
-            <if test="updateTime != null">#{updateTime},  </if>
-            <if test="updateOp != null">#{updateOp},  </if>
-            <if test="isDelete != null">#{isDelete} </if>
-        </trim>
+            <trim prefix="(" suffix=")" suffixOverrides="," >
+                <if test="memNo != null">`mem_no`, </if>
+                <if test="orderNo != null">`order_no`, </if>
+                <if test="amt != null">`amt`, </if>
+                <if test="time != null">`time`, </if>
+                <if test="sourceCode != null">`source_code`, </if>
+                <if test="sourceDetail != null">`source_detail`, </if>
+                <if test="uniqueNo != null">`unique_no`, </if>
+                <if test="debtDetailId != null">`debt_detail_id`, </if>
+                <if test="deptName != null">`dept_name`, </if>
+                <if test="remark != null">`remark`, </if>
+                <if test="payWay != null">`pay_way`, </if>
+                <if test="createTime != null">`create_time`, </if>
+                <if test="createOp != null">`create_op`, </if>
+                <if test="updateTime != null">`update_time`, </if>
+                <if test="updateOp != null">`update_op`, </if>
+                <if test="isDelete != null">`is_delete` </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides="," >
+                <if test="memNo != null">#{memNo},  </if>
+                <if test="orderNo != null">#{orderNo},  </if>
+                <if test="amt != null">#{amt},  </if>
+                <if test="time != null">#{time},  </if>
+                <if test="sourceCode != null">#{sourceCode},  </if>
+                <if test="sourceDetail != null">#{sourceDetail},  </if>
+                <if test="uniqueNo != null">#{uniqueNo},  </if>
+                <if test="debtDetailId != null">#{debtDetailId},  </if>
+                <if test="deptName != null">#{deptName},  </if>
+                <if test="remark != null">#{remark},  </if>
+                <if test="payWay != null">#{payWay}, </if>
+                <if test="createTime != null">#{createTime},  </if>
+                <if test="createOp != null">#{createOp},  </if>
+                <if test="updateTime != null">#{updateTime},  </if>
+                <if test="updateOp != null">#{updateOp},  </if>
+                <if test="isDelete != null">#{isDelete} </if>
+            </trim>
 	</insert>
 
     <select id="selectByUniqueAndSourceCode" resultMap="BaseResultMap">

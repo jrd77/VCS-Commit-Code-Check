@@ -169,7 +169,15 @@ public class CashierNoTService {
         CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
         return cashierEntity;
     }
-
+    
+    /**
+     * 收银台支付记录，不含钱包支付记录
+     */
+    public CashierEntity getCashierEntityNoWallet(String orderNo,String memNo,String payKind){
+        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKindNoWallet(orderNo,memNo,payKind);
+        return cashierEntity;
+    }
+    
     /**
      * 收银台记录应收违章押金
      * @param createOrderRenterWZDepositReq
@@ -478,6 +486,15 @@ public class CashierNoTService {
      * @param vo
      */
 	private void putPayPreValue(NotifyDataVo notifyDataVo, PayedOrderRenterWZDepositReqVO vo) {
+		//按0处理
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeCreditAmount())) {
+			notifyDataVo.setTotalFreezeCreditAmount("0");
+		}
+		//按0处理
+		if(StringUtils.isBlank(notifyDataVo.getTotalFreezeFundAmount())) {
+			notifyDataVo.setTotalFreezeFundAmount("0");
+		}
+		
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   
 			//预授权方式
 			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
@@ -548,7 +565,7 @@ public class CashierNoTService {
 
     /**
      * 构造参数 PayVo (押金、违章押金)
-     * @param cashierEntity
+     * @param cashierEntity   计算paySn，是在异步通知支付成功的时候落库的。
      * @param orderPaySign
      * @param freeDepositType  免押方式(1:绑卡减免,2:芝麻减免,3:消费) 
      * @return

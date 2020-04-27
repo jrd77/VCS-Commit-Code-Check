@@ -175,7 +175,7 @@ public class OrderCostController {
             expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();;
         }
         if(wzIsAuthorize == null){
-            expReturnDeposit = depositEntity.getShifuDepositAmt()==null?0:depositEntity.getShifuDepositAmt();
+            expReturnWzDeposit = wzDepositEntity.getShishouDeposit()==null?0:wzDepositEntity.getShishouDeposit();
         }else if(AuthorizeEnum.IS.getCode() == wzIsAuthorize){
             expReturnWzDeposit =  wzDepositEntity.getAuthorizeDepositAmt() == null?0: wzDepositEntity.getAuthorizeDepositAmt();
         }else if(AuthorizeEnum.NOT.getCode() == wzIsAuthorize){

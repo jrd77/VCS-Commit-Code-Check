@@ -124,4 +124,7 @@ public class RenterMemberDTO {
 
     @AutoDocProperty(value = "驾驶证准驾车型（驾照）")
     private String driLicAllowCar;
+
+    @AutoDocProperty(value = "订单类型")
+    private String orderCategory;
 }
