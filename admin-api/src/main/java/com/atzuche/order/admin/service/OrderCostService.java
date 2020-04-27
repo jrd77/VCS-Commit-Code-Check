@@ -932,7 +932,10 @@ public class OrderCostService {
 //	    		  gps += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
 //	    	  }
 //		  }
-	      
+
+        /*获取GPS押金*/
+
+
 	      /**
 	       * 获取车主增值服务费用列表
 	       */
@@ -978,10 +981,10 @@ public class OrderCostService {
 		 platformSrvFeeAmt = String.valueOf( NumberUtils.convertNumberToFushu(srvFee));
 		 platformAddOilSrvAmt = String.valueOf(NumberUtils.convertNumberToFushu(oil));
 		 gpsAmt = String.valueOf(NumberUtils.convertNumberToFushu(gps));
-		 
-		 //被覆盖了。。。
+
+        //被覆盖了。。。
 //		 ownerPayToPlatform = String.valueOf(NumberUtils.convertNumberToFushu(ownerPay));
-		 gpsDeposit = String.valueOf(gpsDepositAmt);
+		 gpsDeposit = String.valueOf(data.getGpsDepositTotal()==null?0:data.getGpsDepositTotal());
 		 carServiceSrvFee = String.valueOf(NumberUtils.convertNumberToFushu(getReturnCarFee));
 		 
 		 //封装

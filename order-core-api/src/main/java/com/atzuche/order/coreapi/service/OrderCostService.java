@@ -456,7 +456,7 @@ public class OrderCostService {
 //			}
 			Integer ownerCostAmtSettleAfter = accountOwnerIncomeExamineNoTService.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
 			resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
-		
+            resVo.setGpsDepositTotal(ownerCosts.getGpsDepositDetail()==null?0:ownerCosts.getGpsDepositDetail().getTotalAmount());
 		return resVo;
 	}
 	
