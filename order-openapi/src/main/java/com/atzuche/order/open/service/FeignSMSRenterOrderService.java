@@ -8,13 +8,15 @@ import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author 胡春林
  * sms短信需要的租客feign接口
  */
-@FeignClient(name = "order-center-api")
+//@FeignClient(url = "http://10.0.3.80:1412" ,name="order-center-api")
+@FeignClient(value = "order-center-api", path = "/api/sms/renter")
 public interface FeignSMSRenterOrderService {
 
     /**
