@@ -250,7 +250,7 @@ public class RenterCostFacadeService {
                 OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
 
         detail.setSrvGetCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT)));
-        detail.setSrvGetCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
+        detail.setSrvReturnCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
         return detail;
     }
 
