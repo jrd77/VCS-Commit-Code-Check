@@ -29,7 +29,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-
+            version = '1.0.1-SNAPSHOT'
             artifact sourceJar {
                 classifier "sources"
             }
