@@ -91,6 +91,8 @@ public class ViolationInfoService {
             violationResVO.setOrderType("普通订单");
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
+            }else{
+                violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(3));
             }
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
                 violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
