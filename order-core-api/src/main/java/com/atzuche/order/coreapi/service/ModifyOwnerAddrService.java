@@ -24,7 +24,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.CarBasicInfo;
@@ -279,7 +279,7 @@ public class ModifyOwnerAddrService {
     			costBaseDTO.setOrderNo(ownerTransAddressReqVO.getOrderNo());
     			costBaseDTO.setMemNo(ownerTransAddressReqVO.getMemNo());
 	        	ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity = consoleOwnerOrderFineDeatailService.fineDataConvert(costBaseDTO, -modifyAddrCost, FineSubsidyCodeEnum.PLATFORM,
-                        FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.MODIFY_ADDRESS_FINE);
+                        FineSubsidySourceCodeEnum.OWNER, FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE);
 	        	consoleOwnerOrderFineDeatailService.addFineRecord(consoleOwnerOrderFineDeatailEntity);
     		}
     	}

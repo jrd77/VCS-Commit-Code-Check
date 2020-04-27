@@ -1,5 +1,6 @@
 package com.atzuche.order.rentercost.service;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
@@ -92,8 +93,8 @@ public class RenterOrderSubsidyDetailService {
     /**
      * 数据转化
      * @param costBaseDTO 基础信息
-     * @param fineAmt 罚金金额
-     * @param code 罚金补贴方编码枚举
+     * @param subsidyAmount 罚金金额
+     * @param target 罚金补贴方编码枚举
      * @param source 罚金来源编码枚举
      * @param type 罚金类型枚举
      * @return ConsoleRenterOrderFineDeatailEntity
@@ -204,6 +205,61 @@ public class RenterOrderSubsidyDetailService {
      * @return RenterOrderSubsidyDetailDTO 补贴明细
      */
     public RenterOrderSubsidyDetailDTO calOwnerCouponSubsidyInfo(Integer memNo, OrderCouponDTO ownerCoupon) {
+        if (null == ownerCoupon) {
+            return null;
+        }
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+        renterOrderSubsidyDetailDTO.setMemNo(String.valueOf(memNo));
+        renterOrderSubsidyDetailDTO.setSubsidyAmount(ownerCoupon.getAmount());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.OWNER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.OWNER.getDesc());
+
+        renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyCostCode(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo());
+        renterOrderSubsidyDetailDTO.setSubsidyCostName(RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getTxt());
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("使用车主券抵扣租金");
+        return renterOrderSubsidyDetailDTO;
+    }
+
+
+    /**
+     * 租客端车主券补贴明细
+     *
+     * @param subsidyAmount      补贴金额
+     * @param renterCashCodeEnum 租客费用编码
+     * @return RenterOrderSubsidyDetailDTO 补贴明细
+     */
+    public RenterOrderSubsidyDetailDTO calLongOwnerCouponSubsidyInfo(Integer subsidyAmount,
+                                                                  RenterCashCodeEnum renterCashCodeEnum) {
+        if (null == subsidyAmount || OrderConstant.ZERO == subsidyAmount) {
+            return null;
+        }
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO = new RenterOrderSubsidyDetailDTO();
+        renterOrderSubsidyDetailDTO.setSubsidyAmount(subsidyAmount);
+        renterOrderSubsidyDetailDTO.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidySourceCode(SubsidySourceCodeEnum.OWNER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidySourceName(SubsidySourceCodeEnum.OWNER.getDesc());
+
+        renterOrderSubsidyDetailDTO.setSubsidyTargetCode(SubsidySourceCodeEnum.RENTER.getCode());
+        renterOrderSubsidyDetailDTO.setSubsidyTargetName(SubsidySourceCodeEnum.RENTER.getDesc());
+        renterOrderSubsidyDetailDTO.setSubsidyCostCode(renterCashCodeEnum.getCashNo());
+        renterOrderSubsidyDetailDTO.setSubsidyCostName(renterCashCodeEnum.getTxt());
+        renterOrderSubsidyDetailDTO.setSubsidyDesc("长租折扣抵扣租金");
+        return renterOrderSubsidyDetailDTO;
+    }
+
+    /**
+     * 租客端车主券补贴明细
+     *
+     * @param memNo       租客会员注册号
+     * @param ownerCoupon 车主券抵扣信息
+     * @return RenterOrderSubsidyDetailDTO 补贴明细
+     */
+    public RenterOrderSubsidyDetailDTO calLongOwnerCouponSubsidyInfo(Integer memNo, OrderCouponDTO ownerCoupon) {
         if (null == ownerCoupon) {
             return null;
         }

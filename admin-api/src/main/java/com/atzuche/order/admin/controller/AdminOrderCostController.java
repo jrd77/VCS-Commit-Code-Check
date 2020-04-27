@@ -3,6 +3,7 @@
  */
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,6 +29,18 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.dianping.cat.Cat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jing.huang
@@ -83,8 +96,26 @@ public class AdminOrderCostController {
 		}
 		
 	}
-	
 
+    @AutoDocMethod(description = "长租-计算租客子订单费用", value = "长租-计算租客子订单费用", response = OrderRenterCostResVO.class)
+    @RequestMapping(value="calculateRenterOrderCostLongRent",method = RequestMethod.POST)
+    public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
+        logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
+        if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
+
+        try {
+            OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCostLongRent(renterCostReqVO);
+            logger.info("calculateRenterOrderCostLongRent resp[{}]", GsonUtils.toJson(resp));
+            return ResponseData.success(resp);
+        } catch (Exception e) {
+            Cat.logError("calculateRenterOrderCostLongRent exception params="+renterCostReqVO.toString(),e);
+            logger.error("calculateRenterOrderCostLongRent exception params="+renterCostReqVO.toString(),e);
+            return ResponseData.error();
+        }
+
+    }
 	@AutoDocMethod(description = "计算车主子订单费用", value = "计算车主子订单费用", response = OrderOwnerCostResVO.class)
 	@RequestMapping(value="calculateOwnerOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateOwnerOrderCost(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
@@ -105,7 +136,25 @@ public class AdminOrderCostController {
 		}
 		
 	}
+    @AutoDocMethod(description = "长租-计算车主子订单费用", value = "长租-计算车主子订单费用", response = OrderOwnerCostResVO.class)
+    @RequestMapping(value="calculateOwnerOrderCostLong",method = RequestMethod.POST)
+    public ResponseData calculateOwnerOrderCostLong(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
+        logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
+        if (bindingResult.hasErrors()) {
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
+        }
 
+        try {
+            OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCostLong(ownerCostReqVO);
+            logger.info("resp = " + resp.toString());
+            return ResponseData.success(resp);
+        } catch (Exception e) {
+            Cat.logError("calculateOwnerOrderCost exception params="+ownerCostReqVO.toString(),e);
+            logger.error("calculateOwnerOrderCost exception params="+ownerCostReqVO.toString(),e);
+            return ResponseData.error();
+        }
+
+    }
 //	private DeliveryCarVO getDeliveryCarVO(String orderNo){
 //        DeliveryCarRepVO deliveryCarDTO = new DeliveryCarRepVO();
 //        deliveryCarDTO.setOrderNo(orderNo);

@@ -38,10 +38,8 @@ public class LongOrderCostFilterChain implements ApplicationContextAware {
     private void init() {
         //租金
         orderCostFilterList.add(applicationContext.getBean(OrderRentAmtFilter.class));
-        //基础保险费
-        orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtFilter.class));
-        //全面保障费
-        orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtFilter.class));
+        //租金折扣
+        orderCostFilterList.add(applicationContext.getBean(LongOrderOwnerCouponFilter.class));
         //附加驾驶人保险费
         orderCostFilterList.add(applicationContext.getBean(OrderExtraDriverInsureAmtFilter.class));
         //手续费
@@ -50,6 +48,14 @@ public class LongOrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(OrderGetAndReturnCarCostFilter.class));
         //超运能溢价
         orderCostFilterList.add(applicationContext.getBean(OrderOverTransportCapacityPremiumFilter.class));
+        //取还车、超运能溢价费用补贴
+        orderCostFilterList.add(applicationContext.getBean(LongOrderGetAndReturnCarCostSubsidyFilter.class));
+        //平台优惠券抵扣
+        orderCostFilterList.add(applicationContext.getBean(OrderPlatformCouponFilter.class));
+        //车辆押金
+        orderCostFilterList.add(applicationContext.getBean(OrderCarDepositAmtFilter.class));
+        //违章押金
+        orderCostFilterList.add(applicationContext.getBean(OrderIllegalDepositAmtFilter.class));
     }
 
     public void calculate(OrderCostContext context) throws OrderFilterException {

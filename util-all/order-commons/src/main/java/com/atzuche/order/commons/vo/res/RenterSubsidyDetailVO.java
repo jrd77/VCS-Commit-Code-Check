@@ -55,6 +55,10 @@ public class RenterSubsidyDetailVO {
     private Integer totalSubsidy;
     @AutoDocProperty(value = "租客给平台的费用")
     private Integer renter2PlatformAmt;
+    @AutoDocProperty(value = "长租折扣金额")
+    private Integer longRentDecutAmt;
+    @AutoDocProperty(value = "长租-取还车费用补贴")
+    private Integer longGetReturnCarCostSubsidy;
 
     public Integer getTotalSubsidy(){
         int total=0;

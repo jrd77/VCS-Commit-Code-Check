@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.OwnerCouponBindReqVO;
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import com.atzuche.order.renterorder.service.OwnerDiscountCouponService;
 import com.atzuche.order.renterorder.service.PlatformCouponService;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
@@ -194,7 +195,7 @@ public class CouponAndCoinHandleService {
      * @param reqVO 参数
      * @return OwnerCouponLongResVO 长租折扣信息
      */
-    public OwnerCouponLongResVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
+    public OwnerCouponLongVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
         return ownerDiscountCouponService.getLongOwnerCoupon(reqVO);
     }
 

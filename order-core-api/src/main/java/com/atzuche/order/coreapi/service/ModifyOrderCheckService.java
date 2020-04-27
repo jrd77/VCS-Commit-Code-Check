@@ -6,6 +6,7 @@ import java.util.List;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
@@ -22,11 +23,13 @@ import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderDataNoChangeEx
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderExistTODOChangeApplyException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderGoodPriceNotExistException;
+import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderLongRentDaysLimitException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderMemberNotExistException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRentOrRevertTimeException;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderWaitReceiptException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferCarException;
+import com.atzuche.order.coreapi.modifyorder.exception.TransferRenterAndOwnerTheSameException;
 import com.atzuche.order.coreapi.modifyorder.exception.TransferUseOwnerCouponException;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
@@ -39,6 +42,7 @@ import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
 
 @Service
@@ -57,7 +61,12 @@ public class ModifyOrderCheckService {
 	@Autowired
 	private OrderService orderService;
 	
+	@Value("${auto.cost.configHours}")
+    private Integer configHours;
+	
 	private static final int MODIFY_LIMIT_SIZE = 6;
+	
+	private static final int LONG_RENT_DAYS_LIMIT = 30;
 	
 	/**
 	 * 库存校验
@@ -98,6 +107,11 @@ public class ModifyOrderCheckService {
 		returnCarAddress.setLon(modifyOrderDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderDTO.getRevertCarLon()):null);
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
+		orderInfoDTO.setLongRent(0);
+		if (StringUtils.isNotBlank(modifyOrderDTO.getLongCouponCode())) {
+			// 长租订单
+			orderInfoDTO.setLongRent(1);
+		}
 		stockService.checkCarStock(orderInfoDTO);
 	}
 	
@@ -118,6 +132,8 @@ public class ModifyOrderCheckService {
 		checkDataChange(changeItemList);
 		// 校验时间
 		checkTime(modifyOrderDTO);
+		// 长租校验
+		checkLongRent(modifyOrderDTO);
 		// 主订单信息
 		OrderEntity orderEntity = modifyOrderDTO.getOrderEntity();
 		// 校验主订单
@@ -347,9 +363,28 @@ public class ModifyOrderCheckService {
 			OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(modifyOrderDTO.getOrderNo());
 			String initCarNo = (ownerGoodsEntity != null && ownerGoodsEntity.getCarNo() != null) ? String.valueOf(ownerGoodsEntity.getCarNo()):null;  
 			if (initCarNo != null && initCarNo.equals(modifyOrderDTO.getCarNo())) {
-				// 使用车主券不允许换车
-				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验使用车主券不允许换车", new TransferCarException());
+				// 不能换同一辆车
+				Cat.logError("ModifyOrderCheckService.checkUserOwnerCoupon校验不能换同一辆车", new TransferCarException());
 				throw new TransferCarException();
+			}
+			// 商品信息
+			RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
+			if (modifyOrderDTO.getMemNo() != null && modifyOrderDTO.getMemNo().equals(renterGoodsDetailDTO.getOwnerMemNo())) {
+				// 不能换自己的车
+				throw new TransferRenterAndOwnerTheSameException();
+			}
+		}
+	}
+	
+	/**
+	 * 长租最短租期校验
+	 * @param modifyOrderDTO
+	 */
+	public void checkLongRent(ModifyOrderDTO modifyOrderDTO) {
+		if (StringUtils.isNotBlank(modifyOrderDTO.getLongCouponCode())) {
+			double rentDays = CommonUtils.getRentDays(modifyOrderDTO.getRentTime(), modifyOrderDTO.getRevertTime(), configHours);
+			if (rentDays < LONG_RENT_DAYS_LIMIT) {
+				throw new ModifyOrderLongRentDaysLimitException();
 			}
 		}
 	}

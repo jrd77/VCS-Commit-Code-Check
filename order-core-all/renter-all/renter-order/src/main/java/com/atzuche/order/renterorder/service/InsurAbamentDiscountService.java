@@ -76,11 +76,13 @@ public class InsurAbamentDiscountService {
 			//获取全面保障费
 	        List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
 	        if (comprehensiveEnsureList != null && !comprehensiveEnsureList.isEmpty()) {
-	        	List<RenterOrderSubsidyDetailDTO> abatementSubsidyList = comprehensiveEnsureList.stream().map(fr -> getAbatementSubsidy(costBaseDTO, fr, insureDiscount)).collect(Collectors.toList());
+	        	List<RenterOrderSubsidyDetailDTO> abatementSubsidyList =
+                        comprehensiveEnsureList.stream().map(fr -> getAbatementSubsidy(costBaseDTO, fr,
+                                insureDiscount,"修改订单全面保障费打折补贴")).collect(Collectors.toList());
 	        	renterSubsidyList.addAll(abatementSubsidyList);
 	        }
 		}
-		return renterSubsidyList;
+		return renterSubsidyList.stream().filter(obj -> obj != null).collect(Collectors.toList());
 	}
 	
 	
@@ -91,7 +93,9 @@ public class InsurAbamentDiscountService {
 	 * @param insureDiscount
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
-	public RenterOrderSubsidyDetailDTO getAbatementSubsidy(CostBaseDTO costBaseDTO, RenterOrderCostDetailEntity abatementSubsidyEntity, double insureDiscount) {
+	public RenterOrderSubsidyDetailDTO getAbatementSubsidy(CostBaseDTO costBaseDTO,
+                                                           RenterOrderCostDetailEntity abatementSubsidyEntity,
+                                                           double insureDiscount, String subsidyDesc) {
 		Integer insurAmt = abatementSubsidyEntity.getTotalAmount();
         // 单价
         int unitPrice = (int) Math.ceil(abatementSubsidyEntity.getUnitPrice()*insureDiscount);
@@ -100,10 +104,10 @@ public class InsurAbamentDiscountService {
         if (insurAmt != null && Math.abs(insurAmt) > Math.abs(afterDiscountInsurAmt)) {
         	Integer subsidyAmount = Math.abs(insurAmt) - Math.abs(afterDiscountInsurAmt);
         	// 产生补贴
-        	RenterOrderSubsidyDetailDTO subsidyDetail = convertToRenterOrderSubsidyDetailDTO(costBaseDTO, subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
-        			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.ABATEMENT_INSURE, "修改订单全面保障费折扣补贴");
-        	return subsidyDetail;
+        	return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE,
+                    SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.ABATEMENT_INSURE, subsidyDesc);
         }
+        log.info("获取全面保障费打折补贴.insurAmt:[{}],afterDiscountInsurAmt:[{}]", insurAmt, afterDiscountInsurAmt);
         return null;
 	}
 	

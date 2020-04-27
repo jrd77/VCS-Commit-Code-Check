@@ -17,6 +17,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.*;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
+import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.exception.*;
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
@@ -101,7 +102,7 @@ public class RenterOrderCostCombineService {
     @Value("${auto.cost.unitExtraDriverInsure}")
     private Integer unitExtraDriverInsure;
     
-    private static final Integer [] ORDER_TYPES = {1,2};
+    private static final Integer [] ORDER_TYPES = {1,2,3};
 	
 	public static final List<RenterCashCodeEnum> RENTERCASHCODEENUM_LIST = new ArrayList<RenterCashCodeEnum>() {
 
@@ -172,6 +173,71 @@ public class RenterOrderCostCombineService {
 		FeeResult feeResult = RenterFeeCalculatorUtils.calRentAmt(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours, carPriceOfDayList);
 		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.RENT_AMT);
 		return result;
+	}
+	
+	
+	/**
+	 * 获取日均价对象列表
+	 * @param rentAmtDTO
+	 * @return List<HolidayAverageDateTimeVO>
+	 */
+	public List<HolidayAverageDateTimeVO> listRentAmtEntityByAverage(RentAmtDTO rentAmtDTO) {
+		log.info("getRentAmtEntity rentAmtDTO=[{}]",rentAmtDTO);
+		if (rentAmtDTO == null) {
+			log.error("getRentAmtEntity 获取租金对象列表rentAmtDTO对象为空");
+			Cat.logError("获取租金对象列表rentAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = rentAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getRentAmtEntity 获取租金对象列表rentAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取租金对象列表rentAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseCopyDTO = new CostBaseDTO();
+		// 赋值后需要
+		BeanUtils.copyProperties(costBaseDTO, costBaseCopyDTO);
+		List<RenterGoodsPriceDetailDTO> dayPriceList = rentAmtDTO.getRenterGoodsPriceDetailDTOList();
+		// 按还车时间分组
+		Map<LocalDateTime, List<RenterGoodsPriceDetailDTO>> dayPriceMap = dayPriceList.stream().collect(Collectors.groupingBy(RenterGoodsPriceDetailDTO::getRevertTime));
+		dayPriceMap = dayPriceMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+		int i = 1;
+		List<HolidayAverageDateTimeVO> holidayAverageDateTimeVOList = new ArrayList<HolidayAverageDateTimeVO>();
+		for(Map.Entry<LocalDateTime, List<RenterGoodsPriceDetailDTO>> it : dayPriceMap.entrySet()){
+			if (i == 1) {
+				costBaseCopyDTO.setEndTime(it.getKey());
+			} else {
+				costBaseCopyDTO.setStartTime(costBaseCopyDTO.getEndTime());
+				costBaseCopyDTO.setEndTime(it.getKey());
+			}
+			holidayAverageDateTimeVOList.add(getHolidayAverage(costBaseCopyDTO, it.getValue()));
+			i++;
+		}
+		return holidayAverageDateTimeVOList;
+	}
+	
+	
+	/**
+	 * 计算日均价
+	 * @param costBaseDTO
+	 * @param dayPrices
+	 * @return HolidayAverageDateTimeVO
+	 */
+	private HolidayAverageDateTimeVO getHolidayAverage(CostBaseDTO costBaseDTO, List<RenterGoodsPriceDetailDTO> dayPrices) {
+		// 数据转化
+		List<CarPriceOfDay> carPriceOfDayList = dayPrices.stream().map(dayPrice -> {
+			CarPriceOfDay carPriceOfDay = new CarPriceOfDay();
+			carPriceOfDay.setCurDate(dayPrice.getCarDay());
+			carPriceOfDay.setDayPrice(dayPrice.getCarUnitPrice());
+			return carPriceOfDay;
+		}).collect(Collectors.toList());
+		// 计算日均价
+		Integer holidayAverage = RenterFeeCalculatorUtils.getHolidayAverageRentAMT(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), carPriceOfDayList);
+		HolidayAverageDateTimeVO holidayAverageDateTimeVO = new HolidayAverageDateTimeVO();
+		holidayAverageDateTimeVO.setRentOriginalUnitPriceAmt(holidayAverage);
+		holidayAverageDateTimeVO.setRevertTime(CommonUtils.formatTime(costBaseDTO.getEndTime(), CommonUtils.FORMAT_STR_DEFAULT));
+		return holidayAverageDateTimeVO;
 	}
 	
 	
@@ -541,7 +607,6 @@ public class RenterOrderCostCombineService {
 	/**
 	 * 
 	 * @param orderNo
-	 * @param renterOrderNo
 	 * @param memNo
 	 * @return
 	 */
@@ -1196,7 +1261,7 @@ public class RenterOrderCostCombineService {
                     Cat.logEvent(CatConstants.FEIGN_PARAM,"cityCode="+cityCode+"&revertTimeLong="+revertTimeLong);
                     log.info("判断是否超运能入参:cityCode={},rentTimeLong={}",cityCode,revertTimeLong);
                     returnFlgResponse = getBackCityLimitFeignApi.isCityServiceLimit(cityCode, revertTimeLong);
-                    log.info("判断是否超运能入参:cityCode={},rentTimeLong={}，结果：getFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(revertTimeLong));
+                    log.info("判断是否超运能入参:cityCode={},revertTimeLong={}，结果：returnFlgResponse={}",cityCode,revertTimeLong,JSON.toJSONString(returnFlgResponse));
                     Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(returnFlgResponse));
                     if(returnFlgResponse == null || returnFlgResponse.getResCode() == null || !ErrorCode.SUCCESS.getCode().equals(returnFlgResponse.getResCode())){
                         throw new ReturnCarOverCostFailException();

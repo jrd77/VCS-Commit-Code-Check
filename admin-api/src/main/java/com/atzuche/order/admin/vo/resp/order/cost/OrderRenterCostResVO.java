@@ -29,7 +29,6 @@ public class OrderRenterCostResVO {
 
 	@AutoDocProperty(value="租车费用-实退")
 	private String rentFeeShitui = "0";
-
 	
 	
 	@AutoDocProperty(value="租车费用-基础费用")  ///
@@ -78,7 +77,10 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="优惠抵扣")
 	private String deductionAmount;
 	//--------------------------------------------
-	
+	@AutoDocProperty(value="长租租金折扣文案")
+	private String longDiscountDesc;
+	@AutoDocProperty(value="长租租金折扣抵扣金额")
+	private String longRentDeductAmt;
 	@AutoDocProperty(value="车主券")  ///
 	private String ownerCouponTitle; 
 	
@@ -150,7 +152,6 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="车辆押金-实退")
 	private String vehicleDepositShitui;
 	
-	
 	@AutoDocProperty(value="平台任务减免金额")
 	private String platformTaskFreeAmt;
 	
@@ -178,7 +179,12 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="补付费用-实收")
 	private String paymentAmountShishou;
 	//--------------------------------------------
-	
+
+    @AutoDocProperty(value="车主长租折扣")
+    private String ownerLongRentDeduct;
+    @AutoDocProperty(value="车主长租折扣实际抵扣金额")
+    private String ownerLongRentDeductAmt;
+
 	//ADD
 	@AutoDocProperty(value="租车费用-应扣")
 	private String rentFeeYingkou = "0";
@@ -198,5 +204,5 @@ public class OrderRenterCostResVO {
 	private String violationDepositShikou;
 	@AutoDocProperty(value="违章押金-实收免押预授权")
 	private String violationDepositShishouAuth;
-	
+
 }

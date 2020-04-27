@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.coreapi.filter.StockFilter;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +88,8 @@ public class OwnerAgreeOrderService {
     private PayCallbackService payCallbackService;
     @Autowired
     private CashierPayService cashierPayService;
+    @Autowired
+    private OrderSourceStatService orderSourceStatService;
 
 
     /**
@@ -216,8 +221,13 @@ public class OwnerAgreeOrderService {
         if (ownerOrderEntity == null) {
             throw new OrderNotFoundException(orderNo);
         }
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(orderNo, false);
-        logger.info("ownerGoodsDetailDTO is {}", ownerGoodsDetailDTO);
+        //OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(orderNo, false);
+        OrderSourceStatEntity orderSourceStatEntity = orderSourceStatService.selectByOrderNo(orderNo);
+        if(orderSourceStatEntity == null){
+            logger.error("订单统计信息不存在orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+        //logger.info("ownerGoodsDetailDTO is {}", ownerGoodsDetailDTO);
         orderInfoDTO.setCarNo(Integer.parseInt(ownerOrderEntity.getGoodsCode()));
         orderInfoDTO.setCityCode(Integer.parseInt(orderEntity.getCityCode()));
         orderInfoDTO.setOldCarNo(null);
@@ -234,9 +244,7 @@ public class OwnerAgreeOrderService {
 
         orderInfoDTO.setGetCarAddress(getCarAddress);
         orderInfoDTO.setReturnCarAddress(returnCarAddress);
-
+        orderInfoDTO.setLongRent(StockFilter.isLongRent(orderSourceStatEntity.getCategory()));
         return orderInfoDTO;
     }
-
-
 }

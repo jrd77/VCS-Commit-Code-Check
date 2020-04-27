@@ -40,13 +40,17 @@ public class OwnerOrderSubsidyDetailService {
 		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetail(ownerOrderSubsidyDetailEntity);
 	}
-	
+
+
 	/**
 	 * 批量保存车主补贴明细
 	 * @param costList 车主补贴明细列表
 	 * @return Integer
 	 */
 	public Integer saveOwnerOrderSubsidyDetailBatch(List<OwnerOrderSubsidyDetailEntity> costList) {
+		if (costList == null || costList.isEmpty()) {
+			return 0;
+		}
 		return ownerOrderSubsidyDetailMapper.saveOwnerOrderSubsidyDetailBatch(costList);
 	}
 	

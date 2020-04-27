@@ -2,6 +2,12 @@ package com.atzuche.order.coreapi.submit.exception;
 
 import com.atzuche.order.commons.OrderException;
 
+/**
+ * SubmitOrderController 相关业务校验异常
+ *
+ * @author pengcheng.fu
+ * @date 2019/2/3 15:45
+ */
 public class SubmitOrderException extends OrderException {
 
 

@@ -18,14 +18,14 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 @EnableEurekaClient
 @SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.atzuche.violation","com.atzuche.config"})
 @MapperScan({"com.atzuche.order"})
-public class TemplateApplication extends SpringBootServletInitializer {
+public class WzTemplateApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(TemplateApplication.class, args);
+        SpringApplication.run(WzTemplateApplication.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(TemplateApplication.class);
+        return application.sources(WzTemplateApplication.class);
     }
 }

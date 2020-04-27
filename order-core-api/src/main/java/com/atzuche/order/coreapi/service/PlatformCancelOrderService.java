@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderResDTO;
@@ -10,8 +11,10 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.parentorder.entity.OrderCancelReasonEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.dianping.cat.Cat;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,20 @@ public class PlatformCancelOrderService {
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
                 //通知收银台退款以及退还凹凸币和钱包
                 orderSettleService.settleOrderCancel(orderNo);
+
+                //通知结算计算凹凸币和钱包等
+                CancelOrderReqDTO reqDTO =
+                        orderCommonConver.buildCancelOrderReqDTO(cancelOrderRes.getOrderNo(),
+                                cancelOrderRes.getRenterOrderNo(),
+                                cancelOrderRes.getOwnerOrderNo(), false, true);
+                logger.info("取消订单责任判定后进行结算,reqDTO:[{}]", JSON.toJSONString(reqDTO));
+                try {
+                    orderSettleService.orderCancelSettleCombination(reqDTO);
+                } catch (Exception e) {
+                    logger.error("手动责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
+                    Cat.logError("手动责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
+                }
+
                 //通知流程系统
                 CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo,
                         cancelOrderRes);
