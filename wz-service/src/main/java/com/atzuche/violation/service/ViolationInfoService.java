@@ -94,6 +94,14 @@ public class ViolationInfoService {
             }else{
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(3));
             }
+            OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationResVO.getOrderNo());
+            String orderDetain = "未暂扣";
+            if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                orderDetain = "未暂扣";
+            } else {
+                orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+            }
+            violationResVO.setWzDepositStatus(orderDetain);
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
                 violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
             }
