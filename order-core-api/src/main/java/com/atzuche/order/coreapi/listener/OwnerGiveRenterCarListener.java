@@ -29,7 +29,7 @@ public class OwnerGiveRenterCarListener {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerGiveRenterCarListener.class);
 
-    private static final String ORDER_PRERETURNCAR_QUEUE = "status.order.preReturnCar.queue";
+    private static final String ORDER_PRERETURNCAR_QUEUE = "status.order.preReturnCar.queue20200427";
 
     @Resource
     private DeRunService deRunService;
