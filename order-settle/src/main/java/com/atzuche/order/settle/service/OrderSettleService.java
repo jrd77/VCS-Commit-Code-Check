@@ -199,7 +199,7 @@ public class OrderSettleService{
         } else {  
         	//应扣大于实收,应扣小于等于实收
         	//处理预授权的情况。200420
-        	if(accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
+        	if(accountRenterDepositResVO.getIsAuthorize()!=null && accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
         		depositYingkouOri = depositShishouOri;
         	}
         }
