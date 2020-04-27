@@ -60,6 +60,11 @@ public class RenterSubsidyDetailVO {
     @AutoDocProperty(value = "长租-取还车费用补贴")
     private Integer longGetReturnCarCostSubsidy;
 
+    @AutoDocProperty(value = "取车服务费补贴")
+    private Integer srvGetCostAmt=0;
+    @AutoDocProperty(value = "还车服务费补贴")
+    private Integer srvReturnCostAmt=0;
+
     public Integer getTotalSubsidy(){
         int total=0;
         if(platformCouponSubsidyAmt!=null){

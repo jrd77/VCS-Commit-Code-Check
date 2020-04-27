@@ -158,8 +158,8 @@ public class RenterCostFacadeService {
     ////全费用对象full
     public RenterCostDetailVO getRenterCostFullDetail(String orderNo, String renterOrderNo, String memNo){
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
-        List<RenterOrderFineDeatailEntity> renterOrderFineDeatailEntityList=fineDeatailService.listRenterOrderFineDeatail(orderNo,renterOrderNo);
-        List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailEntityList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo,memNo);
+        //List<RenterOrderFineDeatailEntity> renterOrderFineDeatailEntityList=fineDeatailService.listRenterOrderFineDeatail(orderNo,renterOrderNo);
+        //List<ConsoleRenterOrderFineDeatailEntity> consoleRenterOrderFineDeatailEntityList = consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo,memNo);
 
         RenterCostDetailVO basicCostDetailVO = new RenterCostDetailVO();
 
@@ -248,6 +248,9 @@ public class RenterCostFacadeService {
                 OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST) +
                 OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
                 OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
+
+        detail.setSrvGetCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT)));
+        detail.setSrvGetCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
         return detail;
     }
 
