@@ -67,6 +67,7 @@ public class OrderCarDepositAmtFilter implements OrderCostFilter {
         memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
                 Math.abs(carDepositAmt.getCarDepositAmt()));
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(orderCostCarDepositAmtReqDTO.getRenterMemberRightDTOList());
+        memRightCarDepositAmtReqDTO.setOrderCategory(baseReqDTO.getOrderCategory());
         log.info("订单费用计算-->车辆押金.memRightCarDepositAmtReqDTO:[{}]",
                 JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
