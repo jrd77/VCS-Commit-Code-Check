@@ -125,7 +125,12 @@ public class RenterSubsidyDetailVO {
         if(trafficSubsidyAmt!=null){
             total=total+trafficSubsidyAmt;
         }
-
+        if(srvGetCostAmt != null){
+            total=total+srvGetCostAmt;
+        }
+        if(srvReturnCostAmt != null){
+            total=total+srvReturnCostAmt;
+        }
         return total;
     }
 
