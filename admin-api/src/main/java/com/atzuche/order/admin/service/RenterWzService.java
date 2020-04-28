@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
 import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
@@ -9,20 +10,19 @@ import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
-import com.atzuche.order.commons.CompareHelper;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
 import com.atzuche.order.detain.dto.CarDepositTemporaryRefundReqDTO;
 import com.atzuche.order.detain.service.RenterDetain;
 import com.atzuche.order.detain.vo.RenterDetainVO;
 import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
+import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
@@ -32,9 +32,13 @@ import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.WzCostLogService;
 import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
+import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -61,8 +65,6 @@ public class RenterWzService {
     @Resource
     private RenterGoodsService renterGoodsService;
 
-    @Resource
-    private RenterMemberService renterMemberService;
 
     @Resource
     private WzTemporaryRefundLogService wzTemporaryRefundLogService;
@@ -75,6 +77,9 @@ public class RenterWzService {
 
     @Resource
     private RenterOrderService renterOrderService;
+
+    @Autowired
+    private FeignMemberService feignMemberService;
 
     @Resource
     private RenterDetain renterDetain;
@@ -136,7 +141,7 @@ public class RenterWzService {
             memNo = fromDb.getMemNo();
         }else{
             carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
-            String renterNoByOrderNo = renterMemberService.getRenterNoByOrderNo(orderNo);
+            String renterNoByOrderNo = getRenterMemberFromRemote(orderNo);
             if(StringUtils.isNotBlank(renterNoByOrderNo)){
                 memNo = Integer.parseInt(renterNoByOrderNo);
             }
@@ -147,7 +152,26 @@ public class RenterWzService {
         RenterOrderWzCostDetailEntity entityByType = getEntityByType(costDetail.getCostCode(), orderNo, costDetail.getAmount(), carNum, memNo,costDetail.getRemark());
         renterOrderWzCostDetailService.saveRenterOrderWzCostDetail(entityByType);
     }
-
+    private String getRenterMemberFromRemote(String orderNo){
+        ResponseData<String> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取会员号");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取会员号,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignMemberService.getRenterMemberByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取获取会员号异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取获取会员号异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
     private RenterOrderWzCostDetailEntity getEntityByType(String code, String orderNo, String amount, String carNum, Integer memNo, String remark){
         String authName = AdminUserUtil.getAdminUser().getAuthName();
         String authId = AdminUserUtil.getAdminUser().getAuthId();

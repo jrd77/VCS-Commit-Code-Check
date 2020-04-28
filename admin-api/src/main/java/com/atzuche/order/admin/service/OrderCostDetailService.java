@@ -43,7 +43,6 @@ import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
-import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
@@ -87,8 +86,6 @@ public class OrderCostDetailService {
 	private RenterDepositDetailService renterDepositDetailService;
     @Autowired
     private MemProxyService memberService;
-    @Autowired
-    private RenterMemberService renterMemberService;
     @Autowired
     private RenterOrderCostCombineService renterOrderCostCombineService;
     @Autowired
@@ -169,7 +166,8 @@ public class OrderCostDetailService {
 //        RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderEntity.getMemNoRenter());
 //        List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //会员权益,从落库表中获取
-        RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterCostReqVO.getRenterOrderNo(), true);
+        //RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterCostReqVO.getRenterOrderNo(), true);
+        RenterMemberDTO renterMemberDTO = getRenterMemeberFromRemot(renterCostReqVO.getRenterOrderNo(), true);
         List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //数据封装
         putTaskRight(reductTaskList,renterMemberRightDTOList);
@@ -1640,6 +1638,27 @@ public class OrderCostDetailService {
         }catch (Exception e){
             log.error("Feign 获取车主会员信息异常,responseObject={},ownerOrderNo={}",JSON.toJSONString(responseObject),ownerOrderNo,e);
             Cat.logError("Feign 获取车主会员信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private RenterMemberDTO getRenterMemeberFromRemot(String renterOrderNo,boolean isNeedRight){
+        ResponseData<RenterMemberDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客会员信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取租客会员信息,renterOrderNo={},isNeedRight={}", renterOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignMemberService.queryRenterMemberByOwnerOrderNo(renterOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客会员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 获取租客会员信息异常",e);
             throw e;
         }finally {
             t.complete();
