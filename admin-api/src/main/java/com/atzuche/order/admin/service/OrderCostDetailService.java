@@ -25,10 +25,10 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -122,9 +122,9 @@ public class OrderCostDetailService {
     @Autowired
     private OwnerGoodsService ownerGoodsService;
     @Autowired
-    private OwnerMemberService ownerMemberService;
-    @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private FeignMemberService feignMemberService;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -645,7 +645,7 @@ public class OrderCostDetailService {
 		    	//反向记录
            RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
            OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
-           OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerGoodsEntity.getOwnerOrderNo(), false);
+           OwnerMemberDTO ownerMemberDTO = this.getOwnerMemeberFromRemot(ownerGoodsEntity.getOwnerOrderNo(), false);
            costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
             OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()),targetEnum,sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
             //
@@ -1619,6 +1619,27 @@ public class OrderCostDetailService {
             log.error("Feign 获取租客费用详情,responseObject={},orderNo={}", JSON.toJSONString(responseData),orderNo,e);
             Cat.logError("Feign 获取租客费用详情",e);
             t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private OwnerMemberDTO getOwnerMemeberFromRemot(String ownerOrderNo,boolean isNeedRight){
+        ResponseData<OwnerMemberDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车主会员信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取车主会员信息,ownerOrderNo={},isNeedRight={}", ownerOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,ownerOrderNo);
+            responseObject =  feignMemberService.queryOwnerMemberByOwnerOrderNo(ownerOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,ownerOrderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取车主会员信息异常,responseObject={},ownerOrderNo={}",JSON.toJSONString(responseObject),ownerOrderNo,e);
+            Cat.logError("Feign 获取车主会员信息异常",e);
             throw e;
         }finally {
             t.complete();

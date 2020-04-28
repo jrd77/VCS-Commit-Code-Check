@@ -1,0 +1,29 @@
+package com.atzuche.order.open.service;
+
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
+import com.autoyol.commons.web.ResponseData;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@FeignClient(name="order-center-api")
+public interface FeignMemberService {
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/28 11:22
+     * @Description: 根据订单号和车主会员号查询车主信息
+     * 
+     **/
+    @GetMapping("/member/owner/queryOwnerMemberByOrderNoAndOwnerNo")
+    public ResponseData<OwnerMemberDTO> queryOwnerMemberByOrderNoAndOwnerNo(@Param("orderNo") String orderNo, @Param("ownerMemberNo")String ownerMemberNo);
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/28 11:48
+     * @Description: 根据车主子订单号查询车主会员和车主权益信息
+     * 
+     **/
+    @GetMapping("/member/owner/queryOwnerMemberByOwnerOrderNo")
+    public ResponseData<com.atzuche.order.commons.entity.dto.OwnerMemberDTO > queryOwnerMemberByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo, @Param("isNeedRight")boolean isNeedRight);
+}
+
+
