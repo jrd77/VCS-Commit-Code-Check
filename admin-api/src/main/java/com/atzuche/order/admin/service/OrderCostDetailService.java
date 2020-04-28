@@ -22,14 +22,13 @@ import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignGoodsService;
 import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
-import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -115,8 +114,6 @@ public class OrderCostDetailService {
     RenterOrderCostService renterOrderCostService;
     @Autowired
     FeignOrderCostService feignOrderCostService;
-    @Autowired
-    private OwnerGoodsService ownerGoodsService;
     @Autowired
     private OrderStatusService orderStatusService;
     @Autowired
@@ -644,8 +641,9 @@ public class OrderCostDetailService {
 		    	//反向记录
            //RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
            RenterGoodsDetailDTO renterGoodsDetail = getRenterGoodsFromRemot(renterCostReqVO.getRenterOrderNo(), false);
-           OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
-           OwnerMemberDTO ownerMemberDTO = this.getOwnerMemeberFromRemot(ownerGoodsEntity.getOwnerOrderNo(), false);
+           //OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
+           OwnerGoodsDetailDTO ownerGoodsDetailDTO = getOwnerGoodsFromRemot(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
+           OwnerMemberDTO ownerMemberDTO = this.getOwnerMemeberFromRemot(ownerGoodsDetailDTO.getOwnerOrderNo(), false);
            costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
             OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()),targetEnum,sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
             //
@@ -1682,6 +1680,31 @@ public class OrderCostDetailService {
             return responseObject.getData();
         }catch (Exception e){
             log.error("Feign 获取租商品员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 获取租商品员信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private OwnerGoodsDetailDTO getOwnerGoodsFromRemot(Integer carNo,String orderNo){
+	    if(carNo == null){
+	        log.error("车辆号不能为空carNo={}",carNo);
+	        throw new InputErrorException();
+        }
+        ResponseData<OwnerGoodsDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租商品员信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryOwnerGoodsByCarNoAndOrderNo");
+            log.info("Feign 开始获取租商品员信息,carNo={},orderNo={}", carNo,orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"carNo="+carNo+",orderNo="+orderNo);
+            responseObject =  feignGoodsService.queryOwnerGoodsByCarNoAndOrderNo(carNo,orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,"carNo="+carNo+",orderNo="+orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租商品员信息异常,responseObject={},param={}",JSON.toJSONString(responseObject),"carNo="+carNo+",orderNo="+orderNo,e);
             Cat.logError("Feign 获取租商品员信息异常",e);
             throw e;
         }finally {

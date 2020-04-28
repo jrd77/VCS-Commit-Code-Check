@@ -6,9 +6,13 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.JsonUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
+import com.atzuche.order.open.service.FeignGoodsService;
+import com.atzuche.order.open.service.FeignRenterGoodsService;
+import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.vo.CarBaseVO;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -34,6 +38,10 @@ public class CarService {
     private static final String ERROR_TXT="系统异常";
     @Autowired
     private CarDetailQueryFeignApi carDetailQueryFeignApi;
+    @Autowired
+    private FeignGoodsService feignGoodsService;
+    @Autowired
+    private FeignRenterGoodsService feignRenterGoodsService;
 
     public CarBusinessResVO getCarBusiness(Integer carNo){
         CarBusinessResVO resVO = new CarBusinessResVO();
@@ -105,5 +113,48 @@ public class CarService {
             throw remoteCallException;
         }
     }
+    public RenterGoodWithoutPriceVO queryRenterGoods(String orderNo,String carNo){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中租客商品信息");
+        ResponseData<RenterGoodWithoutPriceVO> responseObject = null;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignRenterGoodsService.getRenterGoodsDetailWithoutPrice");
+            logger.info("Feign 开始获取订单中租客商品信息,[orderNo={},carNo={}]", orderNo,JSON.toJSONString(carNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(carNo));
+            responseObject = feignRenterGoodsService.getRenterGoodsDetailWithoutPrice(orderNo,carNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            RenterGoodWithoutPriceVO baseVO = responseObject.getData();
+            logger.info("baseVo is {}",baseVO);
+            t.setStatus(Transaction.SUCCESS);
+            return baseVO;
+        }catch (Exception e){
+            logger.error("Feign 订单中租客商品信息,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo),e);
+            Cat.logError("Feign 获取订单中租客商品信息异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 
+    public OwnerGoodsDetailDTO getOwnerGoodsFromRemot(String orderNo){
+        ResponseData<OwnerGoodsDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车主商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryOwnerGoodsByOrderNo");
+            logger.info("Feign 开始获取车主商品信息,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignGoodsService.queryOwnerGoodsByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            logger.error("Feign 获取车主商品信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取车主商品信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }

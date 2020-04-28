@@ -1,5 +1,6 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -16,7 +17,7 @@ public interface FeignGoodsService {
      *
      **/
     @RequestMapping("/goods/renter/queryCarNumByOrderNo")
-    public ResponseData<String> queryCarNumByOrderNo(@RequestParam("orderNo") String orderNo);
+     ResponseData<String> queryCarNumByOrderNo(@RequestParam("orderNo") String orderNo);
     
     /*
      * @Author ZhangBin
@@ -25,5 +26,23 @@ public interface FeignGoodsService {
      * 
      **/
     @RequestMapping("/goods/renter/queryRenterGoodsDetail")
-    public ResponseData<RenterGoodsDetailDTO> queryRenterGoodsDetail(@RequestParam("renterOrderNo")String renterOrderNo, @RequestParam("isNeedPrice") boolean isNeedPrice);
+     ResponseData<RenterGoodsDetailDTO> queryRenterGoodsDetail(@RequestParam("renterOrderNo")String renterOrderNo, @RequestParam("isNeedPrice") boolean isNeedPrice);
+    
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/28 16:15 
+     * @Description: 根据订单号查询车主商品信息
+     * 
+     **/
+    @RequestMapping("/goods/owner/queryRenterGoodsDetail")
+    ResponseData<OwnerGoodsDetailDTO> queryOwnerGoodsByOrderNo(@RequestParam("orderNo")String orderNo);
+    
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/28 16:29 
+     * @Description: 使用订单号和车辆号查询商品信息
+     * 
+     **/
+    @RequestMapping("/goods/owner/queryOwnerGoodsByCarNoAndOrderNo")
+    ResponseData<OwnerGoodsDetailDTO> queryOwnerGoodsByCarNoAndOrderNo(@RequestParam("carNo") Integer carNo,@RequestParam("orderNo") String orderNo);
 }

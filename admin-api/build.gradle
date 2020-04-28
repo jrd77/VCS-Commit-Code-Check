@@ -63,7 +63,6 @@ dependencies {
 
     compile project(":util-all:fee-calculator")
  
-    //compile project(":order-core-all:renter-all:renter-commodity")
 	//compile project(":order-core-all:parent-order")
 	//compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-settle")
