@@ -8,14 +8,17 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEnti
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.AccountDepositException;
 import com.atzuche.order.commons.exceptions.AccountWzDepositException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
+import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
 import com.atzuche.order.commons.vo.res.*;
+import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -24,6 +27,9 @@ import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.entity.vo.GetReturnAndOverFeeDetailVO;
+import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
@@ -62,6 +68,8 @@ public class OrderCostController {
 	private CashierQueryService cashierQueryService;
 	@Autowired
 	private OwnerCostFacadeService ownerCostFacadeService;
+	@Autowired
+	private RenterOrderCostCombineService renterOrderCostCombineService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -266,6 +274,40 @@ public class OrderCostController {
         }
         RenterCostVO renterCostVO = facadeService.renterCostShishouDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());
         return ResponseData.success(renterCostVO);
+    }
+    
+    
+    /**
+     * 获取取还车费用和超运能费用
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/getreturnfee/detail")
+	public ResponseData<GetReturnAndOverFeeDetailVO> getGetReturnFeeDetail(@RequestBody GetReturnAndOverFeeVO req){
+    	GetReturnAndOverFeeDetailVO getReturnAndOverFeeDetailVO = renterOrderCostCombineService.getGetReturnAndOverFeeDetailVO(req);
+		return ResponseData.success(getReturnAndOverFeeDetailVO);
+	}
+    
+    
+    /**
+     * 获取附加驾驶员保障费
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/extraDriverInsure/detail")
+	public ResponseData<RenterOrderCostDetailEntity> getExtraDriverInsureDetail(@RequestBody ExtraDriverDTO req){
+    	RenterOrderCostDetailEntity renterOrderCostDetailEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(req);
+		return ResponseData.success(renterOrderCostDetailEntity);
+	}
+    
+    
+    /**
+     * 获取租客补贴
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
+	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo){
+    	RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo);
+    	return ResponseData.success(renterAndConsoleSubsidyVO);
     }
     
 }

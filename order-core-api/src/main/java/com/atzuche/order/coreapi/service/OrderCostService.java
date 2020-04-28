@@ -29,6 +29,7 @@ import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderIncrementDetailEnti
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.commons.vo.res.ownercosts.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
+import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
@@ -36,6 +37,8 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
@@ -101,6 +104,10 @@ public class OrderCostService {
 	private OwnerCouponLongService ownerCouponLongService;
     @Autowired
     private OwnerOrderService ownerOrderService;
+    @Autowired
+    private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
+    @Autowired
+    private OrderService orderService;
 
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
@@ -657,6 +664,26 @@ public class OrderCostService {
         }
         return null;
     }
+	
+	
+	/**
+	 * 获取租客补贴
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @return RenterAndConsoleSubsidyVO
+	 */
+	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo) {
+		  //主订单
+	      OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+	      // 管理后台补贴
+		  List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
+		  // 租客子订单补贴
+		  List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo); 
+		  RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
+		  renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
+		  renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
+		  return renterAndConsoleSubsidyVO;
+	}
 	
 
 }

@@ -1,6 +1,11 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeDetailVO;
+import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
+import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleSubsidyVO;
+import com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -92,5 +97,26 @@ public interface FeignOrderCostService {
     @PostMapping("/order/temp/save/depoist")
     ResponseData saveTempCarDepoist(@RequestBody SaveTempCarDepositInfoReqVO reqVO);
 
-
+    /**
+     * 获取取还车费用和超运能费用
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/getreturnfee/detail")
+	public ResponseData<GetReturnAndOverFeeDetailVO> getGetReturnFeeDetail(@RequestBody GetReturnAndOverFeeVO req);
+    
+    /**
+     * 获取附加驾驶员保障费
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/extraDriverInsure/detail")
+	public ResponseData<RenterOrderCostDetailEntity> getExtraDriverInsureDetail(@RequestBody ExtraDriverDTO req);
+    
+    /**
+     * 获取租客补贴
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
+	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+    
 }

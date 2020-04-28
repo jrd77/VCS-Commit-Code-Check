@@ -40,8 +40,8 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
+import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
@@ -125,6 +125,8 @@ public class OrderCostDetailService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private OrderCostRemoteService orderCostRemoteService;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -241,9 +243,14 @@ public class OrderCostDetailService {
       List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
       
       AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
-      putComUseDriverListAlreaySave(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
+      List<String> driverIds = new ArrayList<String>();
+	  driverIds.add("1");// 计算一个人的价格
+	  extraDriverDTO.setDriverIds(driverIds);
+	  com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity extraCost = orderCostRemoteService.getExtraDriverInsureDetail(extraDriverDTO);
+	  String unitExtra = extraCost == null ? "0" : String.valueOf( NumberUtils.convertNumberToZhengshu(extraCost.getTotalAmount()));
+	  putComUseDriverListAlreaySave(resVo,commUseDriverList,lstDriverId,unitExtra);
       
-      putComUseDriverList(resVo,commUseDriverList,extraDriverDTO,lstDriverId);
+      putComUseDriverList(resVo,commUseDriverList,lstDriverId,unitExtra);
 		return resVo;
 	}
 	
@@ -255,14 +262,9 @@ public class OrderCostDetailService {
 	 * @param lstDriverId
 	 * @throws Exception
 	 */
-	private void putComUseDriverListAlreaySave(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
+	private void putComUseDriverListAlreaySave(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,List<String> lstDriverId, String unitExtra) throws Exception {
 		if(lstDriverId != null && lstDriverId.size() > 0) {
 			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
-			List<String> driverIds = new ArrayList<String>();
-			driverIds.add("1");//默认一个
-			extraDriverDTO.setDriverIds(driverIds);
-			///
-//			extraDriverDTO.setDriverIds(lstDriverId);
 			
 			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
 				//已经入库的lstDriverId
@@ -280,14 +282,7 @@ public class OrderCostDetailService {
 					//数据封装
 					dto.setValidityEndDate(end);
 					dto.setValidityStartDate(start);
-					
-					//计算费用
-					String amt = "0";
-					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
-					if(extraDriverInsureAmtEntity != null) {
-						amt = String.valueOf( NumberUtils.convertNumberToZhengshu(extraDriverInsureAmtEntity.getTotalAmount()));
-					}
-					dto.setAmt(amt);
+					dto.setAmt(unitExtra);
 					listCommUseDriverInfoDTO.add(dto);
 				}
 			}
@@ -303,15 +298,8 @@ public class OrderCostDetailService {
 	 * @param commUseDriverList
 	 * @throws Exception
 	 */
-	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,ExtraDriverDTO extraDriverDTO,List<String> lstDriverId) throws Exception {
-//		if(lstDriverId != null && lstDriverId.size() > 0) {
+	private void putComUseDriverList(AdditionalDriverInsuranceVO resVo, List<CommUseDriverInfoDTO> commUseDriverList,List<String> lstDriverId, String unitExtra) throws Exception {
 			List<CommUseDriverInfoStringDateDTO> listCommUseDriverInfoDTO = new ArrayList<CommUseDriverInfoStringDateDTO>();
-			List<String> driverIds = new ArrayList<String>();
-			driverIds.add("1");//默认一个
-			extraDriverDTO.setDriverIds(driverIds);
-			///
-//			extraDriverDTO.setDriverIds(lstDriverId);
-			
 			for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverList) {
 				//已经入库的lstDriverId
 				//允许全部的展示。@邵大宏 前端会做处理。20200211
@@ -329,14 +317,7 @@ public class OrderCostDetailService {
 					//数据封装
 					dto.setValidityEndDate(end);
 					dto.setValidityStartDate(start);
-					
-					//计算费用
-					String amt = "0";
-					RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
-					if(extraDriverInsureAmtEntity != null) {
-						amt = String.valueOf( NumberUtils.convertNumberToZhengshu(extraDriverInsureAmtEntity.getTotalAmount()));
-					}
-					dto.setAmt(amt);
+					dto.setAmt(unitExtra);
 					listCommUseDriverInfoDTO.add(dto);
 //				}
 			}
