@@ -76,8 +76,6 @@ public class RenterWzService {
     @Resource
     private RenterOrderService renterOrderService;
 
-    @Resource
-    private RenterDetain renterDetain;
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
