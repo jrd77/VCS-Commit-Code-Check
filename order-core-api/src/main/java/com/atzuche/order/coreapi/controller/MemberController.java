@@ -8,7 +8,6 @@ import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
