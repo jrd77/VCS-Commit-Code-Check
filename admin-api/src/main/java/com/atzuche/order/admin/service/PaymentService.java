@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
