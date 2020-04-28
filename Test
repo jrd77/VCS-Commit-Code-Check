@@ -1,20 +1,18 @@
-private OwnerGoodsDetailDTO getOwnerGoodsFromRemot(String carNo,String orderNo){
-        ResponseData<OwnerGoodsDetailDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租商品员信息");
+ResponseData<OrderHistoryRespDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取订单状态");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取租商品员信息,renterOrderNo={},isNeedRight={}", renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
-            responseObject =  feignGoodsService.queryOwnerGoodsDetail(renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.getByOrderNo");
+            log.info("Feign 开始获取订单状态,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignOrderService.getByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             return responseObject.getData();
         }catch (Exception e){
-            log.error("Feign 获取租商品员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
-            Cat.logError("Feign 获取租商品员信息异常",e);
+            log.error("Feign 获取订单状态异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取订单状态异常",e);
             throw e;
         }finally {
             t.complete();
         }
-    }
