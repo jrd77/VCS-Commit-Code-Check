@@ -7,8 +7,6 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AutoDocVersion(version = "订单详细信息 - 查看车主信息接口文档")
 public class AdminCarOwnerInfoController {
-    private final static Logger logger = LoggerFactory.getLogger(AdminCarOwnerInfoController.class);
-    
-
-
 
     @Autowired
     private AdminCarOwnerInfoService adminCarOwnerInfoService;

@@ -5,6 +5,7 @@ import com.autoyol.commons.web.ResponseData;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name="order-center-api")
 public interface FeignMemberService {
@@ -15,7 +16,7 @@ public interface FeignMemberService {
      * 
      **/
     @GetMapping("/member/owner/queryOwnerMemberByOrderNoAndOwnerNo")
-    public ResponseData<OwnerMemberDTO> queryOwnerMemberByOrderNoAndOwnerNo(@Param("orderNo") String orderNo, @Param("ownerMemberNo")String ownerMemberNo);
+    public ResponseData<OwnerMemberDTO> queryOwnerMemberByOrderNoAndOwnerNo(@RequestParam("orderNo") String orderNo, @RequestParam("ownerMemberNo")String ownerMemberNo);
     /*
      * @Author ZhangBin
      * @Date 2020/4/28 11:48
@@ -23,7 +24,7 @@ public interface FeignMemberService {
      * 
      **/
     @GetMapping("/member/owner/queryOwnerMemberByOwnerOrderNo")
-    public ResponseData<com.atzuche.order.commons.entity.dto.OwnerMemberDTO > queryOwnerMemberByOwnerOrderNo(@Param("ownerOrderNo") String ownerOrderNo, @Param("isNeedRight")boolean isNeedRight);
+    public ResponseData<com.atzuche.order.commons.entity.dto.OwnerMemberDTO > queryOwnerMemberByOwnerOrderNo(@RequestParam("ownerOrderNo") String ownerOrderNo, @RequestParam("isNeedRight")boolean isNeedRight);
 }
 
 

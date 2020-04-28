@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.vo.resp.car.CarOwnerInfoRespVO;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.mem.MemProxyService;
@@ -16,7 +15,6 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
 
