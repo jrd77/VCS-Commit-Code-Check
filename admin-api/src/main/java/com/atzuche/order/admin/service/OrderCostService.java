@@ -7,7 +7,6 @@ import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
-import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
@@ -23,10 +22,8 @@ import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -72,15 +69,7 @@ public class OrderCostService {
 	@Autowired
 	private AutoCoinProxyService autoCoinProxyService;
 	@Autowired
-	private CashierPayService cashierPayService;
-	@Autowired
 	private OrderSettleService orderSettleService;
-	@Autowired
-    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-	@Autowired
-    private AdminDeliveryCarService deliveryCarInfoService;
-	@Autowired
-	private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
 	@Autowired
 	private OwnerCouponLongService ownerCouponLongService;
 	

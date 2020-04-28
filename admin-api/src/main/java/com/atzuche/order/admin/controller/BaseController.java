@@ -1,6 +1,6 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.delivery.exception.DeliveryOrderException;
+import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.validation.BindingResult;
