@@ -62,11 +62,9 @@ dependencies {
     compile project(":casier-all:cashier-account")
 
     compile project(":util-all:fee-calculator")
-    compile project(":order-delivery")
  
     compile project(":order-core-all:renter-all:renter-mem")
     compile project(":order-core-all:renter-all:renter-commodity")
-	compile project(":order-core-all:renter-all:renter-cost")
 	compile project(":order-core-all:parent-order")
 	compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-settle")
