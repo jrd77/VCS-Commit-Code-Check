@@ -51,7 +51,6 @@ dependencies {
     compile("com.caucho:hessian:4.0.38")
     compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
 
-    compile('com.autoyol.car:auto-car-service-api:2020042201-SNAPSHOT')
    
 
 //    compile project(":casier-all:cashier-account")
@@ -64,19 +63,15 @@ dependencies {
 
     compile project(":util-all:fee-calculator")
  
-    compile project(":order-core-all:renter-all:renter-wz")
     compile project(":order-core-all:renter-all:renter-mem")
     compile project(":order-core-all:renter-all:renter-commodity")
 	compile project(":order-core-all:parent-order")
 	compile project(":order-core-all:carowner-all:carowner-mem")
     compile project(":order-settle")
-    compile project(":order-detain")
+    //compile project(":order-detain")
     
     compile project(":order-coin")
-
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
-
-    compile('com.autoyol:auto-coin-service-api:1.0.3-SNAPSHOT')
 
 }
