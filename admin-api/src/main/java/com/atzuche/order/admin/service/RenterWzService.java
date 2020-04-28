@@ -2,7 +2,6 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
-import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
@@ -12,17 +11,16 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderHistoryRespDTO;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
 import com.atzuche.order.detain.dto.CarDepositTemporaryRefundReqDTO;
 import com.atzuche.order.detain.service.RenterDetain;
 import com.atzuche.order.detain.vo.RenterDetainVO;
 import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
+import com.atzuche.order.open.service.FeignGoodsService;
 import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
@@ -62,9 +60,6 @@ public class RenterWzService {
     @Resource
     private WzCostLogService wzCostLogService;
 
-    @Resource
-    private RenterGoodsService renterGoodsService;
-
 
     @Resource
     private WzTemporaryRefundLogService wzTemporaryRefundLogService;
@@ -80,6 +75,9 @@ public class RenterWzService {
 
     @Autowired
     private FeignMemberService feignMemberService;
+
+    @Autowired
+    private FeignGoodsService feignGoodsService;
 
     @Resource
     private RenterDetain renterDetain;
@@ -140,7 +138,8 @@ public class RenterWzService {
             carNum = fromDb.getCarPlateNum();
             memNo = fromDb.getMemNo();
         }else{
-            carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
+            //carNum = renterGoodsService.queryCarNumByOrderNo(orderNo);
+            carNum = getCarNumFromRemot(orderNo);
             String renterNoByOrderNo = getRenterMemberFromRemote(orderNo);
             if(StringUtils.isNotBlank(renterNoByOrderNo)){
                 memNo = Integer.parseInt(renterNoByOrderNo);
@@ -485,5 +484,26 @@ public class RenterWzService {
             costDetails.add(dto);
         }
         return costDetails;
+    }
+
+    private String getCarNumFromRemot(String orderNo){
+        ResponseData<String> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车辆号");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取车辆号,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignGoodsService.queryCarNumByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取车辆号异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取车辆号异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
     }
 }

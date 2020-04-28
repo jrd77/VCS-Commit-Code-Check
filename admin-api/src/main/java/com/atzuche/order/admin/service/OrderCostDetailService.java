@@ -25,6 +25,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.mem.MemProxyService;
+import com.atzuche.order.open.service.FeignGoodsService;
 import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
@@ -99,8 +100,6 @@ public class OrderCostDetailService {
     @Autowired
     OrderSettleService orderSettleService;
     @Autowired
-    RenterGoodsService renterGoodsService;
-    @Autowired
     OwnerOrderService ownerOrderService;
     @Autowired
     RenterOrderSubsidyDetailService renterOrderSubsidyDetailService;
@@ -122,6 +121,8 @@ public class OrderCostDetailService {
     private OrderStatusService orderStatusService;
     @Autowired
     private FeignMemberService feignMemberService;
+    @Autowired
+    private FeignGoodsService feignGoodsService;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -641,7 +642,8 @@ public class OrderCostDetailService {
             orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(record);
 	    	/*if(orderEntityOwner != null) {*/
 		    	//反向记录
-           RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
+           //RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
+           RenterGoodsDetailDTO renterGoodsDetail = getRenterGoodsFromRemot(renterCostReqVO.getRenterOrderNo(), false);
            OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
            OwnerMemberDTO ownerMemberDTO = this.getOwnerMemeberFromRemot(ownerGoodsEntity.getOwnerOrderNo(), false);
            costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
@@ -998,7 +1000,8 @@ public class OrderCostDetailService {
             throw new Exception("获取订单数据为空");
         }
         
-        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), true); 
+        //RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), true);
+        RenterGoodsDetailDTO renterGoodsDetail = getRenterGoodsFromRemot(renterCostReqVO.getRenterOrderNo(), true);
         RenterRentDetailDTO renterRentDetailDTO = new RenterRentDetailDTO();
         if(renterGoodsDetail != null && renterGoodsDetail.getRenterGoodsPriceDetailDTOList()!=null && renterGoodsDetail.getRenterGoodsPriceDetailDTOList().size()>0){
             List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetail.getRenterGoodsPriceDetailDTOList();
@@ -1659,6 +1662,27 @@ public class OrderCostDetailService {
         }catch (Exception e){
             log.error("Feign 获取租客会员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
             Cat.logError("Feign 获取租客会员信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    private RenterGoodsDetailDTO getRenterGoodsFromRemot(String renterOrderNo,boolean isNeedRight){
+        ResponseData<RenterGoodsDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租商品员信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始获取租商品员信息,renterOrderNo={},isNeedRight={}", renterOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignGoodsService.queryRenterGoodsDetail(renterOrderNo,isNeedRight);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租商品员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 获取租商品员信息异常",e);
             throw e;
         }finally {
             t.complete();
