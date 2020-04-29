@@ -49,17 +49,17 @@ public class PaymentService {
 		/**
 		 * 租车费用/车辆押金结算前,支付信息列表
 		 */
-		List<PaymentResponseVO> beforeDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> beforeDepositSettlementPaymentList = new ArrayList<>();
 
 		/**
 		 * 租车费用/车辆押金结算时/后,支付信息列表
 		 */
-		List<PaymentResponseVO> afterDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> afterDepositSettlementPaymentList = new ArrayList<>();
 
 		/**
 		 * 违章押金结算时/后,支付信息列表
 		 */
-		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<>();
 		
 		//根据结算时间来切分
 //		logger.info("orderStatus toString={}",orderStatusService.toString());
