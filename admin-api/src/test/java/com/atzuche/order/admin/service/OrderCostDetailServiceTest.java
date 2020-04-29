@@ -13,11 +13,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
-import com.atzuche.order.admin.vo.req.cost.AdditionalDriverInsuranceIdsReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToPlatformCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.OwnerToRenterSubsidyReqVO;
+import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
-import com.atzuche.order.admin.vo.req.cost.RenterFineCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoSimpleDTO;

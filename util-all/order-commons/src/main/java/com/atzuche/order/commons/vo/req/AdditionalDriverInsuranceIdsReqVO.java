@@ -1,8 +1,9 @@
 /**
  * 
  */
-package com.atzuche.order.admin.vo.req.cost;
+package com.atzuche.order.commons.vo.req;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -30,5 +31,18 @@ public class AdditionalDriverInsuranceIdsReqVO {
     
 	@AutoDocProperty("附加驾驶人ID列表")
 	List<CommUseDriverInfoSimpleDTO> listCommUseDriverIds;
+
+    /**
+     * 创建人
+     */
+    private String createOp;
+    /**
+     * 修改人
+     */
+    private String updateOp;
+    /**
+     * 操作人ID
+     */
+    private String operatorId;
 	
 }

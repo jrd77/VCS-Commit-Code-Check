@@ -13,20 +13,18 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.*;
 import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity;
+import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
@@ -34,12 +32,9 @@ import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntit
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderFineDeatailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.open.service.FeignGoodsService;
+import com.atzuche.order.open.service.FeignAdditionDriverService;
 import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
@@ -48,7 +43,6 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -59,7 +53,6 @@ import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -104,7 +97,7 @@ public class OrderCostDetailService {
     @Autowired
     FeignOrderCostService feignOrderCostService;
     @Autowired
-    private OrderStatusService orderStatusService;
+    private FeignAdditionDriverService feignAdditionDriverService;
     @Autowired
     private OrderCostRemoteService orderCostRemoteService;
     @Autowired
@@ -317,105 +310,14 @@ public class OrderCostDetailService {
 	 * @throws Exception 
 	 */
 	public void insertAdditionalDriverInsuranceByOrderNo(AdditionalDriverInsuranceIdsReqVO renterCostReqVO) throws Exception {
-		//根据订单号查询会员号
-		//主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-	      if(orderEntity == null){
-	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
-	          throw new Exception("获取订单数据为空");
-	      }
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterCostReqVO.getOrderNo());
-        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
-            log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
-            throw new NotAllowedEditException();
-        }
-	    //封装对象
-	      ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
-	      CostBaseDTO costBaseDTO = new CostBaseDTO();
-	      costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
-	      costBaseDTO.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-	      costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
-	      costBaseDTO.setStartTime(orderEntity.getExpRentTime());
-	      costBaseDTO.setEndTime(orderEntity.getExpRevertTime());
-	      extraDriverDTO.setCostBaseDTO(costBaseDTO);
-		  
-	      List<String> driverIds = new ArrayList<String>();
-	      //参数
-	      List<CommUseDriverInfoSimpleDTO> listCommUseDriverIds = renterCostReqVO.getListCommUseDriverIds();
-	      for (CommUseDriverInfoSimpleDTO commUseDriverInfoSimpleDTO : listCommUseDriverIds) {
-	    	  driverIds.add(String.valueOf(commUseDriverInfoSimpleDTO.getId()));
-	      }
-		  extraDriverDTO.setDriverIds(driverIds);
-			
-	      
-//		计算费用
-		
-		//获取附加驾驶人保险金额
-		//封装数据
-		RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(extraDriverDTO);
-		
-		//统一设置修改人名称。20200205 huangjing
+        //统一设置修改人名称。20200205 huangjing
         String userName = AdminUserUtil.getAdminUser().getAuthName(); // 获取的管理后台的用户名。
-        extraDriverInsureAmtEntity.setUpdateOp(userName);
-        extraDriverInsureAmtEntity.setCreateOp(userName);
-        extraDriverInsureAmtEntity.setOperatorId(userName);
-        
-		//添加租客费用.
-		int i = renterOrderCostDetailService.saveOrUpdateRenterOrderCostDetail(extraDriverInsureAmtEntity);
-		if(i>0) {
-			//最后更新  200305 huangjing
-			renterOrderCostService.updateExtraDriverInsureAmtEntity(extraDriverInsureAmtEntity);
-			logger.info("附加驾驶人保险金额SUCCESS");
-		}else {
-			logger.info("附加驾驶人保险金额FAILURE");
-		}
-		
-		//添加附加驾驶人记录
-        //保存附加驾驶人信息
-		List<CommUseDriverInfoDTO> commUseDriverList = new ArrayList<CommUseDriverInfoDTO>();
-		
-        //租客会员信息
-		RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderEntity.getMemNoRenter());
-		List<CommUseDriverInfoDTO> commUseDriverListRemote = renterMemberDTO.getCommUseDriverList();  //远程调用
-      
-		//参数
-		for (CommUseDriverInfoSimpleDTO commUseDriverInfoDTO : listCommUseDriverIds) {
-			CommUseDriverInfoDTO dto = new CommUseDriverInfoDTO();
-			
-			CommUseDriverInfoDTO tmp = getCommUseDriverInfoDTOById(commUseDriverInfoDTO.getId(),commUseDriverListRemote);
-			//属性赋值
-			if(tmp != null) { //获取身份证号，准驾车型，开始时间和结束时间。该表字段是后面新加的。20200213
-				BeanUtils.copyProperties(tmp,dto);
-			}
-			dto.setId(commUseDriverInfoDTO.getId());
-			dto.setRealName(commUseDriverInfoDTO.getRealName());
-			dto.setMobile(commUseDriverInfoDTO.getMobile());
-			//记录操作人
-			dto.setConsoleOperatorName(userName);
-			
-			
-			commUseDriverList.add(dto); //注意封装数据
-		}
-//        renterAdditionalDriverService.insertBatchAdditionalDriver(renterCostReqVO.getOrderNo(),
-//        		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
-		
-        renterAdditionalDriverService.insertBatchAdditionalDriverBeforeDel(renterCostReqVO.getOrderNo(),
-        		renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
-        
-        logger.info("保存附加驾驶人信息SUCCESS");
+        renterCostReqVO.setUpdateOp(userName);
+        renterCostReqVO.setCreateOp(userName);
+        renterCostReqVO.setOperatorId(userName);
+        insertAdditionalDriverFromRemot(renterCostReqVO);
 	}
-	
-	private CommUseDriverInfoDTO getCommUseDriverInfoDTOById(Integer id,
-			List<CommUseDriverInfoDTO> commUseDriverListRemote) {
-		CommUseDriverInfoDTO tmp = null;
-		for (CommUseDriverInfoDTO commUseDriverInfoDTO : commUseDriverListRemote) {
-			if(id.intValue() == commUseDriverInfoDTO.getId().intValue()) {  //id相等。
-				tmp = commUseDriverInfoDTO;
-				break;
-			}
-		}
-		return tmp;
-	}
+
 
 	public PlatformToRenterSubsidyResVO findPlatFormToRenterListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		//根据费用编码获取
@@ -828,5 +730,24 @@ public class OrderCostDetailService {
         }
     }
 
-
+    private void insertAdditionalDriverFromRemot(AdditionalDriverInsuranceIdsReqVO renterCostReqVO){
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "增加附加驾驶人");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            log.info("Feign 开始增加附加驾驶人renterCostReqVO={}", renterCostReqVO);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(renterCostReqVO));
+            responseObject =  feignAdditionDriverService.insertAdditionalDriver(renterCostReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+           ;
+        }catch (Exception e){
+            log.error("Feign 增加附加驾驶人异常,responseObject={},renterCostReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(renterCostReqVO),e);
+            Cat.logError("Feign 增加附加驾驶人",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }
