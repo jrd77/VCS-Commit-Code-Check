@@ -6,17 +6,22 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.CashierDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
+import com.atzuche.order.rentercost.mapper.RenterOrderCostDetailMapper;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ResponseData;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author 胡春林
@@ -44,6 +50,8 @@ public class RenterOrderInfoController {
     OrderStatusService orderStatusService;
     @Resource
     CashierMapper cashierMapper;
+    @Resource
+    RenterOrderCostDetailMapper renterOrderCostDetailMapper;
 
     /**
      * 获取租客商品信息
@@ -123,5 +131,24 @@ public class RenterOrderInfoController {
         CashierDTO cashierDTO = new CashierDTO();
         BeanUtils.copyProperties(cashierEntity, cashierDTO);
         return ResponseData.success(cashierDTO);
+    }
+
+    @GetMapping("/getListRenterOrderCostDetail")
+    public ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(String orderNo) {
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if (renterOrderEntity == null) {
+            throw new OrderNotFoundException(orderNo);
+        }
+        List<RenterOrderCostDetailEntity> list = renterOrderCostDetailMapper.listRenterOrderCostDetail(orderNo, renterOrderEntity.getRenterOrderNo());
+        if (CollectionUtils.isEmpty(list)) {
+            throw new OrderNotFoundException(orderNo);
+        }
+        List renterOrderDetailList = Lists.newArrayList();
+        for (RenterOrderCostDetailEntity renterOrderCostDetailEntity : list) {
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = new RenterOrderCostDetailDTO();
+            BeanUtils.copyProperties(renterOrderCostDetailEntity, renterOrderCostDetailDTO);
+            renterOrderDetailList.add(renterOrderCostDetailDTO);
+        }
+        return ResponseData.success(renterOrderDetailList);
     }
 }
