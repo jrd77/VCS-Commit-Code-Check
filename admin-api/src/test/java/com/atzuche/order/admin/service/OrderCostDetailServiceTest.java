@@ -53,7 +53,7 @@ public class OrderCostDetailServiceTest {
 	
 	@Test
 	public void testUpdatefineAmtListByOrderNo() {
-		RenterFineCostReqVO renterCostReqVO = new RenterFineCostReqVO();
+		com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO = new com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO();
 		renterCostReqVO.setOrderNo("28804131200299");
 		renterCostReqVO.setRenterOrderNo("2880413120029910010");
 		renterCostReqVO.setRenterBeforeReturnCarFineAmt("20");
@@ -69,7 +69,7 @@ public class OrderCostDetailServiceTest {
 	
 	@Test
 	public void testUpdateOwnerToPlatFormListByOrderNo() {
-		OwnerToPlatformCostReqVO ownerCostReqVO = new OwnerToPlatformCostReqVO();
+		com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO ownerCostReqVO = new com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO();
 		ownerCostReqVO.setOrderNo("28804131200299");
 		ownerCostReqVO.setOwnerOrderNo("2880413120029910011");
 		ownerCostReqVO.setOliAmt("10");
@@ -178,7 +178,7 @@ public class OrderCostDetailServiceTest {
 
 	@Test
 	public void testOwnerToRenterRentAmtSubsidy() {
-		OwnerToRenterSubsidyReqVO ownerCostReqVO = new OwnerToRenterSubsidyReqVO();
+		com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO ownerCostReqVO = new com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO();
 		ownerCostReqVO.setOrderNo("86392311200299");
 		ownerCostReqVO.setOwnerOrderNo("8639231120029910011");
 		ownerCostReqVO.setOwnerSubsidyRentAmt("0");

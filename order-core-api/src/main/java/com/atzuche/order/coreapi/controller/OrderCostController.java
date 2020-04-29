@@ -9,16 +9,27 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.AccountDepositException;
 import com.atzuche.order.commons.exceptions.AccountWzDepositException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
+import com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO;
+import com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO;
+import com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO;
+import com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO;
+import com.atzuche.order.commons.vo.rentercost.RenterCostReqVO;
+import com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO;
+import com.atzuche.order.commons.vo.rentercost.RenterToPlatformCostReqVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.req.OwnerCostSettleDetailReqVO;
+import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.*;
+import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleFineVO;
 import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleSubsidyVO;
+import com.atzuche.order.coreapi.service.OrderCostAggregateService;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
@@ -27,6 +38,7 @@ import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.GetReturnAndOverFeeDetailVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -70,6 +82,8 @@ public class OrderCostController {
 	private OwnerCostFacadeService ownerCostFacadeService;
 	@Autowired
 	private RenterOrderCostCombineService renterOrderCostCombineService;
+	@Autowired
+	private OrderCostAggregateService orderCostAggregateService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -309,5 +323,115 @@ public class OrderCostController {
     	RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo);
     	return ResponseData.success(renterAndConsoleSubsidyVO);
     }
+    
+    
+    /**
+     * 获取管理费用
+     * @param orderNo
+     */
+    @GetMapping("/order/renter/cost/listOrderConsoleCostDetail")
+	public ResponseData<List<OrderConsoleCostDetailEntity>> listOrderConsoleCostDetailEntity(@RequestParam("orderNo") String orderNo){
+    	List<OrderConsoleCostDetailEntity> list = orderCostService.listOrderConsoleCostDetailEntity(orderNo);
+    	return ResponseData.success(list);
+    }
+    
+    
+    /**
+     * 保存调价
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updateRenterPriceAdjustmentByOrderNo")
+	public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO req){
+    	orderCostService.updateRenterPriceAdjustmentByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 租客需支付给平台的费用 修改
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updateRenterToPlatFormListByOrderNo")
+	public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO req){
+    	orderCostService.updateRenterToPlatFormListByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 添加，车主需支付给平台的费用
+     * @param req
+     */
+    @PostMapping("/order/owner/cost/updateOwnerToPlatFormListByOrderNo")
+	public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody OwnerToPlatformCostReqVO req){
+    	orderCostService.updateOwnerToPlatFormListByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 租客租金明细
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/findRenterRentAmtListByOrderNo")
+	public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO req){
+    	RenterRentDetailDTO renterRentDetailDTO = orderCostService.findRenterRentAmtListByOrderNo(req);
+		return ResponseData.success(renterRentDetailDTO);
+	}
+    
+    
+    /**
+     * 获取租客罚金
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @GetMapping("/order/renter/cost/renterAndConsoleFine")
+	public ResponseData<RenterAndConsoleFineVO> getRenterAndConsoleFineVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo){
+    	RenterAndConsoleFineVO renterAndConsoleFineVO = orderCostService.getRenterAndConsoleFineVO(orderNo, renterOrderNo);
+    	return ResponseData.success(renterAndConsoleFineVO);
+    }
+    
+    
+    /**
+     * 违约罚金 修改违约罚金
+     * @param req
+     */
+    @PostMapping("/order/renterowner/cost/updatefineAmtListByOrderNo")
+	public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO req){
+    	orderCostAggregateService.updatefineAmtListByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 平台给租客的补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updatePlatFormToRenterListByOrderNo")
+	public ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody PlatformToRenterSubsidyReqVO req){
+    	orderCostAggregateService.updatePlatFormToRenterListByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    /**
+     * 租金补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/ownerToRenterRentAmtSubsidy")
+	public ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody OwnerToRenterSubsidyReqVO req){
+    	orderCostAggregateService.ownerToRenterRentAmtSubsidy(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 平台给车主的补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updatePlatFormToOwnerListByOrderNo")
+	public ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req){
+    	orderCostAggregateService.updatePlatFormToOwnerListByOrderNo(req);
+		return ResponseData.success();
+	}
     
 }

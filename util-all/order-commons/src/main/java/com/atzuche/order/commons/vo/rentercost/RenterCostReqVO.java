@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.atzuche.order.commons.vo.req;
+package com.atzuche.order.commons.vo.rentercost;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -17,11 +17,12 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class RenterAdjustCostReqVO {
+public class RenterCostReqVO {
 	@NotBlank(message="订单编号不能为空")
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
+	//根据的是订单号和会员号查询的。下面两个子订单号参数实际并未用到。
     @ApiModelProperty(value="租客子订单号",required=true)
 //    @NotBlank(message="renterOrderNo不能为空")
     private String renterOrderNo;
@@ -29,15 +30,4 @@ public class RenterAdjustCostReqVO {
     @ApiModelProperty(value="车主子订单号",required=true)
 //    @NotBlank(message="ownerOrderNo不能为空")
     private String ownerOrderNo;
-    
-    @ApiModelProperty(value="租客给车主的调价",required=true)
-//    @NotBlank(message="租客给车主的调价不能为空")
-    private String renterToOwnerAdjustAmt;
-    
-    @ApiModelProperty(value="车主给租客的调价",required=true)
-//    @NotBlank(message="车主给租客的调价不能为空")
-    private String ownerToRenterAdjustAmt;
-    // 操作人
-    private String operateName;
-    
 }
