@@ -109,8 +109,6 @@ public class OrderCostDetailService {
     private OrderCostRemoteService orderCostRemoteService;
     @Autowired
     private FeignMemberService feignMemberService;
-    @Autowired
-    private FeignGoodsService feignGoodsService;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -799,26 +797,6 @@ public class OrderCostDetailService {
         }
     }
 
-    private OwnerMemberDTO getOwnerMemeberFromRemot(String ownerOrderNo,boolean isNeedRight){
-        ResponseData<OwnerMemberDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车主会员信息");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取车主会员信息,ownerOrderNo={},isNeedRight={}", ownerOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,ownerOrderNo);
-            responseObject =  feignMemberService.queryOwnerMemberByOwnerOrderNo(ownerOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,ownerOrderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        }catch (Exception e){
-            log.error("Feign 获取车主会员信息异常,responseObject={},ownerOrderNo={}",JSON.toJSONString(responseObject),ownerOrderNo,e);
-            Cat.logError("Feign 获取车主会员信息异常",e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
 
     private RenterMemberDTO getRenterMemeberFromRemot(String renterOrderNo,boolean isNeedRight){
         ResponseData<RenterMemberDTO> responseObject = null;
@@ -841,49 +819,5 @@ public class OrderCostDetailService {
         }
     }
 
-    private RenterGoodsDetailDTO getRenterGoodsFromRemot(String renterOrderNo,boolean isNeedRight){
-        ResponseData<RenterGoodsDetailDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租商品员信息");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取租商品员信息,renterOrderNo={},isNeedRight={}", renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
-            responseObject =  feignGoodsService.queryRenterGoodsDetail(renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        }catch (Exception e){
-            log.error("Feign 获取租商品员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
-            Cat.logError("Feign 获取租商品员信息异常",e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
 
-    private OwnerGoodsDetailDTO getOwnerGoodsFromRemot(Integer carNo,String orderNo){
-	    if(carNo == null){
-	        log.error("车辆号不能为空carNo={}",carNo);
-	        throw new InputErrorException();
-        }
-        ResponseData<OwnerGoodsDetailDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租商品员信息");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryOwnerGoodsByCarNoAndOrderNo");
-            log.info("Feign 开始获取租商品员信息,carNo={},orderNo={}", carNo,orderNo);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,"carNo="+carNo+",orderNo="+orderNo);
-            responseObject =  feignGoodsService.queryOwnerGoodsByCarNoAndOrderNo(carNo,orderNo);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,"carNo="+carNo+",orderNo="+orderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        }catch (Exception e){
-            log.error("Feign 获取租商品员信息异常,responseObject={},param={}",JSON.toJSONString(responseObject),"carNo="+carNo+",orderNo="+orderNo,e);
-            Cat.logError("Feign 获取租商品员信息异常",e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
 }
