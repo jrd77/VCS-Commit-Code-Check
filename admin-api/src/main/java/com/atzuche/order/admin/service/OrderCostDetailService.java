@@ -501,17 +501,15 @@ public class OrderCostDetailService {
 		return resVo;
 	}
 	
-	public RenterPriceAdjustmentResVO findRenterPriceAdjustmentByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
+	
+	/**
+	 * 租客车主互相调价 车主租客互相调价展示
+	 * @param renterCostReqVO
+	 * @return RenterPriceAdjustmentResVO
+	 */
+	public RenterPriceAdjustmentResVO findRenterPriceAdjustmentByOrderNo(RenterCostReqVO renterCostReqVO) {
 		RenterPriceAdjustmentResVO resVo = new RenterPriceAdjustmentResVO();
-		
-		//根据订单号查询会员号
-		//主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-	      if(orderEntity == null){
-	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
-	          throw new Exception("获取订单数据为空");
-	      }
-	   // 远程调用获取租客补贴
+	    // 远程调用获取租客补贴
 		RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
 		// 管理后台补贴
 		List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = renterAndConsoleSubsidyVO == null ? null:renterAndConsoleSubsidyVO.getConsoleSubsidyList();
@@ -564,7 +562,13 @@ public class OrderCostDetailService {
 	    orderCostRemoteService.updateRenterPriceAdjustmentByOrderNo(renterCostReqVO);
 	}
 	
-	public RenterToPlatformVO findRenterToPlatFormListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
+	
+	/**
+	 * 查询租客需支付给平台的费用
+	 * @param renterCostReqVO
+	 * @return RenterToPlatformVO
+	 */
+	public RenterToPlatformVO findRenterToPlatFormListByOrderNo(RenterCostReqVO renterCostReqVO) {
 		
 		List<OrderConsoleCostDetailEntity> list = orderCostRemoteService.listOrderConsoleCostDetailEntity(renterCostReqVO.getOrderNo());
         List<OrderConsoleCostDetailDTO> orderConsoleCostDetailDTOS = new ArrayList<>();
@@ -637,7 +641,12 @@ public class OrderCostDetailService {
 	}
 	
 	
-	public OrderRenterFineAmtDetailResVO findfineAmtListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
+	/**
+	 * 违约罚金 违约罚金明细
+	 * @param renterCostReqVO
+	 * @return OrderRenterFineAmtDetailResVO
+	 */
+	public OrderRenterFineAmtDetailResVO findfineAmtListByOrderNo(RenterCostReqVO renterCostReqVO) {
 		OrderRenterFineAmtDetailResVO resVo = new OrderRenterFineAmtDetailResVO();
 
 		String renterBeforeReturnCarFineAmt = "";
@@ -650,7 +659,7 @@ public class OrderCostDetailService {
 		OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
 		if (orderEntity == null) {
 			logger.error("获取订单数据为空orderNo={}", renterCostReqVO.getOrderNo());
-			throw new Exception("获取订单数据为空");
+			return null;
 		}
 
 		int renterBeforeReturnCarFineAmount = 0;
@@ -728,7 +737,7 @@ public class OrderCostDetailService {
 	 * 违约罚金 修改违约罚金
 	 * @param renterCostReqVO
 	 */
-	public void updatefineAmtListByOrderNo(com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO) throws Exception {
+	public void updatefineAmtListByOrderNo(com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO) {
 		//统一设置修改人名称。20200205 huangjing
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         renterCostReqVO.setOperatorName(userName);
@@ -741,7 +750,7 @@ public class OrderCostDetailService {
 	 * @param renterCostReqVO
 	 * @throws Exception 
 	 */
-	public void updatePlatFormToRenterListByOrderNo(com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO renterCostReqVO) throws Exception {
+	public void updatePlatFormToRenterListByOrderNo(com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO renterCostReqVO) {
 		//获取的管理后台的用户名
     	String userName = AdminUserUtil.getAdminUser().getAuthName();
     	renterCostReqVO.setOperatorName(userName);
@@ -756,7 +765,7 @@ public class OrderCostDetailService {
 	 * @param ownerCostReqVO
 	 * @throws Exception
 	 */
-	public void ownerToRenterRentAmtSubsidy(com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO ownerCostReqVO) throws Exception {
+	public void ownerToRenterRentAmtSubsidy(com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO ownerCostReqVO) {
 		orderCostRemoteService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
 	}
 	
@@ -765,7 +774,7 @@ public class OrderCostDetailService {
 	 * @param ownerCostReqVO
 	 * @throws Exception 
 	 */
-	public void updatePlatFormToOwnerListByOrderNo(com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO ownerCostReqVO) throws Exception {
+	public void updatePlatFormToOwnerListByOrderNo(com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO ownerCostReqVO) {
 		//获取的管理后台的用户名
     	String userName = AdminUserUtil.getAdminUser().getAuthName();
     	ownerCostReqVO.setOperatorName(userName);
