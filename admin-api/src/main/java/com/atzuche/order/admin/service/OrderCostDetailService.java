@@ -734,14 +734,13 @@ public class OrderCostDetailService {
         ResponseData<?> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "增加附加驾驶人");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignAdditionDriverService.insertAdditionalDriver");
             log.info("Feign 开始增加附加驾驶人renterCostReqVO={}", renterCostReqVO);
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(renterCostReqVO));
             responseObject =  feignAdditionDriverService.insertAdditionalDriver(renterCostReqVO);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-           ;
         }catch (Exception e){
             log.error("Feign 增加附加驾驶人异常,responseObject={},renterCostReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(renterCostReqVO),e);
             Cat.logError("Feign 增加附加驾驶人",e);
