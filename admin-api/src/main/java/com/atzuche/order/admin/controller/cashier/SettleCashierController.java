@@ -49,14 +49,14 @@ public class SettleCashierController {
      * @param orderNo
      * @return
      */
-    @AutoDocMethod(value = "订单取消结算", description = "订单取消结算", response = String.class)
+ /*   @AutoDocMethod(value = "订单取消结算", description = "订单取消结算", response = String.class)
     @GetMapping("/settleOrderCancel")
     public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
         log.info("SettleCashierController settleOrderCancel start param [{}]", orderNo);
         orderSettleService.settleOrderCancel(orderNo);
         log.info("SettleCashierController settleOrderCancel end param [{}],result [{}]");
         return ResponseData.success();
-    }
+    }*/
 
     @AutoDocMethod(value = "订单取消-组合结算", description = "订单取消-组合结算", response = String.class)
     @PostMapping("/orderCancelSettleCombination")
@@ -66,9 +66,9 @@ public class SettleCashierController {
         return ResponseData.success();
     }
 
-    /**
+  /*  *//**
      * 手动退款
-     */
+     *//*
     @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
     @GetMapping("/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
@@ -77,7 +77,7 @@ public class SettleCashierController {
         cashierPayService.refundOrderPay(cashierRefundApply);
         log.info("CashierController cashierRefundApply end param [{}],result [{}]");
         return ResponseData.success();
-    }
+    }*/
 
 
 
