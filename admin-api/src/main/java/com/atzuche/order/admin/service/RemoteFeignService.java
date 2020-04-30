@@ -8,10 +8,9 @@ import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
-import com.atzuche.order.open.service.FeignAdditionDriverService;
-import com.atzuche.order.open.service.FeignGoodsService;
-import com.atzuche.order.open.service.FeignMemberService;
-import com.atzuche.order.open.service.FeignOrderService;
+import com.atzuche.order.commons.vo.req.PaymentReqVO;
+import com.atzuche.order.commons.vo.res.PaymentRespVO;
+import com.atzuche.order.open.service.*;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -31,7 +30,8 @@ public class RemoteFeignService {
     private FeignMemberService feignMemberService;
     @Autowired
     private FeignAdditionDriverService feignAdditionDriverService;
-
+    @Autowired
+    private FeignPaymentService feignPaymentService;
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 10:38
@@ -240,7 +240,28 @@ public class RemoteFeignService {
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){
             log.error("Feign 增加附加驾驶人异常,responseObject={},renterCostReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(renterCostReqVO),e);
-            Cat.logError("Feign 增加附加驾驶人",e);
+            Cat.logError("Feign 增加附加驾驶人异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    public PaymentRespVO queryPaymentFromRemote(PaymentReqVO paymentReqVO){
+        ResponseData<PaymentRespVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "支付信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryByOrderNo");
+            log.info("Feign 开始支付信息paymentReqVO={}", JSON.toJSONString(paymentReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(paymentReqVO));
+            responseObject = feignPaymentService.queryByOrderNo(paymentReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 支付信息异常,responseObject={},paymentReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(paymentReqVO),e);
+            Cat.logError("Feign 支付信息异常",e);
             throw e;
         }finally {
             t.complete();

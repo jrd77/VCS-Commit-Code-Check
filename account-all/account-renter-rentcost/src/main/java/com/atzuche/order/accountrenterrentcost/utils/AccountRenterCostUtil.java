@@ -1,6 +1,6 @@
 package com.atzuche.order.accountrenterrentcost.utils;
 
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountRenterCostDetailDTO;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 
@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AccountRenterCostUtil {
     /*
@@ -17,12 +16,12 @@ public class AccountRenterCostUtil {
      * @Description: 过滤租车费用记录
      *
      **/
-    public static AccountRenterCostDetailEntity filterRenterCost(List<AccountRenterCostDetailEntity> list,
+    public static AccountRenterCostDetailDTO filterRenterCost(List<AccountRenterCostDetailDTO> list,
                                                           PaySourceEnum paySourceEnum,
                                                           PayTypeEnum payTypeEnum,
                                                           LocalDateTime startTime,
                                                           LocalDateTime endTime){
-        Optional<AccountRenterCostDetailEntity> first = Optional.ofNullable(list)
+        Optional<AccountRenterCostDetailDTO> first = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
                 .filter(x -> paySourceEnum.getCode().equals(x.getPaySourceCode()))

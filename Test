@@ -1,20 +1,24 @@
-ResponseData<OrderHistoryRespDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取订单状态");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.getByOrderNo");
-            log.info("Feign 开始获取订单状态,orderNo={}", orderNo);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOrderService.getByOrderNo(orderNo);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        }catch (Exception e){
-            log.error("Feign 获取订单状态异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
-            Cat.logError("Feign 获取订单状态异常",e);
-            throw e;
-        }finally {
-            t.complete();
+/**
+     * 对象转换
+     * @param OfflineRefundApplyEntity
+     * @return
+     */
+    private PaymentResponseVO convertAccountRenterCostDetail(AccountRenterCostDetailDTO accountRenterCostDetailDTO) {
+        PaymentResponseVO vo = new PaymentResponseVO();
+        if(accountRenterCostDetailDTO == null){
+            return null;
         }
-
-
+        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getCreateTime()));
+        vo.setItem("租车费用");
+        vo.setPaymentType(convertType(accountRenterCostDetailDTO.getPayType()));
+        vo.setAmount(String.valueOf(accountRenterCostDetailDTO.getAmt()));
+        vo.setSerialNumber("");
+        vo.setOrderType(convertOperate(accountRenterCostDetailDTO.getPayType()));
+        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getCreateTime()));
+        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getUpdateTime()));
+        vo.setStauts("已退款");
+        vo.setPaymentId("---");
+        vo.setPaymentSource(convertSource(accountRenterCostDetailDTO.getPaySource()));
+        vo.setResponseCode("---");
+        return vo;
+    }
