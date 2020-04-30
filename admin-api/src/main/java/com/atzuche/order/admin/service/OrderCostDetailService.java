@@ -10,7 +10,10 @@ import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.*;
-import com.atzuche.order.commons.*;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.CostStatUtils;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
@@ -27,8 +30,6 @@ import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.rentcosts.*;
 import com.atzuche.order.mem.MemProxyService;
-import com.atzuche.order.open.service.FeignAdditionDriverService;
-import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -85,12 +86,9 @@ public class OrderCostDetailService {
     ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
     FeignOrderCostService feignOrderCostService;
-    @Autowired
-    private FeignAdditionDriverService feignAdditionDriverService;
+
     @Autowired
     private OrderCostRemoteService orderCostRemoteService;
-    @Autowired
-    private FeignMemberService feignMemberService;
     @Autowired
     private RemoteFeignService remoteFeignService;
 
@@ -139,7 +137,7 @@ public class OrderCostDetailService {
 //        List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //会员权益,从落库表中获取
         //RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterCostReqVO.getRenterOrderNo(), true);
-        RenterMemberDTO renterMemberDTO = getRenterMemeberFromRemot(renterCostReqVO.getRenterOrderNo(), true);
+        RenterMemberDTO renterMemberDTO = remoteFeignService.getRenterMemeberFromRemot(renterCostReqVO.getRenterOrderNo(), true);
         List<RenterMemberRightDTO> renterMemberRightDTOList = renterMemberDTO.getRenterMemberRightDTOList();
         //数据封装
         putTaskRight(reductTaskList,renterMemberRightDTOList);
@@ -308,7 +306,7 @@ public class OrderCostDetailService {
         renterCostReqVO.setUpdateOp(userName);
         renterCostReqVO.setCreateOp(userName);
         renterCostReqVO.setOperatorId(userName);
-        insertAdditionalDriverFromRemot(renterCostReqVO);
+        remoteFeignService.insertAdditionalDriverFromRemot(renterCostReqVO);
 	}
 
 
@@ -704,44 +702,7 @@ public class OrderCostDetailService {
     }
 
 
-    private RenterMemberDTO getRenterMemeberFromRemot(String renterOrderNo,boolean isNeedRight){
-        ResponseData<RenterMemberDTO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客会员信息");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取租客会员信息,renterOrderNo={},isNeedRight={}", renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
-            responseObject =  feignMemberService.queryRenterMemberByOwnerOrderNo(renterOrderNo,isNeedRight);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        }catch (Exception e){
-            log.error("Feign 获取租客会员信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
-            Cat.logError("Feign 获取租客会员信息异常",e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
 
-    private void insertAdditionalDriverFromRemot(AdditionalDriverInsuranceIdsReqVO renterCostReqVO){
-        ResponseData<?> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "增加附加驾驶人");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignAdditionDriverService.insertAdditionalDriver");
-            log.info("Feign 开始增加附加驾驶人renterCostReqVO={}", renterCostReqVO);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(renterCostReqVO));
-            responseObject =  feignAdditionDriverService.insertAdditionalDriver(renterCostReqVO);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
-            log.error("Feign 增加附加驾驶人异常,responseObject={},renterCostReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(renterCostReqVO),e);
-            Cat.logError("Feign 增加附加驾驶人",e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
+
+
 }

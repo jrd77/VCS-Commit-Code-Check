@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller.car;
 
 
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.car.CarDetailDTO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
@@ -30,19 +31,20 @@ public class CarController {
     private CarProxyService carProxyService;
 
     @Autowired
-    private com.atzuche.order.admin.service.car.CarService carService;
+    private RemoteFeignService remoteFeignService;
+
 
     @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)
     @GetMapping(value = "console/car/detail")
     public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo,@RequestParam("orderNo")String orderNo) {
         CarDetailDTO carBusiness = carProxyService.getCarDetail(carNo);
-        RenterGoodWithoutPriceVO renterGoodWithoutPriceVO = carService.queryRenterGoods(orderNo,carNo);
+        RenterGoodWithoutPriceVO renterGoodWithoutPriceVO = remoteFeignService.queryRenterGoods(orderNo,carNo);
         BeanUtils.copyProperties(renterGoodWithoutPriceVO,carBusiness);
         carBusiness.setGps(renterGoodWithoutPriceVO.getGpsSerialNumber());
         carBusiness.setDayMileage(renterGoodWithoutPriceVO.getCarDayMileage());
         carBusiness.setEngineNum(renterGoodWithoutPriceVO.getEngineNum());
         //OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = carService.getOwnerGoodsFromRemot(orderNo);
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = remoteFeignService.getOwnerGoodsFromRemot(orderNo);
         //从owner_goods 表取已有数据LocalDateTimeUtils.strToDateLong(date)
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getLicenseExpire())){
             String date = LocalDateTimeUtils.formatDateTime(ownerGoodsDetailDTO.getLicenseExpire());

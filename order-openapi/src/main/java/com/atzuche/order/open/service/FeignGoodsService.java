@@ -2,8 +2,10 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -45,4 +47,14 @@ public interface FeignGoodsService {
      **/
     @RequestMapping("/goods/owner/queryOwnerGoodsByCarNoAndOrderNo")
     ResponseData<OwnerGoodsDetailDTO> queryOwnerGoodsByCarNoAndOrderNo(@RequestParam("carNo") Integer carNo,@RequestParam("orderNo") String orderNo);
+
+
+    /**
+     * 根据订单号和车辆号返回租客的车辆详情（不包含价格），主要是renter_goods中的数据
+     * @param orderNo
+     * @param carNo
+     * @return
+     */
+    @GetMapping("/renter/goods")
+    ResponseData<RenterGoodWithoutPriceVO> getRenterGoodsDetailWithoutPrice(@RequestParam("orderNo") String orderNo, @RequestParam("carNo") String carNo);
 }
