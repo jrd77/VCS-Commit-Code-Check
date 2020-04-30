@@ -26,13 +26,13 @@ public class SettleCancelController {
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
     /**
-     * 同XXLJOB定时任务退款方法。
+     * 手动退款。自己用
      * @param orderNo
      * @param payKind
      * @return
      */
-    @AutoDocMethod(value = "定时任务退款", description = "定时任务退款", response = String.class)
-    @GetMapping("/cashierRefundApply")
+    @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
+    @GetMapping("/settleCancel/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo, @RequestParam("payKind") String payKind) {
         log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
         CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
@@ -47,7 +47,7 @@ public class SettleCancelController {
      * 
      **/
     @AutoDocMethod(value = "订单取消-组合结算", description = "订单取消-组合结算", response = String.class)
-    @PostMapping("/orderCancelSettleCombination")
+    @PostMapping("/settleCancel/orderCancelSettleCombination")
     public ResponseData<?> orderCancelSettleCombination(@RequestBody CancelOrderReqDTO cancelOrderReqDTO){
         log.info("取消订单-结算SettleCashierController.orderCancelSettleCombination cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         orderSettleService.orderCancelSettleCombination(cancelOrderReqDTO);
