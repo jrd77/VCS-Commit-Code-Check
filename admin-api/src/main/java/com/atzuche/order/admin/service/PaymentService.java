@@ -308,7 +308,7 @@ public class PaymentService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.getByOrderNo");
             log.info("Feign 开始获取订单状态,orderNo={}", orderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOrderService.getByOrderNo(orderNo);
+            responseObject =  feignOrderService.queryOrderStatusByOrderNo(orderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);

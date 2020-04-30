@@ -19,8 +19,6 @@ import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.commons.vo.detain.CarDepositDetainReqVO;
 import com.atzuche.order.commons.vo.detain.IllegalDepositDetainReqVO;
 import com.atzuche.order.commons.vo.res.console.ConsoleOrderWzDetailQueryResVO;
-import com.atzuche.order.open.service.FeignGoodsService;
-import com.atzuche.order.open.service.FeignMemberService;
 import com.atzuche.order.open.service.FeignOrderDepositService;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -28,6 +26,7 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -46,13 +45,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RenterWzService {
     @Resource
-    private FeignMemberService feignMemberService;
-
-    @Resource
-    private FeignGoodsService feignGoodsService;
-
-    @Resource
     private FeignOrderDepositService feignOrderDepositService;
+
+    @Autowired
+    private RemoteFeignService remoteFeignService;
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
@@ -213,8 +209,8 @@ public class RenterWzService {
             carNum = fromDb.getCarPlateNum();
             memNo = fromDb.getMemNo();
         } else {
-            carNum = getCarNumFromRemot(orderNo);
-            String renterNoByOrderNo = getRenterMemberFromRemote(orderNo);
+            carNum = remoteFeignService.getCarNumFromRemot(orderNo);
+            String renterNoByOrderNo = remoteFeignService.getRenterMemberFromRemote(orderNo);
             if (StringUtils.isNotBlank(renterNoByOrderNo)) {
                 memNo = Integer.parseInt(renterNoByOrderNo);
             }
@@ -478,48 +474,5 @@ public class RenterWzService {
             costDetails.add(vo);
         }
         return costDetails;
-    }
-
-    private String getCarNumFromRemot(String orderNo) {
-        ResponseData<String> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车辆号");
-        try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD, "feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取车辆号,orderNo={}", orderNo);
-            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
-            responseObject = feignGoodsService.queryCarNumByOrderNo(orderNo);
-            Cat.logEvent(CatConstants.FEIGN_RESULT, orderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        } catch (Exception e) {
-            log.error("Feign 获取车辆号异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject), orderNo, e);
-            Cat.logError("Feign 获取车辆号异常", e);
-            throw e;
-        } finally {
-            t.complete();
-        }
-    }
-
-
-    private String getRenterMemberFromRemote(String orderNo) {
-        ResponseData<String> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取会员号");
-        try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD, "feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取会员号,orderNo={}", orderNo);
-            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
-            responseObject = feignMemberService.getRenterMemberByOrderNo(orderNo);
-            Cat.logEvent(CatConstants.FEIGN_RESULT, orderNo);
-            ResponseCheckUtil.checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
-        } catch (Exception e) {
-            log.error("Feign 获取获取会员号异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject), orderNo, e);
-            Cat.logError("Feign 获取获取会员号异常", e);
-            throw e;
-        } finally {
-            t.complete();
-        }
     }
 }

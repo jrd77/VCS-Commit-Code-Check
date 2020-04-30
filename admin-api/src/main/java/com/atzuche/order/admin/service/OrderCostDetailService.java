@@ -6,31 +6,26 @@ package com.atzuche.order.admin.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.exception.RenterCostFailException;
-import com.atzuche.order.admin.vo.req.cost.*;
+import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.*;
 import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
-import com.atzuche.order.commons.enums.*;
-import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
-import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderFineDeatailEntity;
-import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.commons.vo.res.rentcosts.*;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignAdditionDriverService;
 import com.atzuche.order.open.service.FeignMemberService;
@@ -38,10 +33,6 @@ import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
@@ -77,8 +68,6 @@ public class OrderCostDetailService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
-	private OrderService orderService;
-	@Autowired
 	private RenterDepositDetailService renterDepositDetailService;
     @Autowired
     private MemProxyService memberService;
@@ -102,17 +91,20 @@ public class OrderCostDetailService {
     private OrderCostRemoteService orderCostRemoteService;
     @Autowired
     private FeignMemberService feignMemberService;
+    @Autowired
+    private RemoteFeignService remoteFeignService;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
 	     //根据订单号查询会员号
 		//主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-	      if(orderEntity == null){
-	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
-	          throw new Exception("获取订单数据为空");
-	      }
-		      
+	      //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
+        logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+          throw new Exception("获取订单数据为空");
+        }
+
 		//减免前车辆押金
 	    String reductionBeforeRentDepost="";
 		//减免后车辆押金
@@ -196,14 +188,15 @@ public class OrderCostDetailService {
 	public AdditionalDriverInsuranceVO findAdditionalDriverInsuranceByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		//根据订单号查询会员号
 		//主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-	      if(orderEntity == null){
-	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
-	          throw new Exception("获取订单数据为空");
-	      }
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
+        logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+          throw new Exception("获取订单数据为空");
+        }
 			      
         //租客会员信息
-      RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderEntity.getMemNoRenter());
+      RenterMemberDTO renterMemberDTO = memberService.getRenterMemberInfo(orderDTO.getMemNoRenter());
       List<CommUseDriverInfoDTO> commUseDriverList = renterMemberDTO.getCommUseDriverList();
       
       //封装对象
@@ -211,9 +204,9 @@ public class OrderCostDetailService {
       CostBaseDTO costBaseDTO = new CostBaseDTO();
       costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
       costBaseDTO.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-      costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
-      costBaseDTO.setStartTime(orderEntity.getExpRentTime());
-      costBaseDTO.setEndTime(orderEntity.getExpRevertTime());
+      costBaseDTO.setMemNo(orderDTO.getMemNoRenter());
+      costBaseDTO.setStartTime(orderDTO.getExpRentTime());
+      costBaseDTO.setEndTime(orderDTO.getExpRevertTime());
       extraDriverDTO.setCostBaseDTO(costBaseDTO);
       
       List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
@@ -324,11 +317,12 @@ public class OrderCostDetailService {
 		PlatformToRenterSubsidyResVO resVo = new PlatformToRenterSubsidyResVO();
 		//根据订单号查询会员号
 		//主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-	      if(orderEntity == null){
-	      	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
-	          throw new Exception("获取订单数据为空");
-	      }
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
+        logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+          throw new Exception("获取订单数据为空");
+        }
 		 
 	    int dispatching = 0;
 	    int oil = 0;
@@ -558,8 +552,9 @@ public class OrderCostDetailService {
 
 		// 根据订单号查询会员号
 		// 主订单
-		OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-		if (orderEntity == null) {
+		//OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+		if (orderDTO == null) {
 			logger.error("获取订单数据为空orderNo={}", renterCostReqVO.getOrderNo());
 			return null;
 		}

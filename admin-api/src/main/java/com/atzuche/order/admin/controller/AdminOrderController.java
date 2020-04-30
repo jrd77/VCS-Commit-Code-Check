@@ -11,23 +11,17 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.account.SettleStatusEnum;
-import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.vo.request.TransferReq;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +53,7 @@ public class AdminOrderController {
     private AdminOrderService adminOrderService;
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
-    @Autowired
-    private OrderStatusService orderStatusService;
+
     @Autowired
     private CarService carService;
 
@@ -76,12 +69,6 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
-            log.error("已经结算不允许编辑orderNo={}",orderNo);
-            throw new NotAllowedEditException();
-        }
-
         OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
         reqDTO.setOrderNo(orderNo);
 

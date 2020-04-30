@@ -3,22 +3,17 @@
  */
 package com.atzuche.order.admin.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.atzuche.order.commons.exceptions.OrderNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderResponseVO;
+import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
@@ -28,31 +23,43 @@ import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.open.service.FeignOrderService;
 import com.autoyol.commons.utils.StringUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.CommonUtils;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author jing.huang
  *
  */
+@Slf4j
 @Service
 public class ModificationOrderService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	FeignOrderModifyService feignOrderModifyService;
-	@Autowired
-	OrderService orderService;
-	
+    @Autowired
+    RemoteFeignService remoteFeignService;
+
 	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) {
 		ModificationOrderListResponseVO respVo = new ModificationOrderListResponseVO();
 		List<ModificationOrderResponseVO> modificationOrderList =  new ArrayList<ModificationOrderResponseVO>();
 		//主订单
-        OrderEntity orderEntity = orderService.getOrderEntity(modificationOrderRequestVO.getOrderNo());
-        if(orderEntity == null){
+        //OrderEntity orderEntity = orderService.getOrderEntity(modificationOrderRequestVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(modificationOrderRequestVO.getOrderNo());
+        if(orderDTO == null){
         	logger.error("获取订单数据为空orderNo={}",modificationOrderRequestVO.getOrderNo());
             throw new OrderNotFoundException(modificationOrderRequestVO.getOrderNo());
         }
@@ -60,7 +67,7 @@ public class ModificationOrderService {
 		ModifyOrderMainQueryReqVO req = new ModifyOrderMainQueryReqVO();
 //		BeanUtils.copyProperties(req, modificationOrderRequestVO);
 		req.setOrderNo(modificationOrderRequestVO.getOrderNo());
-		req.setMemNo(orderEntity.getMemNoRenter());
+		req.setMemNo(orderDTO.getMemNoRenter());
         
 		ResponseData<ModifyOrderMainResVO> resData = feignOrderModifyService.getModifyOrderMain(req);
 		if(resData != null) {

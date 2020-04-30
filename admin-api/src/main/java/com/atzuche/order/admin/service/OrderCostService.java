@@ -10,6 +10,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
@@ -26,8 +27,6 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OwnerCouponLongService;
@@ -37,7 +36,6 @@ import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +57,7 @@ public class OrderCostService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	FeignOrderCostService feignOrderCostService;
-	@Autowired
-	OrderService orderService;
+
 	@Autowired
 	OwnerOrderService ownerOrderService;
 	@Autowired
@@ -73,7 +70,8 @@ public class OrderCostService {
 	private OrderSettleService orderSettleService;
 	@Autowired
 	private OwnerCouponLongService ownerCouponLongService;
-	
+	@Autowired
+	private RemoteFeignService remoteFeignService;
 	/**
 	 * 
 	 * @param renterCostReqVO
@@ -83,15 +81,16 @@ public class OrderCostService {
 		OrderRenterCostResVO realVo = new OrderRenterCostResVO();
 		
 		//主订单
-        OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-        if(orderEntity == null){
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
         	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
             throw new Exception("获取订单数据为空");
         }
         
         OrderCostReqVO req = new OrderCostReqVO();
 		req.setOrderNo(renterCostReqVO.getOrderNo());
-		req.setMemNo(orderEntity.getMemNoRenter());
+		req.setMemNo(orderDTO.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
 		
 		
@@ -109,7 +108,7 @@ public class OrderCostService {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
-				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
+				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
 				if(costVo != null) {
 					 logger.info("costVo toString=[{}]",costVo.toString());
 				}
@@ -121,7 +120,7 @@ public class OrderCostService {
 				//租客订单对象
 				RenterOrderEntity entity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
 				//优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
-				putRenterOrderDeduct(realVo,data,entity,orderEntity.getMemNoRenter());
+				putRenterOrderDeduct(realVo,data,entity,orderDTO.getMemNoRenter());
 				
 				//租车押金和违章押金   车辆押金  违章押金
 				putRenterOrderDeposit(realVo,data,costVo);
@@ -1086,15 +1085,16 @@ public class OrderCostService {
     public OrderRenterCostResVO calculateRenterOrderCostLongRent(RenterCostReqVO renterCostReqVO) throws Exception {
         OrderRenterCostResVO realVo = new OrderRenterCostResVO();
         //主订单
-        OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-        if(orderEntity == null){
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
             logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
             throw new Exception("获取订单数据为空");
         }
 
         OrderCostReqVO req = new OrderCostReqVO();
         req.setOrderNo(renterCostReqVO.getOrderNo());
-        req.setMemNo(orderEntity.getMemNoRenter());
+        req.setMemNo(orderDTO.getMemNoRenter());
         req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
 
 
@@ -1112,7 +1112,7 @@ public class OrderCostService {
             com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
             if(data != null) {
                 int renterCostAmtFinal = data.getRenterCostAmtFinal();
-                RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
+                RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
 
                 //租金费用  费用明细表renter_order_cost_detail
                 putRenterOrderCostDetail(realVo,data);
@@ -1120,7 +1120,7 @@ public class OrderCostService {
                 //租客订单对象
                 RenterOrderEntity entity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
                 //优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
-                putRenterOrderDeduct(realVo,data,entity,orderEntity.getMemNoRenter());
+                putRenterOrderDeduct(realVo,data,entity,orderDTO.getMemNoRenter());
                 //长租折扣 TODO
                 longRentDeduct(realVo,data);
 

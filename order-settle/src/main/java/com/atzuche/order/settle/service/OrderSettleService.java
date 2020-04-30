@@ -700,7 +700,7 @@ public class OrderSettleService{
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
             OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode() == (orderStatusEntity.getSettleStatus())){
                 log.info("订单已经结算过orderNo={}",orderNo);
                 return;
             }
