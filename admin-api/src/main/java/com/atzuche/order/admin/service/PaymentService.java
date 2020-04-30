@@ -21,7 +21,6 @@ import com.atzuche.order.commons.vo.req.PaymentReqVO;
 import com.atzuche.order.commons.vo.res.CashierResVO;
 import com.atzuche.order.commons.vo.res.PaymentRespVO;
 import com.atzuche.order.open.service.FeignPaymentService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -44,24 +43,14 @@ import java.util.List;
 @Service
 public class PaymentService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	@Autowired
-	OrderStatusService orderStatusService;
+
 	@Autowired
 	FeignPaymentService feignPaymentService;
-
     @Autowired
     AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired
     private RemoteFeignService remoteFeignService;
 
-    public static void main(String[] args) {
-        LocalDateTime localDateTime = LocalDateTime.of(2020,1,1,1,1);
-        LocalDateTime localDateTime2 = localDateTime;
-        localDateTime2 = LocalDateTime.of(2020,2,2,1,1);
-        System.out.println(localDateTime2);
-    }
-	
 	public PaymentInformationResponseVO platformPaymentList(PaymentRequestVO paymentRequestVO) {
 		String orderNo = paymentRequestVO.getOrderNo();
 		PaymentInformationResponseVO respVo = new PaymentInformationResponseVO();
