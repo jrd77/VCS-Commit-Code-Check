@@ -1,10 +1,13 @@
 package com.atzuche.order.open.service;
 
-import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.vo.rentercost.*;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
+import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
@@ -12,6 +15,7 @@ import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
+import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,5 +97,99 @@ public interface FeignOrderCostService {
      */
     @PostMapping("/order/temp/save/depoist")
     ResponseData saveTempCarDepoist(@RequestBody SaveTempCarDepositInfoReqVO reqVO);
+
+    /**
+     * 获取取还车费用和超运能费用
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/getreturnfee/detail")
+	ResponseData<GetReturnAndOverFeeDetailVO> getGetReturnFeeDetail(@RequestBody GetReturnAndOverFeeVO req);
+
+    /**
+     * 获取附加驾驶员保障费
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/extraDriverInsure/detail")
+	ResponseData<RenterOrderCostDetailEntity> getExtraDriverInsureDetail(@RequestBody ExtraDriverDTO req);
+
+    /**
+     * 获取租客补贴
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
+	ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+
+    /**
+     * 获取管理后台费用
+     * @param orderNo
+     */
+    @GetMapping("/order/renter/cost/listOrderConsoleCostDetail")
+	ResponseData<List<OrderConsoleCostDetailEntity>> listOrderConsoleCostDetailEntity(@RequestParam("orderNo") String orderNo);
+
+    /**
+     * 保存调价
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updateRenterPriceAdjustmentByOrderNo")
+	ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO req);
+
+    /**
+     * 租客需支付给平台的费用 修改
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updateRenterToPlatFormListByOrderNo")
+	ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO req);
+
+    /**
+     * 添加，车主需支付给平台的费用
+     * @param req
+     */
+    @PostMapping("/order/owner/cost/updateOwnerToPlatFormListByOrderNo")
+	public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody OwnerToPlatformCostReqVO req);
+
+    /**
+     * 租客租金明细
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/findRenterRentAmtListByOrderNo")
+	ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO req);
+
+    /**
+     * 获取租客罚金
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    @GetMapping("/order/renter/cost/renterAndConsoleFine")
+	ResponseData<RenterAndConsoleFineVO> getRenterAndConsoleFineVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+
+    /**
+     * 违约罚金 修改违约罚金
+     * @param req
+     */
+    @PostMapping("/order/renterowner/cost/updatefineAmtListByOrderNo")
+    ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO req);
+
+    /**
+     * 平台给租客的补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updatePlatFormToRenterListByOrderNo")
+	ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody PlatformToRenterSubsidyReqVO req);
+
+    /**
+     * 租金补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/ownerToRenterRentAmtSubsidy")
+	ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody OwnerToRenterSubsidyReqVO req);
+
+
+    /**
+     * 平台给车主的补贴
+     * @param req
+     */
+    @PostMapping("/order/renter/cost/updatePlatFormToOwnerListByOrderNo")
+	ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req);
 
 }

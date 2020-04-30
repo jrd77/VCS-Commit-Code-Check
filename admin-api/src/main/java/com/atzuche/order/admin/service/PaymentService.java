@@ -1,45 +1,46 @@
-/**
- * 
- */
 package com.atzuche.order.admin.service;
+
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
+import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
+import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.vo.req.PaymentReqVO;
+import com.atzuche.order.commons.vo.res.CashierResVO;
+import com.atzuche.order.open.service.FeignOrderService;
+import com.atzuche.order.open.service.FeignPaymentService;
+import com.autoyol.commons.utils.StringUtils;
+import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
-import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
-import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.vo.req.PaymentReqVO;
-import com.atzuche.order.commons.vo.res.CashierResVO;
-import com.atzuche.order.open.service.FeignPaymentService;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.autoyol.commons.utils.StringUtils;
-import com.autoyol.commons.web.ResponseData;
-
 /**
  * @author jing.huang
  *
  */
+@Slf4j
 @Service
 public class PaymentService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
-	OrderStatusService orderStatusService;
+    FeignOrderService feignOrderService;
 	@Autowired
 	FeignPaymentService feignPaymentService;
-	
-//	@Autowired
-//	PaymentCashierService paymentCashierService;
+
 	
 	public PaymentInformationResponseVO platformPaymentList(PaymentRequestVO paymentRequestVO) {
 		String orderNo = paymentRequestVO.getOrderNo();
@@ -48,26 +49,27 @@ public class PaymentService {
 		/**
 		 * 租车费用/车辆押金结算前,支付信息列表
 		 */
-		List<PaymentResponseVO> beforeDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> beforeDepositSettlementPaymentList = new ArrayList<>();
 
 		/**
 		 * 租车费用/车辆押金结算时/后,支付信息列表
 		 */
-		List<PaymentResponseVO> afterDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> afterDepositSettlementPaymentList = new ArrayList<>();
 
 		/**
 		 * 违章押金结算时/后,支付信息列表
 		 */
-		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
+		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<>();
 		
 		//根据结算时间来切分
 //		logger.info("orderStatus toString={}",orderStatusService.toString());
-		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
-		//非空处理
+		//OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatus = getOrderStatusFromRemot(orderNo);
+        //非空处理
 //		if(orderStatus == null) {
 //			return null;
 //		}
-		
+
 //		logger.info("orderStatus toString={}",orderStatus.toString());
 		/**
 		 * 违章结算时间
@@ -89,7 +91,7 @@ public class PaymentService {
 //		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
 //			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
 //		}
-		
+
 		if(orderStatus != null && orderStatus.getWzSettleStatus().intValue() != 0) {  //违章结算状态:0,否 1,是
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
@@ -98,7 +100,7 @@ public class PaymentService {
 		PaymentReqVO vo2 = new PaymentReqVO();
 		vo2.setOrderNo(orderNo);	    
 //		String result2 = restTemplate.postForObject(url, vo, String.class);
-		
+
 //		logger.info("feignPaymentService toString={}",feignPaymentService.toString());
 		ResponseData<List<CashierResVO>> resData = feignPaymentService.queryByOrderNo(vo2); //paymentCashierService.queryPaymentList(orderNo);
 		
@@ -298,6 +300,27 @@ public class PaymentService {
 		}
 		return "未知";
 	}
-	
+
+    private OrderStatusDTO getOrderStatusFromRemot(String orderNo){
+        ResponseData<OrderStatusDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取订单状态");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.getByOrderNo");
+            log.info("Feign 开始获取订单状态,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignOrderService.getByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取订单状态异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取订单状态异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
 	
 }
