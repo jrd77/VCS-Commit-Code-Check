@@ -613,6 +613,7 @@ public class OrderCommonConver {
         baseReqDTO.setOwnerMemNo(context.getOwnerMemberDto().getMemNo());
         baseReqDTO.setStartTime(context.getOrderReqVO().getRentTime());
         baseReqDTO.setEndTime(context.getOrderReqVO().getRevertTime());
+        baseReqDTO.setOrderCategory(context.getOrderReqVO().getOrderCategory());
         logger.info("Init OrderCostBaseReqDTO.result is,baseReqDTO:[{}]", JSON.toJSONString(baseReqDTO));
         return baseReqDTO;
     }

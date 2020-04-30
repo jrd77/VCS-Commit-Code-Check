@@ -5,6 +5,7 @@ import com.atzuche.order.commons.exceptions.RentTimeException;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.autoyol.platformcost.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -29,19 +30,20 @@ public class LongMinRentTimeFilter implements OrderFilter {
         OrderReqVO orderReqVO = context.getOrderReqVO();
         LocalDateTime rentTime = orderReqVO.getRentTime();
         LocalDateTime revertTime = orderReqVO.getRevertTime();
-        long durationDay = Duration.between(rentTime, revertTime).toDays();
+        //long durationDay = Duration.between(rentTime, revertTime).toDays();
+        Double durationDay = CommonUtils.getRentDays(rentTime, revertTime, CommonUtils.CONFIGHOURS);
         if(durationDay < MIN_RENT_DAY){
             throw new RentTimeException("最短租期:"+MIN_RENT_DAY+"天");
         }
     }
 
     public static void main(String[] args) {
-        LocalDate start = LocalDateTime.of(2019, 12, 3, 22, 00, 00).toLocalDate();
-        LocalDate end = LocalDateTime.of(2020, 1, 1, 21, 00, 00).toLocalDate();
+        LocalDateTime start = LocalDateTime.of(2020, 1, 1, 02, 00, 00);
+        LocalDateTime end = LocalDateTime.of(2020, 1, 2, 03, 00, 00);
 
-        LocalDate minus = start.plusMonths(2);
-        System.out.println(minus);
-        LocalDate with = start.with(TemporalAdjusters.lastDayOfMonth());
-        System.out.println(with);
+        Duration between = Duration.between(start, end);
+        System.out.println(between.toDays());
     }
+
+
 }

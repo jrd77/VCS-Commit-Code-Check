@@ -29,6 +29,10 @@ public class OrderOwnerCostResVO {
       * 获取gps服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
       */
       List<OwnerOrderPurchaseDetailEntity> gpsCost;
+    /**
+     * gps押金
+     */
+    private Integer  gpsDepositTotal;
 
      ///----------------------------------------------------------  6大块
     /**
