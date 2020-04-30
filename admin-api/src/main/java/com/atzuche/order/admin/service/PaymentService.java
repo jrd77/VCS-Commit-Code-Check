@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.utils.AccountRenterCostUtil;
@@ -20,11 +21,15 @@ import com.atzuche.order.cashieraccount.service.OfflineRefundApplyService;
 import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.utils.CashierUtils;
+import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,22 +91,12 @@ public class PaymentService {
 		List<PaymentResponseVO> violationDepositSettlementPaymentList = new ArrayList<PaymentResponseVO>();
 		
 		//根据结算时间来切分
-//		logger.info("orderStatus toString={}",orderStatusService.toString());
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
-		//非空处理
-//		if(orderStatus == null) {
-//			return null;
-//		}
-		
-//		logger.info("orderStatus toString={}",orderStatus.toString());
+
 		/**
 		 * 违章结算时间
 		 */
 		LocalDateTime wzSettleTime = null;
-		/**
-		 * 车辆押金结算时间，租车费用和车辆押金是一起结算的。
-		 */
-//		LocalDateTime carDepositSettleTime = null;
 		/**
 		 * 租车费用结算时间
 		 */
@@ -111,20 +106,14 @@ public class PaymentService {
 		if(orderStatus != null && orderStatus.getSettleStatus().intValue() != 0) {
 			settleTime = orderStatus.getSettleTime();
 		}
-//		if(orderStatus.getCarDepositSettleStatus().intValue() == 1) {  //车辆押金结算状态:0,否 1,是
-//			carDepositSettleTime = orderStatus.getCarDepositSettleTime();
-//		}
-		
+
 		if(orderStatus != null && orderStatus.getWzSettleStatus().intValue() != 0) {  //违章结算状态:0,否 1,是
 			wzSettleTime = orderStatus.getWzSettleTime();
 		}
 		
-//		RestTemplate restTemplate = new RestTemplate();
 		PaymentReqVO vo2 = new PaymentReqVO();
 		vo2.setOrderNo(orderNo);	    
-//		String result2 = restTemplate.postForObject(url, vo, String.class);
-		
-//		logger.info("feignPaymentService toString={}",feignPaymentService.toString());
+
 		ResponseData<List<CashierResVO>> resData = feignPaymentService.queryByOrderNo(vo2); //paymentCashierService.queryPaymentList(orderNo);
 		
 		/**

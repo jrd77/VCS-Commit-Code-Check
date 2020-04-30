@@ -4,6 +4,7 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEnti
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.res.RenterWzCostVO;

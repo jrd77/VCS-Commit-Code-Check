@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.service;
 import com.atzuche.order.cashieraccount.service.CashierRefundApplyService;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.coreapi.entity.request.IllegalAppealReqVO;
 import com.atzuche.order.coreapi.entity.vo.res.IllegalOrderInfoResVO;
 import com.atzuche.order.coreapi.entity.vo.res.TransIllegalDetailResVO;
