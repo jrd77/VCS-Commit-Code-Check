@@ -44,41 +44,6 @@ public class SettleCashierController {
         return result;
     }
 
-    /**
-     * 订单取消结算
-     * @param orderNo
-     * @return
-     */
- /*   @AutoDocMethod(value = "订单取消结算", description = "订单取消结算", response = String.class)
-    @GetMapping("/settleOrderCancel")
-    public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
-        log.info("SettleCashierController settleOrderCancel start param [{}]", orderNo);
-        orderSettleService.settleOrderCancel(orderNo);
-        log.info("SettleCashierController settleOrderCancel end param [{}],result [{}]");
-        return ResponseData.success();
-    }*/
-
-    @AutoDocMethod(value = "订单取消-组合结算", description = "订单取消-组合结算", response = String.class)
-    @PostMapping("/orderCancelSettleCombination")
-    public ResponseData<?> orderCancelSettleCombination(@RequestBody CancelOrderReqDTO cancelOrderReqDTO){
-        log.info("取消订单-结算SettleCashierController.orderCancelSettleCombination cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
-        orderSettleService.orderCancelSettleCombination(cancelOrderReqDTO);
-        return ResponseData.success();
-    }
-
-  /*  *//**
-     * 手动退款
-     *//*
-    @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
-    @GetMapping("/cashierRefundApply")
-    public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
-        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
-        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
-        cashierPayService.refundOrderPay(cashierRefundApply);
-        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
-        return ResponseData.success();
-    }*/
-
 
 
 }

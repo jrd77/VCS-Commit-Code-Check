@@ -20,8 +20,6 @@ public class SettleCancelController {
 
     @Autowired
     private OrderSettleService orderSettleService;
-    //环境变量，1正式，2测试
-    @Value("${sysEnv:2}") String sysEnv;
     @Autowired
     private CashierPayService cashierPayService;
     @Autowired
@@ -36,20 +34,18 @@ public class SettleCancelController {
     @AutoDocMethod(value = "定时任务退款", description = "定时任务退款", response = String.class)
     @GetMapping("/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo, @RequestParam("payKind") String payKind) {
-        //测试环境执行
-        if(Env.test.getCode().equals(sysEnv)) {
-            log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
-            CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
-            cashierPayService.refundOrderPay(cashierRefundApply);
-            log.info("CashierController cashierRefundApply end param [{}],result [{}]");
-            return ResponseData.success();
-        }else {
-            //访问受限
-            log.info("pro sysEnv="+sysEnv);
-            return ResponseData.createErrorCodeResponse(com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getCode(),com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getText());
-        }
+        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
+        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
+        cashierPayService.refundOrderPay(cashierRefundApply);
+        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
+        return ResponseData.success();
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/30 11:35 
+     * @Description: 订单取消结算-（自己用）
+     * 
+     **/
     @AutoDocMethod(value = "订单取消-组合结算", description = "订单取消-组合结算", response = String.class)
     @PostMapping("/orderCancelSettleCombination")
     public ResponseData<?> orderCancelSettleCombination(@RequestBody CancelOrderReqDTO cancelOrderReqDTO){
