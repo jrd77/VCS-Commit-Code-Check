@@ -1,4 +1,4 @@
-package com.atzuche.order.renterwz.enums;
+package com.atzuche.order.commons.enums.wz;
 
 /**
  * WzStatusEnums

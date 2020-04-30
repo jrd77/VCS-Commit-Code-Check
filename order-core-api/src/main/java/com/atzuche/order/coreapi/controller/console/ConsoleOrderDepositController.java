@@ -3,9 +3,12 @@ package com.atzuche.order.coreapi.controller.console;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.WzCostLogDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.detain.CarDepositDetainReqVO;
 import com.atzuche.order.commons.vo.detain.IllegalDepositDetainReqVO;
+import com.atzuche.order.commons.vo.res.console.ConsoleOrderWzDetailQueryResVO;
 import com.atzuche.order.coreapi.service.console.ConsoleOrderDepositHandleService;
 import com.atzuche.order.detain.dto.CarDepositTemporaryRefundReqDTO;
 import com.autoyol.commons.web.ResponseData;
@@ -14,12 +17,11 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 管理后台订单押金相关处理集合
@@ -73,4 +75,40 @@ public class ConsoleOrderDepositController {
         return ResponseData.success();
     }
 
+
+    @GetMapping("/order/wz/detail/get")
+    @AutoDocMethod(description = "获取订单违章明细接口", value = "获取订单违章明细接口")
+    public ResponseData<ConsoleOrderWzDetailQueryResVO> queryWzDetailByOrderNo(@RequestParam("orderNo") String orderNo) {
+        log.info("Get order wz detil list.param is,orderNo:[{}]", orderNo);
+        ConsoleOrderWzDetailQueryResVO resVO = consoleOrderDepositHandleService.getOrderWzDetailByOrderNo(orderNo);
+        log.info("Get order wz detil list.result is,resVO:[{}]", JSON.toJSONString(resVO));
+        return ResponseData.success(resVO);
+    }
+
+    @GetMapping("/order/wz/cost/optlog/get")
+    @AutoDocMethod(description = "获取订单违章费用变更日志接口", value = "获取订单违章费用变更日志接口")
+    public ResponseData<List<WzCostLogDTO>> queryWzCostOptLogByOrderNo(@RequestParam("orderNo") String orderNo) {
+        log.info("Get order wz cost opt log.param is,orderNo:[{}]", orderNo);
+        List<WzCostLogDTO> dtos = consoleOrderDepositHandleService.getWzCostOptLogByOrderNo(orderNo);
+        log.info("Get order wz cost opt log.result is,resVO:[{}]", JSON.toJSONString(dtos));
+        return ResponseData.success(dtos);
+    }
+
+
+    @PostMapping("/order/wz/cost/optlog/save")
+    @AutoDocMethod(description = "保存订单违章费用变更日志接口", value = "保存订单违章费用变更日志接口")
+    public ResponseData<List<WzCostLogDTO>> saveWzCostOptLog(@RequestBody WzCostLogDTO req) {
+        log.info("Save order wz cost opt log.param is,req:[{}]", req);
+        consoleOrderDepositHandleService.saveWzCostOptLog(req);
+        return ResponseData.success();
+    }
+
+
+    @PostMapping("/order/wz/cost/detail/save")
+    @AutoDocMethod(description = "保存订单违章费用明细接口", value = "保存订单违章费用明细接口")
+    public ResponseData<?> saveWzCostDetail(@RequestBody RenterOrderWzCostDetailDTO req) {
+        log.info("Save order wz cost detail.param is,req:[{}]", req);
+        consoleOrderDepositHandleService.saveWzCostDetail(req);
+        return ResponseData.success();
+    }
 }

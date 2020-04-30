@@ -1,25 +1,28 @@
-package com.atzuche.order.coreapi.controller;
+package com.atzuche.order.coreapi.controller.console;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.coreapi.service.OrderConsoleCostHandleService;
+import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
+import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +37,7 @@ import java.util.List;
 @Slf4j
 public class OrderConsoleCostHandleController {
 
-    @Autowired
+    @Resource
     private OrderConsoleCostHandleService orderConsoleCostHandleService;
 
 

@@ -1,5 +1,6 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -91,6 +93,5 @@ public interface FeignOrderCostService {
      */
     @PostMapping("/order/temp/save/depoist")
     ResponseData saveTempCarDepoist(@RequestBody SaveTempCarDepositInfoReqVO reqVO);
-
 
 }

@@ -19,7 +19,6 @@ import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.*;
-import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.PhotoUploadVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;

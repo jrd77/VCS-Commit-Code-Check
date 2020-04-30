@@ -4,24 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
-import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
 import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.account.SettleStatusEnum;
-import com.atzuche.order.commons.exceptions.NotAllowedEditException;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +38,6 @@ public class AdminRenterWzController extends BaseController {
 
     @Resource
     private AdminLogService adminLogService;
-    @Autowired
-    private OrderStatusService orderStatusService;
 
     @GetMapping("/console/wz/detail")
     @AutoDocMethod(description = "违章押金信息", value = "违章押金信息",response = RenterWzDetailResVO.class)
@@ -94,11 +85,6 @@ public class AdminRenterWzController extends BaseController {
     @AutoDocMethod(description = "暂扣/取消暂扣违章押金", value = "暂扣/取消暂扣违章押金",response = ResponseData.class)
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
-        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getWzSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
-            log.error("已经结算不允许编辑orderNo={}",req.getOrderNo());
-            throw new NotAllowedEditException();
-        }
         renterWzService.addTemporaryRefund(req);
         try{
             adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(), JSON.toJSONString(req));
