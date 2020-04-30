@@ -45,7 +45,9 @@ public class RenterOrderDTO implements Serializable {
          */
         @AutoDocProperty(value="预计还车时间",required=true)
         private LocalDateTime expRevertTime;
-    @AutoDocProperty(value="预计还车时间")
+
+
+        @AutoDocProperty(value="预计还车时间")
         private String expRevertTimeStr;
     	/**
          * 实际起租时间

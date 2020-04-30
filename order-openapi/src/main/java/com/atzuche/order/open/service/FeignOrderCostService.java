@@ -3,18 +3,7 @@ package com.atzuche.order.open.service;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
-import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeDetailVO;
-import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
-import com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO;
-import com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO;
-import com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO;
-import com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO;
-import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
-import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleSubsidyVO;
-import com.atzuche.order.commons.vo.rentercost.RenterCostReqVO;
-import com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO;
-import com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity;
-import com.atzuche.order.commons.vo.rentercost.RenterToPlatformCostReqVO;
+import com.atzuche.order.commons.vo.rentercost.*;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -34,9 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author jing.huang
@@ -115,93 +103,93 @@ public interface FeignOrderCostService {
      * @param req
      */
     @PostMapping("/order/renter/cost/getreturnfee/detail")
-	public ResponseData<GetReturnAndOverFeeDetailVO> getGetReturnFeeDetail(@RequestBody GetReturnAndOverFeeVO req);
-    
+	ResponseData<GetReturnAndOverFeeDetailVO> getGetReturnFeeDetail(@RequestBody GetReturnAndOverFeeVO req);
+
     /**
      * 获取附加驾驶员保障费
      * @param req
      */
     @PostMapping("/order/renter/cost/extraDriverInsure/detail")
-	public ResponseData<RenterOrderCostDetailEntity> getExtraDriverInsureDetail(@RequestBody ExtraDriverDTO req);
-    
+	ResponseData<RenterOrderCostDetailEntity> getExtraDriverInsureDetail(@RequestBody ExtraDriverDTO req);
+
     /**
      * 获取租客补贴
      * @param orderNo
      * @param renterOrderNo
      */
     @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
-	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
-   
+	ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+
     /**
      * 获取管理后台费用
      * @param orderNo
      */
     @GetMapping("/order/renter/cost/listOrderConsoleCostDetail")
-	public ResponseData<List<OrderConsoleCostDetailEntity>> listOrderConsoleCostDetailEntity(@RequestParam("orderNo") String orderNo);
-    
+	ResponseData<List<OrderConsoleCostDetailEntity>> listOrderConsoleCostDetailEntity(@RequestParam("orderNo") String orderNo);
+
     /**
      * 保存调价
      * @param req
      */
     @PostMapping("/order/renter/cost/updateRenterPriceAdjustmentByOrderNo")
-	public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO req);
-    
+	ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO req);
+
     /**
      * 租客需支付给平台的费用 修改
      * @param req
      */
     @PostMapping("/order/renter/cost/updateRenterToPlatFormListByOrderNo")
-	public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO req);
-    
+	ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody RenterToPlatformCostReqVO req);
+
     /**
      * 添加，车主需支付给平台的费用
      * @param req
      */
     @PostMapping("/order/owner/cost/updateOwnerToPlatFormListByOrderNo")
 	public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody OwnerToPlatformCostReqVO req);
-    
+
     /**
      * 租客租金明细
      * @param req
      */
     @PostMapping("/order/renter/cost/findRenterRentAmtListByOrderNo")
-	public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO req);
-    
+	ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody RenterCostReqVO req);
+
     /**
      * 获取租客罚金
      * @param orderNo
      * @param renterOrderNo
      */
     @GetMapping("/order/renter/cost/renterAndConsoleFine")
-	public ResponseData<RenterAndConsoleFineVO> getRenterAndConsoleFineVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
-    
+	ResponseData<RenterAndConsoleFineVO> getRenterAndConsoleFineVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+
     /**
      * 违约罚金 修改违约罚金
      * @param req
      */
     @PostMapping("/order/renterowner/cost/updatefineAmtListByOrderNo")
-	public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO req);
-    
+    ResponseData<?> updatefineAmtListByOrderNo(@RequestBody RenterFineCostReqVO req);
+
     /**
      * 平台给租客的补贴
      * @param req
      */
     @PostMapping("/order/renter/cost/updatePlatFormToRenterListByOrderNo")
-	public ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody PlatformToRenterSubsidyReqVO req);
-    
+	ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody PlatformToRenterSubsidyReqVO req);
+
     /**
      * 租金补贴
      * @param req
      */
     @PostMapping("/order/renter/cost/ownerToRenterRentAmtSubsidy")
-	public ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody OwnerToRenterSubsidyReqVO req);
-    
-    
+	ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody OwnerToRenterSubsidyReqVO req);
+
+
     /**
      * 平台给车主的补贴
      * @param req
      */
     @PostMapping("/order/renter/cost/updatePlatFormToOwnerListByOrderNo")
-	public ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req);
-    
+	ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req);
+
 }

@@ -7,10 +7,8 @@ import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.enums.ErrorCode;
-import com.atzuche.order.commons.enums.detain.DetailSourceEnum;
+import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.detain.service.RenterDetain;
-import com.atzuche.order.detain.vo.RenterDetainVO;
-import com.atzuche.order.detain.vo.UnfreezeRenterDetainVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -20,7 +18,6 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.WzCostLogEntity;
 import com.atzuche.order.renterwz.entity.WzTemporaryRefundLogEntity;
-import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.WzCostLogService;
 import com.atzuche.order.renterwz.service.WzTemporaryRefundLogService;
@@ -190,7 +187,7 @@ public class WzService {
             map.put(REMARK,WzCostEnums.WZ_SERVICE_COST.getRemark());
         }
         if(WzCostEnums.WZ_STOP_COST.getCode().equals(costCode)){
-            map.put(AMOUNT,WzCostEnums.WZ_STOP_COST.getDesc());
+            map.put(AMOUNT, WzCostEnums.WZ_STOP_COST.getDesc());
             map.put(REMARK,WzCostEnums.WZ_STOP_COST.getRemark());
         }
         return map;

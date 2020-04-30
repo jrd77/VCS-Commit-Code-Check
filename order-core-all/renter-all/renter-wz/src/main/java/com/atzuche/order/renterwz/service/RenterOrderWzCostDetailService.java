@@ -1,8 +1,8 @@
 package com.atzuche.order.renterwz.service;
 
+import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzSettleFlagEntity;
-import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzCostDetailMapper;
 import com.atzuche.order.renterwz.vo.WzSettleVO;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,6 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * RenterOrderWzCostDetailService
@@ -37,7 +36,7 @@ public class RenterOrderWzCostDetailService {
     public int updateTransFeeByOrderNo(String orderNo, Integer wzFine, Integer wzDysFine, Integer wzServiceCost, String carNum, Integer memNo) {
         int count = 0;
         //将之前同类的设为无效
-        renterOrderWzCostDetailMapper.updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(orderNo,carNum,memNo,LOSE_EFFECTIVENESS,WzCostEnums.getCode(1));
+        renterOrderWzCostDetailMapper.updateCostStatusByOrderNoAndCarNumAndMemNoAndCostCode(orderNo,carNum,memNo,LOSE_EFFECTIVENESS, WzCostEnums.getCode(1));
         if(wzFine != null && wzFine > 0){
             RenterOrderWzCostDetailEntity entity = getEntityByType(1, orderNo, wzFine, carNum, memNo);
             Integer i = renterOrderWzCostDetailMapper.saveRenterOrderWzCostDetail(entity);

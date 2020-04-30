@@ -59,13 +59,16 @@ dependencies {
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
 
-    compile project(":casier-all:cashier-account")
 
-    compile project(":util-all:fee-calculator")
- 
+    compile project(":order-core-all:renter-all:renter-mem")
+    compile project(":order-core-all:renter-all:renter-commodity")
 	//compile project(":order-core-all:parent-order")
-    compile project(":order-settle")
-    compile project(":order-detain")
+	compile project(":order-core-all:carowner-all:carowner-mem")
+    //compile project(":order-settle")
+    //compile project(":order-detain")
+    //compile project(":casier-all:cashier-account")
+    //compile project(":order-core-all:renter-all:renter-wz")
+ 
     
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
