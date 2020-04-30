@@ -1,5 +1,6 @@
 package com.atzuche.order.renterwz.service;
 
+import com.atzuche.order.commons.enums.wz.WzStatusEnums;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
 import org.springframework.stereotype.Service;
