@@ -103,6 +103,10 @@ public class PaymentService {
 			wzSettleTime = orderStatusDTO.getWzSettleTime();
 		}
 
+        if(orderStatusDTO.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+            wzSettleTime = null;
+        }
+
 
 		if(paymentRespVO == null || paymentRespVO.getCashierResVOList().size()<=0) {
             respVo.setAfterDepositSettlementPaymentList(afterDepositSettlementPaymentList);
@@ -149,10 +153,6 @@ public class PaymentService {
                         afterDepositSettlementPaymentList.add(vo);
                     }
                     //退款（线下+虚拟支付+真实支付）
-
-                    if(orderStatusDTO.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
-                        wzSettleTime = null;
-                    }
 
                     if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付

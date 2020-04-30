@@ -247,6 +247,12 @@ public class RemoteFeignService {
         }
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/30 14:58
+     * @Description: 获取支付信息
+     *
+     **/
     public PaymentRespVO queryPaymentFromRemote(PaymentReqVO paymentReqVO){
         ResponseData<PaymentRespVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "支付信息");
