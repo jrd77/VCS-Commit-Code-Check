@@ -73,9 +73,6 @@ public class PlatformCancelOrderService {
                 //退还车主券
                 String recover = null == cancelOrderRes.getRentCarPayStatus() || cancelOrderRes.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(orderNo, cancelOrderRes.getOwnerCouponNo(), recover);
-                //通知收银台退款以及退还凹凸币和钱包
-                orderSettleService.settleOrderCancel(orderNo);
-
                 //通知结算计算凹凸币和钱包等
                 CancelOrderReqDTO reqDTO =
                         orderCommonConver.buildCancelOrderReqDTO(cancelOrderRes.getOrderNo(),

@@ -138,4 +138,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+    <select id="queryByOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from account_virtual_pay_detail where order_no = #{orderNo} and  is_delete = 0
+    </select>
 </mapper>
