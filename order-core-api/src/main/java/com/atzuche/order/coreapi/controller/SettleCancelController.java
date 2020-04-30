@@ -26,7 +26,7 @@ public class SettleCancelController {
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
     /**
-     * 手动退款。自己用
+     * 手动退款-（自己用）
      * @param orderNo
      * @param payKind
      * @return
