@@ -9,9 +9,11 @@ import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
+import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
@@ -165,10 +167,17 @@ public class OrderBusinessService {
         OwnerPreAndSettleIncomRespDTO ownerPreAndSettleIncomRespDTO = new OwnerPreAndSettleIncomRespDTO();
         int ownerIncomAmt = 0;
         if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+
             List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
-            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineStatus.PASS_EXAMINE);
+            AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = AccountOwnerIncomeExamineUtil.filterByType(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineType.OWNER_INCOME);
+            if(accountOwnerIncomeExamineEntity == null){
+                log.error("车主结算收益查询异常");
+                throw new OwnerIncomeExamineNotFoundException();
+            }
+            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, null);
             ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
             ownerPreAndSettleIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+            ownerPreAndSettleIncomRespDTO.setAuditStatus(accountOwnerIncomeExamineEntity.getStatus());
         }else{
             OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
             ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
