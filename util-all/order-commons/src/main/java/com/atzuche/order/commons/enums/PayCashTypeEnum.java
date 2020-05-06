@@ -1,4 +1,4 @@
-package com.atzuche.order.cashieraccount.common;
+package com.atzuche.order.commons.enums;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>

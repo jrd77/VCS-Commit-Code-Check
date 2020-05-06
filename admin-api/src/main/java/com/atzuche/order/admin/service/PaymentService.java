@@ -3,16 +3,13 @@
  */
 package com.atzuche.order.admin.service;
 
-import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
-import com.atzuche.order.accountrenterrentcost.utils.AccountRenterCostUtil;
 import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
-import com.atzuche.order.cashieraccount.utils.CashierUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
@@ -30,10 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -46,8 +41,6 @@ public class PaymentService {
 
 	@Autowired
 	FeignPaymentService feignPaymentService;
-    @Autowired
-    AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired
     private RemoteFeignService remoteFeignService;
 
@@ -155,48 +148,48 @@ public class PaymentService {
 
                     if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyDTO offlineRefundApplyDTO = CashierUtils.filterBySourceCode(offlineRefundApplyDTOList, Arrays.asList(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT), null, wzSettleTimeRefound);
+                            OfflineRefundApplyDTO offlineRefundApplyDTO = filterBySourceCode(offlineRefundApplyDTOList, Arrays.asList(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT), null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
-                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.WZ_DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.WZ_DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else{
-                            CashierRefundApplyDTO cashierRefundApplyDTO = CashierUtils.filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            CashierRefundApplyDTO cashierRefundApplyDTO = filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }
                     }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyDTO offlineRefundApplyDTO = CashierUtils.filterBySourceCode(offlineRefundApplyDTOList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT), null, wzSettleTimeRefound);
+                            OfflineRefundApplyDTO offlineRefundApplyDTO = filterBySourceCode(offlineRefundApplyDTOList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT), null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
-                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else{
-                            CashierRefundApplyDTO cashierRefundApplyDTO = CashierUtils.filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.RENT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            CashierRefundApplyDTO cashierRefundApplyDTO = filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.RENT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }
                     }else if(DataPayKindConstant.RENT_AMOUNT.equals(payKind)){//租车费用
                         if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
-                            OfflineRefundApplyDTO offlineRefundApplyDTO = CashierUtils.filterBySourceCode(offlineRefundApplyDTOList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT), null, wzSettleTimeRefound);
+                            OfflineRefundApplyDTO offlineRefundApplyDTO = filterBySourceCode(offlineRefundApplyDTOList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT), null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
-                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.RENTER_COST, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            AccountVirtualPayDetailDTO accountVirtualPayDetailDTO = filterByPayCashTypeAndPayType(accountVirtualPayDetailDTOList, PayCashTypeEnum.RENTER_COST, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else if(PaySourceEnum.WALLET_PAY.getCode().equals(paySource)){//钱包支付
                             List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOList = paymentRespVO.getAccountRenterCostDetailDTOList();
-                            AccountRenterCostDetailDTO accountRenterCostDetailDTO = AccountRenterCostUtil.filterRenterCost(accountRenterCostDetailDTOList, PaySourceEnum.WALLET_PAY, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            AccountRenterCostDetailDTO accountRenterCostDetailDTO = filterRenterCost(accountRenterCostDetailDTOList, PaySourceEnum.WALLET_PAY, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertAccountRenterCostDetail(accountRenterCostDetailDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }else{
-                            CashierRefundApplyDTO cashierRefundApplyDTO = CashierUtils.filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.RENT_AMOUNT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
+                            CashierRefundApplyDTO cashierRefundApplyDTO = filterCashierRefound(cashierRefundApplyDTOList, DataPayKindConstant.RENT_AMOUNT, PayTypeEnum.PUR_RETURN, null, wzSettleTimeRefound);
                             PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyDTO);
                             if(vo != null)afterDepositSettlementPaymentList.add(vo);
                         }
@@ -467,4 +460,106 @@ public class PaymentService {
 		}
 		return "未知";
 	}
+
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/23 19:16
+     * @Description: 过滤虚拟支付记录
+     *
+     **/
+    public static AccountVirtualPayDetailDTO filterByPayCashTypeAndPayType(List<AccountVirtualPayDetailDTO> list,
+                                                                           PayCashTypeEnum payCashTypeEnum,
+                                                                           PayTypeEnum payTypeEnum,
+                                                                           LocalDateTime startTime,
+                                                                           LocalDateTime endTime){
+        Optional<AccountVirtualPayDetailDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x ->payCashTypeEnum.getValue().equals(x.getPayCashType()))
+                .filter(x->payTypeEnum.getCode().equals(x.getPayType()))
+                .filter(x->startTime==null?true:(x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x->endTime==null?true:x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/23 19:23
+     * @Description: 过滤线下支付
+     *
+     **/
+    public static OfflineRefundApplyDTO filterBySourceCode(List<OfflineRefundApplyDTO> list,
+                                                           List<RenterCashCodeEnum> renterCashCodeEnum,
+                                                           LocalDateTime startTime,
+                                                           LocalDateTime endTime){
+        List<String> renterCashCodeEnumList = Optional.ofNullable(renterCashCodeEnum)
+                .orElseGet(ArrayList::new).stream()
+                .map(x -> x.getCashNo()).collect(Collectors.toList());
+        Optional<OfflineRefundApplyDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> renterCashCodeEnumList.contains(x.getSourceCode()))
+                .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x -> endTime == null ? true : (x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime)))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/23 19:23
+     * @Description: 退款申请表
+     *
+     **/
+    public static CashierRefundApplyDTO filterCashierRefound(List<CashierRefundApplyDTO> list,
+                                                             String dataPayKindConstant,
+                                                             PayTypeEnum payTypeEnum,
+                                                             LocalDateTime startTime,
+                                                             LocalDateTime endTime){
+        Optional<CashierRefundApplyDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x ->dataPayKindConstant==null?true:dataPayKindConstant.equals(x.getPayKind()))
+                .filter(x->payTypeEnum.getCode().equals(x.getPayType()))
+                .filter(x->startTime==null?true:(x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x->endTime==null?true:x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/24 11:46
+     * @Description: 过滤租车费用记录
+     *
+     **/
+    public static AccountRenterCostDetailDTO filterRenterCost(List<AccountRenterCostDetailDTO> list,
+                                                              PaySourceEnum paySourceEnum,
+                                                              PayTypeEnum payTypeEnum,
+                                                              LocalDateTime startTime,
+                                                              LocalDateTime endTime){
+        Optional<AccountRenterCostDetailDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> paySourceEnum.getCode().equals(x.getPaySourceCode()))
+                .filter(x -> payTypeEnum.getCode().equals(x.getPayTypeCode()))
+                .filter(x -> startTime == null ? true : (x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x -> endTime == null ? true : (x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime)))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
 }
