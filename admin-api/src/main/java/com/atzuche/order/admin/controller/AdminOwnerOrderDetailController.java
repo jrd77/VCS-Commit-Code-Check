@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminOwnerOrderDetailController {
     @Autowired
     private OwnerOrderDetailService ownerOrderDetailService;
-    @Autowired
-    private OwnerOrderService ownerOrderService;
-    
+
 
     /**
      * @Author ZhangBin
@@ -191,23 +189,7 @@ public class AdminOwnerOrderDetailController {
             responseData.setResMsg("车主订单号不能为空");
             return responseData;
         }
-        
-        //需要获取车主的会员号 20200212 huangjing
-        OwnerOrderEntity orderEntityOwner = null;  
-
-		    orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
-	        if(orderEntityOwner == null){
-	        	//否则根据主订单号查询
-//		    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
-	        	log.error("获取订单数据(车主)为空ownerOrderNo={}",ownerOrderNo);
-//	            throw new Exception("获取订单数据(车主)为空");
-	        	ResponseData responseData = new ResponseData();
-	            responseData.setResCode(ErrorCode.ORDER_NOT_EXIST.getCode());
-	            responseData.setResMsg("车主子订单号不存在");
-	            return responseData;
-	        }
-	    
-        ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,orderEntityOwner.getMemNo());
+        ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
         return responseData;
     }
 

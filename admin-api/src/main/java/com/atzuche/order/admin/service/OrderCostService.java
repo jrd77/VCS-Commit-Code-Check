@@ -56,8 +56,6 @@ public class OrderCostService {
 	FeignOrderCostService feignOrderCostService;
 
 	@Autowired
-	OwnerOrderService ownerOrderService;
-	@Autowired
     private WalletProxyService walletProxyService;
 	@Autowired
 	private AutoCoinProxyService autoCoinProxyService;
@@ -694,25 +692,10 @@ public class OrderCostService {
 	 */
 	public OrderOwnerCostResVO calculateOwnerOrderCost(OwnerCostReqVO ownerCostReqVO) throws Exception {
 		OrderOwnerCostResVO realVo = new OrderOwnerCostResVO();
-		
-		OwnerOrderEntity orderEntityOwner = null;  
-	    if(StringUtils.isNotBlank(ownerCostReqVO.getOwnerOrderNo())) {  
-		    orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
-	        if(orderEntityOwner == null){
-	        	logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
-	            throw new Exception("获取订单数据(车主)为空");
-	        }
-	    }
-//	    else {
-//	    	//否则根据主订单号查询
-//	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(ownerCostReqVO.getOrderNo());
-//	    	
-//	    }
-	    
 		OrderCostReqVO req = new OrderCostReqVO();
 		req.setOrderNo(ownerCostReqVO.getOrderNo());
 		req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
-		req.setMemNo(orderEntityOwner.getMemNo());
+
 		ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
 		
 		//子订单号
@@ -728,6 +711,8 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
 			if(data != null) {
+                req.setMemNo(data.getOwnerOrderDTO().getMemNo());
+
 				//租客支付给平台的费用。console  200214
 				putOwnerToPlatformCost(realVo,data);
 				
@@ -1164,20 +1149,9 @@ public class OrderCostService {
 
     public OrderOwnerCostResVO calculateOwnerOrderCostLong(OwnerCostReqVO ownerCostReqVO) throws Exception {
         OrderOwnerCostResVO realVo = new OrderOwnerCostResVO();
-
-        OwnerOrderEntity orderEntityOwner = null;
-        if(StringUtils.isNotBlank(ownerCostReqVO.getOwnerOrderNo())) {
-            orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
-            if(orderEntityOwner == null){
-                logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
-                throw new Exception("获取订单数据(车主)为空");
-
-            }
-        }
         OrderCostReqVO req = new OrderCostReqVO();
         req.setOrderNo(ownerCostReqVO.getOrderNo());
         req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
-        req.setMemNo(orderEntityOwner.getMemNo());
         ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
 
         //子订单号
@@ -1193,6 +1167,7 @@ public class OrderCostService {
         if(resData != null) {
             com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
             if(data != null) {
+                req.setMemNo(data.getOwnerOrderDTO().getMemNo());
                 //租客支付给平台的费用。console  200214
                 putOwnerToPlatformCost(realVo,data);
 

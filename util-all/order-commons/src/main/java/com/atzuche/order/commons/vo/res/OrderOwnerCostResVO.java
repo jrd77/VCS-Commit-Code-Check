@@ -4,6 +4,7 @@
 package com.atzuche.order.commons.vo.res;
 
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
 import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
@@ -96,5 +97,8 @@ public class OrderOwnerCostResVO {
      * 长租折扣
      */
     private OwnerCouponLongDTO ownerCouponLongDTO;
-    
+    /**
+     * 车主订单
+     */
+    private OwnerOrderDTO ownerOrderDTO;
 }

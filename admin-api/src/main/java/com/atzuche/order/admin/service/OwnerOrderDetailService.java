@@ -142,19 +142,19 @@ public class OwnerOrderDetailService {
         return responseObject;
     }
 
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo, String ownerOrderNo,String memNo) {
+    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(String orderNo,String ownerOrderNo) {
         ResponseData<PlatformToOwnerSubsidyDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取平台给车主的补贴明细");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始获取平台给车主的补贴明细,orderNo={}", orderNo);
+            log.info("Feign 开始获取平台给车主的补贴明细,orderNo={},ownerOrderNo={}", orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
-            responseObject =  feignOwnerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
+            responseObject =  feignOwnerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
         }catch (Exception e){
-            log.error("Feign 获取平台给车主的补贴明细异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
+            log.error("Feign 获取平台给车主的补贴明细异常,responseObject={},orderNo={},ownerOrderNo={}", JSON.toJSONString(responseObject),orderNo,ownerOrderNo,e);
             Cat.logError("Feign 获取平台给车主的补贴明细异常",e);
             t.setStatus(e);
             throw e;

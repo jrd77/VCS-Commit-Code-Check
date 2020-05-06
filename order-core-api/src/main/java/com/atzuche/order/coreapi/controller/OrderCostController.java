@@ -48,6 +48,7 @@ import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -233,7 +234,14 @@ public class OrderCostController {
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("车主子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
 		BindingResultUtil.checkBindingResult(bindingResult);
-
+        OwnerOrderEntity ownerOrderEntity = null;
+        if(StringUtils.isNotBlank(req.getSubOrderNo())) {
+            ownerOrderEntity = ownerOrderService.getOwnerOrderByOwnerOrderNo(req.getSubOrderNo());
+            if(ownerOrderEntity == null){
+                log.error("获取订单数据(车主)为空orderNo={}",req.getOrderNo());
+                throw new OwnerOrderNotFoundException(ownerOrderEntity.getOwnerOrderNo());
+            }
+        }
 		OrderOwnerCostResVO resVo = orderCostService.orderCostOwnerGet(req);
 		return ResponseData.success(resVo);
 
