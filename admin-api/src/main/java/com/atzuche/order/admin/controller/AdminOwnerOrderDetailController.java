@@ -5,8 +5,6 @@ import com.atzuche.order.admin.vo.req.FienAmtUpdateReqVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;

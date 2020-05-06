@@ -32,8 +32,6 @@ import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.rentcosts.*;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
-import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -70,11 +68,6 @@ public class OrderCostDetailService {
     @Autowired
     OrderSettleService orderSettleService;
 
-    @Autowired
-    OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
-
-    @Autowired
-    ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
     FeignOrderCostService feignOrderCostService;
 
