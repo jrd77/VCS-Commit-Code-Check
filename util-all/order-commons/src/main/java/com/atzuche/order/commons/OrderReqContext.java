@@ -1,10 +1,6 @@
 package com.atzuche.order.commons;
 
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.vo.req.NormalOrderReqVO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import lombok.Data;
 
@@ -41,6 +37,11 @@ public class OrderReqContext {
      * 提交订单请求信息
      */
     private OrderReqVO orderReqVO;
+
+    /**
+     * 提前延后时间
+     */
+    private CarRentTimeRangeDTO carRentTimeRangeDTO;
     /**
      * 提供扩展参数，但是该参数不能直接操作
      */

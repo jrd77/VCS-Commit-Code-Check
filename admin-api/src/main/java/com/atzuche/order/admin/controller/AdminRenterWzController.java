@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
-import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
@@ -86,7 +85,6 @@ public class AdminRenterWzController extends BaseController {
     @AutoDocMethod(description = "暂扣/取消暂扣违章押金", value = "暂扣/取消暂扣违章押金",response = ResponseData.class)
     public ResponseData addTemporaryRefund(@Valid @RequestBody TemporaryRefundReqVO req, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-
         renterWzService.addTemporaryRefund(req);
         try{
             adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND,req.getOrderNo(), JSON.toJSONString(req));

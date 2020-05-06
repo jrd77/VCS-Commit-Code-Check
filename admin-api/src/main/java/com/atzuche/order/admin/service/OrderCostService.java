@@ -7,11 +7,13 @@ import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
-import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -22,21 +24,13 @@ import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
+import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderIncrementDetailService;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.parentorder.entity.OrderEntity;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
-import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author jing.huang
@@ -57,27 +52,15 @@ public class OrderCostService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	FeignOrderCostService feignOrderCostService;
-	@Autowired
-	OrderService orderService;
-	@Autowired
-	OwnerOrderService ownerOrderService;
-	@Autowired
-	RenterOrderService renterOrderService;
+
 	@Autowired
     private WalletProxyService walletProxyService;
 	@Autowired
 	private AutoCoinProxyService autoCoinProxyService;
 	@Autowired
-	private CashierPayService cashierPayService;
-	@Autowired
 	private OrderSettleService orderSettleService;
 	@Autowired
-    private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-	@Autowired
-    private AdminDeliveryCarService deliveryCarInfoService;
-	@Autowired
-	private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
-	
+	private RemoteFeignService remoteFeignService;
 	/**
 	 * 
 	 * @param renterCostReqVO
@@ -87,15 +70,16 @@ public class OrderCostService {
 		OrderRenterCostResVO realVo = new OrderRenterCostResVO();
 		
 		//主订单
-        OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
-        if(orderEntity == null){
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
         	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
             throw new Exception("获取订单数据为空");
         }
         
         OrderCostReqVO req = new OrderCostReqVO();
 		req.setOrderNo(renterCostReqVO.getOrderNo());
-		req.setMemNo(orderEntity.getMemNoRenter());
+		req.setMemNo(orderDTO.getMemNoRenter());
 		req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
 		
 		
@@ -113,18 +97,20 @@ public class OrderCostService {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
-				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderEntity.getMemNoRenter(),renterCostAmtFinal);
-				if(costVo != null) {
+				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
+                RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
+                if(costVo != null) {
 					 logger.info("costVo toString=[{}]",costVo.toString());
 				}
 				
 				//租金费用  费用明细表renter_order_cost_detail   
 				putRenterOrderCostDetail(realVo,data);
-				
+                //平台保障费、全面保障服务费 （长租不需要这两个费用）
+                putInsureAbatementAmt(realVo,data);
 				//租客订单对象
-				RenterOrderEntity entity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+
 				//优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
-				putRenterOrderDeduct(realVo,data,entity,orderEntity.getMemNoRenter());
+				putRenterOrderDeduct(realVo,data,renterOrderDTO,orderDTO.getMemNoRenter());
 				
 				//租车押金和违章押金   车辆押金  违章押金
 				putRenterOrderDeposit(realVo,data,costVo);
@@ -200,29 +186,29 @@ public class OrderCostService {
 	private void putRentFeeBase(OrderRenterCostResVO realVo,
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		//租客租金
-		int rentAmt = Integer.valueOf(realVo.getRentAmount());
+		int rentAmt = Integer.valueOf(realVo.getRentAmount()==null?"0":realVo.getRentAmount());
 		//基础保障费
-		int insure = Integer.valueOf(realVo.getInsuranceAmount());
+		int insure = Integer.valueOf(realVo.getInsuranceAmount()==null?"0":realVo.getInsuranceAmount());
 //		附加驾驶员险
-		int drive = Integer.valueOf(realVo.getAdditionalDriverInsuranceAmount());
-		//违约罚金
-		int fine = Integer.valueOf(realVo.getCarServiceFine());
-		//调价
-		int adjust = Integer.valueOf(realVo.getAdjustAmt());
-		//油费
-		int oil = Integer.valueOf(realVo.getOilAmt());
-		//手续费
-		int fee = Integer.valueOf(realVo.getServiceCharge());
-		//全面保障
-		int insureAll = Integer.valueOf(realVo.getSupperInsuranceAmount());
-		//配送
-		int getReturnFee = Integer.valueOf(realVo.getCarServiceFee());
-		//租客需支付给平台的费用
-		int rentPayToPlatform = Integer.valueOf(realVo.getRenterPayToPlatform());
+		int drive = Integer.valueOf(realVo.getAdditionalDriverInsuranceAmount()==null?"0":realVo.getAdditionalDriverInsuranceAmount());
+        //违约罚金
+        int fine = Integer.valueOf(realVo.getCarServiceFine()==null?"0":realVo.getCarServiceFine());
+        //调价
+        int adjust = Integer.valueOf(realVo.getAdjustAmt()==null?"0":realVo.getAdjustAmt());
+        //油费
+        int oil = Integer.valueOf(realVo.getOilAmt()==null?"0":realVo.getOilAmt());
+        //手续费
+        int fee = Integer.valueOf(realVo.getServiceCharge()==null?"0":realVo.getServiceCharge());
+        //全面保障
+        int insureAll = Integer.valueOf(realVo.getSupperInsuranceAmount()==null?"0":realVo.getSupperInsuranceAmount());
+        //配送
+        int getReturnFee = Integer.valueOf(realVo.getCarServiceFee()==null?"0":realVo.getCarServiceFee());
+        //租客需支付给平台的费用
+        int rentPayToPlatform = Integer.valueOf(realVo.getRenterPayToPlatform()==null?"0":realVo.getRenterPayToPlatform());
 		//超里程
 		int beyondMile = StringUtils.isNotBlank(realVo.getBeyondMileAmt())?Integer.valueOf(realVo.getBeyondMileAmt()):0;
 		//加油服务费
-		int addOil = Integer.valueOf(realVo.getAddOilSrvAmt());
+		int addOil = Integer.valueOf(realVo.getAddOilSrvAmt()==null?"0":realVo.getAddOilSrvAmt());
 		
 		int base = rentAmt + insure + drive + fine + adjust + oil + fee + insureAll + getReturnFee + rentPayToPlatform + beyondMile + addOil;
 		
@@ -463,7 +449,7 @@ public class OrderCostService {
 		
 	}
 
-	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderEntity entity, String memNo) {
+	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderDTO renterOrderDTO, String memNo) {
 		int walletAmt = data.getWalletCostDetail().getAmt();
 		//租客的补贴
 		//还需要考虑加上管理后台的补贴
@@ -477,6 +463,8 @@ public class OrderCostService {
 		String aotuCoinCashNo =  RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo();
 		//送取服务券
 		String getReturnCouponCashNo = RenterCashCodeEnum.GETCARFEE_COUPON_OFFSET.getCashNo();
+		// 长租租金折扣抵扣
+		String longRentDeductNo = RenterCashCodeEnum.RENT_AMT.getCashNo();
 		
 		
 		
@@ -485,6 +473,7 @@ public class OrderCostService {
 		int ownerCoupon = 0;
 		int aotuCoin = 0;
 		int getReturnCoupon = 0;
+		int longRentDeductAmt = 0;
 				
 		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
 			//12120010  12120051  12120012
@@ -496,12 +485,16 @@ public class OrderCostService {
 				aotuCoin +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}else if(getReturnCouponCashNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
 				getReturnCoupon +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
+			}else if(longRentDeductNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
+				longRentDeductAmt +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}
 		}
-		int deductionAmount = platformCoupon + ownerCoupon + aotuCoin + walletAmt + getReturnCoupon;
+		int deductionAmount = platformCoupon + ownerCoupon + aotuCoin + walletAmt + getReturnCoupon + longRentDeductAmt;
 		
 		/*负数表示*/
 		realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));
+		// 长租租金折扣
+		realVo.setLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(longRentDeductAmt)));
 		//车主券
 		realVo.setOwnerCouponAmt(String.valueOf(NumberUtils.convertNumberToFushu(ownerCoupon)));
 		//平台券
@@ -521,6 +514,11 @@ public class OrderCostService {
 		/*
 		 * 获取标题
 		 */
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        //OwnerCouponLongEntity longCouponEnt = ownerCouponLongService.getByRenterOrderNo(renterOrderDTO.getRenterOrderNo());
+		if (ownerCouponLongDTO != null) {
+			realVo.setLongDiscountDesc(ownerCouponLongDTO.getDiscountDesc());
+		}
 		String platformCouponTitle = "";
 		String ownerCouponTitle = "";
 		String getReturnCouponTitle = ""; 
@@ -542,23 +540,66 @@ public class OrderCostService {
 		realVo.setGetReturnCouponTitle(getReturnCouponTitle);
 		
 		//是否使用标识处理
-		if(entity != null) {
-			realVo.setIsUseAotuCoin(String.valueOf(entity.getIsUseCoin()));
+		if(renterOrderDTO != null) {
+			realVo.setIsUseAotuCoin(String.valueOf(renterOrderDTO.getIsUseCoin()));
 			realVo.setIsUseGetReturnCoupon(getReturnCoupon>0?"1":"0");  //0否1是
-			realVo.setIsUseWallet(String.valueOf(entity.getIsUseWallet()));
+			realVo.setIsUseWallet(String.valueOf(renterOrderDTO.getIsUseWallet()));
 		}
 	}
-										
+
+    private void longRentDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
+        List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+        int sum = Optional.ofNullable(subsidyLst)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
+                .mapToInt(RenterOrderSubsidyDetailResVO::getSubsidyAmount)
+                .sum();
+        int deductionAmount = realVo.getDeductionAmount() != null ? 0 : Integer.valueOf(realVo.getDeductionAmount());
+        deductionAmount = deductionAmount + (-sum);
+        realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));
+
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        if(ownerCouponLongDTO != null){
+            realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
+        }
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
+    }
+
+
+    private void putInsureAbatementAmt(OrderRenterCostResVO realVo,com.atzuche.order.commons.vo.res.OrderRenterCostResVO data){
+        //平台保障费
+        String insureCashNo = RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo();
+        //全面保障服务费
+        String abatementCashNo = RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo();
+        //费用列表
+        List<RenterOrderCostDetailResVO> costList = data.getRenterOrderCostDetailList();
+        int insuranceAmount = 0;
+        int supperInsuranceAmount = 0;
+        if(costList != null) {
+            for (RenterOrderCostDetailResVO renterOrderCostDetailResVO : costList) {
+                 if(insureCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+                    insuranceAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }else if(abatementCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+                    supperInsuranceAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }
+            }
+        }
+        //基础保障费
+        realVo.setInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(insuranceAmount)));
+        //全面保障服务费
+        realVo.setSupperInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(supperInsuranceAmount)));
+    }
+
 	private void putRenterOrderCostDetail(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
 		/**
 		 * 
 		 */
 		//租客租金
 		String rentAmtCashNo =  RenterCashCodeEnum.RENT_AMT.getCashNo();
-		//平台保障费
-		String insureCashNo = RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo();
-		//全面保障服务费
-		String abatementCashNo = RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo();
+
 		//附加驾驶员险
 		String driverCashNo = RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo();
 		//手续费
@@ -571,8 +612,7 @@ public class OrderCostService {
 		
 		//默认0
 		int rentAmount = 0;
-		int insuranceAmount = 0;
-		int supperInsuranceAmount = 0;
+
 		int additionalDriverInsuranceAmount = 0;
 		int serviceCharge = 0;
 		int carServiceFee = 0;
@@ -580,16 +620,9 @@ public class OrderCostService {
 		//费用列表
 		List<RenterOrderCostDetailResVO> costList = data.getRenterOrderCostDetailList();
 		if(costList != null) {
-			
 			for (RenterOrderCostDetailResVO renterOrderCostDetailResVO : costList) {
 				if(rentAmtCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
 					rentAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
-				}else if(insureCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
-					insuranceAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
-				
-				}else if(abatementCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
-					supperInsuranceAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
-					
 				}else if(driverCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
 					additionalDriverInsuranceAmount +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
 					
@@ -613,10 +646,6 @@ public class OrderCostService {
 		}
 		//租客租金
 		realVo.setRentAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(rentAmount)));
-		//基础保障费
-		realVo.setInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(insuranceAmount)));
-		//全面保障服务费
-		realVo.setSupperInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(supperInsuranceAmount)));
 		//附加驾驶员险
 		realVo.setAdditionalDriverInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(additionalDriverInsuranceAmount)));
 		//手续费
@@ -661,25 +690,10 @@ public class OrderCostService {
 	 */
 	public OrderOwnerCostResVO calculateOwnerOrderCost(OwnerCostReqVO ownerCostReqVO) throws Exception {
 		OrderOwnerCostResVO realVo = new OrderOwnerCostResVO();
-		
-		OwnerOrderEntity orderEntityOwner = null;  
-	    if(StringUtils.isNotBlank(ownerCostReqVO.getOwnerOrderNo())) {  
-		    orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
-	        if(orderEntityOwner == null){
-	        	logger.error("获取订单数据(车主)为空orderNo={}",ownerCostReqVO.getOrderNo());
-	            throw new Exception("获取订单数据(车主)为空");
-	        }
-	    }
-//	    else {
-//	    	//否则根据主订单号查询
-//	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(ownerCostReqVO.getOrderNo());
-//	    	
-//	    }
-	    
 		OrderCostReqVO req = new OrderCostReqVO();
 		req.setOrderNo(ownerCostReqVO.getOrderNo());
 		req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
-		req.setMemNo(orderEntityOwner.getMemNo());
+
 		ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
 		
 		//子订单号
@@ -695,12 +709,14 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
 			if(data != null) {
+                req.setMemNo(data.getOwnerOrderDTO().getMemNo());
+
 				//租客支付给平台的费用。console  200214
 				putOwnerToPlatformCost(realVo,data);
 				
 				//给租客的优惠（车主券）和平台补贴   调价
 				putPlatformSubsidyAndOwnerCoupon(realVo,data);
-				
+
 				//扣款
 				putPlatformDeductAmt(realVo,data);
 				
@@ -786,7 +802,7 @@ public class OrderCostService {
 		 List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatails = data.getConsoleOwnerOrderFineDeatails();
 		 for (ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity : consoleOwnerOrderFineDeatails) {
 			 //罚金来源编码（车主/租客/平台）1-租客，2-车主，3-平台
-				if(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
+				if(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE.getFineType().equals(consoleOwnerOrderFineDeatailEntity.getFineType())) {
 					fineAmtInt += consoleOwnerOrderFineDeatailEntity.getFineAmount().intValue();
 				}
 		 }
@@ -883,7 +899,10 @@ public class OrderCostService {
 //	    		  gps += ownerOrderPurchaseDetailEntity.getTotalAmount().intValue();
 //	    	  }
 //		  }
-	      
+
+        /*获取GPS押金*/
+
+
 	      /**
 	       * 获取车主增值服务费用列表
 	       */
@@ -929,10 +948,10 @@ public class OrderCostService {
 		 platformSrvFeeAmt = String.valueOf( NumberUtils.convertNumberToFushu(srvFee));
 		 platformAddOilSrvAmt = String.valueOf(NumberUtils.convertNumberToFushu(oil));
 		 gpsAmt = String.valueOf(NumberUtils.convertNumberToFushu(gps));
-		 
-		 //被覆盖了。。。
+
+        //被覆盖了。。。
 //		 ownerPayToPlatform = String.valueOf(NumberUtils.convertNumberToFushu(ownerPay));
-		 gpsDeposit = String.valueOf(gpsDepositAmt);
+		 gpsDeposit = String.valueOf(data.getGpsDepositTotal()==null?0:data.getGpsDepositTotal());
 		 carServiceSrvFee = String.valueOf(NumberUtils.convertNumberToFushu(getReturnCarFee));
 		 
 		 //封装
@@ -1043,5 +1062,148 @@ public class OrderCostService {
 		 ///车主给租客的调价
 		 realVo.setAdjustAmt(ownerToRenterAdjustAmt);
 	}
-	
+
+    public OrderRenterCostResVO calculateRenterOrderCostLongRent(RenterCostReqVO renterCostReqVO) throws Exception {
+        OrderRenterCostResVO realVo = new OrderRenterCostResVO();
+        //主订单
+        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
+        OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
+        if(orderDTO == null){
+            logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
+            throw new Exception("获取订单数据为空");
+        }
+
+        OrderCostReqVO req = new OrderCostReqVO();
+        req.setOrderNo(renterCostReqVO.getOrderNo());
+        req.setMemNo(orderDTO.getMemNoRenter());
+        req.setSubOrderNo(renterCostReqVO.getRenterOrderNo());
+
+
+        ///子订单号
+        realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+        //默认值处理  调价目前没有
+//		realVo.setAdjustAmt("0");
+        //加油服务费 huangjing-todo
+        realVo.setAddOilSrvAmt("0");
+        ///租客需支付给平台的费用 huangjing-todo  -DO
+//		realVo.setRenterPayToPlatform("0");
+
+        ResponseData<com.atzuche.order.commons.vo.res.OrderRenterCostResVO> resData = feignOrderCostService.orderCostRenterGet(req);
+        if(resData != null) {
+            com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
+            if(data != null) {
+                int renterCostAmtFinal = data.getRenterCostAmtFinal();
+                RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
+                RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
+                //租金费用  费用明细表renter_order_cost_detail
+                putRenterOrderCostDetail(realVo,data);
+                //优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
+                putRenterOrderDeduct(realVo,data,renterOrderDTO,orderDTO.getMemNoRenter());
+                //长租折扣 TODO
+                longRentDeduct(realVo,data);
+
+                //租车押金和违章押金   车辆押金  违章押金
+                putRenterOrderDeposit(realVo,data,costVo);
+
+                //取还车服务违约金   renter_order_fine_deatail  取还车服务违约金
+                putRenterOrderFine(realVo,data);
+
+                //租车费用应收@海豹   实收
+                putPaymentAmount(realVo,data,costVo);
+
+                //油费,超里程
+                putOilBeyondMile(realVo,data);
+
+                //平台给租客的补贴， 车主和租客的调价，车主给租客的租金补贴
+                putConsoleSubsidy(realVo,data);
+
+                //平台给租客的补贴（长租取还车补贴特殊处理）
+                subsidyLongRent(realVo,data);
+                //补付费用
+                //需补付金额,跟修改订单的补付金额是同一个方法。
+                putSupplementAmt(realVo,data,costVo);
+
+                //租客支付给平台的费用。console  200214
+                putRenterToPlatformCost(realVo,data);
+
+                //rentFeeBase基础费用
+                putRentFeeBase(realVo,data);
+            }
+        }
+
+        return realVo;
+    }
+
+    private void subsidyLongRent(OrderRenterCostResVO realVo,com.atzuche.order.commons.vo.res.OrderRenterCostResVO data){
+        List<RenterOrderSubsidyDetailResVO> subsidyLst = data.getSubsidyLst();
+        int longGetReturnCarCostSubsidy = OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.SRV_GET_COST) +
+                OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.SRV_RETURN_COST) +
+                OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT) +
+                OrderSubsidyDetailUtils.getRenterResvoSubsidyAmt(subsidyLst, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
+        realVo.setPlatformSubsidyAmt(String.valueOf((realVo.getPlatformSubsidyAmt()==null?0:Integer.valueOf(realVo.getPlatformSubsidyAmt())) - longGetReturnCarCostSubsidy));
+        realVo.setPlatformSubsidyRealAmt(String.valueOf((realVo.getPlatformSubsidyRealAmt()==null?0:Integer.valueOf(realVo.getPlatformSubsidyRealAmt())) - longGetReturnCarCostSubsidy));
+        realVo.setPlatformSubsidyTotalAmt(String.valueOf((realVo.getPlatformSubsidyTotalAmt()==null?0:Integer.valueOf(realVo.getPlatformSubsidyTotalAmt())) - longGetReturnCarCostSubsidy));
+    }
+
+    public OrderOwnerCostResVO calculateOwnerOrderCostLong(OwnerCostReqVO ownerCostReqVO) throws Exception {
+        OrderOwnerCostResVO realVo = new OrderOwnerCostResVO();
+        OrderCostReqVO req = new OrderCostReqVO();
+        req.setOrderNo(ownerCostReqVO.getOrderNo());
+        req.setSubOrderNo(ownerCostReqVO.getOwnerOrderNo());
+        ResponseData<com.atzuche.order.commons.vo.res.OrderOwnerCostResVO> resData = feignOrderCostService.orderCostOwnerGet(req);
+
+        //子订单号
+        realVo.setOwnerOrderNo(ownerCostReqVO.getOwnerOrderNo());
+        //默认值处理  调价目前没有
+//		realVo.setAdjustAmt("0");
+        //加油服务费
+        realVo.setAddOilSrvAmt("0");
+        ///车主需支付给平台的费用
+//		realVo.setOwnerPayToPlatform("0");
+
+
+        if(resData != null) {
+            com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data = resData.getData();
+            if(data != null) {
+                req.setMemNo(data.getOwnerOrderDTO().getMemNo());
+                //租客支付给平台的费用。console  200214
+                putOwnerToPlatformCost(realVo,data);
+
+                //给租客的优惠（车主券）和平台补贴   调价
+                putPlatformSubsidyAndOwnerCoupon(realVo,data);
+                //长租折扣
+                putPlatformSubsidyAndOwnerCouponLong(realVo,data);
+
+                //扣款
+                putPlatformDeductAmt(realVo,data);
+
+                //收益
+                putBaseFee(realVo,data,ownerCostReqVO);
+
+                //最后算
+                putIncome(realVo,data);
+
+            }
+        }else {
+            logger.error("feign接口返回resData null!!! params={}",ownerCostReqVO.toString());
+        }
+
+        return realVo;
+    }
+
+    private void putPlatformSubsidyAndOwnerCouponLong(OrderOwnerCostResVO realVo, com.atzuche.order.commons.vo.res.OrderOwnerCostResVO data) {
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = data.getOwnerOrderSubsidyDetail();
+        int sum = Optional.ofNullable(ownerOrderSubsidyDetail)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
+                .mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount)
+                .sum();
+
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        if(ownerCouponLongDTO != null){
+            realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
+        }
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
+    }
 }

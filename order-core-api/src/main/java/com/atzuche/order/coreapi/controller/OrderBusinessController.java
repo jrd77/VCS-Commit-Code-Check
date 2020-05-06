@@ -1,15 +1,14 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.entity.dto.ReturnCarIncomeResultDTO;
+import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.coreapi.service.OrderBusinessService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,4 +98,27 @@ public class OrderBusinessController {
         ReturnCarIncomeResultDTO returnCarIncomeDTO = orderBusinessService.queryOwnerIncome(orderNo);
         return ResponseData.success(returnCarIncomeDTO);
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/22 15:44
+     * @Description: 查询车主预计收益或者结算收益
+     *
+     **/
+    @GetMapping("/orderBusiness/queryOwnerPreAndSettleIncom")
+    public ResponseData<OwnerPreAndSettleIncomRespDTO> queryOwnerPreAndSettleIncom(@RequestParam(name = "orderNo",required = true) String orderNo){
+        OwnerPreAndSettleIncomRespDTO ownerPreAndSettleIncomRespDTO = orderBusinessService.queryOwnerPreAndSettleIncom(orderNo);
+        return ResponseData.success(ownerPreAndSettleIncomRespDTO);
+    }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/6 11:29
+     * @Description: 查询押金比例信息
+     *
+     **/
+    @GetMapping("/orderBusiness/queryrenterDepositDetail")
+    public ResponseData<RenterDepositDetailDTO> queryrenterDepositDetail(@RequestParam(name = "orderNo",required = true) String orderNo){
+        RenterDepositDetailDTO renterDepositDetailDTO = orderBusinessService.queryrenterDepositDetail(orderNo);
+        return ResponseData.success(renterDepositDetailDTO);
+    }
+
 }

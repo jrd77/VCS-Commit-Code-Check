@@ -17,22 +17,9 @@ public class DepositAmtDTO {
 	 */
 	private Integer cityCode;
 	/**
-	 * 是否内部员工 1是，其他否
-	 */
-	//private Integer internalStaff;
-	/**
 	 * 车辆残值
 	 */
 	private Integer surplusPrice;
-
-	/**
-	 * 车型品牌系数
-	 */
-	private Double carBrandTypeRadio;
-	/**
-	 * 车辆年份系数
-	 */
-	private Double carYearRadio;
     /**
      * 车辆品牌
      */

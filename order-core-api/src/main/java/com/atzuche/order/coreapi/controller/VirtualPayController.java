@@ -1,6 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
+import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.service.VirtualPayService;

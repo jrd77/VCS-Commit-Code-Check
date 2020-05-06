@@ -34,11 +34,12 @@ import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.PlatformProfitStatusEnum;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.OilAmtDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.enums.FineTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
@@ -61,6 +62,8 @@ import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.*;
+import com.atzuche.order.ownercost.service.*;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderFineDeatailEntity;
@@ -111,6 +114,17 @@ import com.autoyol.platformcost.model.FeeResult;
 import com.dianping.cat.Cat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 //
 ///**
 // * 订单结算
@@ -149,8 +163,8 @@ public class OrderSettleNoTService {
     private RenterMemberService renterMemberService;
     @Autowired
     private OrderSettleHandleService orderSettleHandleService;
-    
-    
+
+
     // 租车费用
     private static final String RENT_COST_PAY_KIND = "11";
     // 车辆押金
@@ -175,10 +189,10 @@ public class OrderSettleNoTService {
 //        if(Objects.isNull(ownerOrder) || Objects.isNull(ownerOrder.getOwnerOrderNo())){
 //            throw new OrderSettleFlatAccountException();
 //        }
-        
+
         //是否企业级用户订单
         settleOrders.setIsEnterpriseUserOrder(renterMemberService.isEnterpriseUserOrder(renterOrder.getRenterOrderNo()));
-        
+
         // 3 初始化数据
 
         // 3.1获取租客子订单 和 租客会员号
@@ -767,7 +781,7 @@ public class OrderSettleNoTService {
         
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
-        
+
         //公共
         int yingkouAmt1 = accountRenterCostSettle.getShifuAmt() - settleOrdersAccount.getRentCostSurplusAmt();  //需要根据实际的实收来计算。
         int totalOldRealDebtAmt = 0;
@@ -778,7 +792,7 @@ public class OrderSettleNoTService {
             totalOldRealDebtAmt = resVO.getOldTotalRealDebtAmt();
             orderStatusDTO.setSettleStatus(resVO.getSettleStatus().getCode());
             orderStatusDTO.setCarDepositSettleStatus(resVO.getSettleStatus().getCode());
-            
+
             //
             SettleOrderRenterDepositReqVO reqVO = new SettleOrderRenterDepositReqVO();
             reqVO.setOrderNo(settleOrders.getOrderNo());
@@ -788,9 +802,9 @@ public class OrderSettleNoTService {
             reqVO.setShouldTakeAmt(settleOrdersDefinition.getRenterCostAmtFinal());  //总计消费，应收=应扣
             reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
             yingkouAmt2 = orderSettleHandleService.accountRentetDepositHandle(reqVO);
-            
+
 //            yingkouAmt2 = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
-            
+
         } else {
 	        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
 	        orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
@@ -798,7 +812,7 @@ public class OrderSettleNoTService {
 	        totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
         }
         settleOrders.setRenterTotalOldRealDebtAmt(totalOldRealDebtAmt);
-        
+
         //11 租客费用 退还
         orderSettleNewService.refundRentCost(settleOrdersAccount,settleOrdersDefinition.getAccountRenterCostSettleDetails(),orderStatusDTO,settleOrders);
         //12 租客押金 退还
@@ -820,7 +834,7 @@ public class OrderSettleNoTService {
         
         //更新应扣account_renter_cost_settle yingkou_amt   200407
 //        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();  // rentCostPayAmt在抵扣欠款的过程中发生了变更。
-        
+
         //非企业用户
         if(Objects.nonNull(settleOrders.getIsEnterpriseUserOrder()) && settleOrders.getIsEnterpriseUserOrder() == false) {
 	        yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
@@ -1089,14 +1103,14 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
@@ -1114,13 +1128,13 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
@@ -1131,14 +1145,14 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
         }
@@ -1155,7 +1169,7 @@ public class OrderSettleNoTService {
                 entity.setAmt(obj.getFineAmount());
                 //settleCancelOrdersAccount.addOwnerCostSettleDetail(entity);
                 settleCancelOrdersAccount.getAccountOwnerCostSettleDetails().add(entity);
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
@@ -1170,7 +1184,7 @@ public class OrderSettleNoTService {
                 entity.setAmt(obj.getFineAmount());
                 //settleCancelOrdersAccount.addOwnerCostSettleDetail(entity);
                 settleCancelOrdersAccount.getAccountOwnerCostSettleDetails().add(entity);
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
@@ -1190,14 +1204,14 @@ public class OrderSettleNoTService {
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             //过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys().stream().filter(obj ->{
-                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             //过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream().filter(obj ->{
-                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }
@@ -1354,7 +1368,7 @@ public class OrderSettleNoTService {
             accountRenterCostDetail.setAmt(-settleCancelOrdersAccount.getRentSurplusWalletAmt());
             accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getCode());
             accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getText());
-            
+
             cashierService.refundRentCostWallet(accountRenterCostDetail);
         }
         //3 租车费用 退还

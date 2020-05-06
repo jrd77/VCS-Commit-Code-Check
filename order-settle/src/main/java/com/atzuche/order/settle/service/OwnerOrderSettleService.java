@@ -7,7 +7,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.PlatformProfitStatusEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
@@ -137,14 +137,14 @@ public class OwnerOrderSettleService {
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getOwnerOrderFineDeatails())){
             int amt = ownerCosts.getOwnerOrderFineDeatails().stream().filter(obj ->{
                 //过滤的时候-->只过滤出租客并且是取消订单的违约金
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
         if(Objects.nonNull(ownerCosts) && !CollectionUtils.isEmpty(ownerCosts.getConsoleOwnerOrderFineDeatailEntitys())){
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys()
                     .stream()
-                    .filter(obj -> SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj -> SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineAmt = ownerFineAmt +amt;
         }
@@ -161,7 +161,7 @@ public class OwnerOrderSettleService {
                 entity.setSourceDetail(obj.getFineTypeDesc());
                 entity.setAmt(obj.getFineAmount());
                 settleCancelOrdersAccount.getAccountOwnerCostSettleDetails().add(entity);
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
@@ -174,7 +174,7 @@ public class OwnerOrderSettleService {
                 entity.setSourceDetail(obj.getFineTypeDesc());
                 entity.setAmt(obj.getFineAmount());
                 settleCancelOrdersAccount.getAccountOwnerCostSettleDetails().add(entity);
-                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
+                return SubsidySourceCodeEnum.OWNER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType());
             }).mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             ownerFineIncomeAmt = ownerFineIncomeAmt +amt;
         }
@@ -195,7 +195,7 @@ public class OwnerOrderSettleService {
             //过滤的时候-->只过滤出租客并且是取消订单的违约金并且目标方式平台
             int amt = ownerCosts.getConsoleOwnerOrderFineDeatailEntitys()
                     .stream()
-                    .filter(obj -> SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj -> SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }

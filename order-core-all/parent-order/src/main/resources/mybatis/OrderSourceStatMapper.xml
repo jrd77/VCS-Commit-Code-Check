@@ -29,6 +29,7 @@
         <result property="operator" column="operator"/>
         <result property="useAutoCoin" column="use_auto_coin"/>
         <result property="specialConsole" column="special_console"/>
+        <result property="longRentCouponCode" column="long_rent_coupon_code"/>
         <result property="reqOs" column="req_os"/>
         <result property="reqSource" column="req_source"/>
         <result property="reqVersion" column="req_version"/>
@@ -68,7 +69,7 @@
         `utm_source`, `utm_medium`,`utm_campaign`, `utm_term`,
         `other_type`, `entry_code`,`category`,
         `business_parent_type`,`business_child_type`,`platform_parent_type`, `platform_child_type`,
-        `source`, `operator`,`use_auto_coin`,`special_console`,
+        `source`, `operator`,`use_auto_coin`,`special_console`,`long_rent_coupon_code`,
         `req_os`,`req_source`,`req_version`, `request_id`,`schema`,
         `module_name`,`function_name`,`sub_source`,
         `src_port`,`src_ip`,`OAID`,`rent_reason`,
@@ -112,6 +113,7 @@
             `operator`,
             `use_auto_coin`,
             `special_console`,
+            `long_rent_coupon_code`,
             `req_os`,
             `req_source`,
             `req_version`,
@@ -160,6 +162,7 @@
             #{operator},
             #{useAutoCoin},
             #{specialConsole},
+            #{longRentCouponCode},
             #{reqOs},
             #{reqSource},
             #{reqVersion},
@@ -213,6 +216,7 @@
             <if test="operator != null">`operator`, </if>
             <if test="useAutoCoin != null">`use_auto_coin`, </if>
             <if test="specialConsole != null">`special_console`, </if>
+            <if test="longRentCouponCode != null">`long_rent_coupon_code`, </if>
             <if test="reqOs != null">`req_os`, </if>
             <if test="reqSource != null">`req_source`, </if>
             <if test="reqVersion != null">`req_version`, </if>
@@ -262,6 +266,7 @@
             <if test="operator != null">#{operator},  </if>
             <if test="useAutoCoin != null">#{useAutoCoin},  </if>
             <if test="specialConsole != null">#{specialConsole},  </if>
+            <if test="longRentCouponCode != null">#{longRentCouponCode},  </if>
             <if test="reqOs != null">#{reqOs},  </if>
             <if test="reqSource != null">#{reqSource},  </if>
             <if test="reqVersion != null">#{reqVersion},  </if>
@@ -316,6 +321,7 @@
 				<if test="operator != null">`operator` = #{operator}, </if>
 				<if test="useAutoCoin != null">`use_auto_coin` = #{useAutoCoin}, </if>
 				<if test="specialConsole != null">`special_console` = #{specialConsole}, </if>
+                <if test="longRentCouponCode != null">`long_rent_coupon_code` = #{longRentCouponCode}, </if>
 				<if test="reqOs != null">`req_os` = #{reqOs}, </if>
 				<if test="reqSource != null">`req_source` = #{reqSource}, </if>
 				<if test="reqVersion != null">`req_version` = #{reqVersion}, </if>
@@ -369,8 +375,9 @@
 				`source` = #{source}, 		
 				`operator` = #{operator}, 		
 				`use_auto_coin` = #{useAutoCoin}, 		
-				`special_console` = #{specialConsole}, 		
-				`req_os` = #{reqOs}, 		
+				`special_console` = #{specialConsole},
+                `long_rent_coupon_code` = #{longRentCouponCode},
+                `req_os` = #{reqOs},
 				`req_source` = #{reqSource}, 		
 				`req_version` = #{reqVersion}, 		
 				`request_id` = #{requestId}, 		

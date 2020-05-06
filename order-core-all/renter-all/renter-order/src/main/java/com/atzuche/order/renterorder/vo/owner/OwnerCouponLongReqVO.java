@@ -1,5 +1,9 @@
 package com.atzuche.order.renterorder.vo.owner;
 
+import java.util.List;
+
+import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
+
 import lombok.Data;
 
 /**
@@ -32,11 +36,6 @@ public class OwnerCouponLongReqVO {
     private String carNo;
 
     /**
-     * 原始租金
-     */
-    private Integer rentOriginalAmt;
-
-    /**
      * 订单租期开始时间
      */
     private String rentTime;
@@ -50,4 +49,9 @@ public class OwnerCouponLongReqVO {
      * 车主券编码
      */
     private String couponCode;
+    
+    /**
+     * 原始日均价
+     */
+    private List<HolidayAverageDateTimeVO> ownerUnitPriceVOS;
 }

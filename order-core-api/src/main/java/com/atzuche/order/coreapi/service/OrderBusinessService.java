@@ -1,24 +1,36 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
+import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderNoticeEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +53,12 @@ public class OrderBusinessService {
     private RenterMemberService renterMemberService;
     @Autowired
     private OrderSettleService orderSettleService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+    @Autowired
+    private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+    private RenterDepositDetailService renterDepositDetailService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -139,4 +157,40 @@ public class OrderBusinessService {
         return returnCarIncomeResultDTO;
     }
 
+    public OwnerPreAndSettleIncomRespDTO queryOwnerPreAndSettleIncom(String orderNo) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity == null){
+            log.error("订单状态查询失败orderNo={}",orderNo);
+            throw new OrderStatusNotFoundException();
+        }
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        if(ownerOrderEntity == null){
+            log.error("找不到有效的车主子订单 orderNo={}",orderNo);
+            throw new OrderNotFoundException(orderNo);
+        }
+        OwnerPreAndSettleIncomRespDTO ownerPreAndSettleIncomRespDTO = new OwnerPreAndSettleIncomRespDTO();
+        int ownerIncomAmt = 0;
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+            List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineStatus.PASS_EXAMINE);
+            ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
+            ownerPreAndSettleIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        }else{
+            OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
+            ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
+            ownerPreAndSettleIncomRespDTO.setSettleStatus(orderStatusEntity.getSettleStatus());
+        }
+        ownerPreAndSettleIncomRespDTO.setOwnerIncomAmt(ownerIncomAmt);
+        return ownerPreAndSettleIncomRespDTO;
+    }
+
+    public RenterDepositDetailDTO queryrenterDepositDetail(String orderNo) {
+        RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(orderNo);
+        RenterDepositDetailDTO renterDepositDetailDTO = null;
+        if(renterDepositDetailEntity != null){
+            renterDepositDetailDTO = new RenterDepositDetailDTO();
+            BeanUtils.copyProperties(renterDepositDetailEntity,renterDepositDetailDTO);
+        }
+        return renterDepositDetailDTO;
+    }
 }

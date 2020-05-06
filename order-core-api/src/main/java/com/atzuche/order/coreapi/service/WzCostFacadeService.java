@@ -4,14 +4,13 @@ import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEnti
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.res.RenterWzCostVO;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
-import com.atzuche.order.renterwz.enums.WzCostEnums;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailUtils;
-import com.autoyol.doc.annotation.AutoDocProperty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

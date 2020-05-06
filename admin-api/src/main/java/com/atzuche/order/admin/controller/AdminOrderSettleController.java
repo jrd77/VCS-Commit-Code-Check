@@ -20,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminOrderSettleController {
 
 	@Autowired
-	private OrderSettleService orderSettleService;
-	@Autowired
 	private OrderWzSettleService orderWzSettleService;
 
     @Autowired
@@ -41,11 +39,14 @@ public class AdminOrderSettleController {
         return result;
     }
 
-    /**
+/*
+    */
+/**
      * 手动车辆结算接口
      * @param orderNo
      * @return
-     */
+     *//*
+
     @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
     @GetMapping("/settleOrderCancel")
     public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
@@ -54,6 +55,7 @@ public class AdminOrderSettleController {
         log.info("CashierController settleOrderCancel end param [{}],result [{}]");
         return ResponseData.success();
     }
+*/
 
     /**
      * 手动车辆结算接口

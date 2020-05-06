@@ -17,7 +17,6 @@ import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
 import com.atzuche.order.open.service.FeignOrderDetailService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
@@ -43,8 +42,7 @@ public class CarDepositReturnDetailService {
     private FeignOrderDetailService feignOrderDetailService;
     @Autowired
     private OrderSettleService orderSettleService;
-    @Autowired
-    private RenterOrderService renterOrderService;
+
 
     public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(CarDepositReqVO reqVo) {
         String orderNo = reqVo.getOrderNo();

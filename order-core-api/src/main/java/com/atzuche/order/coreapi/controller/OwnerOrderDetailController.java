@@ -4,6 +4,9 @@ import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeat
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.coreapi.service.OwnerOrderDetailService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import java.util.List;
 public class OwnerOrderDetailController {
     @Autowired
     private OwnerOrderDetailService ownerOrderDetailService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
 
     /**
      * @Author ZhangBin
@@ -120,7 +125,7 @@ public class OwnerOrderDetailController {
      *
      **/
     @GetMapping("/owner/platformToOwnerSubsidy")
-    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo,@RequestParam("memNo") String memNo){
+    public ResponseData<PlatformToOwnerSubsidyDTO> platformToOwnerSubsidy(@RequestParam("orderNo") String orderNo, @RequestParam("ownerOrderNo") String ownerOrderNo){
         if(orderNo == null || orderNo.trim().length()<=0){
             throw new InputErrorException("主订单号不能为空");
         }
@@ -128,7 +133,15 @@ public class OwnerOrderDetailController {
         if(ownerOrderNo == null || ownerOrderNo.trim().length()<=0){
             throw new InputErrorException("车主订单号不能为空");
         }
-        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,memNo);
+        OwnerOrderEntity orderEntityOwner = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        if(orderEntityOwner == null){
+            log.error("获取订单数据(车主)为空ownerOrderNo={}",ownerOrderNo);
+            ResponseData responseData = new ResponseData();
+            responseData.setResCode(ErrorCode.ORDER_NOT_EXIST.getCode());
+            responseData.setResMsg("车主子订单号不存在");
+            return responseData;
+        }
+        PlatformToOwnerSubsidyDTO platformToOwnerSubsidyDTO = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo,orderEntityOwner.getMemNo());
         return ResponseData.success(platformToOwnerSubsidyDTO);
     }
 

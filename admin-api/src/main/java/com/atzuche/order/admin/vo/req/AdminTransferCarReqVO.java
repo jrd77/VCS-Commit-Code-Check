@@ -18,9 +18,11 @@ public class AdminTransferCarReqVO implements Serializable {
     @AutoDocProperty(value="订单编号,必填，",required=true)
     private String orderNo;
 
-    @NotBlank(message="车辆注册号carNo不能为空")
-    @AutoDocProperty(value="车辆注册号",required=true)
+    @AutoDocProperty(value="车辆注册号")
     private String carNo;
+    
+    @AutoDocProperty(value="车牌号",required=true)
+    private String plateNum;
 
     @AutoDocProperty(value="是否使用特供价 1-使用，0-不使用")
     private Integer useSpecialPriceFlag;

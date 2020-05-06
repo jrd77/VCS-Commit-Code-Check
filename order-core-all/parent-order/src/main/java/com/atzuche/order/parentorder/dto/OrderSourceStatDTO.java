@@ -116,6 +116,10 @@ public class OrderSourceStatDTO {
      */
     private Integer specialConsole;
     /**
+     * 长租券码
+     */
+    private String longRentCouponCode;
+    /**
      * 请求系统
      */
     private String reqOs;

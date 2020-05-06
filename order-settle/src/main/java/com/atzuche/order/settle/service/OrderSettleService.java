@@ -199,7 +199,7 @@ public class OrderSettleService{
         } else {  
         	//应扣大于实收,应扣小于等于实收
         	//处理预授权的情况。200420
-        	if(accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
+        	if(accountRenterDepositResVO.getIsAuthorize()!=null && accountRenterDepositResVO.getIsAuthorize().intValue() != 0) {
         		depositYingkouOri = depositShishouOri;
         	}
         }
@@ -682,7 +682,7 @@ public class OrderSettleService{
      **/
     @Transactional(rollbackFor=Exception.class)
     public void orderCancelSettleCombination(CancelOrderReqDTO cancelOrderReqDTO){
-        log.info("订单取消结算cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
+        log.info("订单取消结算-START-cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
         String orderNo = cancelOrderReqDTO.getOrderNo();
         String ownerOrderNo = cancelOrderReqDTO.getOwnerOrderNo();
         String renterOrderNo = cancelOrderReqDTO.getRenterOrderNo();
@@ -700,7 +700,7 @@ public class OrderSettleService{
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
             OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode() == (orderStatusEntity.getSettleStatus())){
                 log.info("订单已经结算过orderNo={}",orderNo);
                 return;
             }
@@ -709,6 +709,7 @@ public class OrderSettleService{
         }else{
             ownerOrderSettleService.settleOwnerOrderCancel(orderNo,ownerOrderNo);
         }
+        log.info("订单取消结算-END-cancelOrderReqDTO={}", JSON.toJSONString(cancelOrderReqDTO));
     }
 
 }

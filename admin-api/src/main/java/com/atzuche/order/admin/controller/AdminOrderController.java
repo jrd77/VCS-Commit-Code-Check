@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
@@ -21,6 +22,7 @@ import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -51,6 +53,9 @@ public class AdminOrderController {
     private AdminOrderService adminOrderService;
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
+
+    @Autowired
+    private CarService carService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -202,11 +207,15 @@ public class AdminOrderController {
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
     public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-
+        if (StringUtils.isBlank(reqVO.getCarNo()) && StringUtils.isBlank(reqVO.getPlateNum())) {
+        	return ResponseData.createErrorCodeResponse("408508", "车辆号和车牌号二者必选其一");
+        }
+        // 根据车牌号获取车辆注册号
+        String carNo = StringUtils.isBlank(reqVO.getCarNo()) ? carService.getCarNoByPlateNum(reqVO.getPlateNum()):reqVO.getCarNo();
         TransferReq req = new TransferReq();
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         BeanUtils.copyProperties(reqVO,req);
-
+        req.setCarNo(carNo);
         adminOrderService.transferCar(req);
         return ResponseData.success();
 

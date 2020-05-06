@@ -9,7 +9,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReq
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
@@ -172,14 +172,14 @@ public class RenterOrderSettleService {
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails()
                     .stream()
-                    .filter(obj -> SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj -> SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails()
                     .stream()
-                    .filter(obj ->SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj ->SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidySourceCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineAmt = rentFineAmt +amt;
         }
@@ -197,14 +197,14 @@ public class RenterOrderSettleService {
         int rentFineIncomeAmt = 0;
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getRenterOrderFineDeatails().stream()
-                    .filter(obj ->SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj ->SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(RenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
         }
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getConsoleRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails()
                     .stream()
-                    .filter(obj -> SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj -> SubsidySourceCodeEnum.RENTER.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             rentFineIncomeAmt = rentFineIncomeAmt +amt;
         }
@@ -224,7 +224,7 @@ public class RenterOrderSettleService {
         int platformFineImconeAmt=0;
         if(Objects.nonNull(rentCosts) && !CollectionUtils.isEmpty(rentCosts.getRenterOrderFineDeatails())){
             int amt = rentCosts.getConsoleRenterOrderFineDeatails().stream()
-                    .filter(obj -> SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
+                    .filter(obj -> SubsidySourceCodeEnum.PLATFORM.getCode().equals(obj.getFineSubsidyCode()) && FineTypeCashCodeEnum.CANCEL_FINE.getFineType().equals(obj.getFineType()))
                     .mapToInt(ConsoleRenterOrderFineDeatailEntity::getFineAmount).sum();
             platformFineImconeAmt = platformFineImconeAmt +amt;
         }

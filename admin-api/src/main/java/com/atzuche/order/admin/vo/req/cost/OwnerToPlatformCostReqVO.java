@@ -40,4 +40,6 @@ public class OwnerToPlatformCostReqVO {
     private String stopCar;
     @AutoDocProperty("超里程费用")
     private String extraMileage;
+    // 操作人
+    private String operatorName;
 }

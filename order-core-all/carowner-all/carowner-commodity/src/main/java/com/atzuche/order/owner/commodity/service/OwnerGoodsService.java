@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -35,19 +36,38 @@ public class OwnerGoodsService{
 
     /**
      * 保存车主端的商品信息
-     * @param ownerGoodsDetailDTO
+     *
+     * @param orderNo 订单号
+     * @param ownerOrderNo 车主订单号
+     * @param ownerGoodsDetailDTO 车主商品信息(包含订单号)
      */
-    public void save(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+    public void save(String orderNo, String ownerOrderNo, OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
+        logger.info("Save owner goods detail.param is,orderNo:[{}],ownerOrderNo:[{}],ownerGoodsDetailDTO:[{}]",
+                orderNo, ownerOrderNo, JSON.toJSONString(ownerGoodsDetailDTO));
+        if (Objects.isNull(ownerGoodsDetailDTO)) {
+            return;
+        }
+        ownerGoodsDetailDTO.setOrderNo(orderNo);
+        ownerGoodsDetailDTO.setOwnerOrderNo(ownerOrderNo);
+        save(ownerGoodsDetailDTO);
+    }
+
+    /**
+     * 保存车主端的商品信息
+     *
+     * @param ownerGoodsDetailDTO 车主商品信息(包含订单号)
+     */
+    public void save(OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
         logger.info("Save owner goods detail.param is,ownerGoodsDetailDTO:[{}]", JSON.toJSONString(ownerGoodsDetailDTO));
 
         OwnerGoodsEntity goodsEntity = new OwnerGoodsEntity();
-        BeanUtils.copyProperties(ownerGoodsDetailDTO,goodsEntity);
+        BeanUtils.copyProperties(ownerGoodsDetailDTO, goodsEntity);
         goodsEntity.setChoiceCar(ownerGoodsDetailDTO.isChoiceCar() ? 1 : 0);
         ownerGoodsMapper.insert(goodsEntity);
 
         List<OwnerGoodsPriceDetailDTO> goodsPriceDetailDtoList = ownerGoodsDetailDTO.getOwnerGoodsPriceDetailDTOList();
         List<OwnerGoodsPriceDetailEntity> goodsPriceList = new ArrayList<>();
-        goodsPriceDetailDtoList.forEach(x->{
+        goodsPriceDetailDtoList.forEach(x -> {
             OwnerGoodsPriceDetailEntity goodsPriceDetailEntity = new OwnerGoodsPriceDetailEntity();
             goodsPriceDetailEntity.setOrderNo(ownerGoodsDetailDTO.getOrderNo());
             goodsPriceDetailEntity.setOwnerOrderNo(ownerGoodsDetailDTO.getOwnerOrderNo());
@@ -65,7 +85,7 @@ public class OwnerGoodsService{
      *
      * @param ownerOrderNo 车主订单号
      * @param isNeedPrice 是否需要价格信息 true-需要  false-不需要
-     * @return
+     * @return OwnerGoodsDetailDTO
      */
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(String ownerOrderNo, boolean isNeedPrice){
         OwnerGoodsEntity ownerGoodsEntity = ownerGoodsMapper.selectByOwnerOrderNo(ownerOrderNo);
@@ -89,7 +109,7 @@ public class OwnerGoodsService{
     
     /**
      * 获取最新的车主商品信息
-     * @param orderNo
+     * @param orderNo 订单号
      * @return OwnerGoodsEntity
      */
     public OwnerGoodsEntity getLastOwnerGoodsByOrderNo(String orderNo) {

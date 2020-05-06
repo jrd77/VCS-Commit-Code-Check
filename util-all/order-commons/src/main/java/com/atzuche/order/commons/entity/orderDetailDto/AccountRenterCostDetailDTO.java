@@ -55,5 +55,12 @@ public class AccountRenterCostDetailDTO {
      * 入账时间
      */
     private LocalDateTime time;
-
+    /**
+     *
+     */
+    private LocalDateTime updateTime;
+    /**
+     *
+     */
+    private LocalDateTime createTime;
 }
