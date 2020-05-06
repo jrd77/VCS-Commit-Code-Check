@@ -24,7 +24,8 @@ public class SettleCancelController {
     private CashierPayService cashierPayService;
     @Autowired
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
-
+    //环境变量，1正式，2测试
+    @Value("${sysEnv:2}") String sysEnv;
     /**
      * 手动退款-（自己用）
      * @param orderNo
@@ -34,11 +35,18 @@ public class SettleCancelController {
     @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
     @GetMapping("/settleCancel/cashierRefundApply")
     public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo, @RequestParam("payKind") String payKind) {
-        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
-        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
-        cashierPayService.refundOrderPay(cashierRefundApply);
-        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
-        return ResponseData.success();
+        //测试环境执行
+        if(Env.test.getCode().equals(sysEnv)) {
+            log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
+            CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
+            cashierPayService.refundOrderPay(cashierRefundApply);
+            log.info("CashierController cashierRefundApply end param [{}],result [{}]");
+            return ResponseData.success();
+        }else {
+            //访问受限
+            log.info("pro sysEnv="+sysEnv);
+            return ResponseData.createErrorCodeResponse(com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getCode(),com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getText());
+        }
     }
     /*
      * @Author ZhangBin
