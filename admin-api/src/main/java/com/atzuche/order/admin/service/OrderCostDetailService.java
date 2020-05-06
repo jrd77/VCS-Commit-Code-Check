@@ -17,6 +17,7 @@ import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.RightTypeEnum;
@@ -34,10 +35,6 @@ import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.service.ConsoleOwnerOrderFineDeatailService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
-import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
-import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
-import com.atzuche.order.renterorder.service.RenterDepositDetailService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -67,21 +64,17 @@ import java.util.Optional;
 @Service
 public class OrderCostDetailService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	@Autowired
-	private RenterDepositDetailService renterDepositDetailService;
+
     @Autowired
     private MemProxyService memberService;
-    @Autowired
-    RenterAdditionalDriverService renterAdditionalDriverService;
+
     @Autowired
     OrderSettleService orderSettleService;
     @Autowired
     OwnerOrderService ownerOrderService;
     @Autowired
     OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
-    @Autowired
-    RenterOrderService renterOrderService;
+
     @Autowired
     ConsoleOwnerOrderFineDeatailService consoleOwnerOrderFineDeatailService;
     @Autowired
@@ -117,16 +110,17 @@ public class OrderCostDetailService {
 	    String reductionAmt="";
 		
 		//押金比例
-        RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(renterCostReqVO.getOrderNo());
-        if(renterDepositDetailEntity != null) {
-        	reductionBeforeRentDepost = renterDepositDetailEntity.getOriginalDepositAmt()!=null?String.valueOf(renterDepositDetailEntity.getOriginalDepositAmt()):"";
-        	reductionAmt = renterDepositDetailEntity.getReductionDepositAmt()!=null?String.valueOf(renterDepositDetailEntity.getReductionDepositAmt()):"";
+        //RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(renterCostReqVO.getOrderNo());
+        RenterDepositDetailDTO renterDepositDetailDTO = remoteFeignService.queryrenterDepositDetail(renterCostReqVO.getOrderNo());
+        if(renterDepositDetailDTO != null) {
+        	reductionBeforeRentDepost = renterDepositDetailDTO.getOriginalDepositAmt()!=null?String.valueOf(renterDepositDetailDTO.getOriginalDepositAmt()):"";
+        	reductionAmt = renterDepositDetailDTO.getReductionDepositAmt()!=null?String.valueOf(renterDepositDetailDTO.getReductionDepositAmt()):"";
         	reductionAfterRentDepost = "";
-        	if(renterDepositDetailEntity.getOriginalDepositAmt()!=null && renterDepositDetailEntity.getReductionDepositAmt()!=null) {
-        		reductionAfterRentDepost = String.valueOf(renterDepositDetailEntity.getOriginalDepositAmt().intValue() - renterDepositDetailEntity.getReductionDepositAmt().intValue());
+        	if(renterDepositDetailDTO.getOriginalDepositAmt()!=null && renterDepositDetailDTO.getReductionDepositAmt()!=null) {
+        		reductionAfterRentDepost = String.valueOf(renterDepositDetailDTO.getOriginalDepositAmt().intValue() - renterDepositDetailDTO.getReductionDepositAmt().intValue());
         	}
-        	yearCoefficient = String.valueOf(renterDepositDetailEntity.getNewCarCoefficient());
-        	brandCoefficient = String.valueOf(renterDepositDetailEntity.getCarSpecialCoefficient());
+        	yearCoefficient = String.valueOf(renterDepositDetailDTO.getNewCarCoefficient());
+        	brandCoefficient = String.valueOf(renterDepositDetailDTO.getCarSpecialCoefficient());
         	
         }
 
@@ -207,8 +201,9 @@ public class OrderCostDetailService {
       costBaseDTO.setEndTime(orderDTO.getExpRevertTime());
       extraDriverDTO.setCostBaseDTO(costBaseDTO);
       
-      List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-      
+      //List<String> lstDriverId = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+
+      List<String> lstDriverId = remoteFeignService.queryAdditionalDriverFromRemot(renterCostReqVO.getRenterOrderNo());
       AdditionalDriverInsuranceVO resVo = new AdditionalDriverInsuranceVO();
       List<String> driverIds = new ArrayList<String>();
 	  driverIds.add("1");// 计算一个人的价格

@@ -20,6 +20,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -158,6 +159,15 @@ public class OrderCostService {
 		String orderNo = req.getOrderNo();
 		String memNo = req.getMemNo();
 		String renterOrderNo = req.getSubOrderNo();
+
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
+        RenterOrderDTO renterOrderDTO = null;
+        if(renterOrderEntity != null){
+            renterOrderDTO = new RenterOrderDTO();
+            BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
+            resVo.setRenterOrderDTO(renterOrderDTO);
+        }
+
 		//-------------------------------------------------------------------- 以下是主订单费用
 		//根据订单号查询封装
 		//需补付金额

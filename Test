@@ -1,24 +1,26 @@
-/**
-     * 对象转换
-     * @param OfflineRefundApplyEntity
-     * @return
-     */
-    private PaymentResponseVO convertAccountRenterCostDetail(AccountRenterCostDetailDTO accountRenterCostDetailDTO) {
-        PaymentResponseVO vo = new PaymentResponseVO();
-        if(accountRenterCostDetailDTO == null){
-            return null;
+ /*
+     * @Author ZhangBin
+     * @Date 2020/4/30 14:58
+     * @Description: 获取押金比例
+     *
+     **/
+    public PaymentRespVO queryPaymentFromRemote(PaymentReqVO paymentReqVO){
+        ResponseData<PaymentRespVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "押金比例");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryByOrderNo");
+            log.info("Feign 开始押金比例paymentReqVO={}", JSON.toJSONString(paymentReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(paymentReqVO));
+            responseObject = feignPaymentService.queryByOrderNo(paymentReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 押金比例异常,responseObject={},paymentReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(paymentReqVO),e);
+            Cat.logError("Feign 押金比例异常",e);
+            throw e;
+        }finally {
+            t.complete();
         }
-        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getCreateTime()));
-        vo.setItem("租车费用");
-        vo.setPaymentType(convertType(accountRenterCostDetailDTO.getPayType()));
-        vo.setAmount(String.valueOf(accountRenterCostDetailDTO.getAmt()));
-        vo.setSerialNumber("");
-        vo.setOrderType(convertOperate(accountRenterCostDetailDTO.getPayType()));
-        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getCreateTime()));
-        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailDTO.getUpdateTime()));
-        vo.setStauts("已退款");
-        vo.setPaymentId("---");
-        vo.setPaymentSource(convertSource(accountRenterCostDetailDTO.getPaySource()));
-        vo.setResponseCode("---");
-        return vo;
     }

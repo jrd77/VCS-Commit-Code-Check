@@ -4,6 +4,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.ReturnCarIncomeResultDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.autoyol.commons.web.ResponseData;
@@ -46,4 +47,7 @@ public interface FeignBusinessService {
 
     @GetMapping("/orderBusiness/queryOwnerIncome")
     public ResponseData<ReturnCarIncomeResultDTO> queryOwnerIncome(String orderNo);
+
+    @GetMapping("/orderBusiness/queryrenterDepositDetail")
+    public ResponseData<RenterDepositDetailDTO> queryrenterDepositDetail(@RequestParam(name = "orderNo",required = true) String orderNo);
 }

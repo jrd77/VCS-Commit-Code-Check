@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.PaymentReqVO;
 import com.atzuche.order.commons.vo.res.PaymentRespVO;
@@ -18,6 +19,8 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -32,6 +35,8 @@ public class RemoteFeignService {
     private FeignAdditionDriverService feignAdditionDriverService;
     @Autowired
     private FeignPaymentService feignPaymentService;
+    @Autowired
+    private FeignBusinessService feignBusinessService;
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 10:38
@@ -249,6 +254,33 @@ public class RemoteFeignService {
 
     /*
      * @Author ZhangBin
+     * @Date 2020/4/30 11:02
+     * @Description: 查询附加驾驶人
+     *
+     **/
+    public List<String> queryAdditionalDriverFromRemot(String renterOrderNo){
+        ResponseData<List<String>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "查询附加驾驶人");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignAdditionDriverService.queryAdditionalDriver");
+            log.info("Feign renterOrderNo={}", renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignAdditionDriverService.queryAdditionalDriver(renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 查询附加驾驶人异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 查询附加驾驶人异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    /*
+     * @Author ZhangBin
      * @Date 2020/4/30 14:58
      * @Description: 获取支付信息
      *
@@ -268,6 +300,33 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 支付信息异常,responseObject={},paymentReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(paymentReqVO),e);
             Cat.logError("Feign 支付信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/30 14:58
+     * @Description: 获取押金比例
+     *
+     **/
+    public RenterDepositDetailDTO queryrenterDepositDetail(String orderNo){
+        ResponseData<RenterDepositDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "押金比例");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryrenterDepositDetail");
+            log.info("Feign 开始押金比例orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignBusinessService.queryrenterDepositDetail(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 押金比例异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 押金比例异常",e);
             throw e;
         }finally {
             t.complete();

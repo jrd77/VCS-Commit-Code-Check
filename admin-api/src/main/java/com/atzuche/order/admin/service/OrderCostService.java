@@ -11,6 +11,7 @@ import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
@@ -27,10 +28,6 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
-import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.OwnerCouponLongService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
@@ -61,15 +58,11 @@ public class OrderCostService {
 	@Autowired
 	OwnerOrderService ownerOrderService;
 	@Autowired
-	RenterOrderService renterOrderService;
-	@Autowired
     private WalletProxyService walletProxyService;
 	@Autowired
 	private AutoCoinProxyService autoCoinProxyService;
 	@Autowired
 	private OrderSettleService orderSettleService;
-	@Autowired
-	private OwnerCouponLongService ownerCouponLongService;
 	@Autowired
 	private RemoteFeignService remoteFeignService;
 	/**
@@ -109,7 +102,8 @@ public class OrderCostService {
 			if(data != null) {
 				int renterCostAmtFinal = data.getRenterCostAmtFinal();
 				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
-				if(costVo != null) {
+                RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
+                if(costVo != null) {
 					 logger.info("costVo toString=[{}]",costVo.toString());
 				}
 				
@@ -118,9 +112,9 @@ public class OrderCostService {
                 //平台保障费、全面保障服务费 （长租不需要这两个费用）
                 putInsureAbatementAmt(realVo,data);
 				//租客订单对象
-				RenterOrderEntity entity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+
 				//优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
-				putRenterOrderDeduct(realVo,data,entity,orderDTO.getMemNoRenter());
+				putRenterOrderDeduct(realVo,data,renterOrderDTO,orderDTO.getMemNoRenter());
 				
 				//租车押金和违章押金   车辆押金  违章押金
 				putRenterOrderDeposit(realVo,data,costVo);
@@ -459,7 +453,7 @@ public class OrderCostService {
 		
 	}
 
-	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderEntity entity, String memNo) {
+	private void putRenterOrderDeduct(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data, RenterOrderDTO renterOrderDTO, String memNo) {
 		int walletAmt = data.getWalletCostDetail().getAmt();
 		//租客的补贴
 		//还需要考虑加上管理后台的补贴
@@ -524,9 +518,10 @@ public class OrderCostService {
 		/*
 		 * 获取标题
 		 */
-		OwnerCouponLongEntity longCouponEnt = ownerCouponLongService.getByRenterOrderNo(entity.getRenterOrderNo());
-		if (longCouponEnt != null) {
-			realVo.setLongDiscountDesc(longCouponEnt.getDiscountDesc());
+        OwnerCouponLongDTO ownerCouponLongDTO = data.getOwnerCouponLongDTO();
+        //OwnerCouponLongEntity longCouponEnt = ownerCouponLongService.getByRenterOrderNo(renterOrderDTO.getRenterOrderNo());
+		if (ownerCouponLongDTO != null) {
+			realVo.setLongDiscountDesc(ownerCouponLongDTO.getDiscountDesc());
 		}
 		String platformCouponTitle = "";
 		String ownerCouponTitle = "";
@@ -549,10 +544,10 @@ public class OrderCostService {
 		realVo.setGetReturnCouponTitle(getReturnCouponTitle);
 		
 		//是否使用标识处理
-		if(entity != null) {
-			realVo.setIsUseAotuCoin(String.valueOf(entity.getIsUseCoin()));
+		if(renterOrderDTO != null) {
+			realVo.setIsUseAotuCoin(String.valueOf(renterOrderDTO.getIsUseCoin()));
 			realVo.setIsUseGetReturnCoupon(getReturnCoupon>0?"1":"0");  //0否1是
-			realVo.setIsUseWallet(String.valueOf(entity.getIsUseWallet()));
+			realVo.setIsUseWallet(String.valueOf(renterOrderDTO.getIsUseWallet()));
 		}
 	}
 
@@ -1116,14 +1111,11 @@ public class OrderCostService {
             if(data != null) {
                 int renterCostAmtFinal = data.getRenterCostAmtFinal();
                 RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
-
+                RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
                 //租金费用  费用明细表renter_order_cost_detail
                 putRenterOrderCostDetail(realVo,data);
-
-                //租客订单对象
-                RenterOrderEntity entity = renterOrderService.getRenterOrderByRenterOrderNo(renterCostReqVO.getRenterOrderNo());
                 //优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
-                putRenterOrderDeduct(realVo,data,entity,orderDTO.getMemNoRenter());
+                putRenterOrderDeduct(realVo,data,renterOrderDTO,orderDTO.getMemNoRenter());
                 //长租折扣 TODO
                 longRentDeduct(realVo,data);
 
