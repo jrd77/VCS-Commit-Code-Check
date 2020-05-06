@@ -619,6 +619,11 @@ public class OrderCostDetailService {
 	 * @param renterCostReqVO
 	 */
 	public void updatefineAmtListByOrderNo(com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO) {
+	    //记录日志信息
+
+
+
+
 		//统一设置修改人名称。20200205 huangjing
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         renterCostReqVO.setOperatorName(userName);
