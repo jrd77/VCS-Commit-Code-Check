@@ -1,10 +1,12 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.vo.req.RefuseOrderReqVO;
+import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.CheckCarDispatchResDTO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
@@ -27,8 +29,10 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
+import com.dianping.cat.Cat;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +86,9 @@ public class OwnerRefuseOrderService {
     @Autowired
     OrderActionMqService orderActionMqService;
     @Autowired
-    OrderStatusMqService orderStatusMqService;
+   OrderStatusMqService orderStatusMqService;
+    @Autowired
+    OrderCommonConver orderCommonConver;
 
 
     /**
@@ -138,8 +144,18 @@ public class OwnerRefuseOrderService {
                 String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
                 couponAndCoinHandleService.undoOwnerCoupon(reqVO.getOrderNo(), ownerCouponEntity.getCouponId(), recover);
             }
-            //通知收银台退还凹凸币和钱包
-            orderSettleService.settleOrderCancel(reqVO.getOrderNo());
+            //通知结算计算凹凸币和钱包等
+            CancelOrderReqDTO reqDTO =
+                    orderCommonConver.buildCancelOrderReqDTO(reqVO.getOrderNo(),
+                            renterOrderEntity.getRenterOrderNo(),
+                            ownerOrderEntity.getOwnerOrderNo(), false, true);
+            logger.info("取消订单责任判定后进行结算,reqDTO:[{}]", JSON.toJSONString(reqDTO));
+            try {
+                orderSettleService.orderCancelSettleCombination(reqDTO);
+            } catch (Exception e) {
+                logger.error("取消订单责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
+                Cat.logError("取消订单责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
+            }
         }
 
         //落库
@@ -242,8 +258,19 @@ public class OwnerRefuseOrderService {
             String recover = null == orderStatusEntity.getRentCarPayStatus() || orderStatusEntity.getRentCarPayStatus() == 0 ? "1" : "0";
             couponAndCoinHandleService.undoOwnerCoupon(orderNo, ownerCouponEntity.getCouponId(), recover);
         }
-        //通知收银台退还凹凸币和钱包
-        orderSettleService.settleOrderCancel(orderNo);
+        //通知结算计算凹凸币和钱包等
+        CancelOrderReqDTO reqDTO =
+                orderCommonConver.buildCancelOrderReqDTO(orderNo,
+                        renterOrderEntity.getRenterOrderNo(),
+                        ownerOrderEntity.getOwnerOrderNo(), false, true);
+        logger.info("取消订单责任判定后进行结算,reqDTO:[{}]", JSON.toJSONString(reqDTO));
+        try {
+            orderSettleService.orderCancelSettleCombination(reqDTO);
+        } catch (Exception e) {
+            logger.error("取消订单责任判定后进行结算异常. reqDTO:[{}]", JSON.toJSONString(reqDTO), e);
+            Cat.logError("取消订单责任判定后进行结算异常.reqDTO: " + JSON.toJSONString(reqDTO), e);
+        }
+
         //发送车主拒绝事件
         orderActionMqService.sendOwnerRefundOrderSuccess(orderNo);
         orderStatusMqService.sendOrderStatusByOrderNo(orderNo, orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_END);

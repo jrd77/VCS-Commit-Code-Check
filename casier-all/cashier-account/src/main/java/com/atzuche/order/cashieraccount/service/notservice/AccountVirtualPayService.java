@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/3/10 11:40 上午
@@ -75,5 +77,10 @@ public class AccountVirtualPayService {
         entity.setTotalAmt(0);
         entity.setVersion(1);
         accountVirtualPayMapper.insertSelective(entity);
+    }
+
+
+    public List<AccountVirtualPayDetailEntity> queryVirtualPayByOrderNo(String orderNo){
+        return accountVirtualPayDetailMapper.queryByOrderNo(orderNo);
     }
 }

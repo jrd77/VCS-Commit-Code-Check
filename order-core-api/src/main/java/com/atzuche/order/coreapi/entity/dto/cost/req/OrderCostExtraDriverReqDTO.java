@@ -17,4 +17,12 @@ public class OrderCostExtraDriverReqDTO {
      * 附加驾驶人id列表
      */
     private List<String> driverIds;
+
+
+    public OrderCostExtraDriverReqDTO() {
+    }
+
+    public OrderCostExtraDriverReqDTO(List<String> driverIds) {
+        this.driverIds = driverIds;
+    }
 }

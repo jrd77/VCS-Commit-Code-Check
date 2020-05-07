@@ -24,6 +24,9 @@ public class AutoCoinReductionVO implements Serializable {
     private Integer availableAutoCoinAmt;
 
 
+
+
+
     public String getAutoCoinIsShow() {
         return autoCoinIsShow;
     }

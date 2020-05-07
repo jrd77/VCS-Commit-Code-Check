@@ -202,4 +202,13 @@ public class AccountOwnerIncomeExamineNoTService {
         });
         return accountOwnerIncomeExamineDTOS;
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/22 15:43
+     * @Description: 根据订单号查询
+     *
+     **/
+    public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineByOrderNo(String orderNo){
+        return accountOwnerIncomeExamineMapper.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+    }
 }

@@ -55,6 +55,15 @@ public class RenterSubsidyDetailVO {
     private Integer totalSubsidy;
     @AutoDocProperty(value = "租客给平台的费用")
     private Integer renter2PlatformAmt;
+    @AutoDocProperty(value = "长租折扣金额")
+    private Integer longRentDecutAmt;
+    @AutoDocProperty(value = "长租-取还车费用补贴")
+    private Integer longGetReturnCarCostSubsidy;
+
+    @AutoDocProperty(value = "取车服务费补贴")
+    private Integer srvGetCostAmt=0;
+    @AutoDocProperty(value = "还车服务费补贴")
+    private Integer srvReturnCostAmt=0;
 
     public Integer getTotalSubsidy(){
         int total=0;
@@ -116,7 +125,15 @@ public class RenterSubsidyDetailVO {
         if(trafficSubsidyAmt!=null){
             total=total+trafficSubsidyAmt;
         }
-
+        if(srvGetCostAmt != null){
+            total=total+srvGetCostAmt;
+        }
+        if(srvReturnCostAmt != null){
+            total=total+srvReturnCostAmt;
+        }
+        if(longRentDecutAmt != null){
+            total=total+longRentDecutAmt;
+        }
         return total;
     }
 

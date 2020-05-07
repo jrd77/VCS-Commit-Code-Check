@@ -108,5 +108,9 @@ public class ModifyOrderOwnerDTO {
      * 换车时使用释放老车辆的库存
      */
     private Integer oldCarNo;
+    /**
+     * 长租优惠券码
+     */
+    private String longCouponCode;
     
 }

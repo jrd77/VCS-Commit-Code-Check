@@ -12,6 +12,7 @@ import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleSe
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
@@ -33,11 +34,15 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
+import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
@@ -92,7 +97,12 @@ public class OrderCostService {
 	private OrderConsoleCostDetailService orderConsoleCostDetailService;
 	@Autowired
 	private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
-	
+    @Autowired
+	private OwnerCouponLongService ownerCouponLongService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
+
+
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
 		
@@ -111,6 +121,12 @@ public class OrderCostService {
 			resVo.setNeedIncrementAmt(0);
 		}
 
+        OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+        if(ownerCouponLongEntity != null){
+            OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
+            BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
+            resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
+        }
         //违章押金
         AccountRenterWZDepositResVO wzVo =  accountRenterWzDepositService.getAccountRenterWZDeposit(orderNo, memNo);
         com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO wzVoReal = new com.atzuche.order.commons.vo.res.account.AccountRenterWZDepositResVO();
@@ -422,7 +438,17 @@ public class OrderCostService {
 		          });
 		      }
 			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
-			
+            OwnerOrderEntity ownerOrderByOwnerOrderNo = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+            String renterOrderNo = ownerOrderByOwnerOrderNo.getRenterOrderNo();
+            if(renterOrderNo != null){
+                OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+                if(ownerCouponLongEntity != null){
+                    OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
+                    BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
+                    resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
+                }
+            }
+
 			///车主的结算后收益 200215  结算收益有多条记录的情况。
 //			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
 //			if(examine != null) {
@@ -430,7 +456,7 @@ public class OrderCostService {
 //			}
 			Integer ownerCostAmtSettleAfter = accountOwnerIncomeExamineNoTService.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
 			resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
-		
+            resVo.setGpsDepositTotal(ownerCosts.getGpsDepositDetail()==null?0:ownerCosts.getGpsDepositDetail().getTotalAmount());
 		return resVo;
 	}
 	

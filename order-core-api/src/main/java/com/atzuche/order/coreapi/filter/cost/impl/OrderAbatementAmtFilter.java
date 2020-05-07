@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.AbatementAmtDTO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
+import com.atzuche.order.coreapi.entity.dto.cost.OrderCostDetailContext;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostAbatementAmtReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.req.OrderCostBaseReqDTO;
 import com.atzuche.order.coreapi.entity.dto.cost.res.OrderAbatementAmtResDTO;
@@ -11,6 +12,7 @@ import com.atzuche.order.coreapi.filter.cost.OrderCostFilter;
 import com.atzuche.order.coreapi.submit.exception.OrderCostFilterException;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
+import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算全面保障服务费
@@ -37,14 +40,18 @@ public class OrderAbatementAmtFilter implements OrderCostFilter {
 
         OrderCostBaseReqDTO baseReqDTO = context.getReqContext().getBaseReqDTO();
         OrderCostAbatementAmtReqDTO abatementAmtReqDTO = context.getReqContext().getAbatementAmtReqDTO();
-        log.info("计算订单全面保障服务费.param is,baseReqDTO:[{}],abatementAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
+        log.info("订单费用计算-->全面保障服务.param is,baseReqDTO:[{}],abatementAmtReqDTO:[{}]", JSON.toJSONString(baseReqDTO),
                 JSON.toJSONString(abatementAmtReqDTO));
+
+        if (Objects.isNull(baseReqDTO) || Objects.isNull(abatementAmtReqDTO)) {
+            throw new OrderCostFilterException(ErrorCode.PARAMETER_ERROR.getCode(), "计算全面保障服务参数为空!");
+        }
 
         //基础信息
         CostBaseDTO costBaseDTO = new CostBaseDTO();
         BeanUtils.copyProperties(baseReqDTO, costBaseDTO);
 
-        //全面保障服务费计算相关信息
+        //计算全面保障服务
         AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
         abatementAmtDTO.setCostBaseDTO(costBaseDTO);
         abatementAmtDTO.setCarLabelIds(abatementAmtReqDTO.getCarLabelIds());
@@ -57,15 +64,19 @@ public class OrderAbatementAmtFilter implements OrderCostFilter {
 
         List<RenterOrderCostDetailEntity> list =
                 renterOrderCostCombineService.listAbatementAmtEntity(abatementAmtDTO);
+        log.info("订单费用计算-->全面保障服务.list:[{}]", JSON.toJSONString(list));
 
         OrderAbatementAmtResDTO orderAbatementAmtResDTO = new OrderAbatementAmtResDTO();
         if (CollectionUtils.isNotEmpty(list)) {
-            int abatementAmt = list.stream().mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
+            int abatementAmt = list.stream().filter(c -> Objects.nonNull(c.getTotalAmount())).mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
             orderAbatementAmtResDTO.setAbatementAmt(abatementAmt);
             orderAbatementAmtResDTO.setDetails(list);
-        }
 
-        log.info("计算订单全面保障服务费.result is,orderAbatementAmtResDTO = [{}]", JSON.toJSONString(orderAbatementAmtResDTO));
+            //赋值OrderCostDetailContext
+            OrderCostDetailContext costDetailContext = context.getCostDetailContext();
+            costDetailContext.getCostDetails().addAll(list);
+        }
+        log.info("订单费用计算-->全面保障服务.result is,orderAbatementAmtResDTO:[{}]", JSON.toJSONString(orderAbatementAmtResDTO));
         context.getResContext().setOrderAbatementAmtResDTO(orderAbatementAmtResDTO);
 
     }

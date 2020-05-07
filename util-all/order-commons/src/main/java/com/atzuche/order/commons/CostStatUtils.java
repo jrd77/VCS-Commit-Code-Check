@@ -6,24 +6,19 @@ package com.atzuche.order.commons;
  *
  **/
 
+import com.atzuche.order.commons.entity.orderDetailDto.*;
+import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
+import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.atzuche.order.commons.entity.orderDetailDto.ConsoleOwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderFineDeatailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderIncrementDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderPurchaseDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.RenterOwnerPriceDTO;
-import com.atzuche.order.commons.enums.FineTypeEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 
 public class CostStatUtils {
 
@@ -201,16 +196,16 @@ public class CostStatUtils {
      * @Description: 通过费用编码计算罚金
      *
      **/
-    public static int calOwnerFineByCashNo(FineTypeEnum ownerFineTypeEnum, List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+    public static int calOwnerFineByCashNo(FineTypeCashCodeEnum ownerFineTypeCashCodeEnum, List<OwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
         if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
             return 0;
         }
-        if(ownerFineTypeEnum == null){
+        if(ownerFineTypeCashCodeEnum == null){
             return 0;
         }
         Integer amt = ownerOrderFineDeatailDTOS
                 .stream()
-                .filter(x -> ownerFineTypeEnum.getFineType().equals(x.getFineType()))
+                .filter(x -> ownerFineTypeCashCodeEnum.getFineType().equals(x.getFineType()))
                 .collect(Collectors.summingInt(OwnerOrderFineDeatailDTO::getFineAmount));
         if(amt == null){
             return 0;
@@ -218,16 +213,16 @@ public class CostStatUtils {
         return amt;
     }
     
-    public static int calConsoleOwnerFineByCashNo(FineTypeEnum ownerFineTypeEnum, List<ConsoleOwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+    public static int calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum ownerFineTypeCashCodeEnum, List<ConsoleOwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
         if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
             return 0;
         }
-        if(ownerFineTypeEnum == null){
+        if(ownerFineTypeCashCodeEnum == null){
             return 0;
         }
         Integer amt = ownerOrderFineDeatailDTOS
                 .stream()
-                .filter(x -> ownerFineTypeEnum.getFineType().equals(x.getFineType()))
+                .filter(x -> ownerFineTypeCashCodeEnum.getFineType().equals(x.getFineType()))
                 .collect(Collectors.summingInt(ConsoleOwnerOrderFineDeatailDTO::getFineAmount));
         if(amt == null){
             return 0;

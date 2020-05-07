@@ -61,7 +61,7 @@ public class CityLonLatFilter implements OrderFilter{
                     Map<String, Double> param = new HashMap<String,Double>();
                     param.put("lon", Double.parseDouble(lonAndlat[0]));
                     param.put("lat", Double.parseDouble(lonAndlat[1]));
-                    log.info("param:{}",param);
+                    //log.info("param:{}",param);
                     polygonPoints.add(param);
                 }
             }
