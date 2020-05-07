@@ -4,6 +4,7 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.service.OrderSettle;
+import com.atzuche.order.settle.service.OrderWzSettleService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class OrderSettleController {
 	@Autowired
 	private OrderSettle orderSettle;
+	@Autowired
+	private OrderWzSettleService orderWzSettleService;
 
     @AutoDocMethod(description = "车辆押金结算", value = "车辆押金结算")
 	@GetMapping("/depositSettle")
@@ -38,5 +41,15 @@ public class OrderSettleController {
         log.info("OrderSettleController wz depositSettle end ");
         return ResponseData.success();
 	}
+
+
+    @AutoDocMethod(value = "手动结算违章押金", description = "结算违章押金", response = String.class)
+    @GetMapping("/settleOrderWz")
+    public ResponseData<String> settleOrderWz(@RequestParam("orderNo") String orderNo) {
+        log.info("OrderSettleController settleOrderWz start param [{}]", orderNo);
+        orderWzSettleService.settleWzOrder(orderNo);
+        log.info("OrderSettleController settleOrderWz end param [{}],result [{}]");
+        return ResponseData.success();
+    }
     
 }

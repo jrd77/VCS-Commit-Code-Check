@@ -1195,6 +1195,9 @@ public class ModifyOrderService {
 		if (autoCoinSubsidy != null) {
 			renterSubsidyList.add(autoCoinSubsidy);
 		}
+		//长租车主券抵扣
+
+
 		CostDeductVO costDeductVO = new CostDeductVO();
 		costDeductVO.setOrderCouponList(orderCouponList);
 		costDeductVO.setRenterSubsidyList(renterSubsidyList);

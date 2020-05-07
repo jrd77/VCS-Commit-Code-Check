@@ -32,7 +32,6 @@ import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.rentcosts.*;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.settle.service.OrderSettleService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
@@ -64,10 +63,6 @@ public class OrderCostDetailService {
 
     @Autowired
     private MemProxyService memberService;
-
-    @Autowired
-    OrderSettleService orderSettleService;
-
     @Autowired
     FeignOrderCostService feignOrderCostService;
 

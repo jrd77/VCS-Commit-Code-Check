@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.open.service.FeignOrderSettleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.service.OrderWzSettleService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 
@@ -19,11 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AdminOrderSettleController {
 
-	@Autowired
-	private OrderWzSettleService orderWzSettleService;
-
     @Autowired
     private FeignOrderSettleService feignOrderSettleService;
+    @Autowired
+    private RemoteFeignService remoteFeignService;
 
     /**
      * 手动车辆结算接口
@@ -66,7 +64,7 @@ public class AdminOrderSettleController {
     @GetMapping("/settleOrderWz")
     public ResponseData<String> settleOrderWz(@RequestParam("orderNo") String orderNo) {
         log.info("OrderSettleController settleOrderWz start param [{}]", orderNo);
-        orderWzSettleService.settleWzOrder(orderNo);
+        remoteFeignService.settleOrderWzFromRemote(orderNo);
         log.info("OrderSettleController settleOrderWz end param [{}],result [{}]");
         return ResponseData.success();
     }

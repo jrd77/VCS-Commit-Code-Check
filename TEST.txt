@@ -1,0 +1,19 @@
+ public void settleOrderWzFromRemote(String orderNo){
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "手动结算车辆押金");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryrenterDepositDetail");
+            log.info("Feign 开始手动结算车辆押金orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignOrderSettleService.settleOrderWz(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 手动结算车辆押金异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 手动结算车辆押金异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }

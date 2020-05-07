@@ -37,6 +37,8 @@ public class RemoteFeignService {
     private FeignPaymentService feignPaymentService;
     @Autowired
     private FeignBusinessService feignBusinessService;
+    @Autowired
+    private FeignOrderSettleService feignOrderSettleService;
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 10:38
@@ -327,6 +329,31 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 押金比例异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 押金比例异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/7 14:45
+     * @Description: 手动结算违章押金
+     *
+     **/
+    public void settleOrderWzFromRemote(String orderNo){
+        ResponseData<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "手动结算车辆押金");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderSettleService.settleOrderWz");
+            log.info("Feign 开始手动结算车辆押金orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignOrderSettleService.settleOrderWz(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 手动结算车辆押金异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 手动结算车辆押金异常",e);
             throw e;
         }finally {
             t.complete();

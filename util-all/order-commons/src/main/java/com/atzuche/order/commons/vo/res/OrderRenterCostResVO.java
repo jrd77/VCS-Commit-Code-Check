@@ -117,4 +117,8 @@ public class OrderRenterCostResVO {
      * 租客子订单信息
      */
     private RenterOrderDTO renterOrderDTO;
+    /**
+     * 租客租车费用  押金  违章押金  信息
+     */
+    private RenterCostVO  renterCostVO;
 }

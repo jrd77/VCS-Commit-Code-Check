@@ -37,7 +37,7 @@ import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -26,5 +26,13 @@ public interface FeignOrderSettleService {
      */
 	@GetMapping("/order/settle/depositSettle")
 	public ResponseData depositSettle(@RequestParam(value="orderNo",required = true) String orderNo);
-	
+    
+	/*
+	 * @Author ZhangBin
+	 * @Date 2020/5/7 14:45
+	 * @Description: 手动结算违章押金
+	 * 
+	 **/
+	@GetMapping("/order/settle/settleOrderWz")
+    public ResponseData<?> settleOrderWz(@RequestParam("orderNo") String orderNo);
 }

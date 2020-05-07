@@ -17,6 +17,7 @@ import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
@@ -26,8 +27,6 @@ import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntit
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.open.service.FeignOrderCostService;
-import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
@@ -57,8 +56,6 @@ public class OrderCostService {
     private WalletProxyService walletProxyService;
 	@Autowired
 	private AutoCoinProxyService autoCoinProxyService;
-	@Autowired
-	private OrderSettleService orderSettleService;
 	@Autowired
 	private RemoteFeignService remoteFeignService;
 	/**
@@ -96,8 +93,7 @@ public class OrderCostService {
 		if(resData != null) {
 			com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
 			if(data != null) {
-				int renterCostAmtFinal = data.getRenterCostAmtFinal();
-				RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
+				RenterCostVO costVo = data.getRenterCostVO();
                 RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
                 if(costVo != null) {
 					 logger.info("costVo toString=[{}]",costVo.toString());
@@ -1092,8 +1088,7 @@ public class OrderCostService {
         if(resData != null) {
             com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
             if(data != null) {
-                int renterCostAmtFinal = data.getRenterCostAmtFinal();
-                RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),orderDTO.getMemNoRenter(),renterCostAmtFinal);
+                RenterCostVO costVo = data.getRenterCostVO();
                 RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
                 //租金费用  费用明细表renter_order_cost_detail
                 putRenterOrderCostDetail(realVo,data);
