@@ -18,8 +18,8 @@ import java.util.List;
  * @author 胡春林
  * sms短信需要的租客feign接口
  */
-//@FeignClient(url = "http://10.0.3.80:1412" ,name="order-center-api")
-@FeignClient(value = "order-center-api", path = "/api/sms/renter")
+@FeignClient(name="order-center-api",path ="/api/sms/renter")
+//@FeignClient(value = "order-center-api", path = "/api/sms/renter")
 public interface FeignSMSRenterOrderService {
 
     /**
