@@ -2,11 +2,13 @@ package com.atzuche.order.commons.enums;
 
 import lombok.Getter;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
 public enum MemberFlagEnum {
+    OTHER(0,"0","未知"),
     HIGH_QUALITY_OWNER(1,"1","优质车主"),
     HIGH_QUALITY_RENTER(2,"2","优质租客"),
     HIGH_QUALITY_OWNER_RENTER(3,"3","优质租客+优质车主"),
@@ -37,10 +39,15 @@ public enum MemberFlagEnum {
     }
 
     public static MemberFlagEnum getRightByIndex(int index){
-        return Stream.of(MemberFlagEnum.values())
-                .filter(x->x.getIndex() == index)
+        Optional<MemberFlagEnum> first = Stream.of(MemberFlagEnum.values())
+                .filter(x -> x.getIndex() == index)
                 .limit(1)
-                .collect(Collectors.toList())
-                .get(0);
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }else{
+            return OTHER;
+        }
+
     }
 }
