@@ -6,6 +6,7 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
+import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
@@ -41,7 +42,6 @@ public class DeliveryController {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     CodeUtils codeUtils;
-
 
 
    // @GetMapping("/test")
@@ -196,4 +196,12 @@ public class DeliveryController {
 //            return ResponseData.error();
 //        }
 //    }
+
+
+    @PostMapping("/cancelRenYun")
+    public ResponseData<?> cancelRenYunFlowOrderInfo(@RequestBody CancelFlowOrderDTO cancelFlowOrderVO){
+        deliveryCarTask.cancelRenYunFlowOrderInfo(cancelFlowOrderVO);
+        return ResponseData.success("取消成功");
+    }
+
 }
