@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.*;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.vo.res.order.OrderJudgeDutyVO;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
@@ -37,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -97,14 +97,14 @@ public class CancelOrderJudgeDutyService {
                 fineAmt = penalty;
                 //罚租客补贴给车主
                 renterOrderFineDetailEntityOne = renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
-                        FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                        FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.CANCEL_FINE);
 
                 //罚租客补贴给平台(保险费)
                 if (!cancelReqTime.isBefore(renterOrderEntity.getExpRentTime())) {
                     insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                     RenterOrderFineDeatailEntity renterOrderFineDetailEntityTwo =
                             renterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()), FineSubsidyCodeEnum.PLATFORM,
-                                    FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                                    FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.CANCEL_FINE);
                     renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityTwo);
                 }
 
@@ -112,7 +112,7 @@ public class CancelOrderJudgeDutyService {
                 if (!isSubsidyFineAmt) {
                     consoleOwnerOrderFineDeatailEntity =
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
-                                    FineSubsidySourceCodeEnum.RENTER, FineTypeEnum.CANCEL_FINE);
+                                    FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.CANCEL_FINE);
                     //延时退款，等待车主同意
                     if (null != consoleOwnerOrderFineDeatailEntity && null != consoleOwnerOrderFineDeatailEntity.getFineAmount() && consoleOwnerOrderFineDeatailEntity.getFineAmount() != OrderConstant.ZERO) {
                         consoleOwnerOrderFineDeatailEntity.setMemNo(ownerOrderEntity.getMemNo());
@@ -149,7 +149,7 @@ public class CancelOrderJudgeDutyService {
                 insuranceFineAmt = Math.abs(renterOrderCostEntity.getBasicEnsureAmount());
                 OwnerOrderFineDeatailEntity ownerOrderFineDeatailEntityTwo =
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), Math.abs(renterOrderCostEntity.getBasicEnsureAmount()),
-                                FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                                FineSubsidyCodeEnum.PLATFORM, FineSubsidySourceCodeEnum.OWNER, FineTypeCashCodeEnum.CANCEL_FINE);
                 if (null != ownerOrderFineDeatailEntityTwo) {
                     ownerOrderFineDeatailEntityTwo.setMemNo(ownerOrderEntity.getMemNo());
                     ownerOrderFineDeatailEntityTwo.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
@@ -167,7 +167,7 @@ public class CancelOrderJudgeDutyService {
                 //罚车主补贴给租客
                 OwnerOrderFineDeatailEntity ownerOrderFineDetailEntityOne =
                         ownerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                                FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                                FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeCashCodeEnum.CANCEL_FINE);
                 if (null != ownerOrderFineDetailEntityOne) {
                     ownerOrderFineDetailEntityOne.setMemNo(ownerOrderEntity.getMemNo());
                     ownerOrderFineDetailEntityOne.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
@@ -176,7 +176,7 @@ public class CancelOrderJudgeDutyService {
                 if (!isSubsidyFineAmt) {
                     ConsoleRenterOrderFineDeatailEntity consoleRenterOrderFineDeatailEntity =
                             consoleRenterOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty,
-                                    FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeEnum.CANCEL_FINE);
+                                    FineSubsidyCodeEnum.RENTER, FineSubsidySourceCodeEnum.OWNER, FineTypeCashCodeEnum.CANCEL_FINE);
                     consoleRenterOrderFineDeatailService.saveConsoleRenterOrderFineDeatail(consoleRenterOrderFineDeatailEntity);
                 } else {
                     if (null != ownerOrderFineDetailEntityOne) {
@@ -310,8 +310,8 @@ public class CancelOrderJudgeDutyService {
 
         applyEntity.setFineSubsidySourceCode(FineSubsidySourceCodeEnum.OWNER.getFineSubsidySourceCode());
         applyEntity.setFineSubsidySourceDesc(FineSubsidySourceCodeEnum.OWNER.getFineSubsidySourceDesc());
-        applyEntity.setFineType(FineTypeEnum.CANCEL_FINE.getFineType());
-        applyEntity.setFineTypeDesc(FineTypeEnum.CANCEL_FINE.getFineTypeDesc());
+        applyEntity.setFineType(FineTypeCashCodeEnum.CANCEL_FINE.getFineType());
+        applyEntity.setFineTypeDesc(FineTypeCashCodeEnum.CANCEL_FINE.getFineTypeDesc());
 
         return applyEntity;
     }

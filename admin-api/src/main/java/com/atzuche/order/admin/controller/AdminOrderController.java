@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
@@ -10,17 +11,24 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.vo.request.TransferReq;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -51,6 +59,10 @@ public class AdminOrderController {
     private AdminOrderService adminOrderService;
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+    @Autowired
+    private CarService carService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -64,6 +76,12 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+            log.error("已经结算不允许编辑orderNo={}",orderNo);
+            throw new NotAllowedEditException();
+        }
+
         OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
         reqDTO.setOrderNo(orderNo);
 
@@ -202,11 +220,15 @@ public class AdminOrderController {
     @RequestMapping(value="console/changeCar",method = RequestMethod.POST)
     public ResponseData<?> changeCar(@Valid @RequestBody AdminTransferCarReqVO reqVO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-
+        if (StringUtils.isBlank(reqVO.getCarNo()) && StringUtils.isBlank(reqVO.getPlateNum())) {
+        	return ResponseData.createErrorCodeResponse("408508", "车辆号和车牌号二者必选其一");
+        }
+        // 根据车牌号获取车辆注册号
+        String carNo = StringUtils.isBlank(reqVO.getCarNo()) ? carService.getCarNoByPlateNum(reqVO.getPlateNum()):reqVO.getCarNo();
         TransferReq req = new TransferReq();
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         BeanUtils.copyProperties(reqVO,req);
-
+        req.setCarNo(carNo);
         adminOrderService.transferCar(req);
         return ResponseData.success();
 

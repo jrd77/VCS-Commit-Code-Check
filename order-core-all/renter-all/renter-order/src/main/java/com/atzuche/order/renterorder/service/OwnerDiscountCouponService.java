@@ -2,6 +2,7 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import com.atzuche.order.renterorder.vo.owner.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -243,7 +244,7 @@ public class OwnerDiscountCouponService {
      * @param reqVO 参数
      * @return OwnerCouponLongResVO 长租折扣信息
      */
-    public OwnerCouponLongResVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
+    public OwnerCouponLongVO getLongOwnerCoupon(OwnerCouponLongReqVO reqVO) {
         logger.info("Obtain owner coupon information for long lease orders.param is,reqVO:[{}]",
                 JSON.toJSONString(reqVO));
 
@@ -257,11 +258,9 @@ public class OwnerDiscountCouponService {
             Cat.logEvent(CatConstants.FEIGN_RESULT, json);
             t.setStatus(Transaction.SUCCESS);
             if (StringUtils.isNotBlank(json)) {
-                ResponseData<OwnerCouponLongResVO> responseData = new Gson().fromJson(json, ResponseData.class);
-                if (null != responseData) {
-                    if (StringUtils.equals(ErrorCode.SUCCESS.getCode(), responseData.getResCode())) {
-                        return responseData.getData();
-                    }
+                OwnerCouponLongResVO resVO = new Gson().fromJson(json, OwnerCouponLongResVO.class);
+                if (null != resVO && StringUtils.equals(ErrorCode.SUCCESS.getCode(), resVO.getResCode())) {
+                    return resVO.getData();
                 }
             }
         } catch (Exception e) {

@@ -147,4 +147,8 @@
         order by id desc
     </select>
 
+    <select id="getAccountOwnerIncomeExamineByOrderNo" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List" /> from account_owner_income_examine where order_no = #{orderNo} and is_delete = 0
+    </select>
+
 </mapper>

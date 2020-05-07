@@ -63,12 +63,24 @@ public class RenterAdditionalDriverService {
                 }
             }
 
+        }
+    }
 
+    /**
+     * 批量保存附加驾驶人信息
+     *
+     * @param recordList 附加驾驶人列表
+     */
+    public void insertBatchAdditionalDriver(List<RenterAdditionalDriverEntity> recordList) {
+        if(!CollectionUtils.isEmpty(recordList)) {
+            for (RenterAdditionalDriverEntity record : recordList) {
+                renterAdditionalDriverMapper.insertSelective(record);
+            }
+        } else {
+            logger.info("附加驾驶人信息为空.");
         }
 
-
     }
-    
     
     /**
      * 批量保存附加驾驶人信息（修改订单）

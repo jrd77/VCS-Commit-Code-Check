@@ -1,5 +1,10 @@
 package com.atzuche.order.renterorder.vo.owner;
 
+import java.util.List;
+
+import com.atzuche.order.rentercost.entity.vo.HolidayAverageResultVO;
+
+import com.atzuche.order.rentercost.entity.vo.OwnerCouponLongVO;
 import lombok.Data;
 
 /**
@@ -11,29 +16,11 @@ import lombok.Data;
 @Data
 public class OwnerCouponLongResVO {
 
-    /**
-     * 主订单号
-     */
-    private String orderNo;
+    private String resCode;
 
-    /**
-     * 原始租车金额
-     */
-    private Integer rentOriginalAmt;
+    private String resMsg;
 
-    /**
-     * 抵扣比例
-     */
-    private Double discounRatio;
+    private OwnerCouponLongVO data;
 
-    /**
-     * 减免金额
-     */
-    private Integer reductionAmt;
-
-    /**
-     * 实际租金
-     */
-    private Integer actRentAmt;
 
 }

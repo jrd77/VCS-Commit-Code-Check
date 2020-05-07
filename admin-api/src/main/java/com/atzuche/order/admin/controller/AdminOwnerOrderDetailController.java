@@ -4,7 +4,7 @@ import com.atzuche.order.admin.service.OwnerOrderDetailService;
 import com.atzuche.order.admin.vo.req.FienAmtUpdateReqVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.autoyol.commons.web.ErrorCode;
@@ -217,8 +217,8 @@ public class AdminOwnerOrderDetailController {
         BindingResultUtil.checkBindingResult(bindingResult);
         FienAmtUpdateReqDTO reqDTO = new FienAmtUpdateReqDTO();
         BeanUtils.copyProperties(fienAmtUpdateReqDTO,reqDTO);
-        reqDTO.setOwnerGetReturnCarFienCashNo(FineTypeEnum.GET_RETURN_CAR.getFineType());
-        reqDTO.setOwnerModifyAddrAmtCashNo(FineTypeEnum.MODIFY_ADDRESS_FINE.getFineType());
+        reqDTO.setOwnerGetReturnCarFienCashNo(FineTypeCashCodeEnum.GET_RETURN_CAR.getFineType());
+        reqDTO.setOwnerModifyAddrAmtCashNo(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE.getFineType());
         ResponseData<?> responseData = ownerOrderDetailService.updateFineAmt(reqDTO);
         return responseData;
     }

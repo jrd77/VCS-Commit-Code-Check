@@ -21,4 +21,27 @@ public class OrderCostContext {
      */
     private OrderCostResContext resContext;
 
+    /**
+     * 订单费用明细
+     */
+    private OrderCostDetailContext costDetailContext;
+
+
+    public OrderCostContext() {
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext) {
+        this.reqContext = reqContext;
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext, OrderCostDetailContext costDetailContext) {
+        this.reqContext = reqContext;
+        this.costDetailContext = costDetailContext;
+    }
+
+    public OrderCostContext(OrderCostReqContext reqContext, OrderCostResContext resContext, OrderCostDetailContext costDetailContext) {
+        this.reqContext = reqContext;
+        this.resContext = resContext;
+        this.costDetailContext = costDetailContext;
+    }
 }
