@@ -11,12 +11,12 @@ public enum MemberFlagEnum {
     HIGH_QUALITY_RENTER(2,"2","优质租客"),
     HIGH_QUALITY_OWNER_RENTER(3,"3","优质租客+优质车主"),
     VIP(4,"4","VIP"),
-    QYYH(5,"5","企业用户"),
+    QYYH(5,"5","企业充值用户"),
     DBCZH(6,"6","代步车账号"),
     TD(7,"7","免TD用户"),
     SZTBYG(8,"8","深证太保员工"),
-    ZXYH(9,"9","已注销用户");
-
+    ZXYH(9,"9","已注销用户"),
+    QYXYYH(10,"10","企业信用用户");
     /**
      * 序号
      */
