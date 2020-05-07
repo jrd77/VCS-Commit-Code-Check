@@ -7,7 +7,7 @@ public enum FreeDepositTypeEnum {
 
     BIND_CARD_FREE(1,"绑卡减免"),
     SESAME_FREE(2,"芝麻减免"),
-    CONSUME(3,"消费"),
+    CONSUME(3,"支付押金"),  //消费
     ;
 
     /**

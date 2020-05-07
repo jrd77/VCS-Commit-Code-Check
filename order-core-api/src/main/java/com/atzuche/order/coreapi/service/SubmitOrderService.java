@@ -179,6 +179,7 @@ public class SubmitOrderService {
         RenterMemberDTO renterMemberDTO = context.getRenterMemberDto();
         renterMemberDTO.setOrderNo(orderNo);
         renterMemberDTO.setRenterOrderNo(renterOrderNo);
+        renterMemberDTO.setOrderCategory(orderReqVO.getOrderCategory());
         renterMemberService.save(renterMemberDTO);
 
 
@@ -366,6 +367,7 @@ public class SubmitOrderService {
         orderDTO.setSource(orderReqVO.getSource());
         orderDTO.setExpRentTime(orderReqVO.getRentTime());
         orderDTO.setExpRevertTime(orderReqVO.getRevertTime());
+        //绑卡，芝麻都属于免押方式。
         orderDTO.setIsFreeDeposit(StringUtils.isBlank(orderReqVO.getFreeDoubleTypeId())
                 || Integer.parseInt(orderReqVO.getFreeDoubleTypeId()) == FreeDepositTypeEnum.CONSUME.getCode() ?
                 0 : 1);

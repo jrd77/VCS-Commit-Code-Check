@@ -19,6 +19,8 @@ public class MemRightCarDepositAmtReqDTO {
      * 会员权益列表
      */
     private List<RenterMemberRightDTO> renterMemberRightDTOList;
-
-
+    /**
+     * 订单类型
+     */
+    private String orderCategory;
 }

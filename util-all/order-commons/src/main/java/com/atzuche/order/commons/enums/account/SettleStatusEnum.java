@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public enum SettleStatusEnum {
-
+    SETTL_WALLET_DEDUCT(3,"结算失败,钱包已扣"),
     SETTL_FAIL(2,"结算失败"),
 	SETTLED(1,"已结算"),
     SETTLEING(0,"未结算"),

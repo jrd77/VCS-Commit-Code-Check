@@ -83,6 +83,7 @@ public class RenterOrderCostHandleService {
         memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
                 Math.abs(carDepositAmt.getCarDepositAmt()));
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
+        memRightCarDepositAmtReqDTO.setOrderCategory(renterOrderReqVO.getOrderCategory());
         LOGGER.info("车辆押金减免计算A.param is,memRightCarDepositAmtReqDTO:[{}]",
                 JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
@@ -175,7 +176,7 @@ public class RenterOrderCostHandleService {
         Integer illegalDepositAmt = renterOrderCostCombineService.getIllegalDepositAmt(illDTO);
         int realIllegalDepositAmt =
                 renterMemberRightService.wzDepositAmt(renterOrderReqVO.getRenterMemberRightDTOList(),
-                        illegalDepositAmt);
+                        illegalDepositAmt,renterOrderReqVO.getOrderCategory());
 
         LOGGER.info("违章押金计算结果.result is, illegalDepositAmt:[{}],realIllegalDepositAmt:[{}]", illegalDepositAmt,
                 realIllegalDepositAmt);

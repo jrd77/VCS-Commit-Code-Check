@@ -439,6 +439,7 @@ public class MemProxyService {
             }
         }
         renterMemberDto.setRenterMemberRightDTOList(rights);
+        log.info("ownerMemberDto.setOwnerMemberRightDTOList={}",JSON.toJSONString(rights));
         return renterMemberDto;
     }
 

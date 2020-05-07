@@ -19,6 +19,7 @@ import com.atzuche.order.accountplatorm.service.notservice.AccountPlatformSubsid
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierService;
@@ -36,6 +37,7 @@ import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -285,12 +287,13 @@ public class OrderSettleNewService {
                         AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,cashierRefundApplyReq.getAmt(),id);
                         renterCostSettleDetails.add(entity);
                     }
+                    
+                    //计算 实际支付 金额 退钱总额
+                    int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
+                    // 计算剩余待退
+                    rentCostSurplusAmt = rentCostSurplusAmt+returnAmt;
+                    orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
                 }
-                //计算 实际支付 金额 退钱总额
-                int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
-                // 计算剩余待退
-                rentCostSurplusAmt = rentCostSurplusAmt+returnAmt;
-                orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
             }
 
             //2 查询钱包 比较
@@ -299,10 +302,24 @@ public class OrderSettleNewService {
                 //计算应退钱包金额 并退还
                 int returnWalletAmt = rentCostSurplusAmt>walletAmt?walletAmt:rentCostSurplusAmt;
                 walletProxyService.returnOrChargeWallet(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),Math.abs(returnWalletAmt));
+                
+                //记录退还
+                AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO ();
+                accountRenterCostDetail.setMemNo(settleOrders.getRenterMemNo());
+                accountRenterCostDetail.setOrderNo(settleOrders.getOrderNo());
+                accountRenterCostDetail.setPaySource(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getText());
+                accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
+                accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND);
+                accountRenterCostDetail.setAmt(-Math.abs(returnWalletAmt));
+                accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getCode());
+                accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getText());
+                
+                cashierService.refundRentCostWallet(accountRenterCostDetail);
+                
                 AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt);
                 renterCostSettleDetails.add(entity);
-
             }
+            
             //记录 凹凸币/钱包退还 流水
             cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
         }

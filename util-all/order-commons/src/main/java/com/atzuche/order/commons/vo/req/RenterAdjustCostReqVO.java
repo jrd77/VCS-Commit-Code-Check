@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.atzuche.order.admin.vo.req.cost;
+package com.atzuche.order.commons.vo.req;
 
 import org.hibernate.validator.constraints.NotBlank;
 

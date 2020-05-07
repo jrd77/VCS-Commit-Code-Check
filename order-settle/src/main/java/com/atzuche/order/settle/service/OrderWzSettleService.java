@@ -1,25 +1,19 @@
-/**
- * 
- */
 package com.atzuche.order.settle.service;
 
-import java.time.LocalDateTime;
-
-import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.parentorder.entity.OrderStatusEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
-import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * @author jing.huang
