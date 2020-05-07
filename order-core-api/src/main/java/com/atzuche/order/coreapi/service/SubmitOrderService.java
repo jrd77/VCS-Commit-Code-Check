@@ -1,15 +1,36 @@
 package com.atzuche.order.coreapi.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
@@ -20,6 +41,7 @@ import com.atzuche.order.coreapi.filter.StockFilter;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.submit.filter.cost.LongOrderCostFilterChain;
+import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
@@ -28,6 +50,8 @@ import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.entity.dto.OwnerOrderReqDTO;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.parentorder.dto.OrderDTO;
+import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
 import com.atzuche.order.parentorder.service.ParentOrderService;
@@ -44,17 +68,6 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 订单业务处理类
@@ -354,6 +367,87 @@ public class SubmitOrderService {
         orderInfoDTO.setLongRent(StockFilter.isLongRent(orderReqVO.getOrderCategory()));
         return orderInfoDTO;
     }
+
+
+
+
+    /**
+     * 组装主订单基本信息
+     *
+     * @param orderNo     主订单号
+     * @param riskAuditId 风控审核结果ID
+     * @param orderReqVO  下单请求参数
+     * @param reqTime     下单时间
+     * @return OrderDTO 主订单基本信息
+     */
+    private OrderDTO buildOrderDTO(String orderNo, String riskAuditId, OrderReqVO orderReqVO, LocalDateTime reqTime) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setMemNoRenter(orderReqVO.getMemNo());
+        orderDTO.setCategory(Integer.valueOf(orderReqVO.getOrderCategory()));
+        orderDTO.setCityCode(orderReqVO.getCityCode());
+        orderDTO.setCityName(orderReqVO.getCityName());
+        orderDTO.setEntryCode(orderReqVO.getSceneCode());
+        orderDTO.setSource(orderReqVO.getSource());
+        orderDTO.setExpRentTime(orderReqVO.getRentTime());
+        orderDTO.setExpRevertTime(orderReqVO.getRevertTime());
+        //绑卡，芝麻都属于免押方式。
+        orderDTO.setIsFreeDeposit(StringUtils.isBlank(orderReqVO.getFreeDoubleTypeId())
+                || Integer.parseInt(orderReqVO.getFreeDoubleTypeId()) == FreeDepositTypeEnum.CONSUME.getCode() ?
+                0 : 1);
+        orderDTO.setIsOutCity(orderReqVO.getIsLeaveCity());
+        orderDTO.setRentCity(orderReqVO.getRentCity());
+        orderDTO.setReqTime(reqTime);
+        orderDTO.setIsUseAirPortService(orderReqVO.getUseAirportService());
+        orderDTO.setFlightId(orderReqVO.getFlightNo());
+        orderDTO.setRiskAuditId(riskAuditId);
+        orderDTO.setLimitAmt(StringUtils.isBlank(orderReqVO.getReductiAmt()) ? 0 : Integer.valueOf(orderReqVO.getReductiAmt()));
+        orderDTO.setBasePath(CommonUtils.createTransBasePath(orderNo));
+        orderDTO.setOrderNo(orderNo);
+        orderDTO.setMemNoRenter(orderReqVO.getMemNo());
+        LOGGER.info("Build order dto,result is ,orderDTO:[{}]", JSON.toJSONString(orderDTO));
+        return orderDTO;
+    }
+
+
+    /**
+     * 组装主订单来源统计信息
+     *
+     * @param orderNo    主订单号
+     * @param orderReqVO 下单请求参数
+     * @return OrderSourceStatDTO 主订单来源统计信息
+     */
+    private OrderSourceStatDTO buildOrderSourceStatDTO(String orderNo, OrderReqVO orderReqVO) {
+        OrderSourceStatDTO orderSourceStatDTO = new OrderSourceStatDTO();
+        BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, OrderSourceStatDTO.class, false);
+        beanCopier.copy(orderReqVO, orderSourceStatDTO, null);
+
+        //差异处理
+        orderSourceStatDTO.setAppVersion(orderReqVO.getAppVersion());
+        orderSourceStatDTO.setCategory(orderReqVO.getOrderCategory());
+        orderSourceStatDTO.setEntryCode(orderReqVO.getSceneCode());
+        orderSourceStatDTO.setModuleName(orderReqVO.getModuleName());
+        orderSourceStatDTO.setFunctionName(orderReqVO.getFunctionName());
+        orderSourceStatDTO.setOaid(orderReqVO.getOAID());
+        orderSourceStatDTO.setImei(orderReqVO.getIMEI());
+        orderSourceStatDTO.setOs(orderReqVO.getOS());
+        orderSourceStatDTO.setAppChannelId(orderReqVO.getAppChannelId());
+        orderSourceStatDTO.setAndroidId(orderReqVO.getAndroidID());
+        orderSourceStatDTO.setOrderNo(orderNo);
+        orderSourceStatDTO.setSrcPort(orderReqVO.getSrcPort()==null?"":String.valueOf(orderReqVO.getSrcPort()));
+        orderSourceStatDTO.setPublicLongitude(orderReqVO.getPublicLongitude());
+        orderSourceStatDTO.setPublicLatitude(orderReqVO.getPublicLatitude());
+        orderSourceStatDTO.setReqAddr(BizAreaUtil.getReqAddrFromLonLat(orderSourceStatDTO.getPublicLongitude(),
+                orderSourceStatDTO.getPublicLatitude()));
+        orderSourceStatDTO.setDevice(orderReqVO.getDeviceName());
+        orderSourceStatDTO.setUseAutoCoin(orderReqVO.getUseAutoCoin());
+        orderSourceStatDTO.setSpecialConsole(orderReqVO.getSpecialConsole()==null?0:Integer.valueOf(orderReqVO.getSpecialConsole()));
+        orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
+        LOGGER.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
+        return orderSourceStatDTO;
+    }
+
+
+
 
 
 
