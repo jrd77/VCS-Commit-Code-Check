@@ -15,6 +15,7 @@ import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,8 @@ public class DeliveryCarTask {
     CodeUtils codeUtils;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
+    
+    @Value("${sysEnv:2}") String sysEnv;
 
     /**
      * 添加订单到仁云流程系统
@@ -48,7 +51,11 @@ public class DeliveryCarTask {
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
         String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, DeliveryConstants.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
+        	if("1".equals(sysEnv)) {
+        		sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, DeliveryConstants.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
+        	}else {
+        		sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, DeliveryConstants.ADD_FLOW_ORDER_TEST2, renYunFlowOrderDTO.getOrdernumber());
+        	}
         }
     }
 
@@ -59,7 +66,11 @@ public class DeliveryCarTask {
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
         String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
+        	if("1".equals(sysEnv)) {
+        		sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
+        	}else {
+        		sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER_TEST2, updateFlowOrderDTO.getOrdernumber());
+        	}
         }
     }
 
@@ -71,7 +82,11 @@ public class DeliveryCarTask {
 
         String result = renyunDeliveryCarService.cancelRenYunFlowOrderInfo(cancelFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
+        	if("1".equals(sysEnv)) {
+        		sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
+        	}else {
+        		sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, DeliveryConstants.CANCEL_FLOW_ORDER_TEST2, cancelFlowOrderDTO.getOrdernumber());
+        	}
         }
         return new AsyncResult(true);
     }
