@@ -1,14 +1,11 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.entity.ownerOrderDetail.OwnerRentDetailDTO;
-import com.atzuche.order.open.service.PayFeignService;
+import com.atzuche.order.open.service.FeignPayService;
 import com.atzuche.order.open.vo.OfflinePayVO;
 import com.atzuche.order.open.vo.VirtualPayVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +22,7 @@ import javax.validation.Valid;
 public class AdminPayController {
 
     @Autowired
-    private PayFeignService payFeignService;
+    private FeignPayService payFeignService;
 
     @AutoDocMethod(description = "虚拟支付", value = "虚拟支付")
     @PostMapping("console/pay/virtual")

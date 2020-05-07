@@ -15,7 +15,7 @@ import javax.validation.Valid;
  * @date 2020/3/11 5:17 下午
  **/
 @FeignClient(name = "order-center-api")
-public interface PayFeignService {
+public interface FeignPayService {
 
     @PostMapping("pay/virtual")
     public ResponseData virtualPay(@Valid @RequestBody VirtualPayVO virtualPayVO);
