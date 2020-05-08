@@ -238,6 +238,7 @@ public class OrderActionMqService {
         BeanUtils.copyProperties(orderBaseDataMq, orderCreateMq);
         orderCreateMq.setType(2);
         OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderCreateMq);
         logger.info("发送订单车主确认还车成功事件.mq:[exchange={},routingKey={}],message=[{}]",
                 NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.exchange,
                 NewOrderMQActionEventEnum.OWNER_CONFIRM_RETURNCAR.routingKey,
