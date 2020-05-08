@@ -677,32 +677,7 @@ public class CashierNoTService {
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
 				//设置OS,否则支付宝小程序走的都是信用支付
 				
-				//租客押金
-		        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
-		        //违章押金
-		        AccountRenterWzDepositEntity accountRenterWzDepositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
-		        
-				if( (accountRenterDepositEntity != null && accountRenterDepositEntity.getFreeDepositType() == 3) || 
-						(accountRenterWzDepositEntity != null && accountRenterWzDepositEntity.getFreeDepositType() == 3) ){
-					if("miniprogram-alipay".equals(reqOs)) {
-						vo.setReqOs(MICROPROGRAM_COMMON);  //普通预授权
-					}
-					//非支付宝小程序，默认传参本身。
-				}else{
-					//需要根据标识来区分
-					if(!"miniprogram-alipay".equals(reqOs)) {  //非支付宝小程序
-						String convertReqOs = reqOs;
-						if(IOS.equals(reqOs.toUpperCase())){
-							convertReqOs = CREDITIOS_ALIPAY;
-						}else if(ANDROID.equals(reqOs.toUpperCase())){
-							convertReqOs = CREDITANDROID_ALIPAY;
-						}else{
-							convertReqOs = CREDITIOS_ALIPAY;
-						}
-						vo.setReqOs(convertReqOs);  //信用预授权
-					}
-					//支付宝小程序，默认传参本身。 miniprogram-alipay
-				}
+				minigramChangeReqOs(orderNo, vo, reqOs);
 				
 			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
 				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
@@ -720,6 +695,51 @@ public class CashierNoTService {
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
     }
+    
+    /**
+     * 支付宝小程序遇到租客欠款，不允许走信用支付，支付平台根据reqOs来判断来源。
+     * @param orderNo
+     * @param vo
+     * @param reqOs
+     */
+	public void minigramChangeReqOs(String orderNo, PayVo vo, String reqOs) {
+		if(reqOs == null) {
+			return;
+		}
+		log.info("minigramChangeReqOs params orderNo=[{}],vo=[{}],reqOs=[{}]",orderNo,GsonUtils.toJson(vo),reqOs);
+		
+		//租客押金
+		AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
+		//违章押金
+		AccountRenterWzDepositEntity accountRenterWzDepositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
+		
+		if( (accountRenterDepositEntity != null && accountRenterDepositEntity.getFreeDepositType() == 3) || 
+				(accountRenterWzDepositEntity != null && accountRenterWzDepositEntity.getFreeDepositType() == 3) ){
+			//比较忽略大小写
+			if("miniprogram-alipay".equals(reqOs.toLowerCase())) {
+				vo.setReqOs(MICROPROGRAM_COMMON);  //普通预授权
+				
+			}
+			//非支付宝小程序，默认传参本身。
+		}else{
+			//需要根据标识来区分
+			if(!"miniprogram-alipay".equals(reqOs.toLowerCase())) {  //非支付宝小程序
+				String convertReqOs = reqOs;
+				if(IOS.equals(reqOs.toUpperCase())){
+					convertReqOs = CREDITIOS_ALIPAY;
+				}else if(ANDROID.equals(reqOs.toUpperCase())){
+					convertReqOs = CREDITANDROID_ALIPAY;
+				}else{
+					convertReqOs = CREDITIOS_ALIPAY;
+				}
+				vo.setReqOs(convertReqOs);  //信用预授权
+			}
+			//支付宝小程序，默认传参本身。 miniprogram-alipay
+		}
+		
+		log.info("(result)minigramChangeReqOs params orderNo=[{}],vo=[{}],reqOs=[{}]",orderNo,GsonUtils.toJson(vo),reqOs);
+		
+	}
     
     
     public PayVo getPayVOForOrderSupplementDetail(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
