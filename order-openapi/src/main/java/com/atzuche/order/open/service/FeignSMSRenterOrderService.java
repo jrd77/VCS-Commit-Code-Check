@@ -70,6 +70,6 @@ public interface FeignSMSRenterOrderService {
      * @return
      */
     @GetMapping("/getListRenterOrderCostDetail")
-    ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(String orderNo);
+    ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(@RequestParam("orderNo") String orderNo);
 
 }
