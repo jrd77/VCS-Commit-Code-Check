@@ -188,26 +188,7 @@ public class AdminOrderService {
     }
 
 
-    public void modifyOrder(ModifyOrderReqVO modifyOrderReq) {
-        ResponseData<?> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "租客商品信息");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.cancelOrder");
-            log.info("Feign 开始修改订单,modifyOrderReq={}", JSON.toJSONString(modifyOrderReq));
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(modifyOrderReq));
-            responseObject = feignOrderModifyService.modifyOrderForConsole(modifyOrderReq);
-            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
-            checkResponse(responseObject);
-            t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
-            log.error("Feign 修改订单异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
-            Cat.logError("Feign 修改订单异常",e);
-            t.setStatus(e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-    }
+
 
     public void modificationConfirm(OrderModifyConfirmReqVO reqVO) {
         ModifyApplyHandleReq req = new ModifyApplyHandleReq();

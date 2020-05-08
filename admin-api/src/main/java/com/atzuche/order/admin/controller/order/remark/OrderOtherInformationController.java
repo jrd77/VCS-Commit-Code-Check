@@ -8,6 +8,7 @@ import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
 import com.atzuche.order.admin.dto.remark.OrderRiskStatusRequestDTO;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.OrderCarServiceRemarkRequestVO;
 import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
@@ -58,7 +59,8 @@ public class OrderOtherInformationController extends BaseController{
     @Autowired
     FeignOrderUpdateService feignOrderUpdateService;
 
-
+    @Autowired
+    RemoteFeignService remoteFeignService;
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
@@ -70,7 +72,8 @@ public class OrderOtherInformationController extends BaseController{
             RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
             rentCityAndRiskAccidentReqDTO.setOrderNo(orderRentCityRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setRentCity(orderRentCityRequestVO.getRentCity());
-            ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            //ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            ResponseData<?> responseData =  remoteFeignService.updateRentCityAndRiskAccidentFromRemote(rentCityAndRiskAccidentReqDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
                 if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                     CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE,  orderRentCityRequestVO);
@@ -97,7 +100,8 @@ public class OrderOtherInformationController extends BaseController{
             RentCityAndRiskAccidentReqDTO rentCityAndRiskAccidentReqDTO = new RentCityAndRiskAccidentReqDTO();
             rentCityAndRiskAccidentReqDTO.setOrderNo(orderRiskStatusRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setIsRiskAccident(Integer.parseInt(orderRiskStatusRequestVO.getRiskAccidentStatus()));
-            ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            //ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            ResponseData<?> responseData =  remoteFeignService.updateRentCityAndRiskAccidentFromRemote(rentCityAndRiskAccidentReqDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
                 if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                     //修改成功发送MQ事件
@@ -148,7 +152,8 @@ public class OrderOtherInformationController extends BaseController{
             //调用订单服务获取租车城市和风控事故状态
             OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
             orderDetailReqDTO.setOrderNo(orderRemarkRequestVO.getOrderNo());
-            ResponseData<OrderStatusRespDTO> orderStatusRespDTOResponse = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            //ResponseData<OrderStatusRespDTO> orderStatusRespDTOResponse = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            ResponseData<OrderStatusRespDTO> orderStatusRespDTOResponse = remoteFeignService.getOrderStatusFromRemote(orderDetailReqDTO);
             if(!ObjectUtils.isEmpty(orderStatusRespDTOResponse)){
                 OrderStatusRespDTO orderStatusRespDTO = orderStatusRespDTOResponse.getData();
                 orderOtherInformationResponseVO.setRentCity(orderStatusRespDTO.getOrderDTO().getRentCity());

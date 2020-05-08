@@ -1,25 +1,24 @@
-
-    /*
+/*
      * @Author ZhangBin
-     * @Date 2020/4/30 14:58
-     * @Description: 订单状态流转列表
+     * @Date 2020/5/8 10:15
+     * @Description: 修改用车城市和风控事故状态
      *
      **/
-    public ResponseData<AdminGetDisCouponListResVO> queryDisCouponByOrderNoFromRemote(OrderFlowRequestDTO orderFlowRequestDTO){
-        ResponseData<AdminGetDisCouponListResVO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单状态流转列表");
+    public ResponseData  updateRentCityAndRiskAccidentFromRemote(RentCityAndRiskAccidentReqDTO req){
+        ResponseData responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "修改用车城市和风控事故状态");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCouponService.getDisCouponListByOrderNo");
-            log.info("Feign 开始订单状态流转列表req={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.updateRentCityAndRiskAccident");
+            log.info("Feign 开始修改用车城市和风控事故状态req={}", JSON.toJSONString(req));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
-            responseObject = feignOrderCouponService.getDisCouponListByOrderNo(req);
+            responseObject = feignOrderUpdateService.updateRentCityAndRiskAccident(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
             return responseObject;
         }catch (Exception e){
-            log.error("Feign 订单状态流转列表异常,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
-            Cat.logError("Feign 订单状态流转列表异常",e);
+            log.error("Feign 修改用车城市和风控事故状态异常,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 修改用车城市和风控事故状态异常",e);
             throw e;
         }finally {
             t.complete();
