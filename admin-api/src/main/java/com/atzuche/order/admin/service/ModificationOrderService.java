@@ -69,7 +69,9 @@ public class ModificationOrderService {
 		req.setOrderNo(modificationOrderRequestVO.getOrderNo());
 		req.setMemNo(orderDTO.getMemNoRenter());
         
-		ResponseData<ModifyOrderMainResVO> resData = feignOrderModifyService.getModifyOrderMain(req);
+		//ResponseData<ModifyOrderMainResVO> resData = feignOrderModifyService.getModifyOrderMain(req);
+        ResponseData<ModifyOrderMainResVO> resData = remoteFeignService.getOrderdetailFromRemote(req);
+
 		if(resData != null) {
 			ModifyOrderMainResVO data = resData.getData();
 			
@@ -88,7 +90,8 @@ public class ModificationOrderService {
 					/**
 					 * 子订单查询
 					 */
-					ResponseData<ModifyOrderResVO> resSubData = feignOrderModifyService.queryModifyOrderList(req2);
+					//ResponseData<ModifyOrderResVO> resSubData = feignOrderModifyService.queryModifyOrderList(req2);
+                    ResponseData<ModifyOrderResVO> resSubData = remoteFeignService.queryModifyOrderListFromRemote(req2);
 					if(resSubData != null) {
 						ModifyOrderResVO subData = resSubData.getData();
 						if(subData != null) {

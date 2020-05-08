@@ -1,4 +1,4 @@
-package com.atzuche.order.settle.vo.res;
+package com.atzuche.order.commons.vo.res;
 
 import lombok.Data;
 

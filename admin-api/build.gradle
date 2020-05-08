@@ -53,7 +53,7 @@ dependencies {
 
    
 
-    compile project(":casier-all:cashier-account")
+    //compile project(":casier-all:cashier-account")
 
 
     compile project(":util-all:fee-calculator")
@@ -64,12 +64,12 @@ dependencies {
     //compile project(":order-core-all:renter-all:renter-commodity")
 	//compile project(":order-core-all:parent-order")
 	//compile project(":order-core-all:carowner-all:carowner-mem")
-    compile project(":order-settle")
+    //compile project(":order-settle")
     //compile project(":order-detain")
     //compile project(":casier-all:cashier-account")
     //compile project(":order-core-all:renter-all:renter-wz")
- 
-    
+    compile project(":order-wallet:order-wallet-client")
+    compile 'com.aliyun.oss:aliyun-sdk-oss:2.8.3'
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")

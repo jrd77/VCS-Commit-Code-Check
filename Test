@@ -1,24 +1,24 @@
- /*
+/*
      * @Author ZhangBin
-     * @Date 2020/4/30 14:58
-     * @Description: 获取押金比例
+     * @Date 2020/5/8 10:15
+     * @Description: 修改用车城市和风控事故状态
      *
      **/
-    public PaymentRespVO queryPaymentFromRemote(PaymentReqVO paymentReqVO){
-        ResponseData<PaymentRespVO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "押金比例");
+    public ResponseData  updateRentCityAndRiskAccidentFromRemote(RentCityAndRiskAccidentReqDTO req){
+        ResponseData responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "修改用车城市和风控事故状态");
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryByOrderNo");
-            log.info("Feign 开始押金比例paymentReqVO={}", JSON.toJSONString(paymentReqVO));
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(paymentReqVO));
-            responseObject = feignPaymentService.queryByOrderNo(paymentReqVO);
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderUpdateService.updateRentCityAndRiskAccident");
+            log.info("Feign 开始修改用车城市和风控事故状态req={}", JSON.toJSONString(req));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
+            responseObject = feignOrderUpdateService.updateRentCityAndRiskAccident(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            return responseObject.getData();
+            return responseObject;
         }catch (Exception e){
-            log.error("Feign 押金比例异常,responseObject={},paymentReqVO={}",JSON.toJSONString(responseObject),JSON.toJSONString(paymentReqVO),e);
-            Cat.logError("Feign 押金比例异常",e);
+            log.error("Feign 修改用车城市和风控事故状态异常,responseObject={},req={}",JSON.toJSONString(responseObject),JSON.toJSONString(req),e);
+            Cat.logError("Feign 修改用车城市和风控事故状态异常",e);
             throw e;
         }finally {
             t.complete();

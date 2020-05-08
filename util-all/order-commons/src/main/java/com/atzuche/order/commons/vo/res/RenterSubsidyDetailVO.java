@@ -131,6 +131,9 @@ public class RenterSubsidyDetailVO {
         if(srvReturnCostAmt != null){
             total=total+srvReturnCostAmt;
         }
+        if(longRentDecutAmt != null){
+            total=total+longRentDecutAmt;
+        }
         return total;
     }
 

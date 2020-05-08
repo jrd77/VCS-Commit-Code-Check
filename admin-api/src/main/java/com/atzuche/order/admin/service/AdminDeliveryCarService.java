@@ -1,31 +1,22 @@
 package com.atzuche.order.admin.service;
 
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.admin.filter.CityLonLatFilter;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.enums.DeliveryErrorCode;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
-import com.atzuche.order.commons.vo.delivery.DeliveryCarRepVO;
-import com.atzuche.order.commons.vo.delivery.DeliveryCarVO;
-import com.atzuche.order.commons.vo.delivery.DeliveryReqDTO;
-import com.atzuche.order.commons.vo.delivery.DeliveryReqVO;
-import com.atzuche.order.commons.vo.delivery.DistributionCostVO;
-import com.atzuche.order.commons.vo.delivery.GetHandoverCarDTO;
-import com.atzuche.order.commons.vo.delivery.ReturnHandoverCarDTO;
-import com.atzuche.order.commons.vo.delivery.SimpleOrderInfoVO;
+import com.atzuche.order.commons.vo.delivery.*;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
-import com.atzuche.order.open.service.FeignModifyOwnerAddrService;
 import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author 胡春林
@@ -39,9 +30,9 @@ public class AdminDeliveryCarService {
     @Autowired
     CityLonLatFilter cityLonLatFilter;
     @Autowired
-    FeignModifyOwnerAddrService feignModifyOwnerAddrService;
-    @Autowired
     private DeliveryRemoteService deliveryRemoteService;
+    @Autowired
+    private RemoteFeignService remoteFeignService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -95,14 +86,17 @@ public class AdminDeliveryCarService {
         orderReqVo.setSrvReturnAddr(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnAddr());
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
-        ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
+        //ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
+        ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+
         if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
             logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
             throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
         }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if(Objects.nonNull(ownerTransAddressReqVO)) {
-            ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
+            //ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
+            ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
             if (!ownerResponseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !ownerResponseData.getResCode().equals("510004")) {
                 logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
                 throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());

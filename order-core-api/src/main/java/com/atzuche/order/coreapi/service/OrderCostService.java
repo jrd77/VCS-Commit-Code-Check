@@ -79,6 +79,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.doc.util.StringUtil;
 import com.autoyol.platformcost.CommonUtils;
 import com.autoyol.platformcost.model.FeeResult;
@@ -233,215 +234,216 @@ public class OrderCostService {
         
         
 		
-		//配送订单
-	      List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
-	      RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
-	      RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
-	      RenterOrderDeliveryResVO renterOrderDeliveryGetReal = new RenterOrderDeliveryResVO();
-	      RenterOrderDeliveryResVO renterOrderDeliveryReturnReal = new RenterOrderDeliveryResVO();
-	      
-	      if(renterOrderDeliveryGet != null) {
-	      	BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetReal);
-	      }
-	      if(renterOrderDeliveryReturn != null) {
-	      	BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnReal);
-	      }
-	      resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
-	      resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
-	      
-	   // 获取修改前租客使用的优惠券列表
-		  List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(renterOrderNo);
-		  List<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity> orderCouponListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity>();
-		  if(orderCouponList != null) {
-			  orderCouponList.stream().forEach(x->{
-				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
-		      		try {
-						BeanUtils.copyProperties(x, real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		      		orderCouponListReal.add(real);
-		          });
-		      }
-		  resVo.setOrderCouponList(orderCouponListReal);
-	      
-		  //补付费用
-		  List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
-		  List<com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity> supplementListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity>();
-		  if(supplementList != null) {
-			  supplementList.stream().forEach(x->{
-				  com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity();
-		      		try {
-						BeanUtils.copyProperties(x,real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		      		supplementListReal.add(real);
-		          });
-		      }
-		  resVo.setSupplementList(supplementListReal);
-	      
-	      AccountRenterCostSettleEntity arcse = accountRenterCostSettleService.selectByOrderNo(orderNo, memNo);
-	      AccountRenterCostSettleResVO  renterSettleVo = new AccountRenterCostSettleResVO();
-	      if(arcse != null) {
-		      	BeanUtils.copyProperties(arcse,renterSettleVo);
-		  }
-		  resVo.setRenterSettleVo(renterSettleVo);
-		  
-	      
-        
-	      //-----------------------------------------------------------------
+        //配送订单
+        List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(renterOrderNo);
+        RenterOrderDeliveryEntity renterOrderDeliveryGet = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
+        RenterOrderDeliveryEntity renterOrderDeliveryReturn = filterDeliveryOrderByType(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
+        RenterOrderDeliveryResVO renterOrderDeliveryGetReal = new RenterOrderDeliveryResVO();
+        RenterOrderDeliveryResVO renterOrderDeliveryReturnReal = new RenterOrderDeliveryResVO();
 
-		  ///油费，超里程，加油服务费
-		  RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
-//		  com.atzuche.order.commons.vo.res.RentCosts rentCostsReal = new com.atzuche.order.commons.vo.res.RentCosts();
-//		  BeanUtils.copyProperties(rentCostsReal, rentCost);
-//		  resVo.setRentCosts(rentCostsReal);
-		  
-		  //租客费用统计 200309
-		  resVo.setRenterCostAmtFinal(rentCost.getRenterCostAmtFinal());
-		  
-		  /**
-		   * 简化处理 !!!
-		   */
-		    /**
-		     * 交接车-油费
-		     */
-            RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
-//            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
-//            if(oilAmt != null) {
-//                BeanUtils.copyProperties(oilAmt,oilAmtReal);
-//                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
-//                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-//                //oilDifferenceCrash may be "0.0" format
-//                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
-//            }
-//		    resVo.setOilAmt(oilAmtReal);
-            if(oilAmt != null) {
-            	String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
-            	oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
-            	//oilDifferenceCrash may be "0.0" format
-            	resVo.setOilAmt((int)Float.parseFloat(oilDifferenceCrash));
-            }
+        if(renterOrderDeliveryGet != null) {
+        BeanUtils.copyProperties(renterOrderDeliveryGet,renterOrderDeliveryGetReal);
+        }
+        if(renterOrderDeliveryReturn != null) {
+        BeanUtils.copyProperties(renterOrderDeliveryReturn,renterOrderDeliveryReturnReal);
+        }
+        resVo.setRenterOrderDeliveryGet(renterOrderDeliveryGetReal);
+        resVo.setRenterOrderDeliveryReturn(renterOrderDeliveryReturnReal);
 
-		    /*
-		     * 交接车-获取超里程费用
-		     */
-            FeeResult mileageAmt = rentCost.getMileageAmt();
-//		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
-//		    if(mileageAmt != null) {
-//		    	BeanUtils.copyProperties(mileageAmt,mileageAmtReal);
-//                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
-//		    }
-            if(mileageAmt != null) {
-            	resVo.setMileageAmt(mileageAmt.getTotalFee());
-            }
-		    
-          //-------------------------------------------------------------------- 以下是子订单费用
-          //租客费用明细,代码重构，避免重复查询。
-		      List<RenterOrderCostDetailEntity> renterOrderCostDetailList = rentCost.getRenterOrderCostDetails();//renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
-		      List<RenterOrderCostDetailResVO> renterOrderCostDetailListReal = new ArrayList<RenterOrderCostDetailResVO>();
-		      if(renterOrderCostDetailList != null) {
-		      	renterOrderCostDetailList.stream().forEach(x->{
-		      		RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
-		      		try {
-						BeanUtils.copyProperties(x,real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		      		renterOrderCostDetailListReal.add(real);
-		          });
-		      }
-		      //数据封装 20200211
-		      resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
-		      
-		      
-            //租客罚金列表,代码重构，避免重复查询。
-      		List<RenterOrderFineDeatailEntity> fineLst = rentCost.getRenterOrderFineDeatails(); //renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
-      		List<RenterOrderFineDeatailResVO> fineLstReal = new ArrayList<RenterOrderFineDeatailResVO>();
-      		if(fineLst != null) {
-      			fineLst.stream().forEach(x->{
-      				RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
-      	      		try {
-      					BeanUtils.copyProperties(x,real);
-      				} catch (Exception e) {
-      					log.error("对象属性赋值报错:",e);
-      				}
-      	      		fineLstReal.add(real);
-      	          });
-      	      }
-      		resVo.setFineLst(fineLstReal);
-      		
-      		
-      		//管理后台罚金列表,代码重构，避免重复查询。
-      		List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleFineLst = rentCost.getConsoleRenterOrderFineDeatails(); //consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
-      		List<ConsoleRenterOrderFineDeatailEntity> consolefineLstReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
-      		if(consoleFineLst != null) {
-      			consoleFineLst.stream().forEach(x->{
-      				ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
-      	      		try {
-      					BeanUtils.copyProperties(x,real);
-      				} catch (Exception e) {
-      					log.error("对象属性赋值报错:",e);
-      				}
-      	      		consolefineLstReal.add(real);
-      	          });
-      		}
-      		//封装
-      		resVo.setConsoleFineLst(consolefineLstReal);
-      		
-      		
-      		//管理后台费用列表,代码重构，避免重复查询。
-      		List<OrderConsoleCostDetailEntity> consoleCostLst = rentCost.getOrderConsoleCostDetailEntity();//orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,memNo);
-      		List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
-      		if(consoleCostLst != null) {
-      			consoleCostLst.stream().forEach(x->{
-      				com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
-      	      		try {
-      					BeanUtils.copyProperties(x,real);
-      				} catch (Exception e) {
-      					log.error("对象属性赋值报错:",e);
-      				}
-      	      		consoleCostLstReal.add(real);
-      	          });
-      	      }
-      		resVo.setOrderConsoleCostDetails(consoleCostLstReal);
-      		
-      		
-      		 //抵扣明细 租客补贴明细列表,代码重构，避免重复查询。
-		  	List<RenterOrderSubsidyDetailEntity> subsidyLst = rentCost.getRenterOrderSubsidyDetails();//renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
-		      List<RenterOrderSubsidyDetailResVO> subsidyLstReal = new ArrayList<RenterOrderSubsidyDetailResVO>();;
-		      if(subsidyLst != null) {
-		      	subsidyLst.stream().forEach(x->{
-		      		RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
-		      		try {
-						BeanUtils.copyProperties(x,real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		              subsidyLstReal.add(real);
-		          });
-		      }
-		      resVo.setSubsidyLst(subsidyLstReal);
-		      
-		      
-		    
-		     //管理后台补贴,代码重构，避免重复查询。
-		    List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = rentCost.getOrderConsoleSubsidyDetails();
-		    List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetailsReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity>();
-		    if(orderConsoleSubsidyDetails != null) {
-		    	orderConsoleSubsidyDetails.stream().forEach(x->{
-		    		com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
-			      		try {
-							BeanUtils.copyProperties(x,real);
-						} catch (Exception e) {
-							log.error("对象属性赋值报错:",e);
-						}
-			      		orderConsoleSubsidyDetailsReal.add(real);
-			          });
-			      }
-			  resVo.setOrderConsoleSubsidyDetails(orderConsoleSubsidyDetailsReal);
-			   
+        // 获取修改前租客使用的优惠券列表
+        List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(renterOrderNo);
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity> orderCouponListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity>();
+        if(orderCouponList != null) {
+          orderCouponList.stream().forEach(x->{
+              com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
+                try {
+                    BeanUtils.copyProperties(x, real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                orderCouponListReal.add(real);
+              });
+          }
+        resVo.setOrderCouponList(orderCouponListReal);
+
+        //补付费用
+        List<OrderSupplementDetailEntity> supplementList = orderSupplementDetailService.listOrderSupplementDetailByOrderNoAndMemNo(orderNo, memNo);
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity> supplementListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity>();
+        if(supplementList != null) {
+          supplementList.stream().forEach(x->{
+              com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderSupplementDetailEntity();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                supplementListReal.add(real);
+              });
+          }
+        resVo.setSupplementList(supplementListReal);
+
+        AccountRenterCostSettleEntity arcse = accountRenterCostSettleService.selectByOrderNo(orderNo, memNo);
+        AccountRenterCostSettleResVO  renterSettleVo = new AccountRenterCostSettleResVO();
+        if(arcse != null) {
+            BeanUtils.copyProperties(arcse,renterSettleVo);
+        }
+        resVo.setRenterSettleVo(renterSettleVo);
+
+
+
+        //-----------------------------------------------------------------
+
+        ///油费，超里程，加油服务费
+        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        //		  com.atzuche.order.commons.vo.res.RentCosts rentCostsReal = new com.atzuche.order.commons.vo.res.RentCosts();
+        //		  BeanUtils.copyProperties(rentCostsReal, rentCost);
+        //		  resVo.setRentCosts(rentCostsReal);
+
+        //租客费用统计 200309
+        resVo.setRenterCostAmtFinal(rentCost.getRenterCostAmtFinal());
+
+        /**
+        * 简化处理 !!!
+        */
+        /**
+         * 交接车-油费
+         */
+        RenterGetAndReturnCarDTO oilAmt = rentCost.getOilAmt();
+        //            com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity oilAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+        //            if(oilAmt != null) {
+        //                BeanUtils.copyProperties(oilAmt,oilAmtReal);
+        //                String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+        //                oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+        //                //oilDifferenceCrash may be "0.0" format
+        //                oilAmtReal.setTotalAmount((int)Float.parseFloat(oilDifferenceCrash));
+        //            }
+        //		    resVo.setOilAmt(oilAmtReal);
+        if(oilAmt != null) {
+            String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
+            oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
+            //oilDifferenceCrash may be "0.0" format
+            resVo.setOilAmt((int)Float.parseFloat(oilDifferenceCrash));
+        }
+
+        /*
+         * 交接车-获取超里程费用
+         */
+        FeeResult mileageAmt = rentCost.getMileageAmt();
+        //		    com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity mileageAmtReal = new com.atzuche.order.commons.vo.res.rentcosts.RenterOrderCostDetailEntity();
+        //		    if(mileageAmt != null) {
+        //		    	BeanUtils.copyProperties(mileageAmt,mileageAmtReal);
+        //                mileageAmtReal.setTotalAmount(mileageAmt.getTotalFee());
+        //		    }
+        if(mileageAmt != null) {
+            resVo.setMileageAmt(mileageAmt.getTotalFee());
+        }
+
+        //-------------------------------------------------------------------- 以下是子订单费用
+        //租客费用明细,代码重构，避免重复查询。
+          List<RenterOrderCostDetailEntity> renterOrderCostDetailList = rentCost.getRenterOrderCostDetails();//renterOrderCostDetailService.listRenterOrderCostDetail(orderNo, renterOrderNo);
+          List<RenterOrderCostDetailResVO> renterOrderCostDetailListReal = new ArrayList<RenterOrderCostDetailResVO>();
+          if(renterOrderCostDetailList != null) {
+            renterOrderCostDetailList.stream().forEach(x->{
+                RenterOrderCostDetailResVO real = new RenterOrderCostDetailResVO();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                renterOrderCostDetailListReal.add(real);
+              });
+          }
+          //数据封装 20200211
+          resVo.setRenterOrderCostDetailList(renterOrderCostDetailListReal);
+
+
+        //租客罚金列表,代码重构，避免重复查询。
+        List<RenterOrderFineDeatailEntity> fineLst = rentCost.getRenterOrderFineDeatails(); //renterOrderFineDeatailService.listRenterOrderFineDeatail(orderNo, renterOrderNo);
+        List<RenterOrderFineDeatailResVO> fineLstReal = new ArrayList<RenterOrderFineDeatailResVO>();
+        if(fineLst != null) {
+            fineLst.stream().forEach(x->{
+                RenterOrderFineDeatailResVO real = new RenterOrderFineDeatailResVO();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                fineLstReal.add(real);
+              });
+          }
+        resVo.setFineLst(fineLstReal);
+
+
+        //管理后台罚金列表,代码重构，避免重复查询。
+        List<com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity> consoleFineLst = rentCost.getConsoleRenterOrderFineDeatails(); //consoleRenterOrderFineDeatailService.listConsoleRenterOrderFineDeatail(orderNo, memNo);
+        List<ConsoleRenterOrderFineDeatailEntity> consolefineLstReal = new ArrayList<ConsoleRenterOrderFineDeatailEntity>();
+        if(consoleFineLst != null) {
+            consoleFineLst.stream().forEach(x->{
+                ConsoleRenterOrderFineDeatailEntity real = new ConsoleRenterOrderFineDeatailEntity();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                consolefineLstReal.add(real);
+              });
+        }
+        //封装
+        resVo.setConsoleFineLst(consolefineLstReal);
+
+
+        //管理后台费用列表,代码重构，避免重复查询。
+        List<OrderConsoleCostDetailEntity> consoleCostLst = rentCost.getOrderConsoleCostDetailEntity();//orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,memNo);
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
+        if(consoleCostLst != null) {
+            consoleCostLst.stream().forEach(x->{
+                com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                consoleCostLstReal.add(real);
+              });
+          }
+        resVo.setOrderConsoleCostDetails(consoleCostLstReal);
+
+
+         //抵扣明细 租客补贴明细列表,代码重构，避免重复查询。
+        List<RenterOrderSubsidyDetailEntity> subsidyLst = rentCost.getRenterOrderSubsidyDetails();//renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo, renterOrderNo);
+          List<RenterOrderSubsidyDetailResVO> subsidyLstReal = new ArrayList<RenterOrderSubsidyDetailResVO>();;
+          if(subsidyLst != null) {
+            subsidyLst.stream().forEach(x->{
+                RenterOrderSubsidyDetailResVO real = new RenterOrderSubsidyDetailResVO();
+                try {
+                    BeanUtils.copyProperties(x,real);
+                } catch (Exception e) {
+                    log.error("对象属性赋值报错:",e);
+                }
+                  subsidyLstReal.add(real);
+              });
+          }
+          resVo.setSubsidyLst(subsidyLstReal);
+
+
+
+         //管理后台补贴,代码重构，避免重复查询。
+        List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = rentCost.getOrderConsoleSubsidyDetails();
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetailsReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity>();
+        if(orderConsoleSubsidyDetails != null) {
+            orderConsoleSubsidyDetails.stream().forEach(x->{
+                com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity();
+                    try {
+                        BeanUtils.copyProperties(x,real);
+                    } catch (Exception e) {
+                        log.error("对象属性赋值报错:",e);
+                    }
+                    orderConsoleSubsidyDetailsReal.add(real);
+             });
+        }
+        resVo.setOrderConsoleSubsidyDetails(orderConsoleSubsidyDetailsReal);
+        RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderEntity.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
+        resVo.setRenterCostVO(costVo);
 		return resVo;
 	}
 

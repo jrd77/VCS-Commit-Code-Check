@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.vo.resp.car.RenterInfoRespVO;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
@@ -38,17 +39,18 @@ public class AdminRenterInfoController {
     private MemProxyService memProxyService;
 
     @Autowired
-    private FeignOrderDetailService feignOrderDetailService;
+    private RemoteFeignService remoteFeignService;
 
     @AutoDocMethod(description = "获取租客信息接口响应信息", value = "获取租客信息接口响应信息", response = RenterInfoRespVO.class)
     @GetMapping(value = "/info")
     public ResponseData<RenterInfoRespVO> getRenterInfo(@RequestParam(value = "orderNo",required = true) String orderNo) {
         logger.info("reqVo is {}",orderNo);
 
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo(orderNo);
+        //OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
+        //reqDTO.setOrderNo(orderNo);
 
-        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        //ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
         if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
             throw new RenterNotFoundException(orderNo);
         }

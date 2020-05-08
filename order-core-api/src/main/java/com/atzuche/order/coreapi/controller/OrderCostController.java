@@ -44,7 +44,7 @@ import com.atzuche.order.rentercost.entity.vo.GetReturnAndOverFeeDetailVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;

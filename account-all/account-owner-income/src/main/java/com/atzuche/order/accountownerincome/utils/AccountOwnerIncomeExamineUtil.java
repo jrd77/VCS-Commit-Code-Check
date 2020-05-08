@@ -12,20 +12,23 @@ import java.util.stream.Collectors;
 
 public class AccountOwnerIncomeExamineUtil {
 
-    public static List<AccountOwnerIncomeExamineEntity> filterByType(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineType accountOwnerIncomeExamineType){
-        List<AccountOwnerIncomeExamineEntity> collect = Optional.ofNullable(list)
+    public static AccountOwnerIncomeExamineEntity filterByType(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineType accountOwnerIncomeExamineType){
+        Optional<AccountOwnerIncomeExamineEntity> first = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
                 .filter(x -> accountOwnerIncomeExamineType.getStatus() == x.getType())
-                .collect(Collectors.toList());
-        return collect;
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
     }
 
     public static List<AccountOwnerIncomeExamineEntity> filterByStatus(List<AccountOwnerIncomeExamineEntity> list, AccountOwnerIncomeExamineStatus accountOwnerIncomeExamineStatus){
         List<AccountOwnerIncomeExamineEntity> collect = Optional.ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> accountOwnerIncomeExamineStatus.getStatus() == x.getStatus())
+                .filter(x -> accountOwnerIncomeExamineStatus==null?true:(accountOwnerIncomeExamineStatus.getStatus() == x.getStatus()))
                 .collect(Collectors.toList());
         return collect;
     }

@@ -439,7 +439,9 @@ public class CashierPayService{
         List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable,isWalletDebtRentCost);
         log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
         if(CollectionUtils.isEmpty(payVo)){
-            throw new OrderPaySignFailException();
+//            throw new OrderPaySignFailException();
+        	//小程序：之前说的是/cashier/getPaySignStr 返回dataStr空，就不走支付接口，我这边没办法判断走不走支付
+        	return "";
         }
         return cashierNoTService.getPaySignByPayVos(payVo);
     }

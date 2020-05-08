@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.*;
@@ -21,6 +22,7 @@ import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.caucho.hessian.io.RemoteDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class AdminOrderController {
     @Autowired
     private AdminOrderService adminOrderService;
     @Autowired
-    private FeignOrderDetailService feignOrderDetailService;
+    private RemoteFeignService remoteFeignService;
 
     @Autowired
     private CarService carService;
@@ -69,18 +71,21 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo(orderNo);
+        //OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
+        //reqDTO.setOrderNo(orderNo);
 
-        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
-        ResponseCheckUtil.checkResponse(respDTOResponseData);
+        //ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
+
+        //ResponseCheckUtil.checkResponse(respDTOResponseData);
 
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        adminOrderService.modifyOrder(modifyOrderReqVO);
+        //adminOrderService.modifyOrder(modifyOrderReqVO);
+        remoteFeignService.modifyOrder(modifyOrderReqVO);
         return ResponseData.success();
     }
 

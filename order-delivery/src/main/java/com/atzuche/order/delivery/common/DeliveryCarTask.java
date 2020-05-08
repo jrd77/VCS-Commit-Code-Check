@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.common;
 
+import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
@@ -40,6 +41,8 @@ public class DeliveryCarTask {
     CodeUtils codeUtils;
     @Autowired
     RenterOrderDeliveryService renterOrderDeliveryService;
+    @Autowired
+    DeliveryRenYunConfig deliveryRenYunConfig;
 
     /**
      * 添加订单到仁云流程系统
@@ -48,7 +51,7 @@ public class DeliveryCarTask {
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
         String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, DeliveryConstants.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
+            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
         }
     }
 
@@ -59,7 +62,7 @@ public class DeliveryCarTask {
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
         String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, DeliveryConstants.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
+            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
         }
     }
 
@@ -71,7 +74,7 @@ public class DeliveryCarTask {
 
         String result = renyunDeliveryCarService.cancelRenYunFlowOrderInfo(cancelFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, DeliveryConstants.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
+            sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, deliveryRenYunConfig.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
         }
         return new AsyncResult(true);
     }

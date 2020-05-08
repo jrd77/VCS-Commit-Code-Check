@@ -16,10 +16,8 @@ import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainStatusEnum;
 import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
-import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -40,9 +38,6 @@ import java.util.stream.Collectors;
 public class CarDepositReturnDetailService {
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
-    @Autowired
-    private OrderSettleService orderSettleService;
-
 
     public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(CarDepositReqVO reqVo) {
         String orderNo = reqVo.getOrderNo();
@@ -73,8 +68,6 @@ public class CarDepositReturnDetailService {
             throw new RuntimeException("车辆押金获取失败:"+ orderNo);
         }
         RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
-        String renterOrderNo = renterOrderDTO.getRenterOrderNo();
-        String renterMemNo = renterOrderDTO.getRenterMemNo();
         AccountRenterDepositDTO accountRenterDepositDTO = data.getAccountRenterDepositDTO();
         RenterDepositDetailDTO renterDepositDetailDTO = data.getRenterDepositDetailDTO();
         OrderDTO orderDTO = data.getOrderDTO();
@@ -128,8 +121,8 @@ public class CarDepositReturnDetailService {
         if(payTime != null){
             payTimeStr = LocalDateTimeUtils.formateLocalDateTimeStr(payTime, GlobalConstant.DATE_TIME_FORMAT_1);
         }
-        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
-        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterMemNo,rentCost.getRenterCostAmtFinal());
+
+        RenterCostVO renterCostVO = data.getRenterCostVO();
         CarDepositRespVo carDepositRespVo = new CarDepositRespVo();
         int expOrActFlag = 1;
         if(SettleStatusEnum.SETTLED.getCode() == orderStatusDTO.getCarDepositSettleStatus()){//车辆已经结算
