@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterCostException;
 import com.atzuche.order.accountrenterdeposit.exception.AccountRenterDepositDBException;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
@@ -25,8 +26,10 @@ import com.atzuche.order.accountrenterdeposit.vo.req.PayedOrderRenterDepositReqV
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.exception.AccountRenterWZDepositException;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
@@ -88,13 +91,21 @@ public class CashierNoTService {
     @Autowired
     AccountRenterDepositService accountRenterDepositService;
     @Autowired
+    AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
+    @Autowired
     AccountRenterWzDepositService accountRenterWzDepositService;
     @Autowired
     AccountRenterCostSettleService accountRenterCostSettleService;
     @Value("${env_t}")
     private String env;
     @Autowired private BaseProducer baseProducer;
-
+    
+	public static final String ANDROID = "ANDROID";
+	public static final String IOS = "IOS";
+	//信用预授权  App支付宝支付
+	public static final String CREDITIOS_ALIPAY = "CREDITIOS-ALIPAY";
+	public static final String CREDITANDROID_ALIPAY = "CREDITANDROID-ALIPAY";
+	public static final String MICROPROGRAM_COMMON = "MICROPROGRAM-COMMON";
 
     /**
      * 收银台根据主单号 向订单模块查询子单号
@@ -617,6 +628,99 @@ public class CashierNoTService {
         vo.setAtpaySign(StringUtils.EMPTY);
         return vo;
     }
+    
+    /**
+     * 需要变更reqOs字段。
+     * @param orderNo
+     * @param cashierEntity
+     * @param orderPaySign
+     * @param amt
+     * @param title
+     * @param payKind
+     * @param payIdStr
+     * @param extendParams
+     * @param freeDepositType
+     * @return
+     */
+    public PayVo getPayVOChangeReqOs(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
+        PayVo vo = new PayVo();
+        Integer paySn = (Objects.isNull(cashierEntity)|| Objects.isNull(cashierEntity.getPaySn()))?0:cashierEntity.getPaySn();
+        String reqOs = orderPaySign.getReqOs();
+        vo.setInternalNo("1");
+        vo.setExtendParams(extendParams);
+        vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+        vo.setMemNo(orderPaySign.getMenNo());
+//        vo.setOrderNo(orderPaySign.getOrderNo());
+        //支持多订单号
+        vo.setOrderNo(orderNo);
+        vo.setOpenId(orderPaySign.getOpenId());
+        //默认赋值
+        vo.setReqOs(reqOs);
+        vo.setPayAmt(String.valueOf(Math.abs(amt)));
+        vo.setPayEnv(env);
+        vo.setPayId(payIdStr);
+        vo.setPayKind(payKind);
+        vo.setPaySn(String.valueOf(paySn));
+        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPayTitle(title);
+//        if(freeDepositType == 2) {
+//        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
+//        }else {
+        	vo.setPayType(orderPaySign.getPayType());  //默认
+//        }
+        
+        //只有押金才有预授权的情况
+        if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
+	        String sourceType = orderPaySign.getPaySource();
+	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
+				//只有押金的时候才有是预授权，其他的情况都是消费
+				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
+				//设置OS,否则支付宝小程序走的都是信用支付
+				
+				//租客押金
+		        AccountRenterDepositEntity accountRenterDepositEntity = accountRenterDepositService.selectByOrderNo(orderNo);
+		        //违章押金
+		        AccountRenterWzDepositEntity accountRenterWzDepositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
+		        
+				if( (accountRenterDepositEntity != null && accountRenterDepositEntity.getFreeDepositType() == 3) || 
+						(accountRenterWzDepositEntity != null && accountRenterWzDepositEntity.getFreeDepositType() == 3) ){
+					if("miniprogram-alipay".equals(reqOs)) {
+						vo.setReqOs(MICROPROGRAM_COMMON);  //普通预授权
+					}
+					//非支付宝小程序，默认传参本身。
+				}else{
+					//需要根据标识来区分
+					if(!"miniprogram-alipay".equals(reqOs)) {  //非支付宝小程序
+						String convertReqOs = reqOs;
+						if(IOS.equals(reqOs.toUpperCase())){
+							convertReqOs = CREDITIOS_ALIPAY;
+						}else if(ANDROID.equals(reqOs.toUpperCase())){
+							convertReqOs = CREDITANDROID_ALIPAY;
+						}else{
+							convertReqOs = CREDITIOS_ALIPAY;
+						}
+						vo.setReqOs(convertReqOs);  //信用预授权
+					}
+					//支付宝小程序，默认传参本身。 miniprogram-alipay
+				}
+				
+			}else if(DataPaySourceConstant.WEIXIN_APP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_MP.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else if(DataPaySourceConstant.WEIXIN_H5.equals(sourceType)){
+				vo.setPayType(DataPayTypeConstant.PAY_PUR); 
+			}else {
+				//默认
+				vo.setPayType(orderPaySign.getPayType());
+			}
+        }
+        
+        vo.setReqIp(IpUtil.getLocalIp());
+        vo.setAtpaySign(StringUtils.EMPTY);
+        return vo;
+    }
+    
     
     public PayVo getPayVOForOrderSupplementDetail(String orderNo,CashierEntity cashierEntity,OrderPaySignReqVO orderPaySign,int amt ,String title,String payKind,String payIdStr ,String extendParams,int freeDepositType) {
         PayVo vo = new PayVo();

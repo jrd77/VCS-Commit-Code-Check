@@ -1085,7 +1085,7 @@ public class CashierPayService{
                     AccountRenterDepositResVO accountRenterDeposit = cashierService.getRenterDepositEntity(orderNo,orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterDeposit)?0:accountRenterDeposit.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(orderNo,cashierEntity,orderPaySign,amt,payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit),accountRenterDeposit.getFreeDepositType());
+                    PayVo vo = cashierNoTService.getPayVOChangeReqOs(orderNo,cashierEntity,orderPaySign,amt,payVO.getTitle(),DataPayKindConstant.RENT,payIdStr,GsonUtils.toJson(accountRenterDeposit),accountRenterDeposit.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
@@ -1097,7 +1097,7 @@ public class CashierPayService{
                     AccountRenterWZDepositResVO accountRenterWZDepositRes = cashierService.getRenterWZDepositEntity(orderNo,orderPaySign.getMenNo());
                     Integer payId = Objects.isNull(accountRenterWZDepositRes)?0:accountRenterWZDepositRes.getId();
                     String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
-                    PayVo vo = cashierNoTService.getPayVO(orderNo,cashierEntity,orderPaySign,amt,payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes),accountRenterWZDepositRes.getFreeDepositType());
+                    PayVo vo = cashierNoTService.getPayVOChangeReqOs(orderNo,cashierEntity,orderPaySign,amt,payVO.getTitle(),DataPayKindConstant.DEPOSIT,payIdStr,GsonUtils.toJson(accountRenterWZDepositRes),accountRenterWZDepositRes.getFreeDepositType());
                     String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
                     vo.setPayMd5(payMd5);
                     payVo.add(vo);
