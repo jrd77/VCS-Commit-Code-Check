@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.RemoteFeignService;
+import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.atzuche.order.open.service.FeignOrderSettleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("settle")
 @Slf4j
 public class AdminOrderSettleController {
-
-    @Autowired
-    private FeignOrderSettleService feignOrderSettleService;
     @Autowired
     private RemoteFeignService remoteFeignService;
 
@@ -32,28 +30,12 @@ public class AdminOrderSettleController {
     @GetMapping("/deposit")
     public ResponseData<String> settleDeposit(@RequestParam("orderNo") String orderNo) {
         log.info("OrderSettleController settleDeposit start param [{}]", orderNo);
-        ResponseData result = feignOrderSettleService.depositSettle(orderNo);
+        ResponseData result = remoteFeignService.depositSettleFromRemote(orderNo);
+        //ResponseData result = feignOrderSettleService.depositSettle(orderNo);
         log.info("CashierController settleDeposit end param [{}],result [{}]",orderNo,result);
         return result;
     }
 
-/*
-    */
-/**
-     * 手动车辆结算接口
-     * @param orderNo
-     * @return
-     *//*
-
-    @AutoDocMethod(value = "查询支付款项信息", description = "查询支付款项信息", response = String.class)
-    @GetMapping("/settleOrderCancel")
-    public ResponseData<String> settleOrderCancel(@RequestParam("orderNo") String orderNo) {
-        log.info("OrderSettleController settleOrderCancel start param [{}]", orderNo);
-        orderSettleService.settleOrderCancel(orderNo);
-        log.info("CashierController settleOrderCancel end param [{}],result [{}]");
-        return ResponseData.success();
-    }
-*/
 
     /**
      * 手动车辆结算接口
