@@ -134,7 +134,7 @@ public class RenterOrderInfoController {
     }
 
     @GetMapping("/getListRenterOrderCostDetail")
-    public ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(String orderNo) {
+    public ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(@RequestParam("orderNo") String orderNo) {
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if (renterOrderEntity == null) {
             throw new OrderNotFoundException(orderNo);
