@@ -5,9 +5,26 @@ package com.atzuche.order.admin.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
+import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
+import com.atzuche.order.accountrenterrentcost.utils.AccountRenterCostUtil;
+import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
+import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
+import com.atzuche.order.cashieraccount.entity.OfflineRefundApplyEntity;
+import com.atzuche.order.cashieraccount.service.OfflineRefundApplyService;
+import com.atzuche.order.cashieraccount.service.notservice.AccountVirtualPayService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
+import com.atzuche.order.cashieraccount.utils.CashierUtils;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
+import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +54,15 @@ public class PaymentService {
 	OrderStatusService orderStatusService;
 	@Autowired
 	FeignPaymentService feignPaymentService;
-	
+    @Autowired
+    CashierRefundApplyNoTService cashierRefundApplyNoTService;
+    @Autowired
+    OfflineRefundApplyService offlineRefundApplyService;
+    @Autowired
+    AccountVirtualPayService accountVirtualPayService;
+    @Autowired
+    AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+
 //	@Autowired
 //	PaymentCashierService paymentCashierService;
 	
@@ -105,42 +130,106 @@ public class PaymentService {
 		/**
 		 * 不等于空
 		 */
-		if(resData != null) {
-			List<CashierResVO> lst = resData.getData();
-			for (CashierResVO cashierEntity : lst) {
-				String payTime = cashierEntity.getPayTime();
-				if(StringUtils.isBlank(payTime)) {
-					LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
-					//中间段的。
-//					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-//					afterDepositSettlementPaymentList.add(vo);
-					PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-					beforeDepositSettlementPaymentList.add(vo);
-				}else {
-					/**
-					 * 根据支付时间来切换
-					 */
-					LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
-					//未结算
-					if(settleTime == null) {
-						PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-						beforeDepositSettlementPaymentList.add(vo);
-					}else {
-						if(settleTime != null && payTimeLdt.isBefore(settleTime)) {
-							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-							beforeDepositSettlementPaymentList.add(vo);
-						}else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
-							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-							violationDepositSettlementPaymentList.add(vo);
-						}else {
-							//中间段的。
-							PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
-							afterDepositSettlementPaymentList.add(vo);
-						}
-					}
-				}
-			}
-		}
+		if(resData == null || resData.getData() ==null || resData.getData().size()<=0) {
+            respVo.setAfterDepositSettlementPaymentList(afterDepositSettlementPaymentList);
+            respVo.setBeforeDepositSettlementPaymentList(beforeDepositSettlementPaymentList);
+            respVo.setViolationDepositSettlementPaymentList(violationDepositSettlementPaymentList);
+            return respVo;
+        }
+        List<CashierResVO> lst = resData.getData();
+        List<OfflineRefundApplyEntity> offlineRefundApplyEntityList = offlineRefundApplyService.queryByOrderNo(orderNo);
+        List<AccountVirtualPayDetailEntity> accountVirtualPayDetailEntityList = accountVirtualPayService.queryVirtualPayByOrderNo(orderNo);
+        List<CashierRefundApplyEntity> refundApplyList = cashierRefundApplyNoTService.getRefundApplyByOrderNo(orderNo);
+        for (CashierResVO cashierEntity : lst) {
+            String payKind = cashierEntity.getPayKind();
+            String paySource = cashierEntity.getPaySource();
+            String payTime = cashierEntity.getPayTime();
+            if(DataPayKindConstant.RENT_AMOUNT.equals(payKind) && PaySourceEnum.WALLET_PAY.getCode().equals(paySource)){
+                payTime = LocalDateTimeUtils.formatDateTime(cashierEntity.getCreateTime(),"yyyyMMddHHmmss") ;
+            }
+
+            if(StringUtils.isBlank(payTime)) {
+                LocalDateTime payTimeLdt = LocalDateTimeUtils.dateToLocalDateTime(new Date());
+                PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                beforeDepositSettlementPaymentList.add(vo);
+            }else {
+                /**
+                 * 根据支付时间来切换
+                 */
+                LocalDateTime payTimeLdt = LocalDateTimeUtils.parseStringToDateTime(payTime, "yyyyMMddHHmmss");
+                if(settleTime == null) {
+                    PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                    beforeDepositSettlementPaymentList.add(vo);
+                }else {
+
+                    if(settleTime != null &&  payTimeLdt.isBefore(settleTime)) {
+                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                        beforeDepositSettlementPaymentList.add(vo);
+                    }else if(wzSettleTime != null && payTimeLdt.isAfter(wzSettleTime)) {
+                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                        violationDepositSettlementPaymentList.add(vo);
+                    }else {  //中间段的。
+                        //收银台
+                        PaymentResponseVO vo = convertPaymentResponseVO(cashierEntity,payTimeLdt);
+                        afterDepositSettlementPaymentList.add(vo);
+                    }
+                    //退款（线下+虚拟支付+真实支付）
+
+                    if(orderStatus.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+                        wzSettleTime = null;
+                    }
+                    if(DataPayKindConstant.DEPOSIT.equals(payKind)){//违章押金
+                        if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList, Arrays.asList(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT), null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
+                            AccountVirtualPayDetailEntity accountVirtualPayDetailEntity = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailEntityList, PayCashTypeEnum.WZ_DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else{
+                            CashierRefundApplyEntity cashierRefundApplyEntity = CashierUtils.filterCashierRefound(refundApplyList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }
+                    }else if(DataPayKindConstant.RENT.equals(payKind)){//车辆押金
+                        if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT), null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
+                            AccountVirtualPayDetailEntity accountVirtualPayDetailEntity = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailEntityList, PayCashTypeEnum.DEPOSIT, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else{
+                            CashierRefundApplyEntity cashierRefundApplyEntity = CashierUtils.filterCashierRefound(refundApplyList, DataPayKindConstant.RENT, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }
+                    }else if(DataPayKindConstant.RENT_AMOUNT.equals(payKind)){//租车费用
+                        if(PaySourceEnum.AT_OFFLINE.getCode().equals(paySource)){//线下支付
+                            OfflineRefundApplyEntity offlineRefundApplyEntity = CashierUtils.filterBySourceCode(offlineRefundApplyEntityList,Arrays.asList(RenterCashCodeEnum.SETTLE_RENT_COST_TO_RETURN_AMT,RenterCashCodeEnum.CANCEL_RENT_COST_TO_RETURN_AMT), null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromOfflineRefundApply(offlineRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else if(PaySourceEnum.VIRTUAL_PAY.getCode().equals(paySource)){//虚拟支付
+                            AccountVirtualPayDetailEntity accountVirtualPayDetailEntity = CashierUtils.filterByPayCashTypeAndPayType(accountVirtualPayDetailEntityList, PayCashTypeEnum.RENTER_COST, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromVirtualPayDetail(accountVirtualPayDetailEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else if(PaySourceEnum.WALLET_PAY.getCode().equals(paySource)){//钱包支付
+                            List<AccountRenterCostDetailEntity> accountRenterCostDetailEntityList = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
+                            AccountRenterCostDetailEntity accountRenterCostDetailEntity = AccountRenterCostUtil.filterRenterCost(accountRenterCostDetailEntityList, PaySourceEnum.WALLET_PAY, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertAccountRenterCostDetail(accountRenterCostDetailEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }else{
+                            CashierRefundApplyEntity cashierRefundApplyEntity = CashierUtils.filterCashierRefound(refundApplyList, DataPayKindConstant.RENT_AMOUNT, PayTypeEnum.PUR_RETURN, null, wzSettleTime);
+                            PaymentResponseVO vo = convertPaymentFromCashierRefundApply(cashierRefundApplyEntity);
+                            if(vo != null)afterDepositSettlementPaymentList.add(vo);
+                        }
+                    }
+                }
+            }
+        }
+
 		
 		/**
 		 * 数据封装
@@ -150,7 +239,102 @@ public class PaymentService {
 		respVo.setViolationDepositSettlementPaymentList(violationDepositSettlementPaymentList);
 		return respVo;
 	}
-	
+    /**
+     * 对象转换
+     * @param OfflineRefundApplyEntity
+     * @return
+     */
+    private PaymentResponseVO convertAccountRenterCostDetail(AccountRenterCostDetailEntity accountRenterCostDetailEntity) {
+        PaymentResponseVO vo = new PaymentResponseVO();
+        if(accountRenterCostDetailEntity == null){
+            return null;
+        }
+        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailEntity.getCreateTime()));
+        vo.setItem("租车费用");
+        vo.setPaymentType(convertType(accountRenterCostDetailEntity.getPayType()));
+        vo.setAmount(String.valueOf(accountRenterCostDetailEntity.getAmt()));
+        vo.setSerialNumber("");
+        vo.setOrderType(convertOperate(accountRenterCostDetailEntity.getPayType()));
+        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailEntity.getCreateTime()));
+        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(accountRenterCostDetailEntity.getUpdateTime()));
+        vo.setStauts("已退款");
+        vo.setPaymentId("---");
+        vo.setPaymentSource(convertSource(accountRenterCostDetailEntity.getPaySource()));
+        vo.setResponseCode("---");
+        return vo;
+    }
+    /**
+     * 对象转换
+     * @param cashierEntity
+     * @return
+     */
+    private PaymentResponseVO convertPaymentFromVirtualPayDetail(AccountVirtualPayDetailEntity accountVirtualPayDetailEntity) {
+        PaymentResponseVO vo = new PaymentResponseVO();
+        if(accountVirtualPayDetailEntity == null){
+            return null;
+        }
+        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(accountVirtualPayDetailEntity.getCreateTime()));
+        vo.setItem(PayCashTypeEnum.fromValue(accountVirtualPayDetailEntity.getPayCashType()).getName());
+        vo.setPaymentType(convertType(accountVirtualPayDetailEntity.getPayType()));
+        vo.setAmount(String.valueOf(accountVirtualPayDetailEntity.getAmt()));
+        vo.setSerialNumber("");
+        vo.setOrderType(convertOperate(accountVirtualPayDetailEntity.getPayType()));
+        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(accountVirtualPayDetailEntity.getCreateTime()));
+        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(accountVirtualPayDetailEntity.getUpdateTime()));
+        vo.setStauts("");
+        vo.setPaymentId("---");
+        vo.setPaymentSource("");
+        vo.setResponseCode("---");
+        return vo;
+    }
+    /**
+     * 对象转换
+     * @param OfflineRefundApplyEntity
+     * @return
+     */
+    private PaymentResponseVO convertPaymentFromCashierRefundApply(CashierRefundApplyEntity cashierRefundApplyEntity) {
+        PaymentResponseVO vo = new PaymentResponseVO();
+        if(cashierRefundApplyEntity == null){
+            return null;
+        }
+        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(cashierRefundApplyEntity.getCreateTime()));
+        vo.setItem(convertItem(cashierRefundApplyEntity.getPayKind()));
+        vo.setPaymentType(convertType(cashierRefundApplyEntity.getPayType()));
+        vo.setAmount(String.valueOf(cashierRefundApplyEntity.getAmt()));
+        vo.setSerialNumber(cashierRefundApplyEntity.getQn());
+        vo.setOrderType(convertOperate(cashierRefundApplyEntity.getPayType()));
+        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(cashierRefundApplyEntity.getCreateTime()));
+        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(cashierRefundApplyEntity.getUpdateTime()));
+        vo.setStauts(convertOfflineStatus(cashierRefundApplyEntity.getStatus()));
+        vo.setPaymentId("---");
+        vo.setPaymentSource(convertSource(cashierRefundApplyEntity.getPaySource()));
+        vo.setResponseCode("---");
+        return vo;
+    }
+    /**
+     * 对象转换
+     * @param OfflineRefundApplyEntity
+     * @return
+     */
+    private PaymentResponseVO convertPaymentFromOfflineRefundApply(OfflineRefundApplyEntity offlineRefundApplyEntity) {
+        PaymentResponseVO vo = new PaymentResponseVO();
+        if(offlineRefundApplyEntity == null){
+            return null;
+        }
+        vo.setCreateTime(LocalDateTimeUtils.formatDateTime(offlineRefundApplyEntity.getCreateTime()));
+        vo.setItem(convertItem(offlineRefundApplyEntity.getPayKind()));
+        vo.setPaymentType(convertType(offlineRefundApplyEntity.getPayType()));
+        vo.setAmount(String.valueOf(offlineRefundApplyEntity.getAmt()));
+        vo.setSerialNumber(offlineRefundApplyEntity.getQn());
+        vo.setOrderType(convertOperate(offlineRefundApplyEntity.getPayType()));
+        vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(offlineRefundApplyEntity.getCreateTime()));
+        vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(offlineRefundApplyEntity.getUpdateTime()));
+        vo.setStauts(convertOfflineStatus(offlineRefundApplyEntity.getStatus()));
+        vo.setPaymentId("---");
+        vo.setPaymentSource(convertSource(offlineRefundApplyEntity.getPaySource()));
+        vo.setResponseCode("---");
+        return vo;
+    }
 	/**
 	 * 对象转换
 	 * @param cashierEntity
@@ -229,7 +413,18 @@ public class PaymentService {
 		}
 		return "未知";
 	}
-	
+
+    private String convertOfflineStatus(String transStatus) {
+        if("00".equals(transStatus)) {
+            return "已退款";
+        }else if("01".equals(transStatus)) {
+            return "待退款";
+        }else if("02".equals(transStatus)) {
+            return "暂停退款";
+        }
+        return "未知";
+    }
+
 	/**
 	 * 操作类型:支付,退款
 	 * @param payType

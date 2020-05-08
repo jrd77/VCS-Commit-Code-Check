@@ -42,5 +42,9 @@ public class OrderCostBaseReqDTO {
      * 订单还车时间(yyyy-MM-dd HH:mm:ss)
      */
     private LocalDateTime endTime;
+    /*
+    * 订单类型
+    * */
+    private String orderCategory;
 
 }

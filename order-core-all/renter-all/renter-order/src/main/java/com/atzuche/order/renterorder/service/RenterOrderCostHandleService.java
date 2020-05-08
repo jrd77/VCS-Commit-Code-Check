@@ -6,6 +6,7 @@ import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.DepositAmtDTO;
 import com.atzuche.order.commons.entity.dto.IllegalDepositAmtDTO;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.dto.OrderCouponDTO;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
@@ -21,6 +22,8 @@ import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.RenterOrderResVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongReqVO;
+import com.atzuche.order.renterorder.vo.owner.OwnerCouponLongResVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.auto.coin.service.vo.res.AutoCoinResponseVO;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
@@ -30,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * 租客订单费用处理类
@@ -139,6 +144,7 @@ public class RenterOrderCostHandleService {
         memRightCarDepositAmtReqDTO.setOriginalDepositAmt(null == carDepositAmt.getCarDepositAmt() ? 0 :
                 Math.abs(carDepositAmt.getCarDepositAmt()));
         memRightCarDepositAmtReqDTO.setRenterMemberRightDTOList(renterOrderReqVO.getRenterMemberRightDTOList());
+        memRightCarDepositAmtReqDTO.setOrderCategory(renterOrderReqVO.getOrderCategory());
         LOGGER.info("车辆押金减免计算B.param is,memRightCarDepositAmtReqDTO:[{}]",
                 JSON.toJSONString(memRightCarDepositAmtReqDTO));
         MemRightCarDepositAmtRespDTO memRightCarDepositAmtRespDTO =
@@ -267,6 +273,8 @@ public class RenterOrderCostHandleService {
         return false;
     }
 
+
+
     /**
      * 限时红包处理
      *
@@ -358,6 +366,41 @@ public class RenterOrderCostHandleService {
         }
 
         return 0;
+    }
+
+
+
+    ////////////////////////////////////////////////////华丽的分割线(抵扣与补贴分割)///////////////////////////////////////
+
+    /**
+     * 处理长租订单补贴信息
+     *
+     * @param actRentUnitPriceAmt 折扣后单价
+     * @param count               份数
+     * @param rentAmt             原租金
+     * @return RenterOrderSubsidyDetailDTO 补贴信息
+     */
+    public RenterOrderSubsidyDetailDTO handleLongOwnerCoupon(Integer actRentUnitPriceAmt, Double count,
+                                                             Integer rentAmt) {
+
+        LOGGER.info("处理长租订单补贴信息.param is,actRentUnitPriceAmt:[{}], count:[{}],rentAmt:[{}]", actRentUnitPriceAmt, count, rentAmt);
+        if (Objects.isNull(actRentUnitPriceAmt)) {
+            LOGGER.info("折扣信息为空,无需补贴.");
+            return null;
+        }
+        int newRentAmt =
+                new BigDecimal(actRentUnitPriceAmt * count).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+        if (Math.abs(rentAmt) <= newRentAmt) {
+            LOGGER.info("无需补贴.rentAmt:[{}],newRentAmt:[{}]", rentAmt, newRentAmt);
+            return null;
+        }
+        int subsidyAmt = Math.abs(rentAmt) - newRentAmt;
+        LOGGER.info("subsidyAmt:[{}] = Math.abs(rentAmt):[{}] - newRentAmt:[{}]", subsidyAmt, rentAmt, newRentAmt);
+        RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO =
+                renterOrderSubsidyDetailService.calLongOwnerCouponSubsidyInfo(subsidyAmt,
+                        RenterCashCodeEnum.RENT_AMT);
+        LOGGER.info("处理长租订单补贴信息.result is,renterOrderSubsidyDetailDTO:[{}]", JSON.toJSONString(renterOrderSubsidyDetailDTO));
+        return renterOrderSubsidyDetailDTO;
     }
 
 }

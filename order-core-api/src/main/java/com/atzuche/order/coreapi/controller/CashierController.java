@@ -2,6 +2,9 @@ package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +48,9 @@ public class CashierController {
     PayRemoteService payRemoteService;
     @Autowired
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
-    //环境变量，1正式，2测试
-    @Value("${sysEnv:2}") String sysEnv;
-    
+
+
+
     /**
      * 查询支付款项信息
      * 类同获取支付金额和调起收银台getTransPlatform接口，对应APPSERVER
@@ -149,27 +152,5 @@ public class CashierController {
 	}
     
     
-    /**
-     * 同XXLJOB定时任务退款方法。
-     * @param orderNo
-     * @param payKind
-     * @return
-     */
-    @AutoDocMethod(value = "手动退款", description = "手动退款", response = String.class)
-    @GetMapping("/cashierRefundApply")
-    public ResponseData<String> cashierRefundApply(@RequestParam("orderNo") String orderNo,@RequestParam("payKind") String payKind) {
-    	//测试环境执行
-    	if(Env.test.getCode().equals(sysEnv)) {
-	        log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
-	        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
-	        cashierPayService.refundOrderPay(cashierRefundApply);
-	        log.info("CashierController cashierRefundApply end param [{}],result [{}]");
-	        return ResponseData.success();
-    	}else {
-    		//访问受限
-    		log.info("pro sysEnv="+sysEnv);
-    		return ResponseData.createErrorCodeResponse(com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getCode(),com.autoyol.commons.web.ErrorCode.DENY_ACCESS.getText());
-    	}
-    }
-    
+
 }
