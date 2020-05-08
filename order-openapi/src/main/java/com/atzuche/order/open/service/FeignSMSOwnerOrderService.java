@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author 胡春林
  * sms短信需要的车主feign接口
  */
-@FeignClient(value="order-center-api",path = "/api/sms/owner")
+@FeignClient(value = "order-center-api", path = "/api/sms/owner")
 public interface FeignSMSOwnerOrderService {
 
     /**
