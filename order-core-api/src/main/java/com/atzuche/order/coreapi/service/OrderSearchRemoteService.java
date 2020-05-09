@@ -383,7 +383,18 @@ public class OrderSearchRemoteService {
         dto.setMoreLicenseFlag(String.valueOf(fromBean.getMoreLicenseFlag()));
         dto.setLicenseExpire(DateUtils.localDateTimeToDate(fromBean.getLicenseExpire()));
         dto.setFrameno(fromBean.getFrameNo());
-        dto.setOrderType("0");
+        //
+        //0,普通订单 1,代步车订单 2,携程套餐订单 3,携程到店订单 4,同程套餐订单 5,安联代步车订单 6,普通套餐订单 7,VIP订单,8.线上长租订单
+        //新增长租分类：
+        //内部分类 1:普通,2:套餐,3:长租
+        String orderType = "0";
+        if (StringUtils.isNotBlank(fromBean.getCategory()) && "1".equals(fromBean.getCategory())) {
+        	orderType = "0";
+        } else if(StringUtils.isNotBlank(fromBean.getCategory()) && "3".equals(fromBean.getCategory())) {
+        	orderType = "8";
+        }
+        dto.setOrderType(orderType);
+        
         dto.setChannelType("0");
         dto.setOwnerOfflineOrderStatus(0);
         dto.setOfflineOrderType("0");

@@ -23,6 +23,8 @@ import com.atzuche.order.rentercost.entity.vo.PayableVO;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.autoyol.autopay.gateway.vo.req.PayVo;
+import com.autoyol.commons.utils.GsonUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,6 +112,16 @@ public class CashierNoTServiceTest {
 	}
 	
 	
+	@Test
+	public void testMinigramChangeReqOs() {
+		String orderNo = "70010280500299";
+		String reqOs = "miniprogram-alipay";
+		PayVo vo = new PayVo();
+		vo.setReqOs(reqOs);
+		cashierNoTService.minigramChangeReqOs(orderNo, vo, reqOs);
+		log.info("vo="+GsonUtils.toJson(vo));
+		
+	}
 	
 	@Test
 	public void testGetRenterOrderNoByOrderNo() {
