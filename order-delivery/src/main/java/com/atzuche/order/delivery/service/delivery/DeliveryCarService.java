@@ -3,6 +3,7 @@ package com.atzuche.order.delivery.service.delivery;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
@@ -373,7 +374,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTenantName(renterMemberDTO.getRealName());
         orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
         orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
-        orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getType()));
+        orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getCarOwnerType()));
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
         orderDeliveryFlowEntity.setIsDelete(0);
         
@@ -442,7 +443,7 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setTenantname(orderDeliveryFlowEntity.getTenantName());
         renYunFlowOrderDTO.setTenantphone(orderDeliveryFlowEntity.getTenantPhone());
         renYunFlowOrderDTO.setTenantturnoverno(String.valueOf(orderDeliveryFlowEntity.getTenantTurnoverNo()));
-        renYunFlowOrderDTO.setOwnerType(String.valueOf(orderDeliveryFlowEntity.getOwnerType()));
+        renYunFlowOrderDTO.setOwnerType(CarOwnerTypeEnum.getNameByCode(orderDeliveryFlowEntity.getOwnerType()));
         renYunFlowOrderDTO.setSceneName(orderDeliveryFlowEntity.getSceneName());
         renYunFlowOrderDTO.setDisplacement(String.valueOf(orderDeliveryFlowEntity.getDisplacement()));
         renYunFlowOrderDTO.setSource(orderDeliveryFlowEntity.getSource());
