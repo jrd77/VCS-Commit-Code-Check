@@ -523,5 +523,10 @@
         order by id desc
         limit 1
     </select>
+    
+    <select id="listOrderNoByCarNo" resultType="String">
+        SELECT DISTINCT order_no FROM `owner_goods` where car_no = #{carNo}
+        and is_delete = 0
+    </select>
 
 </mapper>
