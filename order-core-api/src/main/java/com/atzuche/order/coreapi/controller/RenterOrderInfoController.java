@@ -126,7 +126,7 @@ public class RenterOrderInfoController {
     public ResponseData<CashierDTO> getCashier(@RequestParam("orderNo") String orderNo, @RequestParam("memNo") String memNo, @RequestParam("amount") String amount, @RequestParam("payPur") String payPur) {
         CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderNo, memNo, amount, payPur);
         if (cashierEntity == null) {
-            throw new OrderNotFoundException(orderNo);
+            return ResponseData.success();
         }
         CashierDTO cashierDTO = new CashierDTO();
         BeanUtils.copyProperties(cashierEntity, cashierDTO);
