@@ -7,6 +7,7 @@
         <result property="id" column="id"/>
         <result property="orderNo" column="order_no"/>
         <result property="ownerOrderNo" column="owner_order_no"/>
+        <result property="renterOrderNo" column="renter_order_no"/>
         <result property="memNo" column="mem_no"/>
         <result property="showRentTime" column="show_rent_time"/>
         <result property="showRevertTime" column="show_revert_time"/>
@@ -35,7 +36,8 @@
     <sql id="Base_Column_List">
 	`id`, 	
 	`order_no`, 	
-	`owner_order_no`, 	
+	`owner_order_no`,
+	`renter_order_no`,
 	`mem_no`,
 	`show_rent_time`,
 	`show_revert_time`,
@@ -71,6 +73,7 @@
         (
         `order_no`,
         `owner_order_no`,
+        `renter_order_no`,
         `mem_no`,
         `show_rent_time`,
         `show_revert_time`,
@@ -95,6 +98,7 @@
         (
         #{orderNo},
         #{ownerOrderNo},
+        #{renterOrderNo},
         #{memNo},
         #{showRentTime},
         #{showRevertTime},
@@ -122,6 +126,7 @@
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">`order_no`, </if>
             <if test="ownerOrderNo != null">`owner_order_no`, </if>
+            <if test="renterOrderNo != null">`renter_order_no`, </if>
             <if test="memNo != null">`mem_no`, </if>
             <if test="showRentTime != null">`show_rent_time`, </if>
             <if test="showRevertTime != null">`show_revert_time`, </if>
@@ -148,6 +153,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null">#{orderNo},  </if>
             <if test="ownerOrderNo != null">#{ownerOrderNo},  </if>
+            <if test="renterOrderNo != null">#{renterOrderNo},  </if>
             <if test="memNo != null">#{memNo},  </if>
             <if test="showRentTime != null">#{showRentTime},  </if>
             <if test="showRevertTime != null">#{showRevertTime},  </if>
@@ -179,6 +185,7 @@
         <set>
             <if test="orderNo != null">`order_no` = #{orderNo}, </if>
             <if test="ownerOrderNo != null">`owner_order_no` = #{ownerOrderNo}, </if>
+            <if test="renterOrderNo != null">`renter_order_no` = #{renterOrderNo}, </if>
             <if test="memNo != null">`mem_no` = #{memNo}, </if>
             <if test="showRentTime != null">`show_rent_time` = #{showRentTime}, </if>
             <if test="showRevertTime != null">`show_revert_time` = #{showRevertTime}, </if>
@@ -210,6 +217,7 @@
         <set>
             `order_no` = #{orderNo},
             `owner_order_no` = #{ownerOrderNo},
+            `renter_order_no` = #{renterOrderNo},
             `mem_no` = #{memNo},
             `show_rent_time` = #{showRentTime},
             `show_revert_time` = #{showRevertTime},
@@ -300,13 +308,15 @@
         and is_cancel = 0
         and is_delete = 0
         and mem_no = #{ownerMemNo}
+        order by id desc
+        limit 1
     </select>
     <update id="updateByMemeNo">
         update owner_order set `see_flag` = 1  where `mem_no` = #{ownerMemNo}
     </update>
-    <delete id="updateChildStatusByOwnerOrderNo">
+    <update id="updateChildStatusByOwnerOrderNo">
         update owner_order set `child_status` = #{childStatus}  where `owner_order_no` = #{ownerOrderNo}
-    </delete>
+    </update>
 
     <select id="queryByOwnerOrderNoAndMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order where order_no =#{orderNo}

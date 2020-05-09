@@ -1,6 +1,7 @@
 package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
@@ -55,12 +56,19 @@ public class DeliveryCarService {
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
      */
-    public void addFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext) {
+    public void addFlowOrderInfo(OrderReqContext orderReqContext) {
         if (null == orderReqContext || Objects.isNull(orderReqContext.getOrderReqVO())) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        int getMinute = getMinutes == null ? 0 : getMinutes;
-        int returnMinute = returnMinutes == null ? 0 : returnMinutes;
+        int getMinute =
+                null == orderReqContext.getCarRentTimeRangeDTO() || null ==
+                        orderReqContext.getCarRentTimeRangeDTO().getGetMinutes() ? OrderConstant.ZERO :
+                        orderReqContext.getCarRentTimeRangeDTO().getGetMinutes();
+
+        int returnMinute = null == orderReqContext.getCarRentTimeRangeDTO() || null ==
+                orderReqContext.getCarRentTimeRangeDTO().getReturnMinutes() ? OrderConstant.ZERO :
+                orderReqContext.getCarRentTimeRangeDTO().getReturnMinutes();
+
         log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
                 orderReqContext.getOrderReqVO().getSrvGetAddr());
         addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
@@ -199,6 +207,7 @@ public class DeliveryCarService {
                 orderDeliveryEntity.setOrderNoDelivery(codeUtils.createDeliveryNumber());
                 orderDeliveryEntity.setAheadOrDelayTimeInfo(getMinutes, returnMinutes, orderDeliveryVO);
                 orderDeliveryEntity.setStatus(1);
+                orderDeliveryEntity.setIsDelete(0);
                 renterOrderDeliveryService.insert(orderDeliveryEntity);
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
                 addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue().intValue());
@@ -220,9 +229,27 @@ public class DeliveryCarService {
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+                OrderDeliveryFlowEntity orderDeliveryFlowEntity = createUpdateFlow(lastOrderDeliveryEntity,lastOrderDeliveryEntity.getType(),orderDeliveryVO.getOrderDeliveryDTO());
+                orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
             }
         }
         insertOrUpdateRenterDeliveryAddressInfo(orderDeliveryVO);
+    }
+
+    /**
+     * 構造更新的仁云數據
+     * @return
+     */
+    public OrderDeliveryFlowEntity createUpdateFlow(RenterOrderDeliveryEntity orderDeliveryEntity,Integer orderType,OrderDeliveryDTO orderDeliveryDTO){
+        OrderDeliveryFlowEntity orderDeliveryFlowEntity = new OrderDeliveryFlowEntity();
+        orderDeliveryFlowEntity.setRenterOrderNo(orderDeliveryEntity.getRenterOrderNo());
+        orderDeliveryFlowEntity.setOrderNo(orderDeliveryEntity.getOrderNo());
+        orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
+        orderDeliveryFlowEntity.setTermTime(orderDeliveryEntity.getRentTime());
+        orderDeliveryFlowEntity.setReturnTime(orderDeliveryEntity.getRevertTime());
+        orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryEntity.getRentTime(), DateUtils.DATE_DEFAUTE_1));
+        orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryEntity.getRevertTime(), DateUtils.DATE_DEFAUTE_1));
+        return orderDeliveryFlowEntity;
     }
 
     /**
@@ -375,7 +402,7 @@ public class DeliveryCarService {
         OrderDeliveryFlowEntity orderDeliveryFlow = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(orderDeliveryFlowEntity.getOrderNo(),orderDeliveryFlowEntity.getServiceType());
         if(Objects.nonNull(orderDeliveryFlow))
         {
-            BeanUtils.copyProperties(orderDeliveryFlowEntity,orderDeliveryFlow);
+            CommonUtil.copyPropertiesIgnoreNull(orderDeliveryFlowEntity,orderDeliveryFlow);
             deliveryFlowService.updateOrderDeliveryFlow(orderDeliveryFlow);
             return;
         }

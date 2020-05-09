@@ -82,11 +82,11 @@ public class OrderSourceStatEntity implements Serializable {
 	 */
 	private String entryCode;
 	/**
-	 * 内部分类 1:短租,2:套餐
+	 * 内部分类 1:普通,2:套餐
 	 */
 	private String category;
 	/**
-	 * 业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有
+	 * 业务来源主类型,1:OTA,2代步车，3:礼品卡,4:安联,5:自有,6:长租
 	 */
 	private String businessParentType;
 	/**
@@ -117,6 +117,10 @@ public class OrderSourceStatEntity implements Serializable {
 	 * 是否后台管理操作
 	 */
 	private Integer specialConsole;
+    /**
+     * 长租券码
+     */
+    private String longRentCouponCode;
 	/**
 	 * 请求系统
 	 */

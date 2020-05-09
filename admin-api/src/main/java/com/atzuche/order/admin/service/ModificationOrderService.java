@@ -159,11 +159,14 @@ public class ModificationOrderService {
 		String ownerCouponCashNo =  RenterCashCodeEnum.OWNER_COUPON_OFFSET_COST.getCashNo();
 		//凹凸币抵扣金额
 		String aotuCoinCashNo =  RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo();
+		// 长租折扣抵扣金额(用的租金的费用编码)
+		String longRentAmtDeductNo = RenterCashCodeEnum.RENT_AMT.getCashNo();
 		//默认0
 		int getcarfeeCoupon = 0;
 		int plateformCoupon = 0;
 		int ownerCoupon = 0;
 		int aotuCoin = 0;
+		int longRentDeductAmt = 0;
 				
 		for (RenterOrderSubsidyDetailResVO renterOrderSubsidyDetailResVO : subsidyLst) {
 			//12120010  12120051  12120012
@@ -175,9 +178,11 @@ public class ModificationOrderService {
 				aotuCoin +=  renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}else if (getcarfeeCouponOffsetNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
 				getcarfeeCoupon += renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
+			}else if (longRentAmtDeductNo.equals(renterOrderSubsidyDetailResVO.getSubsidyCostCode())) {
+				longRentDeductAmt += renterOrderSubsidyDetailResVO.getSubsidyAmount().intValue();
 			}
 		}
-		int deductionAmount = getcarfeeCoupon + plateformCoupon + ownerCoupon + aotuCoin + walletAmt;
+		int deductionAmount = getcarfeeCoupon + plateformCoupon + ownerCoupon + aotuCoin + walletAmt + longRentDeductAmt;
 		realVo.setDeductionAmount(String.valueOf(NumberUtils.convertNumberToFushu(deductionAmount)));  //负数
 	}
 

@@ -55,6 +55,9 @@ public class AccountRenterWzDepositDetailNoTService {
     }
 
     public int insertRenterDepositDetailEntity(AccountRenterWzDepositDetailEntity accountRenterDepositDetailEntity) {
+        if(null == accountRenterDepositDetailEntity) {
+            return 0;
+        }
         int result = accountRenterWzDepositDetailMapper.insertSelective(accountRenterDepositDetailEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

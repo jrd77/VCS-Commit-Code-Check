@@ -1,5 +1,8 @@
 package com.atzuche.order.commons.enums.cashcode;
 
+import com.atzuche.order.commons.enums.CancelOrderDutyEnum;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 收费序号,租客从10开头  租客 第一位：1，第二位：1正2负      1正2负 3可正可负   ->0可正可负，第三位：押金类型，第四位：分模块（区域），后4位是编码
  * @author jing.huang
@@ -118,7 +121,9 @@ public enum RenterCashCodeEnum {
 //    ACCOUNT_RENTER_DELIVERY_MILEAGE_COST_PROXY("21130029","交接车-获取代管车超里程费用"),
     
   //第四区域块 看第4位，从4开始。  后4位从0001开始    后面是以此类推，确保费用编码不能重复。
-    
+    SETTLE_WALLET_TO_RENT_COST("11130032","钱包余额转租车费用"),
+    SETTLE_WALLET_TO_WZ_COST("11130033","钱包余额转违章费用"),
+
     ;
 	
 	/**
@@ -135,6 +140,18 @@ public enum RenterCashCodeEnum {
 		this.cashNo = cashNo;
 		this.txt = txt;
 	}
+
+
+    public static RenterCashCodeEnum from(String cashNo) {
+        RenterCashCodeEnum[] cashCodeEnums = values();
+        for (RenterCashCodeEnum cashCode : cashCodeEnums) {
+            if (StringUtils.equals(cashCode.cashNo, cashNo)) {
+                return cashCode;
+            }
+        }
+        throw new RuntimeException("the value of cashNo :" + cashNo + " not supported,please check");
+    }
+
 
 	public String getCashNo() {
 		return cashNo;

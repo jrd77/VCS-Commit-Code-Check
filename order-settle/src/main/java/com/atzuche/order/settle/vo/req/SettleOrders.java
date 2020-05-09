@@ -80,6 +80,18 @@ public class SettleOrders {
      */
     private Boolean rentDepositVirtualPayFlag;
     
+    /**
+     * 是否企业级用户订单
+     */
+	private Boolean isEnterpriseUserOrder;
+    
+	
+	public Boolean getIsEnterpriseUserOrder() {
+		return isEnterpriseUserOrder;
+	}
+	public void setIsEnterpriseUserOrder(Boolean isEnterpriseUserOrder) {
+		this.isEnterpriseUserOrder = isEnterpriseUserOrder;
+	}
 	public String getOrderNo() {
 		return orderNo;
 	}

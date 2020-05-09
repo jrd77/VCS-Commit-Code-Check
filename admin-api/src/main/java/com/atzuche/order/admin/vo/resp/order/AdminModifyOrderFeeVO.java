@@ -115,6 +115,12 @@ public class AdminModifyOrderFeeVO {
      */
     @AutoDocProperty(value = "还车服务违约金")
     private Integer returnFineAmt;
+    
+    /**
+     * 长租折扣抵扣金额
+     */
+    @AutoDocProperty(value = "长租折扣抵扣金额")
+    private Integer longRentDeductAmt;
 
     public Integer getRentAmt() {
         return minusFee(rentAmt);
@@ -183,4 +189,9 @@ public class AdminModifyOrderFeeVO {
     public Integer getReturnFineAmt() {
         return minusFee(returnFineAmt);
     }
+    
+    public Integer getLongRentDeductAmt() {
+        return minusFee(longRentDeductAmt);
+    }
+    
 }

@@ -16,25 +16,40 @@ import java.util.List;
 @Data
 @ToString
 public class PreOrderAdminResponseVO {
-    @AutoDocProperty(value="会员号")
+
+    @AutoDocProperty(value = "用车城市编码")
+    private String cityCode;
+    @AutoDocProperty(value = "用车城市名称")
+    private String rentCity;
+    @AutoDocProperty(value="租客姓名")
+    private String renterName;
+    @AutoDocProperty(value="租客会员号")
     private String memNo;
+    @AutoDocProperty(value="下单手机号")
+    private String mobile;
+    @AutoDocProperty(value="车主姓名")
+    private String ownerName;
+    @AutoDocProperty(value="车主会员号")
+    private String ownerMemNo;
+    @AutoDocProperty(value="车主手机号")
+    private String ownerMobile;
+    @AutoDocProperty(value = "起租时间,格式yyyy-MM-dd HH:mm:ss")
+    private String rentTime;
+    @AutoDocProperty(value = "结束时间,格式yyyy-MM-dd HH:mm:ss")
+    private String revertTime;
+    @AutoDocProperty(value = "总天数")
+    private String countDays;
     @AutoDocProperty(value="车牌号")
     private String carPlatNo;
     @AutoDocProperty(value="钱包总额")
     private int totalWallet;
     @AutoDocProperty(value="凹凸币总额")
     private int totalAutoCoin;
+    @AutoDocProperty(value="是否禁用全面保障服务：1-是，0-否")
+    private Integer noAbatementFlag;
 
     @AutoDocProperty(value="特价车天单价")
     private List<CarDayPrice> carSpecialDayPrices = new ArrayList<>();
-
-//    @AutoDocProperty(value="可用的平台券")
-//    private List<CouponDTO> availablePlatCoupons = new ArrayList<>();
-//    @AutoDocProperty(value="可用的取还车券")
-//    private List<CouponDTO> availableGetCarCoupons = new ArrayList<>();
-//    @AutoDocProperty(value="可用的车主券")
-//    private List<CouponDTO> availableCarOwnerCoupons = new ArrayList<>();
-
     @AutoDocProperty(value = "车主券列表")
     private List<CarOwnerCouponDetailVO> carOwnerCouponDetailVOList;
     @AutoDocProperty(value = "平台优惠券列表，不包括取还车")

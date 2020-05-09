@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum CategoryEnum {
     ORDINARY("1","普通"),
-    SET_MEAL("2","套餐");
+    SET_MEAL("2","套餐"),
+    LONG_ORDER("3", "长租订单");
 
     private String code;
 

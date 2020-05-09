@@ -4,7 +4,7 @@ import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CancelOrderDutyEnum;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.FineTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.coreapi.entity.CancelOrderReqContext;
 import com.atzuche.order.coreapi.entity.dto.CancelOrderReqDTO;
 import com.atzuche.order.coreapi.submit.exception.CancelOrderCheckException;
@@ -76,7 +76,7 @@ public class OwnerAgreeDelayRefundService {
             //对冲renter_order_fine_deatail信息
             RenterOrderFineDeatailEntity entity =
                     renterOrderFineDeatailService.selectByCondition(reqContext.getRenterOrderEntity().getRenterOrderNo(),
-                            FineTypeEnum.CANCEL_FINE, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER);
+                            FineTypeCashCodeEnum.CANCEL_FINE, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER);
             if (null != entity) {
                 entity.setId(null);
                 entity.setFineAmount(-entity.getFineAmount());
@@ -85,7 +85,7 @@ public class OwnerAgreeDelayRefundService {
             //对冲console_owner_order_fine_deatail信息
             ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity =
                     consoleOwnerOrderFineDeatailService.selectByCondition(cancelOrderReqDTO.getOrderNo(),
-                            FineTypeEnum.CANCEL_FINE, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER);
+                            FineTypeCashCodeEnum.CANCEL_FINE, FineSubsidyCodeEnum.OWNER, FineSubsidySourceCodeEnum.RENTER);
             if (null != consoleOwnerOrderFineDeatailEntity) {
                 consoleOwnerOrderFineDeatailEntity.setId(null);
                 consoleOwnerOrderFineDeatailEntity.setFineAmount(-consoleOwnerOrderFineDeatailEntity.getFineAmount());

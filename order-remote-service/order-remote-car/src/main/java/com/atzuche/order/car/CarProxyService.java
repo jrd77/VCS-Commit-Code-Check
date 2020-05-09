@@ -56,6 +56,13 @@ public class CarProxyService {
     public static class CarPriceDetail{
         private List<CarPriceOfDayVO> carPriceOfDayVOList;
         private String plateNum;
+        private Integer ownerNo;
+        // 车辆等级
+        private Integer carLevel;
+        // 车辆购置价
+        private Integer guidePrice;
+        // 保费计算用购置价
+        private Integer inmsrp;
     }
 
     /**
@@ -83,6 +90,12 @@ public class CarProxyService {
             CarPriceDetail carPriceDetail = new CarPriceDetail();
             carPriceDetail.setCarPriceOfDayVOList(responseObject.getData().getDaysPrice());
             carPriceDetail.setPlateNum(responseObject.getData().getCarBaseVO().getPlateNum());
+            carPriceDetail.setOwnerNo(responseObject.getData().getCarBaseVO().getOwnerNo());
+            carPriceDetail.setCarLevel(responseObject.getData().getCarBaseVO().getCarLevel());
+            carPriceDetail.setGuidePrice(responseObject.getData().getCarBaseVO().getGuidePrice());
+            if (responseObject.getData().getCarModelParam() != null) {
+            	carPriceDetail.setInmsrp(responseObject.getData().getCarModelParam().getInmsrp());
+            }
             t.setStatus(Transaction.SUCCESS);
 
             return carPriceDetail;

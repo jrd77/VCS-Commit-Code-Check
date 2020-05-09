@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.service.delivery;
 
 import com.atzuche.order.delivery.common.DeliveryConstants;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
+import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.utils.CommonUtil;
@@ -29,13 +30,15 @@ public class RenYunDeliveryCarService {
 
     @Autowired
     RetryDeliveryCarService retryDeliveryCarService;
+    @Autowired
+    DeliveryRenYunConfig deliveryRenYunConfig;
     /**
      * 添加订单到仁云流程系统
      */
     public String addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderVO) {
         try {
             String flowOrderMap = getFlowOrderMap(renYunFlowOrderVO);
-            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.ADD_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+            String result = retryDeliveryCarService.sendHttpToRenYun(deliveryRenYunConfig.ADD_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
             return result;
         } catch (Exception e) {
             log.error("添加订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
@@ -49,7 +52,7 @@ public class RenYunDeliveryCarService {
     public String updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
         try {
             String flowOrderMap = getFlowOrderMap(updateFlowOrderDTO);
-            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+            String result = retryDeliveryCarService.sendHttpToRenYun(deliveryRenYunConfig.CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
             return result;
         } catch (Exception e) {
             log.error("更新订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
@@ -63,7 +66,7 @@ public class RenYunDeliveryCarService {
     public String cancelRenYunFlowOrderInfo(CancelFlowOrderDTO cancelFlowOrderVO) {
         try {
             String flowOrderMap = getFlowOrderMap(cancelFlowOrderVO);
-            String result = retryDeliveryCarService.sendHttpToRenYun(DeliveryConstants.CANCEL_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
+            String result = retryDeliveryCarService.sendHttpToRenYun(deliveryRenYunConfig.CANCEL_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CANCEL_TYPE.getValue().intValue());
             return result;
         } catch (Exception e) {
             log.error("取消订单到仁云流程系统请求仁云失败，失败原因：{}", e.getMessage());
