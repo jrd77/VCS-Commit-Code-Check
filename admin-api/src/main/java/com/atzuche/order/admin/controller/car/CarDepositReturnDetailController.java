@@ -65,7 +65,6 @@ public class CarDepositReturnDetailController {
     @PostMapping("/console/save/carDeposit/temporaryRefund")
     public ResponseData saveCarDepositTemporaryRefund(@Valid @RequestBody CarDepositTemporaryRefundReqVO req, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
-
         renterWzService.saveCarDepositTemporaryRefund(req);
         try {
             adminLogService.insertLog(AdminOpTypeEnum.TEMPORARY_WZ_REFUND, req.getOrderNo(), JSON.toJSONString(req));

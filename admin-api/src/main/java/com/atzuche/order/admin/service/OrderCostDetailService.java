@@ -5,6 +5,7 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.exception.RenterCostFailException;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
@@ -614,11 +615,6 @@ public class OrderCostDetailService {
 	 * @param renterCostReqVO
 	 */
 	public void updatefineAmtListByOrderNo(com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO) {
-	    //记录日志信息
-
-
-
-
 		//统一设置修改人名称。20200205 huangjing
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         renterCostReqVO.setOperatorName(userName);
