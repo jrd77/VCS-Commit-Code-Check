@@ -29,7 +29,7 @@ dependencies {
 	compile("com.autoyol.tools:prop-encrypt-spring-boot-starter:0.0.1-SNAPSHOT")
 	compile('mysql:mysql-connector-java')
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
-    compile("com.autoyol:search-order-info-api:8.0-SNAPSHOT")
+    compile("com.autoyol:search-order-info-api:8.2-SNAPSHOT")
     compile('com.xuxueli:xxl-job-core:2.0.1-SNAPSHOT')
     compile('com.autoyol.xxljob:xxljob-starter:2.0.1-SNAPSHOT')
 	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
