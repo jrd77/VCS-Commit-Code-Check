@@ -79,7 +79,7 @@ public class DeliveryCarService {
      * 添加配送相关信息细节(是否下单，是否推送仁云)
      */
     public void addRenYunFlowOrderInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext, Integer orderType) {
-        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext, orderType);
+        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(getMinutes,returnMinutes,orderReqContext, orderType);
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -97,7 +97,7 @@ public class DeliveryCarService {
      */
     public void updateRenYunFlowOrderCarInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext, Integer orderType)
     {
-        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(orderReqContext, orderType);
+        OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(getMinutes,returnMinutes,orderReqContext, orderType);
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -303,7 +303,7 @@ public class DeliveryCarService {
      * @param orderReqContext
      * @return
      */
-    public OrderDeliveryVO createOrderDeliveryParams(OrderReqContext orderReqContext, Integer orderType) {
+    public OrderDeliveryVO createOrderDeliveryParams(Integer getMinutes, Integer returnMinutes,OrderReqContext orderReqContext, Integer orderType) {
         if (null == orderReqContext) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
@@ -360,8 +360,8 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setServiceTypeInfo(orderType, orderDeliveryDTO);
         orderDeliveryFlowEntity.setTermTime(orderDeliveryDTO.getRentTime());
         orderDeliveryFlowEntity.setReturnTime(orderDeliveryDTO.getRevertTime());
-        orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryDTO.getRentTime(), DateUtils.DATE_DEFAUTE_1));
-        orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryDTO.getRevertTime(), DateUtils.DATE_DEFAUTE_1));
+        orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryDTO.getRentTime().minusMinutes(getMinutes), DateUtils.DATE_DEFAUTE_1));
+        orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryDTO.getRevertTime().plusMinutes(returnMinutes), DateUtils.DATE_DEFAUTE_1));
         orderDeliveryFlowEntity.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarPlateNum()));
         orderDeliveryFlowEntity.setVehicleModel(renterGoodsDetailDTO.getCarBrandTxt());
         orderDeliveryFlowEntity.setVehicleType(renterGoodsDetailDTO.getCarTypeTxt());
@@ -431,8 +431,8 @@ public class DeliveryCarService {
         renYunFlowOrderDTO.setServiceTypeInfo(orderDeliveryFlowEntity);
         renYunFlowOrderDTO.setTermtime(DateUtils.formate(orderDeliveryFlowEntity.getTermTime(), DateUtils.DATE_DEFAUTE_4));
         renYunFlowOrderDTO.setReturntime(DateUtils.formate(orderDeliveryFlowEntity.getReturnTime(), DateUtils.DATE_DEFAUTE_4));
-        renYunFlowOrderDTO.setBeforeTime(DateUtils.formate(orderDeliveryFlowEntity.getTermTime(), DateUtils.DATE_DEFAUTE_1));
-        renYunFlowOrderDTO.setAfterTime(DateUtils.formate(orderDeliveryFlowEntity.getReturnTime(), DateUtils.DATE_DEFAUTE_1));
+        renYunFlowOrderDTO.setBeforeTime(orderDeliveryFlowEntity.getBeforeTime());
+        renYunFlowOrderDTO.setAfterTime(orderDeliveryFlowEntity.getAfterTime());
         renYunFlowOrderDTO.setVehicletype(orderDeliveryFlowEntity.getVehicleType());
         renYunFlowOrderDTO.setDeliverycarcity(orderDeliveryFlowEntity.getDeliveryCarCity());
         renYunFlowOrderDTO.setDefaultpickupcaraddr(orderDeliveryFlowEntity.getDefaultPickupCarAddr());
