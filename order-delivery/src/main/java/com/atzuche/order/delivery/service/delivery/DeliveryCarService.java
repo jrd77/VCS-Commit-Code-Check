@@ -380,12 +380,15 @@ public class DeliveryCarService {
         //0,普通订单 1,代步车订单 2,携程套餐订单 3,携程到店订单 4,同程套餐订单 5,安联代步车订单 6,普通套餐订单 7,VIP订单,8.线上长租订单
         //新增长租分类：
         //内部分类 1:普通,2:套餐,3:长租
+        String renyunOrderType = "0";
         if (StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())) {
-            orderDeliveryFlowEntity.setOrderType("0");
+//            orderDeliveryFlowEntity.setOrderType("0");
+        	renyunOrderType = "0";
         } else if(StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "3".equals(orderReqVO.getOrderCategory())) {
-        	orderDeliveryFlowEntity.setOrderType("8");
+//        	orderDeliveryFlowEntity.setOrderType("8");
+        	renyunOrderType = "8";
         }
-        
+        orderDeliveryFlowEntity.setOrderType(renyunOrderType);
         
         orderDeliveryFlowEntity.setCreateTime(LocalDateTime.now());
         orderDeliveryFlowEntity.setUpdateTime(LocalDateTime.now());
