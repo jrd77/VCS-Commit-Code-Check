@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +56,7 @@ public class RenterMemberService{
             BeanUtils.copyProperties(x,renterMemberRightDto);
             renterMemberRightDTOS.add(renterMemberRightDto);
         });
-        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
         if(renterMemberRightDTO == null){
             return false;
         }
@@ -100,7 +101,7 @@ public class RenterMemberService{
             renterMemberRightEntity.setRenterOrderNo(renterMemberDto.getRenterOrderNo());
             renterMemberRightEntity.setMemNo(renterMemberDto.getMemNo());
             if(RightTypeEnum.MEMBER_FLAG.getCode() == x.getRightType()
-                    && MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode())
+                    && (MemberFlagEnum.QYYH.getRightCode().equals(x.getRightCode()) || MemberFlagEnum.QYXYYH.getRightCode().equals(x.getRightCode()))
                     && renterMemberDto.getOrderCategory()!=null
                     && !(renterMemberDto.getOrderCategory().equals(CategoryEnum.ORDINARY.getCode()) || renterMemberDto.getOrderCategory().equals(CategoryEnum.LONG_ORDER.getCode()))
                 ){
