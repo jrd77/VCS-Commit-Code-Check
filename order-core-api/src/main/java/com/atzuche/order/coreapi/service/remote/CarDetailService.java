@@ -55,7 +55,7 @@ public class CarDetailService {
             }
         } catch (BaseException e) {
             t.setStatus(e);
-            logger.info("查询车辆信息异常:reqVO is [{}]",dto, e);
+            logger.error("查询车辆信息异常:reqVO is [{}]",dto, e);
             Cat.logError("查询车辆信息异常.", e);
         } finally {
             t.complete();
