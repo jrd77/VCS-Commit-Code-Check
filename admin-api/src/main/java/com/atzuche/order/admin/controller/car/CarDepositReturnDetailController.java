@@ -5,6 +5,7 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.dto.convert.CarDepositDetainOptLogDTO;
 import com.atzuche.order.admin.dto.convert.ConvertUtil;
+import com.atzuche.order.admin.dto.log.AdminOperateLogDTO;
 import com.atzuche.order.admin.entity.AdminOperateLogEntity;
 import com.atzuche.order.admin.mapper.log.QueryVO;
 import com.atzuche.order.admin.service.CarDepositReturnDetailService;
@@ -135,7 +136,7 @@ public class CarDepositReturnDetailController {
      * @return ResponseData
      */
     @GetMapping("/console/get/carDpoist/log")
-    public ResponseData<List<AdminOperateLogEntity>> getTempCarDepoistOptLog(@RequestParam("orderNo") String orderNo) {
+    public ResponseData<List<AdminOperateLogDTO>> getTempCarDepoistOptLog(@RequestParam("orderNo") String orderNo) {
         QueryVO vo = new QueryVO();
         vo.setOrderNo(orderNo);
         vo.setOpType(AdminOpTypeEnum.TEMPORARY_CAR_DEPOSIT.getOpCode());

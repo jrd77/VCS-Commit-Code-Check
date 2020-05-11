@@ -3,14 +3,19 @@ package com.atzuche.order.admin.service.log;
 import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
+import com.atzuche.order.admin.dto.log.AdminOperateLogDTO;
 import com.atzuche.order.admin.entity.AdminOperateLogEntity;
 import com.atzuche.order.admin.mapper.log.AdminOperateLogMapper;
 import com.atzuche.order.admin.mapper.log.QueryVO;
 import com.atzuche.order.admin.vo.req.log.LogQueryVO;
+import com.atzuche.order.commons.DateUtils;
 import com.autoyol.commons.web.ResponseData;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,9 +69,18 @@ public class AdminLogService {
         return adminOperateLogMapper.findAll(orderNo);
     }
 
-    public List<AdminOperateLogEntity> findByQueryVO(QueryVO req) {
-        return adminOperateLogMapper.findByQuery(req);
+    public List<AdminOperateLogDTO> findByQueryVO(QueryVO req) {
+        List<AdminOperateLogEntity> list = adminOperateLogMapper.findByQuery(req);
 
-
+        List<AdminOperateLogDTO> dtos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.forEach(log -> {
+                AdminOperateLogDTO dto = new AdminOperateLogDTO();
+                BeanUtils.copyProperties(log, dto);
+                dto.setOperateTime(DateUtils.formate(log.getCreateTime(), DateUtils.DATE_DEFAUTE1));
+                dtos.add(dto);
+            });
+        }
+        return dtos;
     }
 }

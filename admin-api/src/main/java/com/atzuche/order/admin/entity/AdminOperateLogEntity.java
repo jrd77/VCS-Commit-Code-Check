@@ -83,5 +83,4 @@ public class AdminOperateLogEntity implements Serializable {
      */
     private String ownerOrderNo;
 
-
 }
