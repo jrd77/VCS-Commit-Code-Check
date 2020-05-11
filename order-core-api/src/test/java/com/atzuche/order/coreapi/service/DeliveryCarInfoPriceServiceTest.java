@@ -29,12 +29,12 @@ public class DeliveryCarInfoPriceServiceTest {
 //    RenterOrderService renterOrderService;
 //	@Autowired
 //    ShortMessageSendService shortMessageSendService;
-	@Autowired
-    RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
-	@Autowired
-	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
-	@Autowired
-    RemindPushPayDepositTask remindPushPayDepositTask;
+	//@Autowired
+    //RemindPayIllegalCrashWithHoursTask remindPayIllegalCrashWithHoursTask;
+	//@Autowired
+	//RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
+	//@Autowired
+    //RemindPushPayDepositTask remindPushPayDepositTask;
 //	@Autowired
 //	RemindVoicePayIllegalCrashWithHoursTask remindVoicePayIllegalCrashWithHoursTask;
 	
