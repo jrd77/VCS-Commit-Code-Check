@@ -126,7 +126,7 @@ public class AdminSupplementService {
             		sup.setPayTypeTxt("消费");
             		if (sup.getOpType() != null && sup.getOpType() == 5 && 
             				sup.getPayFlag() != null && (sup.getPayFlag() == 0 || 
-            				sup.getPayFlag() == 1 || sup.getPayFlag() == 4 || sup.getPayFlag() == 5)) {
+            				sup.getPayFlag() == 1)) {
             			sup.setShowDelButton("1");
             		} else {
             			sup.setShowDelButton("0");
