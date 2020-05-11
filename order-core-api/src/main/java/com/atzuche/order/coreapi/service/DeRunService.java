@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.coreapi.entity.vo.ExceptionEmailServerVo;
 import com.atzuche.order.coreapi.service.remote.CarDetailService;
@@ -10,6 +11,7 @@ import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -43,6 +45,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class DeRunService {
 
     private Logger logger = LoggerFactory.getLogger(DeRunService.class);
@@ -96,6 +99,7 @@ public class DeRunService {
      */
     public void changeRentStatus(String orderNo,int status){
         if(StringUtils.isBlank(orderNo)){
+            log.info("orderNo is empty.");
             return;
         }
         //根据订单号 查询最后一个有效子订单的车牌
@@ -108,6 +112,7 @@ public class DeRunService {
         }
         RenterOrderEntity renterOrder = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if(renterOrder == null){
+            log.info("renterOrder is null.orderNo:[{}]", orderNo);
             return;
         }
         String expRentTime = DateUtils.formate(renterOrder.getExpRentTime(),DateUtils.DATE_DEFAUTE);
@@ -125,9 +130,9 @@ public class DeRunService {
         dto.setRentTime(LocalDateTime.now().plusDays(1L).toEpochSecond(ZoneOffset.of("+8")));
         dto.setCarNo(carNo);
         dto.setUseSpecialPrice(USE_SPECIAL_PRICE.equals(renterOrder.getIsUseSpecialPrice()));
-
+        log.info("Query simNo.param is,dto:[{}]", JSON.toJSONString(dto));
         String simNo = carDetailService.querySimNoByCar(dto);
-
+        log.info("Query simNo.result is,simNo:[{}]", simNo);
         this.changeRentStatus(simNo,String.valueOf(status),cityName,orderNo,carNum,renterOrder.getRenterMemNo(), expRentTime,expRevertTime);
     }
 
@@ -143,7 +148,10 @@ public class DeRunService {
      * @param startTime 开始时间
      * @param endTime 结束时间
      */
-    public void changeRentStatus(String sim, String status, String cityName, String orderNo,String platNum, String renterNo, String startTime, String endTime){
+    private void changeRentStatus(String sim, String status, String cityName, String orderNo,String platNum,
+                            String renterNo, String startTime, String endTime){
+        log.info("Change rent status.param is,sim:[{}],status:[{}],cityName:[{}],orderNo:[{}],platNum:[{}]," +
+                "renterNo:[{}],startTime:[{}],endTime:[{}]", sim, status, cityName, orderNo, platNum, renterNo, startTime, endTime);
         ExceptionEmailServerVo email = exceptionEmailService.getEmailServer();
         String[] emails = this.exceptionEmail();
         try {
@@ -160,6 +168,7 @@ public class DeRunService {
             params.put("orderId",orderNo);
             //请求参数
             String reqParam=this.MapToStrUrlEncode(params);
+            log.info("reqParam is:[{}]",reqParam);
             String rpStr = this.sendGpsApiHttpsGet(updateLeaseReqUrl, reqParam);
             logger.info("租用状态变更 >> changeRentStatus >>reqUrl >> {}， reqParam >> {} >> res >> {}",updateLeaseReqUrl, reqParam,rpStr);
             if(rpStr!=null && !"".equals(rpStr)){
@@ -251,7 +260,9 @@ public class DeRunService {
      */
     private String group(String cityStr){
         for(String city:CITYS){
-            if(city.contains(cityStr)) return city;
+            if(city.contains(cityStr)) {
+                return city;
+            }
         }
         return "";
     }
