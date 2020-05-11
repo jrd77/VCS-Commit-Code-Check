@@ -71,19 +71,23 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
-        //OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        //reqDTO.setOrderNo(orderNo);
-
-        //ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
         ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
-
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
-        //adminOrderService.modifyOrder(modifyOrderReqVO);
         remoteFeignService.modifyOrder(modifyOrderReqVO);
+
+        try{
+
+
+
+
+        }catch (Exception e){
+
+        }
+
         return ResponseData.success();
     }
 
