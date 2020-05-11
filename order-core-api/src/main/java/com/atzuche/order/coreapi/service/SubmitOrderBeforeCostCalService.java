@@ -261,7 +261,7 @@ public class SubmitOrderBeforeCostCalService {
         MemAvailCouponRequest request = new MemAvailCouponRequest();
 
         request.setMemNo(Integer.valueOf(reqVO.getMemNo()));
-        request.setIsNew(request.getIsNew());
+        request.setIsNew((renterMember.getIsNew() != null && renterMember.getIsNew() == 1) ? true:false);
         request.setCityCode(Integer.valueOf(orderEntity.getCityCode()));
         request.setLabelIds(null);
         request.setRentTime(DateUtils.formateLong(renterOrderEntity.getExpRentTime(),DateUtils.DATE_DEFAUTE));
