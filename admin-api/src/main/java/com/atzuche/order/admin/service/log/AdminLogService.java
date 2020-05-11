@@ -13,6 +13,7 @@ import com.autoyol.commons.web.ResponseData;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Converter;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -65,13 +66,15 @@ public class AdminLogService {
         entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
         adminOperateLogMapper.insertLog(entity);
     }
-    public List<AdminOperateLogEntity> findByOrderNo(String orderNo) {
-        return adminOperateLogMapper.findAll(orderNo);
+    public List<AdminOperateLogDTO> findByOrderNo(String orderNo) {
+        return convert(adminOperateLogMapper.findAll(orderNo));
     }
 
     public List<AdminOperateLogDTO> findByQueryVO(QueryVO req) {
-        List<AdminOperateLogEntity> list = adminOperateLogMapper.findByQuery(req);
+        return convert(adminOperateLogMapper.findByQuery(req));
+    }
 
+    private List<AdminOperateLogDTO> convert(List<AdminOperateLogEntity> list) {
         List<AdminOperateLogDTO> dtos = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(list)) {
             list.forEach(log -> {

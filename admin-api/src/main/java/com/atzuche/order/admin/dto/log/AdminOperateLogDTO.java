@@ -2,8 +2,6 @@ package com.atzuche.order.admin.dto.log;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * @author pengcheng.fu
  * @date 2020/5/11 17:47
