@@ -6,6 +6,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.coreapi.service.*;
@@ -51,6 +52,8 @@ public class ModifyOrderController {
     private RenterOrderChangeApplyService renterOrderChangeApplyService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private ModifyOrderExtendService modifyOrderExtendService;
 	/**
 	 * 修改订单（APP端或H5端）
 	 * @param modifyOrderAppReq
@@ -246,5 +249,20 @@ public class ModifyOrderController {
 		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
 		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
     	return ResponseData.success(changeApplyCount);
+    }
+	
+	
+	/**
+     * 获取修改前数据
+     * @param modifyOrderReq
+     * @param bindingResult
+     * @return ResponseData
+     */
+    @PostMapping("/order/beforemodifydata/get")
+    public ResponseData<ModifyOrderDTO> getInitModifyOrderDTO(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
+        log.info("获取修改前数据 modifyOrderReq=[{}] ", modifyOrderReq);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		ModifyOrderDTO modifyOrderDTO = modifyOrderExtendService.getInitModifyOrderDTO(modifyOrderReq);
+        return ResponseData.success(modifyOrderDTO);
     }
 }

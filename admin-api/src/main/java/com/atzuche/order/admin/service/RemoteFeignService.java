@@ -773,4 +773,32 @@ public class RemoteFeignService {
             t.complete();
         }
     }
+    
+    
+    /**
+     * 获取修改前数据
+     * @param modifyOrderReq
+     * @return ModifyOrderConsoleDTO
+     */
+    public ModifyOrderConsoleDTO getInitModifyOrderDTO(ModifyOrderReqVO modifyOrderReq) {
+        ResponseData<ModifyOrderConsoleDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取修改前数据");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderModifyService.getInitModifyOrderDTO");
+            log.info("Feign 获取修改前数据,modifyOrderReq={}", JSON.toJSONString(modifyOrderReq));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(modifyOrderReq));
+            responseObject = feignOrderModifyService.getInitModifyOrderDTO(modifyOrderReq);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取修改前数据异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
+            Cat.logError("Feign 获取修改前数据异常",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
 }
