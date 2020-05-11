@@ -88,7 +88,6 @@ public class CarDepositReturnDetailController {
                 AdminUserUtil.getAdminUser().getAuthName(), JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
         return remoteFeignService.getTempCarDepoistsFromRemote(reqVO);
-        //return feignOrderCostService.getTempCarDepoists(reqVO);
     }
 
 
@@ -107,14 +106,11 @@ public class CarDepositReturnDetailController {
         //拉取存储数据
         GetTempCarDepositInfoReqVO infoReqVO = new GetTempCarDepositInfoReqVO();
         infoReqVO.setOrderNo(reqVO.getOrderNo());
-        infoReqVO.setMemNo(reqVO.getMemNo());
-        //ResponseData<GetTempCarDepositInfoResVO> res = feignOrderCostService.getTempCarDepoists(infoReqVO);
         ResponseData<GetTempCarDepositInfoResVO> res = remoteFeignService.getTempCarDepoistsFromRemote(infoReqVO);
         //更新数据
         SaveTempCarDepositInfoReqVO req = new SaveTempCarDepositInfoReqVO();
         BeanUtils.copyProperties(reqVO, req);
         req.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
-        //ResponseData responseData = feignOrderCostService.saveTempCarDepoist(req);
         ResponseData responseData = remoteFeignService.saveTempCarDepoistsFromRemote(req);
         if (Objects.nonNull(responseData) && StringUtils.equals(responseData.getResCode(),
                 ErrorCode.SUCCESS.getCode())) {
