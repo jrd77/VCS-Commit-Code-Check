@@ -3,11 +3,6 @@ package com.atzuche.order.coreapi.service;
 import static org.junit.Assert.fail;
 
 import com.atzuche.order.coreapi.task.*;
-import com.atzuche.order.mq.common.sms.ShortMessageSendService;
-import com.atzuche.order.renterorder.entity.RenterOrderEntity;
-import com.atzuche.order.renterorder.service.RenterOrderService;
-import com.xxl.job.core.biz.model.ReturnT;
-import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +14,6 @@ import com.atzuche.order.coreapi.TemplateApplication;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -115,14 +107,6 @@ public class DeliveryCarInfoPriceServiceTest {
 //		//结束时间
 //		LocalDateTime finshDateTime = localDateTime.plusDays(1);
 //		log.info("起租时间：");
-
-
-
-
-
-
-
-
 
 	//}
 
