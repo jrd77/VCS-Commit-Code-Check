@@ -16,7 +16,7 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 @EnableHystrix
 @EnableFeignClients({"com.autoyol","com.atzuche"})
 @EnableEurekaClient
-@SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.atzuche.violation","com.atzuche.config"})
+@SpringBootApplication(scanBasePackages = {"com.atzuche.order","com.atzuche.violation","com.atzuche.config","com.autoyol"})
 @MapperScan({"com.atzuche.order"})
 public class WzTemplateApplication extends SpringBootServletInitializer {
 

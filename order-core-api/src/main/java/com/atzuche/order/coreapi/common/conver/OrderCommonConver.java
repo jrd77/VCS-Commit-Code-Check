@@ -108,7 +108,8 @@ public class OrderCommonConver {
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());
-        renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
+        //renterOrderReqVO.setIsNew(null == renterMember.getIsNew() || renterMember.getIsNew() == 0);
+        renterOrderReqVO.setIsNew((renterMember.getIsNew() != null && renterMember.getIsNew() == 1) ? true:false);
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
         renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());

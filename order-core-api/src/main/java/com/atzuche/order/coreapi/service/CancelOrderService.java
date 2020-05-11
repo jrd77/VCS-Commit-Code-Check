@@ -23,8 +23,6 @@ import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -362,7 +360,6 @@ public class CancelOrderService {
             if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), memRole)) {
                 cancelSourceEnum = CancelSourceEnum.RENTER;
                 actionEventEnum = NewOrderMQActionEventEnum.ORDER_CANCEL;
-                map = SmsParamsMapUtil.getParamsMap(orderNo,null, ShortMessageTypeEnum.PAY_RENT_CAR_ILLEGAL_DEPOSIT_CANCEL_OWNER.getValue(), null);
             }
             orderActionMqService.sendCancelOrderSuccess(orderNo, cancelSourceEnum, actionEventEnum, map);
 
