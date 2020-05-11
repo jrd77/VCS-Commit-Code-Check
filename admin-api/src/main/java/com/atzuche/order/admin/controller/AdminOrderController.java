@@ -80,7 +80,7 @@ public class AdminOrderController {
         remoteFeignService.modifyOrder(modifyOrderReqVO);
 
         try{
-
+        remoteFeignService.queryCouponByOrderNoFromRemote();
 
 
 

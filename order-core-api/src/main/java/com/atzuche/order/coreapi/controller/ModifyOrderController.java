@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderCouponDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
@@ -14,9 +16,13 @@ import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.ModifyOrderScanCodeVO;
 import com.atzuche.order.open.vo.ModifyOrderScanPickUpVO;
 import com.atzuche.order.open.vo.request.TransferReq;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.OrderCouponEntity;
+import com.atzuche.order.renterorder.service.OrderCouponService;
 import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +32,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -51,6 +58,8 @@ public class ModifyOrderController {
     private RenterOrderChangeApplyService renterOrderChangeApplyService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private OrderCouponService orderCouponService;
 	/**
 	 * 修改订单（APP端或H5端）
 	 * @param modifyOrderAppReq
@@ -246,5 +255,23 @@ public class ModifyOrderController {
 		Integer changeApplyCount = renterOrderChangeApplyService.getRenterOrderChangeApplyAllCountByOrderNo(orderNo);
 		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
     	return ResponseData.success(changeApplyCount);
+    }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/11 16:41 
+     * @Description: 通过订单号查询券信息
+     * 
+     **/
+    @GetMapping("/order/coupon/queryCouponByOrderNo")
+    public ResponseData<List<OrderCouponDTO>> queryCouponByOrderNo(@RequestParam(value = "orderNo") String orderNo,@RequestParam(value = "renterOrderNo") String renterOrderNo){
+        log.info("查询券信息 orderNo={}",orderNo);
+        List<OrderCouponEntity> orderCouponEntitieList = orderCouponService.listOrderCouponByRenterOrderNo(renterOrderNo);
+        List<OrderCouponDTO> orderCouponDTOS = new ArrayList<>();
+        orderCouponEntitieList.stream().forEach(x->{
+            OrderCouponDTO orderCouponDTO = new OrderCouponDTO();
+            BeanUtils.copyProperties(x,orderCouponDTO);
+            orderCouponDTOS.add(orderCouponDTO);
+        });
+        return ResponseData.success(orderCouponDTOS);
     }
 }
