@@ -152,7 +152,4 @@ public class RenterOrderEntity implements Serializable {
      */
     private Integer supplementAmt;
 
-    @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
-    private Integer repeatTimeOrder;
-
 }

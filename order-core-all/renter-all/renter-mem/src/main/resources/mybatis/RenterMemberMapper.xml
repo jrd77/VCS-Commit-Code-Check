@@ -23,6 +23,7 @@
         <result property="driViceLicAuth" column="dri_vice_lic_auth"/>
         <result property="renterCheck" column="renter_check"/>
         <result property="outerSource" column="outer_source"/>
+        <result property="repeatTimeOrder" column="repeat_time_order"/>
         <result property="regTime" column="reg_time"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
@@ -52,6 +53,7 @@
 	`dri_vice_lic_auth`,
 	`renter_check`,
 	`outer_source`,
+	`repeat_time_order`,
 	`reg_time`,
 	`create_time`,
 	`create_op`,
@@ -87,6 +89,7 @@
         `dri_vice_lic_auth`,
         `renter_check`,
         `outer_source`,
+        `repeat_time_order`,
         `reg_time`,
         `create_op`,
         `update_op`
@@ -111,6 +114,7 @@
         #{driViceLicAuth},
         #{renterCheck},
         #{outerSource},
+        #{repeatTimeOrder},
         #{regTime},
         #{createOp},
         #{updateOp}
@@ -138,6 +142,7 @@
             <if test="driViceLicAuth != null">`dri_vice_lic_auth`, </if>
             <if test="renterCheck != null">`renter_check`, </if>
             <if test="outerSource != null">`outer_source`,</if>
+            <if test="repeatTimeOrder != null">`repeat_time_order`, </if>
             <if test="regTime != null">`reg_time`,</if>
             <if test="createOp != null">`create_op`, </if>
             <if test="updateOp != null">`update_op`, </if>
@@ -161,6 +166,7 @@
             <if test="driViceLicAuth != null">#{driViceLicAuth},  </if>
             <if test="renterCheck != null">#{renterCheck}, </if>
             <if test="outerSource != null">#{outerSource},</if>
+            <if test="repeatTimeOrder != null">#{repeatTimeOrder},  </if>
             <if test="regTime != null">#{regTime},</if>
             <if test="createTime != null">#{createTime},  </if>
             <if test="createOp != null">#{createOp},  </if>
@@ -190,6 +196,7 @@
             <if test="driViceLicAuth != null">`dri_vice_lic_auth` = #{driViceLicAuth}, </if>
             <if test="renterCheck != null">`renter_check` = #{renterCheck}, </if>
             <if test="outerSource != null">`outer_source` = #{outerSource}, </if>
+            <if test="repeatTimeOrder != null">`repeat_time_order` = #{repeatTimeOrder}, </if>
             <if test="regTime != null">`reg_time` = #{regTime}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
@@ -219,6 +226,7 @@
             `dri_vice_lic_auth` = #{driViceLicAuth},
             `renter_check` = #{renterCheck},
             `outer_source` = #{outerSource},
+            `repeat_time_order` = #{repeatTimeOrder},
             `reg_time` = #{regTime},
             `create_op` = #{createOp},
             `update_op` = #{updateOp}
