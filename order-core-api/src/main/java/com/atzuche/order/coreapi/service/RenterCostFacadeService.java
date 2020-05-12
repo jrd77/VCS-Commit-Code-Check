@@ -398,7 +398,7 @@ public class RenterCostFacadeService {
         carDepositDTO.expAndActFlg = carExpAndActFlg;
         carDepositDTO.isDetain = orderStatusEntity.getIsDetain();
         carDepositDTO.tempCarDepoists =
-                orderConsoleCostHandleService.getTempCarDepoistInfos(orderNo, memNo, OrderConstant.CASHNOS).getTempCarDepoists();
+                orderConsoleCostHandleService.getTempCarDepoistInfos(orderNo, OrderConstant.CASHNOS).getTempCarDepoists();
 
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();

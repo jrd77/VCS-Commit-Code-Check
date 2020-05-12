@@ -521,7 +521,7 @@ public class RemoteFeignService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.getTempCarDepoists");
             log.info("Feign 开始获取订单车辆押金暂扣扣款明细接口req={}", JSON.toJSONString(req));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
-            feignOrderCostService.getTempCarDepoists(req);
+            responseObject = feignOrderCostService.getTempCarDepoists(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
