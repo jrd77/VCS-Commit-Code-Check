@@ -4,6 +4,8 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 违章押金暂扣处理请求参数
  *
@@ -19,7 +21,7 @@ public class IllegalDepositDetainReqVO {
     private String orderNo;
 
     @AutoDocProperty("违章押金暂扣状态 1：暂扣 2：取消暂扣")
-    @NotBlank(message = "违章押金暂扣状态不能为空")
+    @NotNull(message = "违章押金暂扣状态不能为空")
     private Integer detainStatus;
 
     @AutoDocProperty(value = "操作人")

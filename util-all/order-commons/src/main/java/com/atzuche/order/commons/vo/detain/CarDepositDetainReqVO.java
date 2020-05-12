@@ -4,6 +4,8 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 违章押金暂扣处理请求参数
  *
@@ -43,7 +45,7 @@ public class CarDepositDetainReqVO {
     private String lpDetainReason;
 
     @AutoDocProperty(value = "车辆押金暂扣状态 1：暂扣 2：取消暂扣", required = true)
-    @NotBlank(message = "车辆押金暂扣状态不能为空")
+    @NotNull(message = "车辆押金暂扣状态不能为空")
     private Integer detainStatus;
 
 }
