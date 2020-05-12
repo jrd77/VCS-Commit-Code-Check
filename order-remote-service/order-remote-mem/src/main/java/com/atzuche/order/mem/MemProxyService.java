@@ -87,25 +87,31 @@ public class MemProxyService {
 
         OrderRenterInfoDTO dto = new OrderRenterInfoDTO();
         dto.setMemNo(memNo);
-        dto.setRealName(memberCoreInfo.getRealName());
-        dto.setRenterPhone(String.valueOf(memberCoreInfo.getMobile()));
-        dto.setEmail(memberAuthInfo.getEmail());
-        dto.setGender(convertGender(memberBaseInfo.getGender()));
-        dto.setDriLicRecordNo(memberAuthInfo.getDriLicRecordNo());
         dto.setIdNo(secretInfo.getIdNo());
-        dto.setCensusRegiste(memberBaseInfo.getCensusRegiste());
-        dto.setCity(memberBaseInfo.getCity());
-        dto.setProvince(memberBaseInfo.getProvince());
-        dto.setInternalStaff(convertYesOrNo(memberRoleInfo.getInternalStaff()));
-        dto.setCpicFlag(convertYesOrNo(memberRoleInfo.getCpicMemberFlag()));
-//        dto.setLabelTagList(convertLabelList(memberRoleInfo.));
         dto.setAdditionalDrivers(memberAdditionInfo.getCommUseDriverList());
-        dto.setRegTimeTxt(convertTime(memberCoreInfo.getRegTime()));
-        dto.setDriveAge(convertAge(memberAuthInfo.getDriLicFirstTime()));
         dto.setBuyTimes(String.valueOf(memberStatisticsInfo.getSuccessOrderNum()));
         dto.setUpgrades("0");
-
-
+        if(memberBaseInfo != null){
+            dto.setGender(convertGender(memberBaseInfo.getGender()));
+            dto.setCensusRegiste(memberBaseInfo.getCensusRegiste());
+            dto.setCity(memberBaseInfo.getCity());
+            dto.setProvince(memberBaseInfo.getProvince());
+        }
+        if(memberCoreInfo!=null){
+            dto.setRealName(memberCoreInfo.getRealName());
+            dto.setRenterPhone(String.valueOf(memberCoreInfo.getMobile()));
+            dto.setRegTimeTxt(convertTime(memberCoreInfo.getRegTime()));
+            dto.setRepeatTimeOrder(memberCoreInfo.getRepeatTimeOrder());
+        }
+        if(memberAuthInfo != null){
+            dto.setEmail(memberAuthInfo.getEmail());
+            dto.setDriLicRecordNo(memberAuthInfo.getDriLicRecordNo());
+            dto.setDriveAge(convertAge(memberAuthInfo.getDriLicFirstTime()));
+        }
+        if(memberRoleInfo != null){
+            dto.setInternalStaff(convertYesOrNo(memberRoleInfo.getInternalStaff()));
+            dto.setCpicFlag(convertYesOrNo(memberRoleInfo.getCpicMemberFlag()));
+        }
         return dto;
     }
 

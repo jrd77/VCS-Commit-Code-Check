@@ -63,4 +63,7 @@ public class OrderRenterInfoDTO {
     private String buyTimes;
     @AutoDocProperty(value = "成功升级车辆次数")
     private String upgrades;
+
+    @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
+    private Integer repeatTimeOrder;
 }

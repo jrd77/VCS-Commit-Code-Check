@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
@@ -150,5 +151,8 @@ public class RenterOrderEntity implements Serializable {
      * 需补付金额
      */
     private Integer supplementAmt;
+
+    @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
+    private Integer repeatTimeOrder;
 
 }
