@@ -781,21 +781,20 @@ public class RemoteFeignService {
      * @Description: 获取优惠券信息
      *
      **/
-    public ResponseData<List<OrderCouponDTO>> queryCouponByOrderNoFromRemote(String orderNo,String renterOrderNo){
+    public List<OrderCouponDTO> queryCouponByOrderNoFromRemote(String orderNo){
         ResponseData<List<OrderCouponDTO>> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取优惠券信息");
-
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.orderCostOwnerGet");
-            log.info("Feign 获取优惠券信息,renterOrderNo={}", JSON.toJSONString(renterOrderNo));
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(renterOrderNo));
-            responseObject =feignOrderCouponService.queryCouponByOrderNo(orderNo,renterOrderNo);
+            log.info("Feign 获取优惠券信息,orderNo={}", JSON.toJSONString(orderNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderNo));
+            responseObject =feignOrderCouponService.queryCouponByOrderNo(orderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            return responseObject;
+            return responseObject.getData();
         }catch (Exception e){
-            log.error("Feign 获取优惠券信息异常,responseObject={},orderNo={},renterOrderNo={}",JSON.toJSONString(responseObject),orderNo,renterOrderNo,e);
+            log.error("Feign 获取优惠券信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取优惠券信息异常",e);
             t.setStatus(e);
             throw e;

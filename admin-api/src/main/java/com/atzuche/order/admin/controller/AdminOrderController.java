@@ -2,14 +2,17 @@ package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.car.CarService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderCouponDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
@@ -39,6 +42,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -55,7 +60,8 @@ public class AdminOrderController {
     private AdminOrderService adminOrderService;
     @Autowired
     private RemoteFeignService remoteFeignService;
-
+    @Autowired
+    private AdminLogService adminLogService;
     @Autowired
     private CarService carService;
 
@@ -80,16 +86,57 @@ public class AdminOrderController {
         remoteFeignService.modifyOrder(modifyOrderReqVO);
 
         try{
-        remoteFeignService.queryCouponByOrderNoFromRemote();
+            if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId()) ||
+                StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId()) ||
+                StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
+                List<OrderCouponDTO> orderCouponDTOS = remoteFeignService.queryCouponByOrderNoFromRemote(orderNo);
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId())){
+                   OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getCarOwnerCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
 
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId())){
+                   OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getSrvGetReturnCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
 
-
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getPlatformCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
+            }
         }catch (Exception e){
-
+            log.error("优惠券编辑记录日志异常",e);
         }
 
         return ResponseData.success();
     }
+
+    private OrderCouponDTO filterOrderCouponByCouponId(List<OrderCouponDTO> orderCouponDTOS, String couponId){
+        if(StringUtils.isBlank(couponId)){
+            return null;
+        }
+        Optional<OrderCouponDTO> first = Optional.ofNullable(orderCouponDTOS)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> couponId.equals(x.getCouponId()))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")

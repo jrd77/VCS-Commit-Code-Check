@@ -20,7 +20,7 @@ public enum AdminOpTypeEnum {
     RENTER_TO_PLATFORM(11,"租客需支付给平台的费用修改操作"),
     RENTER_PRICE_ADJUSTMENT(12,"租客车主相互调价操作"),
     PLATFORM_TO_RENTER(13,"平台给租客的补贴修改操作"),
-
+    COUPON_EDIT(14,"券编辑操作")
     ;
     private int opCode;
     private String opType;

@@ -33,5 +33,5 @@ public interface FeignOrderCouponService {
      *
      **/
     @GetMapping("/order/coupon/queryCouponByOrderNo")
-    public ResponseData<List<OrderCouponDTO>> queryCouponByOrderNo(@RequestParam(value = "orderNo") String orderNo,@RequestParam(value = "renterOrderNo") String renterOrderNo);
+    public ResponseData<List<OrderCouponDTO>> queryCouponByOrderNo(@RequestParam(value = "orderNo") String orderNo);
 }
