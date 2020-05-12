@@ -3,12 +3,8 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.entity.dto.SuccessOrderStaCount;
-import com.atzuche.order.coreapi.listener.sms.SMSOrderBaseEventService;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -20,9 +16,7 @@ import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
 import com.autoyol.car.api.model.enums.OwnerTypeEnum;
-import com.autoyol.car.api.model.vo.ResponseObject;
 import com.autoyol.search.api.OrderSearchService;
-import com.autoyol.search.entity.ErrorCode;
 import com.autoyol.search.entity.ResponseData;
 import com.autoyol.search.entity.ViolateBO;
 import com.autoyol.search.vo.OrderVO;
@@ -75,8 +69,6 @@ public class OrderSearchRemoteService {
     @Resource
     private OrderService orderService;
 
-    @Autowired
-    SMSOrderBaseEventService smsOrderBaseEventService;
 
     @Value("${violation.h5.url}")
     private String h5Url;
@@ -391,7 +383,18 @@ public class OrderSearchRemoteService {
         dto.setMoreLicenseFlag(String.valueOf(fromBean.getMoreLicenseFlag()));
         dto.setLicenseExpire(DateUtils.localDateTimeToDate(fromBean.getLicenseExpire()));
         dto.setFrameno(fromBean.getFrameNo());
-        dto.setOrderType("0");
+        //
+        //0,普通订单 1,代步车订单 2,携程套餐订单 3,携程到店订单 4,同程套餐订单 5,安联代步车订单 6,普通套餐订单 7,VIP订单,8.线上长租订单
+        //新增长租分类：
+        //内部分类 1:普通,2:套餐,3:长租
+        String orderType = "0";
+        if (StringUtils.isNotBlank(fromBean.getCategory()) && "1".equals(fromBean.getCategory())) {
+        	orderType = "0";
+        } else if(StringUtils.isNotBlank(fromBean.getCategory()) && "3".equals(fromBean.getCategory())) {
+        	orderType = "8";
+        }
+        dto.setOrderType(orderType);
+        
         dto.setChannelType("0");
         dto.setOwnerOfflineOrderStatus(0);
         dto.setOfflineOrderType("0");
@@ -767,18 +770,6 @@ public class OrderSearchRemoteService {
             }
             throw remoteCallException;
         }
-    }
-
-    /**
-     * 發送一小時未支付租车押金
-     * @param orderNo
-     */
-    public void sendSmsData(String orderNo) {
-        Map paramsMap = Maps.newConcurrentMap();
-        paramsMap.put("indexUrl", h5Url);
-        Map map = SmsParamsMapUtil.getParamsMap(orderNo, ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_RENTER.getValue(), ShortMessageTypeEnum.EXEMPT_PREORDER_AUTO_CANCEL_ORDER_2_OWNER.getValue(), paramsMap);
-        smsOrderBaseEventService.sendShortMessage(map);
-
     }
 
     public List<String> queryRenterOrderChangeApply() {

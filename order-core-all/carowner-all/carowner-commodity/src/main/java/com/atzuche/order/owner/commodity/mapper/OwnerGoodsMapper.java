@@ -1,5 +1,8 @@
 package com.atzuche.order.owner.commodity.mapper;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,4 +32,6 @@ public interface OwnerGoodsMapper{
     OwnerGoodsEntity getOwnerGoodsByCarNo(@Param("carNo")Integer carNo);
 
     OwnerGoodsEntity getOwnerGoodsByCarNoAndOrderNo(@Param("carNo")Integer carNo, @Param("orderNo")String orderNo);
+    
+    List<String> listOrderNoByCarNo(@Param("carNo")Integer carNo);
 }
