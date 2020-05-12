@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.ModificationOrderService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
@@ -10,6 +11,7 @@ import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
@@ -58,6 +60,8 @@ public class AdminOrderController {
 
     @Autowired
     private CarService carService;
+    @Autowired
+    private ModificationOrderService modificationOrderService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -83,7 +87,11 @@ public class AdminOrderController {
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         //adminOrderService.modifyOrder(modifyOrderReqVO);
+        // 获取修改前数据
+ 		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(modifyOrderReqVO);
         remoteFeignService.modifyOrder(modifyOrderReqVO);
+        // 保存操作日志
+        modificationOrderService.saveModifyOrderLog(modifyOrderReqVO, modifyOrderConsoleDTO);
         return ResponseData.success();
     }
 
@@ -219,7 +227,11 @@ public class AdminOrderController {
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         BeanUtils.copyProperties(reqVO,req);
         req.setCarNo(carNo);
+        String oldPlateNum = remoteFeignService.getCarPlateNum(reqVO.getOrderNo());
         adminOrderService.transferCar(req);
+        String updPlateNum = remoteFeignService.getCarPlateNum(reqVO.getOrderNo());
+        // 保存操作日志
+        modificationOrderService.saveTransferLog(reqVO.getOrderNo(), oldPlateNum, updPlateNum);
         return ResponseData.success();
 
 

@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.filter.CityLonLatFilter;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.enums.DeliveryErrorCode;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
@@ -33,6 +34,8 @@ public class AdminDeliveryCarService {
     private DeliveryRemoteService deliveryRemoteService;
     @Autowired
     private RemoteFeignService remoteFeignService;
+    @Autowired
+    private ModificationOrderService modificationOrderService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,8 +90,11 @@ public class AdminDeliveryCarService {
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
         //ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
+        // 获取修改前数据
+ 		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(createModifyOrderInfoParams(deliveryCarVO));
         ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
-
+        // 保存操作日志
+        modificationOrderService.saveModifyOrderLog(createModifyOrderInfoParams(deliveryCarVO), modifyOrderConsoleDTO);
         if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
             logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
             throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());

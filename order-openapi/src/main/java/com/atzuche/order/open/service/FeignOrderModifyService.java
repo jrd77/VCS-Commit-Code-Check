@@ -89,4 +89,12 @@ public interface FeignOrderModifyService {
      */
     @PostMapping("/order/beforemodifydata/get")
     public ResponseData<ModifyOrderConsoleDTO> getInitModifyOrderDTO(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
+    
+    /**
+	 * 根据订单号获取车牌号
+	 * @param orderNo
+	 * @return ResponseData<String>
+	 */
+	@GetMapping("/order/carplatenum/get")
+    public ResponseData<String> getCarPlateNum(@RequestParam(value="orderNo",required = true) String orderNo);
 }

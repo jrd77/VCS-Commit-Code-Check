@@ -265,4 +265,17 @@ public class ModifyOrderController {
 		ModifyOrderDTO modifyOrderDTO = modifyOrderExtendService.getInitModifyOrderDTO(modifyOrderReq);
         return ResponseData.success(modifyOrderDTO);
     }
+    
+    
+    /**
+	 * 根据订单号获取车牌号
+	 * @param orderNo
+	 * @return ResponseData<String>
+	 */
+	@GetMapping("/order/carplatenum/get")
+    public ResponseData<String> getCarPlateNum(@RequestParam(value="orderNo",required = true) String orderNo) {
+		log.info("/order/carplatenum/get orderNo=[{}]", orderNo);
+		String carPlateNum = modifyOrderExtendService.getCarPlateNum(orderNo);
+    	return ResponseData.success(carPlateNum);
+    }
 }

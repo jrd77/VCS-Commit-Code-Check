@@ -3,6 +3,8 @@
  */
 package com.atzuche.order.admin.service;
 
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.payment.PaymentRequestVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.payment.PaymentResponseVO;
@@ -18,8 +20,12 @@ import com.atzuche.order.commons.vo.req.PaymentReqVO;
 import com.atzuche.order.commons.vo.res.CashierResVO;
 import com.atzuche.order.commons.vo.res.PaymentRespVO;
 import com.atzuche.order.open.service.FeignPaymentService;
+import com.atzuche.order.open.vo.OfflinePayVO;
+import com.atzuche.order.open.vo.VirtualPayVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.StringUtils;
+import com.autoyol.platformcost.CommonUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +49,8 @@ public class PaymentService {
 	FeignPaymentService feignPaymentService;
     @Autowired
     private RemoteFeignService remoteFeignService;
+    @Autowired
+    private AdminLogService adminLogService;
 
 	public PaymentInformationResponseVO platformPaymentList(PaymentRequestVO paymentRequestVO) {
 		String orderNo = paymentRequestVO.getOrderNo();
@@ -561,5 +569,46 @@ public class PaymentService {
             return first.get();
         }
         return null;
+    }
+    
+    
+    /**
+     * 线下支付操作日志
+     * @param offlinePayVO
+     */
+    public void saveOfflinePayLog(OfflinePayVO offlinePayVO) {
+    	if (offlinePayVO == null) {
+    		return;
+    	}
+    	try {
+    		String cashTypeName = PayCashTypeEnum.fromValue(offlinePayVO.getCashType()).getName();
+    		String payTime = CommonUtils.formatTime(CommonUtils.parseTime(offlinePayVO.getPayTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
+			// 描述
+			String desc = "款项："+cashTypeName+";支付ID:"+offlinePayVO.getInternalNo()+";支付时间:"+payTime+";支付金额:"+offlinePayVO.getPayAmt()+";交易流水号:"+offlinePayVO.getQn()+";支付来源:"+offlinePayVO.getPaySource()+";";
+			// 保存
+			adminLogService.insertLog(AdminOpTypeEnum.OFFLINE_PAY, offlinePayVO.getOrderNo(), desc);
+		} catch (Exception e) {
+			log.error("管理后台保存修改订单操作日志异常  offlinePayVO=[{}]",offlinePayVO,e);
+		}
+    }
+    
+    
+    /**
+     * 虚拟支付操作日志
+     * @param virtualPayVO
+     */
+    public void saveVirtualPayLog(VirtualPayVO virtualPayVO) {
+    	if (virtualPayVO == null) {
+    		return;
+    	}
+    	try {
+    		String cashTypeName = PayCashTypeEnum.fromValue(virtualPayVO.getCashType()).getName();
+			// 描述
+			String desc = "款项："+cashTypeName+";虚拟支付账号:"+virtualPayVO.getAccountNo()+";支付金额:"+virtualPayVO.getPayAmt()+";";
+			// 保存
+			adminLogService.insertLog(AdminOpTypeEnum.VIRTUAL_PAY, virtualPayVO.getOrderNo(), desc);
+		} catch (Exception e) {
+			log.error("管理后台保存修改订单操作日志异常  virtualPayVO=[{}]",virtualPayVO,e);
+		}
     }
 }

@@ -14,6 +14,8 @@ import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OrderCouponService;
@@ -30,6 +32,8 @@ public class ModifyOrderExtendService {
 	private RenterOrderDeliveryService renterOrderDeliveryService;
 	@Autowired
 	private OrderCouponService orderCouponService;
+	@Autowired
+	private OwnerGoodsService ownerGoodsService;
 	
 
 	/**
@@ -88,5 +92,17 @@ public class ModifyOrderExtendService {
 		modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
 		modifyOrderDTO.setChangeItemList(ModifyOrderUtils.listOrderChangeItemDTO(null, initRenterOrder, modifyOrderReq, orderCouponList, deliveryMap));
 		return modifyOrderDTO;
+	}
+	
+	
+	/**
+	 * 获取车牌号
+	 * @param orderNo
+	 * @return String
+	 */
+	public String getCarPlateNum(String orderNo) {
+		// 获取最新的车主商品信息
+		OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
+		return ownerGoodsEntity.getCarPlateNum();
 	}
 }
