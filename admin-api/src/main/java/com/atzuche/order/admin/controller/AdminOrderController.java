@@ -85,13 +85,22 @@ public class AdminOrderController {
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         remoteFeignService.modifyOrder(modifyOrderReqVO);
 
+        //记录日志
+        adminlog(modifyOrderReqVO);
+
+        return ResponseData.success();
+    }
+
+
+    private void adminlog(ModifyOrderReqVO modifyOrderReqVO){
         try{
+            String orderNo = modifyOrderReqVO.getOrderNo();
             if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId()) ||
-                StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId()) ||
-                StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
+                    StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId()) ||
+                    StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
                 List<OrderCouponDTO> orderCouponDTOS = remoteFeignService.queryCouponByOrderNoFromRemote(orderNo);
                 if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId())){
-                   OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getCarOwnerCouponId());
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getCarOwnerCouponId());
                     if(orderCouponDTO != null){
                         String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
                         adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
@@ -99,7 +108,7 @@ public class AdminOrderController {
                 }
 
                 if(StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId())){
-                   OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getSrvGetReturnCouponId());
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getSrvGetReturnCouponId());
                     if(orderCouponDTO != null){
                         String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
                         adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
@@ -117,10 +126,7 @@ public class AdminOrderController {
         }catch (Exception e){
             log.error("优惠券编辑记录日志异常",e);
         }
-
-        return ResponseData.success();
     }
-
     private OrderCouponDTO filterOrderCouponByCouponId(List<OrderCouponDTO> orderCouponDTOS, String couponId){
         if(StringUtils.isBlank(couponId)){
             return null;
