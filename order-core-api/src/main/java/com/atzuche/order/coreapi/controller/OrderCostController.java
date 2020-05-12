@@ -233,6 +233,7 @@ public class OrderCostController {
 	@PostMapping("/order/cost/owner/get")
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("车主子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
+
 		BindingResultUtil.checkBindingResult(bindingResult);
         OwnerOrderEntity ownerOrderEntity = null;
         if(StringUtils.isNotBlank(req.getSubOrderNo())) {
@@ -242,6 +243,7 @@ public class OrderCostController {
                 throw new OwnerOrderNotFoundException(ownerOrderEntity.getOwnerOrderNo());
             }
         }
+        req.setMemNo(ownerOrderEntity.getMemNo());
 		OrderOwnerCostResVO resVo = orderCostService.orderCostOwnerGet(req);
 		return ResponseData.success(resVo);
 
