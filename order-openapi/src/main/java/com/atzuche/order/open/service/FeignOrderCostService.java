@@ -118,7 +118,7 @@ public interface FeignOrderCostService {
      * @param renterOrderNo
      */
     @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
-	ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo);
+	ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam(value="renterOrderNo",required=false) String renterOrderNo);
 
     /**
      * 获取管理后台费用
