@@ -55,6 +55,7 @@ public class RemoteFeignService {
     FeignOrderModifyService feignOrderModifyService;
     @Autowired
     FeignModifyOwnerAddrService feignModifyOwnerAddrService;
+    
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 10:38

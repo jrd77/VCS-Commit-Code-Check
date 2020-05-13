@@ -1,7 +1,15 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
@@ -9,36 +17,23 @@ import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.entity.OfflineRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
+import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
+import com.atzuche.order.cashieraccount.mapper.OfflineRefundApplyMapper;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
+import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
-import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
-import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
-import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
-import com.atzuche.order.cashieraccount.mapper.OfflineRefundApplyMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
