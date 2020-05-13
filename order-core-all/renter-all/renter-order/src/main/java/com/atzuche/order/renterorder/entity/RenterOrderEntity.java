@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
