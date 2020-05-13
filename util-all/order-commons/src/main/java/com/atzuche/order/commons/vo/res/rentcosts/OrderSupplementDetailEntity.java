@@ -110,6 +110,9 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 */
 	@AutoDocProperty(value="操作人")
 	private String createOp;
+	
+	@AutoDocProperty(value="是否显示删除按钮：1-显示，0-不显示")
+	private String showDelButton;
 	/**
 	 * 修改时间
 	 */
