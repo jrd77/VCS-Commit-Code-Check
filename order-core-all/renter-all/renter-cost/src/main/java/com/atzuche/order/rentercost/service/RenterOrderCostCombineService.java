@@ -567,6 +567,13 @@ public class RenterOrderCostCombineService {
 		return payableList;
 	}
 	
+	/**
+	 * 都不走全局，仅仅根据当前的子订单来，补贴按结算的时候来处理。
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @param memNo
+	 * @return
+	 */
 	public List<PayableVO> listPayableGlobalVO(String orderNo, String renterOrderNo, String memNo) {
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		if (StringUtils.isNotBlank(renterOrderNo)) {

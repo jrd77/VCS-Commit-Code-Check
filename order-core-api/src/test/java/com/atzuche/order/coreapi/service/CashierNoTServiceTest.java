@@ -53,7 +53,9 @@ public class CashierNoTServiceTest {
 			String orderNo = renterOrderEntity.getOrderNo();
 			//管理后台修改补付
 		    if(renterOrderEntity != null) {
-		        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+//		        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+		        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+		        
 		        //应付租车费用（已经求和）
 		        int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
 		        log.info("rentAmtAfter=应付="+rentAmtAfter);

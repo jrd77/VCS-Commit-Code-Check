@@ -40,6 +40,14 @@ public class CashierPayServiceTest {
 	RenterOrderService renterOrderService;
 	
 	@Test
+	public void testGetPaySignStrNewOfflinePay() {
+		String orderNo = "44772111500299";
+		String memNo = "643164996";
+		cashierPayService.getPaySignStrNewOfflinePay(orderNo, memNo, true);
+		
+	}
+	
+	@Test
 	public void testPayCallBack() {
 		fail("Not yet implemented");
 	}

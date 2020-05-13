@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.controller;
 import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.VirtualPayService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OfflinePayDTO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
@@ -47,6 +48,9 @@ public class VirtualPayController {
 
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private CashierPayService cashierPayService;
+    
 
     @PostMapping("pay/virtual")
     public ResponseData  virtualPay(@Valid @RequestBody VirtualPayVO virtualPayVO, BindingResult result) {

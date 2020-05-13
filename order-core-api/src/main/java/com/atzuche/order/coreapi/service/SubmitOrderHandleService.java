@@ -340,7 +340,7 @@ public class SubmitOrderHandleService {
         ownerOrderSubsidyDetailEntity.setOrderNo(orderNo);
         ownerOrderSubsidyDetailEntity.setOwnerOrderNo(ownerOrderNo);
         ownerOrderSubsidyDetailEntity.setMemNo(memNo);
-        ownerOrderSubsidyDetailEntity.setSubsidyAmount(-Math.abs(subsidyAmount));
+        ownerOrderSubsidyDetailEntity.setSubsidyAmount(-subsidyAmount);
 
         ownerOrderSubsidyDetailEntity.setSubsidyTypeCode(SubsidyTypeCodeEnum.RENT_AMT.getCode());
         ownerOrderSubsidyDetailEntity.setSubsidyTypeName(SubsidyTypeCodeEnum.RENT_AMT.getDesc());
