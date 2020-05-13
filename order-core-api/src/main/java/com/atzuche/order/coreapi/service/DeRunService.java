@@ -38,8 +38,9 @@ import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class DeRunService {
      * @param orderNo 订单号
      * @param status 0未租用，1租用中
      */
-    public void changeRentStatus(String orderNo,int status){
+    public void changeRentStatus(String orderNo,int status) throws ParseException {
         if(StringUtils.isBlank(orderNo)){
             log.info("orderNo is empty.");
             return;
@@ -126,8 +127,8 @@ public class DeRunService {
 
         OrderCarInfoParamDTO dto =new OrderCarInfoParamDTO();
         dto.setCarAddressIndex(0);
-        dto.setRentTime(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
-        dto.setRevertTime(LocalDateTime.now().plusDays(1L).toEpochSecond(ZoneOffset.of("+8")));
+        dto.setRentTime(dateTOAutoLong(new Date()));
+        dto.setRevertTime(dateTOAutoLong(org.apache.commons.lang3.time.DateUtils.addDays(new Date(),1)));
         dto.setCarNo(carNo);
         dto.setUseSpecialPrice(USE_SPECIAL_PRICE.equals(renterOrder.getIsUseSpecialPrice()));
         log.info("Query simNo.param is,dto:[{}]", JSON.toJSONString(dto));
@@ -149,7 +150,7 @@ public class DeRunService {
      * @param endTime 结束时间
      */
     private void changeRentStatus(String sim, String status, String cityName, String orderNo,String platNum,
-                            String renterNo, String startTime, String endTime){
+                                  String renterNo, String startTime, String endTime){
         log.info("Change rent status.param is,sim:[{}],status:[{}],cityName:[{}],orderNo:[{}],platNum:[{}]," +
                 "renterNo:[{}],startTime:[{}],endTime:[{}]", sim, status, cityName, orderNo, platNum, renterNo, startTime, endTime);
         ExceptionEmailServerVo email = exceptionEmailService.getEmailServer();
@@ -293,6 +294,11 @@ public class DeRunService {
                 ",车牌号:" + platNum +
                 ",D类sim卡号:" + sim +
                 "，状态status：" + (status.equals("1") ? "在租" : "返还") + "】";
+    }
+    private Long dateTOAutoLong(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DATE_DEFAUTE);
+        String f = sdf.format(date);
+        return Long.parseLong(f);
     }
 
 }
