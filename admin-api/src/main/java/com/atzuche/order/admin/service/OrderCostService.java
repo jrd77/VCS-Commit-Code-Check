@@ -583,7 +583,7 @@ public class OrderCostService {
         if(ownerCouponLongDTO != null){
             realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
-        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(-sum));
     }
 
 
@@ -1249,6 +1249,6 @@ public class OrderCostService {
         if(ownerCouponLongDTO != null){
             realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
-        realVo.setOwnerLongRentDeductAmt(String.valueOf(NumberUtils.convertNumberToFushu(sum)));
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(-sum));
     }
 }
