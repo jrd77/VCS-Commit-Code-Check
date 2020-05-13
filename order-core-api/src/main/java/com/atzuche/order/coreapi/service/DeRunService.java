@@ -127,7 +127,7 @@ public class DeRunService {
         OrderCarInfoParamDTO dto =new OrderCarInfoParamDTO();
         dto.setCarAddressIndex(0);
         dto.setRentTime(LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")));
-        dto.setRentTime(LocalDateTime.now().plusDays(1L).toEpochSecond(ZoneOffset.of("+8")));
+        dto.setRevertTime(LocalDateTime.now().plusDays(1L).toEpochSecond(ZoneOffset.of("+8")));
         dto.setCarNo(carNo);
         dto.setUseSpecialPrice(USE_SPECIAL_PRICE.equals(renterOrder.getIsUseSpecialPrice()));
         log.info("Query simNo.param is,dto:[{}]", JSON.toJSONString(dto));
