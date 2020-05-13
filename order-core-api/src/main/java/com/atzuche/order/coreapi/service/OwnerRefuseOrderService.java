@@ -1,6 +1,8 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -31,6 +33,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
+import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.event.rabbit.neworder.NewOrderMQStatusEventEnum;
 import com.dianping.cat.Cat;
 import org.apache.commons.lang3.StringUtils;
@@ -86,11 +89,14 @@ public class OwnerRefuseOrderService {
     @Autowired
     OrderActionMqService orderActionMqService;
     @Autowired
-   OrderStatusMqService orderStatusMqService;
+    OrderStatusMqService orderStatusMqService;
     @Autowired
     OrderCommonConver orderCommonConver;
-
-
+    @Autowired
+    CashierPayService cashierPayService;
+    @Autowired 
+    private PayCallbackService payCallbackService;
+    
     /**
      * 车主拒单
      *
@@ -130,6 +136,19 @@ public class OwnerRefuseOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(OrderConstant.YES);
+            
+            //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+            OrderPaySignReqVO vo = null;
+            try {
+         	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {
+     	    	   vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
+     	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
+     	           logger.info("（拒单进入调度）获取支付签名串C.params=[{}]",GsonUtils.toJson(vo));
+         	   }
+     		} catch (Exception e) {
+     			logger.error("（拒单进入调度）刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
+     		}
+            
         } else {
             //不进调度
             orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());

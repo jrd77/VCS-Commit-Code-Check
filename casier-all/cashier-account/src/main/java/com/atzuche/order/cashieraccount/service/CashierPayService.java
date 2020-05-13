@@ -111,12 +111,16 @@ public class CashierPayService{
 	private RestTemplate restTemplate;
 	@Value("${new.order.pay.gateway.url}")
 	private String newOrderPayGatewayURL;
+	@Autowired
+	private CashierPayService cashierPayService;
 	
 
     public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
         VirtualNotifyDataVO notifyDataVo = new VirtualNotifyDataVO();
-        notifyDataVo.setOrderNo(virtualPayVO.getOrderNo());
-        notifyDataVo.setMemNo(virtualPayVO.getMemNo());
+        String orderNo = virtualPayVO.getOrderNo();
+        String memNo = virtualPayVO.getMemNo();
+        notifyDataVo.setOrderNo(orderNo);
+        notifyDataVo.setMemNo(memNo);
         notifyDataVo.setAtappId("20");
         notifyDataVo.setPayKind(virtualPayVO.getCashType().getValue());
         notifyDataVo.setPayType(virtualPayVO.getPayType().getValue());
@@ -136,13 +140,26 @@ public class CashierPayService{
         batchNotifyDataVo.setLstNotifyDataVo(list);
 
         payCallBack(batchNotifyDataVo,callBack);
+        
+        //根据支付状态来处理，租车费用已支付，则刷新。200512
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity != null && orderStatusEntity.getRentCarPayStatus() != null && orderStatusEntity.getRentCarPayStatus().intValue() == 1) {
+        	 RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+             boolean isEnterpriseUserOrder = renterMemberService.isEnterpriseUserOrder(renterOrderEntity.getRenterOrderNo());
+             //企业用户
+             if(isEnterpriseUserOrder) {
+            	 cashierPayService.getPaySignStrNewOfflinePay(orderNo, memNo, isEnterpriseUserOrder);
+             }
+        }
     }
 
 
     public void offlinePay(OfflinePayDTO payVO,OrderPayCallBack callBack){
         OfflineNotifyDataVO  notifyDataVo = new OfflineNotifyDataVO();
-        notifyDataVo.setOrderNo(payVO.getOrderNo());
-        notifyDataVo.setMemNo(payVO.getMemNo());
+        String orderNo = payVO.getOrderNo();
+        String memNo = payVO.getMemNo();
+        notifyDataVo.setOrderNo(orderNo);
+        notifyDataVo.setMemNo(memNo);
         notifyDataVo.setAtappId("20");
         notifyDataVo.setPayKind(payVO.getCashType().getValue());
         notifyDataVo.setPayType(payVO.getPayType().getCode());
@@ -163,6 +180,20 @@ public class CashierPayService{
         batchNotifyDataVo.setLstNotifyDataVo(list);
 
         payCallBack(batchNotifyDataVo,callBack);
+        
+        //根据支付状态来处理，租车费用已支付，则刷新。200512
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        
+        //租车费用支付成功
+        if(orderStatusEntity != null && orderStatusEntity.getRentCarPayStatus() != null && orderStatusEntity.getRentCarPayStatus().intValue() == 1) {
+            RenterOrderEntity renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderNo);
+            boolean isEnterpriseUserOrder = renterMemberService.isEnterpriseUserOrder(renterOrderEntity.getRenterOrderNo());
+            //企业用户
+            if(isEnterpriseUserOrder) {
+            	cashierPayService.getPaySignStrNewOfflinePay(orderNo, memNo, isEnterpriseUserOrder);
+            }
+        }
+        
     }
 
     
@@ -180,8 +211,9 @@ public class CashierPayService{
             //2 获取透传值 用户订单流程更新数据
             getExtendParamsParam(vo,batchNotifyDataVo);
            // 3 订单流程 数据更新
-            log.info("payCallBack OrderPayCallBackSuccessVO :[{}]", GsonUtils.toJson(vo));
+            log.info("payCallBack OrderPayCallBackSuccessVO start:[{}]", GsonUtils.toJson(vo));
             orderPayCallBack(vo,callBack);
+            log.info("payCallBack OrderPayCallBackSuccessVO end:[{}]", GsonUtils.toJson(vo));
         }
     }
     
@@ -450,6 +482,7 @@ public class CashierPayService{
     /**
      * 获取支付验签数据
      * 下单和车主自动接单同意的时候，刷新钱包抵扣。
+     * ADD:拒单进入调度的时候，刷新钱包抵扣。200512 
      * 内部方法
      *
      * @param orderPaySign     支付签名
@@ -511,45 +544,8 @@ public class CashierPayService{
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
                         orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
                         
-                        //扩展EXT>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                        isWalletDebtRentCost = true;
-                        //目前限定只有企业用户的时候，才继续通过押金为0的支付。否则条件：必须支付第一笔。或第一笔附带两笔押金为0的支付。经过支付平台。
-                        //APPserver第一道拦截
-                        //该处第二道拦截。
-                        //在拉取押金金额的时候，根据企业用户标识来拉取。
-                        //避免押金为0的支付，绕过支付平台。
-                        if(orderPayable.getAccountPayAbles() != null && orderPayable.getAccountPayAbles().size() > 1 
-                     		   && orderPayable.isEnterpriseUserOrder()) { //含多笔的情况。
-                     	   //押金继续支付，含押金为0的情况。
-                     	   log.info("押金继续支付，含押金为0的情况,params=[{}]",GsonUtils.toJson(orderPayable));
-                     	   
-                     	   
-                     	   //7 签名串
-                           List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable,isWalletDebtRentCost);
-                           log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
-                           if(CollectionUtils.isEmpty(payVo)){
-                               throw new OrderPaySignFailException();
-                           }
-                           String desString = cashierNoTService.getPaySignByPayVos(payVo);
-                           //非空
-                           if(org.apache.commons.lang3.StringUtils.isNotBlank(desString)){
-	                           //模拟发起支付 平台
-	                           PayCipherTextVo vo = new PayCipherTextVo();
-		               			vo.setCipherText(desString);
-		               			vo.setInternalNo(String.valueOf("0"));
-		               			vo.setOpenId("");
-		               			vo.setPaySource(orderPaySign.getPaySource());
-		               			vo.setReqOs(orderPaySign.getReqOs());  //需要处理
-		               			
-		               			
-		               			log.info("tn远程获取支付信息params=[{}],newOrderPayGatewayURL=[{}]", GsonUtils.toJson(vo),newOrderPayGatewayURL + "/public/paygw/routingrules/payBatch");
-		               			String json = restTemplate.postForObject(newOrderPayGatewayURL + "/public/paygw/routingrules/payBatch", vo, String.class);
-		               			log.info("tn远程获取支付信息json=[{}]", json);
-                           }else {
-                        	   log.info("desString签名串为空，无法发起调用支付平台。params=[{}]",GsonUtils.toJson(payVo));
-                           }
-                           
-                        }
+                        //公共抵扣企业用户的押金的方法
+                        commonDebtEnterpriseDeposit(orderPaySign, orderPayable);
                         
                     }
 
@@ -559,17 +555,100 @@ public class CashierPayService{
         }
 	}
 
+	
+	
+	public void getPaySignStrNewOfflinePay(String orderNo,String memNo,boolean isEnterpriseUserOrder) {
+		//构造
+		OrderPaySignReqVO orderPaySign = this.buildOrderPaySignReqVOOfflinePay(orderNo,memNo);
+		
+        //1校验
+        Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
+        orderPaySign.check();
+        //3 查询应付
+        OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
+        BeanUtils.copyProperties(orderPaySign, orderPayReqVO);
+        OrderPayableAmountResVO orderPayable = getOrderPayableAmount(orderPayReqVO,isEnterpriseUserOrder);
+        log.info("(offlinePay)getOrderPayableAmount new result=[{}],params=[{}]",GsonUtils.toJson(orderPayable),GsonUtils.toJson(orderPaySign));
+        
+        //刷新0押金的抵扣
+        commonDebtEnterpriseDeposit(orderPaySign, orderPayable);
+    }
+	
+	/**
+	 * 公共抵扣企业用户的押金的方法
+	 * 线下支付或者虚拟支付，需要调用该方法。
+	 * @param orderPaySign
+	 * @param orderPayable
+	 */
+	private void commonDebtEnterpriseDeposit(OrderPaySignReqVO orderPaySign, OrderPayableAmountResVO orderPayable) {
+		boolean isWalletDebtRentCost;
+		//扩展EXT>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		isWalletDebtRentCost = true;
+		//目前限定只有企业用户的时候，才继续通过押金为0的支付。否则条件：必须支付第一笔。或第一笔附带两笔押金为0的支付。经过支付平台。
+		//APPserver第一道拦截
+		//该处第二道拦截。
+		//在拉取押金金额的时候，根据企业用户标识来拉取。
+		//避免押金为0的支付，绕过支付平台。
+		if(orderPayable.getAccountPayAbles() != null && orderPayable.getAccountPayAbles().size() > 1 
+			   && orderPayable.isEnterpriseUserOrder()) { //含多笔的情况。
+		   //押金继续支付，含押金为0的情况。
+		   log.info("押金继续支付，含押金为0的情况,params=[{}]",GsonUtils.toJson(orderPayable));
+		   
+		   
+		   //7 签名串
+		   List<PayVo> payVo = getOrderPayVO(orderPaySign,orderPayable,isWalletDebtRentCost);
+		   log.info("CashierPayService 加密前费用列表打印 getPaySignStr payVo [{}] ",GsonUtils.toJson(payVo));
+		   if(CollectionUtils.isEmpty(payVo)){
+		       throw new OrderPaySignFailException();
+		   }
+		   String desString = cashierNoTService.getPaySignByPayVos(payVo);
+		   //非空
+		   if(org.apache.commons.lang3.StringUtils.isNotBlank(desString)){
+		       //模拟发起支付 平台
+		       PayCipherTextVo vo = new PayCipherTextVo();
+				vo.setCipherText(desString);
+				vo.setInternalNo(String.valueOf("0"));
+				vo.setOpenId("");
+				vo.setPaySource(orderPaySign.getPaySource());
+				vo.setReqOs(orderPaySign.getReqOs());  //需要处理
+				
+				
+				log.info("tn远程获取支付信息params=[{}],newOrderPayGatewayURL=[{}]", GsonUtils.toJson(vo),newOrderPayGatewayURL + "/public/paygw/routingrules/payBatch");
+				String json = restTemplate.postForObject(newOrderPayGatewayURL + "/public/paygw/routingrules/payBatch", vo, String.class);
+				log.info("tn远程获取支付信息json=[{}]", json);
+		   }else {
+			   log.info("desString签名串为空，无法发起调用支付平台。params=[{}]",GsonUtils.toJson(payVo));
+		   }
+		   
+		}
+	}
+	
+	/**
+	 * 兼容默认方法。
+	 * 方法重载。
+	 * @param orderPayReqVO
+	 * @return
+	 */
+	public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
+		return getOrderPayableAmount(orderPayReqVO, false);
+	}
     /**
      * 查询支付款项信息
      */
-    public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO){
+	/**
+	 * 
+	 * @param orderPayReqVO
+	 * @param isEnterpriseUserOrder  默认false，兼容线下支付兼容刷新双押金为0的情况。
+	 * @return
+	 */
+    public OrderPayableAmountResVO getOrderPayableAmount(OrderPayReqVO orderPayReqVO,boolean isEnterpriseUserOrder){
     	OrderPayableAmountResVO result = new OrderPayableAmountResVO();
         Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
         orderPayReqVO.check();
         //1 查询子单号
         RenterOrderEntity renterOrderEntity = null;
         //是否企业用户
-        boolean isEnterpriseUserOrder = false;
+//        isEnterpriseUserOrder = false;  //默认false,从外部传入。
         //查询子订单有关：进行中的子订单，其他的无关(针对结算后的补付功能。)。200410
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){
 	        renterOrderEntity = cashierNoTService.getRenterOrderNoByOrderNo(orderPayReqVO.getOrderNo());
@@ -756,7 +835,9 @@ public class CashierPayService{
         int rentAmtPayedAfter = 0;
         int amtRentAfter = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //管理后台修改订单的补付
-            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+//            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            
 //            result.setPayableVOs(payableVOs);
             if(result.getPayableVOs() != null) {
             	result.getPayableVOs().addAll(payableVOs);
@@ -844,7 +925,8 @@ public class CashierPayService{
 
         // 计算钱包 支付 目前支付抵扣租费费用
         int amtWallet =0;
-        if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+        //租车费用
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
             int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
             //预计钱包抵扣金额 = amtWallet
             amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
@@ -1274,6 +1356,43 @@ public class CashierPayService{
     
     
     /**
+     * 线下支付
+     * @param orderNo
+     * @param memNo
+     * @return
+     */
+    public OrderPaySignReqVO buildOrderPaySignReqVOOfflinePay(String orderNo,String memNo) {
+		OrderPaySignReqVO vo = new OrderPaySignReqVO();
+		vo.setMenNo(memNo);
+		vo.setIsUseWallet(0);  //线下支付或虚拟支付，租车费用。
+		vo.setOrderNo(orderNo);
+		////配置参数
+		
+		List<String> payKinds = new ArrayList<String>();
+//		payKinds.add(DataPayKindConstant.RENT_AMOUNT);
+//		boolean isEnterpriseUserOrder = renterMemberService.isEnterpriseUserOrder(renterOrderEntity.getRenterOrderNo());
+		//扩展paykind
+//        if(isEnterpriseUserOrder) {
+		/**
+		 * 刷新双押金为0的情况。
+		 */
+        	payKinds.add(DataPayKindConstant.RENT);
+        	payKinds.add(DataPayKindConstant.DEPOSIT);
+//        }
+		
+		vo.setPayKind(payKinds);
+		//////////////////////////// 以上为公共参数
+		vo.setOperator(1);
+		vo.setOperatorName("COREAPI");
+		vo.setOpenId("");
+		vo.setPayType("01");   //默认 消费
+		vo.setReqOs("IOS");  //默认
+//		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
+		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+		return vo;
+	}
+    
+    /**
      * 刷新钱包抵扣的参数封装
      * @param renterOrderEntity
      * @return
@@ -1305,6 +1424,7 @@ public class CashierPayService{
 		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
 		return vo;
 	}
+    
     
     public OrderPaySignReqVO buildOrderPaySignReqVO(String orderNo,String memNo,Integer isUseWallet) {
 		OrderPaySignReqVO vo = new OrderPaySignReqVO();
