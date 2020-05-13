@@ -1,6 +1,7 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
+import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
 import com.atzuche.order.cashieraccount.entity.AccountVirtualPayDetailEntity;
@@ -12,6 +13,8 @@ import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.PayLineEnum;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
@@ -55,6 +58,8 @@ public class CashierRefundApplyNoTService {
     private AccountVirtualPayDetailMapper accountVirtualPayDetailMapper;
     @Autowired
     private AccountVirtualPayMapper accountVirtualPayMapper;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     @Value("${refundWatingDays:1}") String refundWatingDays;
 
@@ -81,11 +86,13 @@ public class CashierRefundApplyNoTService {
         	OfflineRefundApplyEntity record = new OfflineRefundApplyEntity();
         	BeanUtils.copyProperties(cashierRefundApplyEntity, record);
         	offlineRefundApplyMapper.insertSelective(record);
+        	updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return record.getId();
         } else if (payLine != null && payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
         	// 虚拟支付
         	int virtualId = insertVirtualPayDetail(cashierRefundApplyReq);
         	updateVirtualPay(cashierRefundApplyReq);
+        	updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return virtualId;
         }
 //        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
@@ -237,5 +244,32 @@ public class CashierRefundApplyNoTService {
     		return;
     	}
     	accountVirtualPayMapper.deductAmt(virtualAccountNo,amt);
+    }
+    
+    
+    /**
+     * 线下支付和虚拟支付结算后直接退款成功
+     * @param cashierRefundApplyReq
+     */
+    private void updateOrderStatusRefundStatus(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    	if (cashierRefundApplyReq == null) {
+    		return;
+    	}
+    	OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+    	orderStatusDTO.setOrderNo(cashierRefundApplyReq.getOrderNo());
+    	String payKind = cashierRefundApplyReq.getPayKind();
+    	if (PayCashTypeEnum.RENTER_COST.getValue().equals(payKind)) {
+    		// 租车费用
+    		orderStatusDTO.setRentCarRefundStatus(1);
+    	} else if (PayCashTypeEnum.DEPOSIT.getValue().equals(payKind)) {
+    		// 车辆押金
+    		orderStatusDTO.setDepositRefundStatus(1);
+    	} else if (PayCashTypeEnum.WZ_DEPOSIT.getValue().equals(payKind)) {
+    		// 违章押金
+    		orderStatusDTO.setWzRefundStatus(1);
+    	} else {
+    		return;
+    	}
+    	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
 }
