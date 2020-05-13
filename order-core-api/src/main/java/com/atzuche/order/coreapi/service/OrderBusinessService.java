@@ -171,13 +171,15 @@ public class OrderBusinessService {
             List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
             AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = AccountOwnerIncomeExamineUtil.filterByType(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineType.OWNER_INCOME);
             if(accountOwnerIncomeExamineEntity == null){
-                log.error("车主结算收益查询异常");
-                throw new OwnerIncomeExamineNotFoundException();
+                /*log.error("车主结算收益查询异常");
+                throw new OwnerIncomeExamineNotFoundException();*/
+                ownerIncomAmt = 0;
+            }else{
+                List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, null);
+                ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
+                ownerPreAndSettleIncomRespDTO.setAuditStatus(accountOwnerIncomeExamineEntity.getStatus());
             }
-            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, null);
-            ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
             ownerPreAndSettleIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
-            ownerPreAndSettleIncomRespDTO.setAuditStatus(accountOwnerIncomeExamineEntity.getStatus());
         }else{
             OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
             ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
