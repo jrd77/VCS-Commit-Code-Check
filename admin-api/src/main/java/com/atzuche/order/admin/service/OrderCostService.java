@@ -1249,6 +1249,6 @@ public class OrderCostService {
         if(ownerCouponLongDTO != null){
             realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
-        realVo.setOwnerLongRentDeductAmt(String.valueOf(-sum));
+        realVo.setOwnerLongRentDeductAmt(String.valueOf(sum));
     }
 }
