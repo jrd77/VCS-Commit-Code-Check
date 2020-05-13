@@ -37,7 +37,9 @@ public class CarDetailService {
         Cat.logEvent(CatConstants.FEIGN_METHOD, "carDetailQueryFeignApi.getCarDetailOfTransByCarNo");
         Cat.logEvent(CatConstants.FEIGN_PARAM, "reqVO=" + JSON.toJSONString(dto));
         try {
+            logger.info("调用车辆服务查询GPS信息入参",JSON.toJSONString(dto));
             ResponseObject<CarDetailVO> carDetailOfTransByCarNo = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(dto);
+            logger.info("调用车辆服务查询GPS信息出参",JSON.toJSONString(carDetailOfTransByCarNo));
             if(carDetailOfTransByCarNo != null && carDetailOfTransByCarNo.getResCode().equals(ErrorCode.SUCCESS.getCode())){
                 CarDetailVO data = carDetailOfTransByCarNo.getData();
                 if(data == null){
