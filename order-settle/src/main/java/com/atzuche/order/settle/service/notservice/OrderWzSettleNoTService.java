@@ -22,6 +22,7 @@ import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -196,8 +197,14 @@ public class OrderWzSettleNoTService {
             entity.setType(10);
             cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
             log.info("(记录租客费用总账明细)新增租客COST明细表(退款费用)，accountRenterCostSettleDetailEntity params=[{}]",GsonUtils.toJson(entity));
-            
-            orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            Integer payLine = cashierRefundApply.getPayLine();
+            // 0-线上支付，1-线下支付，2-虚拟支付
+            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+            	orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            } else {
+            	orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
 
         }
 

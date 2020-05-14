@@ -81,13 +81,13 @@ public class CashierRefundApplyNoTService {
         	OfflineRefundApplyEntity record = new OfflineRefundApplyEntity();
         	BeanUtils.copyProperties(cashierRefundApplyEntity, record);
         	offlineRefundApplyMapper.insertSelective(record);
-        	updateOrderStatusRefundStatus(cashierRefundApplyReq);
+        	//updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return record.getId();
         } else if (payLine != null && payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
         	// 虚拟支付
         	int virtualId = insertVirtualPayDetail(cashierRefundApplyReq);
         	updateVirtualPay(cashierRefundApplyReq);
-        	updateOrderStatusRefundStatus(cashierRefundApplyReq);
+        	//updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return virtualId;
         }
 //        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
