@@ -42,7 +42,7 @@ public class HandoverCarService {
      * 新增交接车数据
      * @param handoverCarVO
      */
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public void addHandoverCarInfo(HandoverCarVO handoverCarVO, int userType) {
         if (Objects.isNull(handoverCarVO) || handoverCarVO.getHandoverCarInfoDTO().getType() == null) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
