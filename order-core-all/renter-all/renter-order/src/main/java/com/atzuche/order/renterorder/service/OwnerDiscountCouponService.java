@@ -36,11 +36,11 @@ public class OwnerDiscountCouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerDiscountCouponService.class);
 
-    @Bean
+ /*   @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         // Do any additional configuration here
         return builder.build();
-    }
+    }*/
 
     @Resource
     private RestTemplate restTemplate;

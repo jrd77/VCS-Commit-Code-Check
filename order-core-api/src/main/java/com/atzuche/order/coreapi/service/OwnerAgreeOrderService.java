@@ -142,14 +142,13 @@ public class OwnerAgreeOrderService {
     	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {
 	    	   vo = cashierPayService.buildOrderPaySignReqVO(renterOrderEntity);
 	           cashierPayService.getPaySignStrNew(vo,payCallbackService);
-	           logger.info("获取支付签名串B.params=[{}]",GsonUtils.toJson(vo));
+	           logger.info("(车主接单)获取支付签名串B.params=[{}]",GsonUtils.toJson(vo));
     	   }
 		} catch (Exception e) {
-			logger.error("刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
+			logger.error("(车主接单)刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
 		}
-
+        
     }
-
 
 	
 

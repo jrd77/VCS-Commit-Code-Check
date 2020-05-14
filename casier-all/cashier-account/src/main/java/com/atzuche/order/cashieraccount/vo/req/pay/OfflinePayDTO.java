@@ -1,16 +1,13 @@
 package com.atzuche.order.cashieraccount.vo.req.pay;
 
-import com.atzuche.order.cashieraccount.common.PayCashTypeEnum;
+import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>

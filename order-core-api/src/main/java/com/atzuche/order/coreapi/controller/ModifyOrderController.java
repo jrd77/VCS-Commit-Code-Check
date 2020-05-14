@@ -2,39 +2,31 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
-
-import java.util.List;
-
-import javax.validation.Valid;
-
-import com.atzuche.order.rentermem.service.RenterMemberService;
-import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
-import com.atzuche.order.open.vo.request.TransferReq;
+import com.atzuche.order.coreapi.service.*;
+import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.ModifyOrderScanCodeVO;
 import com.atzuche.order.open.vo.ModifyOrderScanPickUpVO;
-import com.atzuche.order.coreapi.service.ModifyOrderCheckService;
-import com.atzuche.order.coreapi.service.ModifyOrderConfirmService;
-import com.atzuche.order.coreapi.service.ModifyOrderFeeService;
-import com.atzuche.order.coreapi.service.ModifyOrderOwnerConfirmService;
-import com.atzuche.order.coreapi.service.ModifyOrderScanCodeService;
-import com.atzuche.order.coreapi.service.ModifyOrderService;
+import com.atzuche.order.open.vo.request.TransferReq;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.service.RenterOrderChangeApplyService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -57,7 +49,8 @@ public class ModifyOrderController {
     private ModifyOrderCheckService modifyOrderCheckService;
     @Autowired
     private RenterOrderChangeApplyService renterOrderChangeApplyService;
-	
+    @Autowired
+    private OrderStatusService orderStatusService;
 	/**
 	 * 修改订单（APP端或H5端）
 	 * @param modifyOrderAppReq
@@ -87,7 +80,13 @@ public class ModifyOrderController {
     public ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
         log.info("修改订单（管理后台）modifyOrderReq=[{}] ", modifyOrderReq);
 		BindingResultUtil.checkBindingResult(bindingResult);
-        // 设置为管理后台修改
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(modifyOrderReq.getOrderNo());
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+            log.error("已经结算不允许编辑orderNo={}",modifyOrderReq.getOrderNo());
+            throw new NotAllowedEditException();
+        }
+
+		// 设置为管理后台修改
         modifyOrderReq.setConsoleFlag(true);
         modifyOrderService.modifyOrder(modifyOrderReq);
 

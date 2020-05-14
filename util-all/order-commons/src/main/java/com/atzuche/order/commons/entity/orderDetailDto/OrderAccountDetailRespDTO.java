@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
@@ -31,4 +32,6 @@ public class OrderAccountDetailRespDTO {
     public  List<RenterDetainReasonDTO> detainReasons;
     @AutoDocProperty(value = "有效租客子订单")
     public RenterOrderDTO renterOrderDTO;
+    @AutoDocProperty(value = "租客租车费用  押金  违章押金  信息")
+    public RenterCostVO renterCostVO;
 }

@@ -13,21 +13,24 @@ import java.util.List;
 public interface AdminOperateLogMapper {
     /**
      * 查询该订单的所有相关操作日志
-     * @param orderNo
-     * @return
+     *
+     * @param orderNo 订单号
+     * @return List<AdminOperateLogEntity>
      */
-    public List<AdminOperateLogEntity>  findAll(String orderNo);
+    List<AdminOperateLogEntity> findAll(String orderNo);
 
     /**
      * 查询接口
-     * @param queryVO
-     * @return
+     *
+     * @param queryVO 查询条件
+     * @return List<AdminOperateLogEntity>
      */
-    public List<AdminOperateLogEntity> findByQuery(QueryVO queryVO);
+    List<AdminOperateLogEntity> findByQuery(QueryVO queryVO);
 
     /**
      * 插入一条日志
-     * @param entity
+     *
+     * @param entity 操作日志
      */
     void insertLog(AdminOperateLogEntity entity);
 }

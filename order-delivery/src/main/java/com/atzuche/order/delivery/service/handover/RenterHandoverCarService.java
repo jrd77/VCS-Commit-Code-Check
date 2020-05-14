@@ -119,7 +119,7 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      *
      * @param renterHandoverCarInfoEntity
      */
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public Integer updateRenterHandoverInfoByPrimaryKey(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity) {
         return renterHandoverCarInfoMapper.updateByPrimaryKeySelective(renterHandoverCarInfoEntity);
     }

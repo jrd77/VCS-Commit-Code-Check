@@ -193,7 +193,7 @@ public class DeliveryCarService {
      * 插入配送地址/配送订单信息
      * @param orderDeliveryVO
      */
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public void insertRenterDeliveryInfoAndDeliveryAddressInfo(Integer getMinutes, Integer returnMinutes, OrderDeliveryVO orderDeliveryVO, Integer type) {
 
         if (Objects.nonNull(orderDeliveryVO.getOrderDeliveryDTO())) {

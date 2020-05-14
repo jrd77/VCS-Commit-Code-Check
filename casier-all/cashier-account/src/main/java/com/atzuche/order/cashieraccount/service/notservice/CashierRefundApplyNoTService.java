@@ -1,5 +1,14 @@
 package com.atzuche.order.cashieraccount.service.notservice;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.atzuche.order.cashieraccount.common.FasterJsonUtil;
 import com.atzuche.order.cashieraccount.common.VirtualAccountEnum;
 import com.atzuche.order.cashieraccount.common.VirtualPayTypeEnum;
@@ -8,34 +17,23 @@ import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.entity.OfflineRefundApplyEntity;
 import com.atzuche.order.cashieraccount.exception.CashierRefundApplyException;
 import com.atzuche.order.cashieraccount.exception.OrderPayRefundCallBackAsnyException;
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
+import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
+import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
+import com.atzuche.order.cashieraccount.mapper.OfflineRefundApplyMapper;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
-import com.atzuche.order.cashieraccount.vo.req.pay.VirtualPayDTO;
+import com.atzuche.order.commons.enums.PayCashTypeEnum;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.PayLineEnum;
-import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.util.MD5;
-import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.doc.util.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayDetailMapper;
-import com.atzuche.order.cashieraccount.mapper.AccountVirtualPayMapper;
-import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
-import com.atzuche.order.cashieraccount.mapper.OfflineRefundApplyMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -55,6 +53,8 @@ public class CashierRefundApplyNoTService {
     private AccountVirtualPayDetailMapper accountVirtualPayDetailMapper;
     @Autowired
     private AccountVirtualPayMapper accountVirtualPayMapper;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     @Value("${refundWatingDays:1}") String refundWatingDays;
 
@@ -81,11 +81,13 @@ public class CashierRefundApplyNoTService {
         	OfflineRefundApplyEntity record = new OfflineRefundApplyEntity();
         	BeanUtils.copyProperties(cashierRefundApplyEntity, record);
         	offlineRefundApplyMapper.insertSelective(record);
+        	//updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return record.getId();
         } else if (payLine != null && payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
         	// 虚拟支付
         	int virtualId = insertVirtualPayDetail(cashierRefundApplyReq);
         	updateVirtualPay(cashierRefundApplyReq);
+        	//updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return virtualId;
         }
 //        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
@@ -237,5 +239,37 @@ public class CashierRefundApplyNoTService {
     		return;
     	}
     	accountVirtualPayMapper.deductAmt(virtualAccountNo,amt);
+    }
+    
+    
+    /**
+     * 线下支付和虚拟支付结算后直接退款成功
+     * @param cashierRefundApplyReq
+     */
+    private void updateOrderStatusRefundStatus(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    	log.info("updateOrderStatusRefundStatus线下支付和虚拟支付结算后直接退款成功处理开始 cashierRefundApplyReq=[{}]",cashierRefundApplyReq);
+    	if (cashierRefundApplyReq == null) {
+    		return;
+    	}
+    	OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+    	orderStatusDTO.setOrderNo(cashierRefundApplyReq.getOrderNo());
+    	String payKind = cashierRefundApplyReq.getPayKind();
+    	if (PayCashTypeEnum.RENTER_COST.getValue().equals(payKind)) {
+    		// 租车费用
+    		orderStatusDTO.setRentCarRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus租车费用");
+    	} else if (PayCashTypeEnum.DEPOSIT.getValue().equals(payKind)) {
+    		// 车辆押金
+    		orderStatusDTO.setDepositRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus车辆押金");
+    	} else if (PayCashTypeEnum.WZ_DEPOSIT.getValue().equals(payKind)) {
+    		// 违章押金
+    		orderStatusDTO.setWzRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus违章押金");
+    	} else {
+    		log.info("updateOrderStatusRefundStatus无");
+    		return;
+    	}
+    	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
 }

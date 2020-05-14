@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.enums.OrderStatusEnums;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.req.order.OrderStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.order.OrderStatusListResponseVO;
@@ -37,9 +38,10 @@ public class AdminOrderStatusController {
 
     @Autowired
 	private FeignOrderFlowService feignOrderFlowService;
-
     @Autowired
     private FeignOrderDetailService feignOrderDetailService;
+    @Autowired
+    private RemoteFeignService remoteFeignService;
 
 
 	@AutoDocMethod(description = "订单状态流转列表", value = "订单状态流转列表", response = OrderStatusListResponseVO.class)
@@ -55,7 +57,8 @@ public class AdminOrderStatusController {
             //获取订单流转列表
             OrderFlowRequestDTO orderFlowRequestDTO = new OrderFlowRequestDTO();
             orderFlowRequestDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
-            ResponseData<OrderFlowListResponseDTO> responseDataOrderFlowListResponseDTO = feignOrderFlowService.selectOrderFlowList(orderFlowRequestDTO);
+            //ResponseData<OrderFlowListResponseDTO> responseDataOrderFlowListResponseDTO = feignOrderFlowService.selectOrderFlowList(orderFlowRequestDTO);
+            ResponseData<OrderFlowListResponseDTO> responseDataOrderFlowListResponseDTO = remoteFeignService.selectOrderFlowListFromRemote(orderFlowRequestDTO);
             List<OrderStatusResponseVO> orderStatusList = new ArrayList();
             OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
             orderDetailReqDTO.setOrderNo(orderStatusRequestVO.getOrderNo());
@@ -73,7 +76,8 @@ public class AdminOrderStatusController {
                 orderStatusListResponseVO.setOrderStatusList(orderStatusList);
             }
             //获取订单当前状态描述
-            ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            //ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = feignOrderDetailService.getOrderStatus(orderDetailReqDTO);
+            ResponseData<OrderStatusRespDTO> responseDataOrderStatusRespDTO = remoteFeignService.getOrderStatusFromRemote(orderDetailReqDTO);
             if(responseDataOrderStatusRespDTO.getResCode().equals(ErrorCode.SUCCESS.getCode())){
                 Integer status=responseDataOrderStatusRespDTO.getData().getOrderStatusDTO().getStatus();
                 orderStatusListResponseVO.setStatusDescription(OrderStatusEnums.getDescriptionByStatus(status));

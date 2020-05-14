@@ -96,7 +96,9 @@ public class SupplementService {
 		if (renterOrder == null) {
 			return list;
 		}
-		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
+//		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
+		List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderNo,renterOrder.getRenterOrderNo(),renterOrder.getRenterMemNo());
+		
         //应付租车费用（已经求和）
         int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
         

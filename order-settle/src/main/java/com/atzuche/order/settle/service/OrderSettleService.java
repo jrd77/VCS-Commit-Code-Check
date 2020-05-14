@@ -44,7 +44,7 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
@@ -700,7 +700,7 @@ public class OrderSettleService{
         }
         if(cancelOrderReqDTO.isSettleRenterFlg()){
             OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode().equals(orderStatusEntity.getSettleStatus())){
+            if(orderStatusEntity != null && SettleStatusEnum.SETTLED.getCode() == (orderStatusEntity.getSettleStatus())){
                 log.info("订单已经结算过orderNo={}",orderNo);
                 return;
             }

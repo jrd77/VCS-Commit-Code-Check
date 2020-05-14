@@ -70,4 +70,6 @@ public class OwnerMemberDTO {
     private Integer renterCarCount;
 
     private List<OwnerMemberRightDTO> ownerMemberRightDTOList;
+
+
 }

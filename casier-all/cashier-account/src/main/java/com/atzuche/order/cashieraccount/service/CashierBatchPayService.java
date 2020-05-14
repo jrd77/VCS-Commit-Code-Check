@@ -102,7 +102,10 @@ public class CashierBatchPayService {
 	        int rentIncrementDebtAmt = 0;
 
 	        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){  //修改订单的补付
-	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+//	            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+	        	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderNo,renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+	            
+	            
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用（已经求和）
 	            rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
