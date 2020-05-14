@@ -38,6 +38,7 @@ import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
 import com.atzuche.order.commons.exceptions.NoEffectiveErrException;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -75,6 +76,7 @@ import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -1378,6 +1380,11 @@ public class OrderDetailService {
         RenterOrderDTO renterOrderDTO = new RenterOrderDTO();
         BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
 
+        String renterMemNo = renterOrderEntity.getRenterMemNo();
+        String renterOrderNo = renterOrderEntity.getRenterOrderNo();
+        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterMemNo,rentCost.getRenterCostAmtFinal());
+
         OrderAccountDetailRespDTO orderAccountDetailRespDTO = new OrderAccountDetailRespDTO();
         orderAccountDetailRespDTO.orderDTO = orderDTO;
         orderAccountDetailRespDTO.orderStatusDTO = orderStatusDTO;
@@ -1391,6 +1398,7 @@ public class OrderDetailService {
         orderAccountDetailRespDTO.cashierDTO = cashierDTO;
         orderAccountDetailRespDTO.detainReasons = dtos;
         orderAccountDetailRespDTO.renterOrderDTO = renterOrderDTO;
+        orderAccountDetailRespDTO.renterCostVO = renterCostVO;
         return orderAccountDetailRespDTO;
     }
 

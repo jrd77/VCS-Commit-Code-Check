@@ -390,10 +390,10 @@ public class RenterOrderCostHandleService {
         }
         int newRentAmt =
                 new BigDecimal(actRentUnitPriceAmt * count).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
-        if (Math.abs(rentAmt) <= newRentAmt) {
+        /*if (Math.abs(rentAmt) <= newRentAmt) {
             LOGGER.info("无需补贴.rentAmt:[{}],newRentAmt:[{}]", rentAmt, newRentAmt);
             return null;
-        }
+        }*/
         int subsidyAmt = Math.abs(rentAmt) - newRentAmt;
         LOGGER.info("subsidyAmt:[{}] = Math.abs(rentAmt):[{}] - newRentAmt:[{}]", subsidyAmt, rentAmt, newRentAmt);
         RenterOrderSubsidyDetailDTO renterOrderSubsidyDetailDTO =

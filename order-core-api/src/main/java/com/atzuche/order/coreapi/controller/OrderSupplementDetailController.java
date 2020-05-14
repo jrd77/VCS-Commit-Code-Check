@@ -167,7 +167,9 @@ public class OrderSupplementDetailController {
 		    	String orderNo = renterOrderEntity.getOrderNo();
 		    	//是否支付租车费用 且 未结算。
 		    	if(checkRentCarPayStatus(orderNo)) {		    	
-			        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+//			        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+			        List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
+			        
 			        //应付租车费用（已经求和）
 			        int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
 			        

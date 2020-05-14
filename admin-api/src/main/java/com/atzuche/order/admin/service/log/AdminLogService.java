@@ -23,23 +23,43 @@ public class AdminLogService {
 
     @Autowired
     private AdminOperateLogMapper adminOperateLogMapper;
+
     /**
      * 插入日志
-     * @param type
-     * @param desc
+     *
+     * @param type    操作类型
+     * @param orderNo 订单号
+     * @param desc    操作内容
      */
-    public void insertLog(AdminOpTypeEnum type,String orderNo,String desc){
+    public void insertLog(AdminOpTypeEnum type, String orderNo, String desc) {
         AdminOperateLogEntity entity = new AdminOperateLogEntity();
         entity.setOrderNo(orderNo);
         entity.setDesc(desc);
-        entity.setOpType(type.getOpCode());
+        entity.setOpTypeCode(type.getOpCode());
         entity.setOpTypeDesc(type.getOpType());
+        entity.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
         entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
-        entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthName());
-
         adminOperateLogMapper.insertLog(entity);
     }
-
+    /**
+     * 插入日志
+     *
+     * @param type    操作类型
+     * @param orderNo 订单号
+     * @param desc    操作内容
+     */
+    public void insertLog(AdminOpTypeEnum type, String orderNo,String renterOrderNo,String ownerOrderNo, String desc) {
+        AdminOperateLogEntity entity = new AdminOperateLogEntity();
+        entity.setOrderNo(orderNo);
+        entity.setRenterOrderNo(renterOrderNo);
+        entity.setOwnerOrderNo(ownerOrderNo);
+        entity.setDesc(desc);
+        entity.setOpTypeCode(type.getOpCode());
+        entity.setOpTypeDesc(type.getOpType());
+        entity.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
+        entity.setOperatorId(AdminUserUtil.getAdminUser().getAuthId());
+        adminOperateLogMapper.insertLog(entity);
+    }
     public List<AdminOperateLogEntity> findByOrderNo(String orderNo) {
         return adminOperateLogMapper.findAll(orderNo);
     }

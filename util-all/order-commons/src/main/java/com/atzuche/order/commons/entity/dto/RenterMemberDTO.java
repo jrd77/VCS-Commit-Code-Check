@@ -127,4 +127,7 @@ public class RenterMemberDTO {
 
     @AutoDocProperty(value = "订单类型")
     private String orderCategory;
+
+    @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
+    private Integer repeatTimeOrder;
 }

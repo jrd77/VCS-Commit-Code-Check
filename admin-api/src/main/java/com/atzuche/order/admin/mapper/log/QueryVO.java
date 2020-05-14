@@ -16,6 +16,6 @@ public class QueryVO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Integer opType;
-
+    private String operatorName;
 
 }

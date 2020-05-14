@@ -37,7 +37,7 @@ public class RenterAdjustCostReqVO {
     @ApiModelProperty(value="车主给租客的调价",required=true)
 //    @NotBlank(message="车主给租客的调价不能为空")
     private String ownerToRenterAdjustAmt;
-    
-    
+    // 操作人
+    private String operateName;
     
 }

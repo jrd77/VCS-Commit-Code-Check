@@ -10,12 +10,14 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
+import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.rentercost.entity.dto.*;
+import com.atzuche.order.rentercost.entity.vo.GetReturnAndOverFeeDetailVO;
 import com.atzuche.order.rentercost.entity.vo.GetReturnResponseVO;
 import com.atzuche.order.rentercost.entity.vo.HolidayAverageDateTimeVO;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -565,6 +567,13 @@ public class RenterOrderCostCombineService {
 		return payableList;
 	}
 	
+	/**
+	 * 都不走全局，仅仅根据当前的子订单来，补贴按结算的时候来处理。
+	 * @param orderNo
+	 * @param renterOrderNo
+	 * @param memNo
+	 * @return
+	 */
 	public List<PayableVO> listPayableGlobalVO(String orderNo, String renterOrderNo, String memNo) {
 		List<PayableVO> payableList = new ArrayList<PayableVO>();
 		if (StringUtils.isNotBlank(renterOrderNo)) {
@@ -1356,6 +1365,27 @@ public class RenterOrderCostCombineService {
         }
         return GlobalConstant.GET_RETURN_OVER_COST;
     }
+    
+    
+    /**
+     * 返回取还车及超运能费用
+     * @param req
+     * @return GetReturnAndOverFeeDetailVO
+     */
+    public GetReturnAndOverFeeDetailVO getGetReturnAndOverFeeDetailVO(GetReturnAndOverFeeVO req) {
+    	if (req == null) {
+    		return null;
+    	}
+    	GetReturnAndOverFeeDetailVO res = new GetReturnAndOverFeeDetailVO();
+    	if (req.getGetReturnCarCostReqDto() != null) {
+    		res.setGetReturnCostDTO(getReturnCarCost(req.getGetReturnCarCostReqDto()));
+    	}
+    	if (req.getGetReturnCarOverCostReqDto() != null) {
+    		res.setGetReturnOverCostDTO(getGetReturnOverCost(req.getGetReturnCarOverCostReqDto()));
+    	}
+    	return res;
+    }
+    
 
 
 	public static void  checkResponse(ResponseObject responseObject){

@@ -1,8 +1,5 @@
 package com.atzuche.order.admin.entity;
 
-import com.autoyol.doc.annotation.AutoDocProperty;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 
@@ -11,6 +8,7 @@ import java.time.LocalDateTime;
 
 /**
  * 管理后台操作记录
+ *
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2020/1/7 10:37 上午
  **/
@@ -18,41 +16,72 @@ import java.time.LocalDateTime;
 @ToString
 public class AdminOperateLogEntity implements Serializable {
 
+    private static final long serialVersionUID = 3048425445744873323L;
+
+    /**
+     *
+     */
     private Integer id;
-
-
-    @AutoDocProperty(value = "订单号")
+    /**
+     * 主订单号
+     */
     private String orderNo;
     /**
-     * 操作类型，
-     */
-    @AutoDocProperty(value = "操作类型")
-    private int opType;
-
-    @AutoDocProperty(value = "操作类型")
-    private String opTypeDesc;
-
-    @AutoDocProperty(value = "操作内容")
-    private String desc;
-
-    /**
-     * 创建时间
-     */
-    @AutoDocProperty(value = "创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    /**
-     * 操作人的id
+     * 操作人ID
      */
     private String operatorId;
     /**
-     * 操作人的姓名
+     * 操作人name
      */
-    @AutoDocProperty(value = "操作人的姓名")
     private String operatorName;
-
-    private String deptId;
+    /**
+     * 部门ID
+     */
+    private Integer deptId;
+    /**
+     * 部门名称
+     */
+    private String deptName;
+    /**
+     * 操作类型
+     */
+    private Integer opTypeCode;
+    /**
+     * 操作类型描述
+     */
+    private String opTypeDesc;
+    /**
+     * 操作描述
+     */
+    private String desc;
+    /**
+     * 操作时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 操作人名称
+     */
+    private String createOp;
+    /**
+     * 修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 修改人
+     */
+    private String updateOp;
+    /**
+     * 0-正常，1-已逻辑删除
+     */
+    private Integer isDelete;
+    /**
+     * 租客子订单号
+     */
+    private String renterOrderNo;
+    /**
+     * 车主子订单号
+     */
+    private String ownerOrderNo;
 
 
 }

@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.vo.resp.car.RenterInfoRespVO;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
@@ -9,8 +10,6 @@ import com.atzuche.order.commons.entity.orderDetailDto.RenterMemberDTO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.mem.dto.OrderRenterInfoDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
-import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
-import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -20,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,24 +35,22 @@ public class AdminRenterInfoController {
     
     private final static Logger logger = LoggerFactory.getLogger(AdminRenterInfoController.class);
     
-
     @Autowired
     private MemProxyService memProxyService;
-    @Autowired
-    private RenterAdditionalDriverService renterAdditionalDriverService;
 
     @Autowired
-    private FeignOrderDetailService feignOrderDetailService;
+    private RemoteFeignService remoteFeignService;
 
     @AutoDocMethod(description = "获取租客信息接口响应信息", value = "获取租客信息接口响应信息", response = RenterInfoRespVO.class)
     @GetMapping(value = "/info")
     public ResponseData<RenterInfoRespVO> getRenterInfo(@RequestParam(value = "orderNo",required = true) String orderNo) {
         logger.info("reqVo is {}",orderNo);
 
-        OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        reqDTO.setOrderNo(orderNo);
+        //OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
+        //reqDTO.setOrderNo(orderNo);
 
-        ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        //ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
+        ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
         if(respDTOResponseData==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(respDTOResponseData.getResCode())){
             throw new RenterNotFoundException(orderNo);
         }
@@ -70,15 +66,16 @@ public class AdminRenterInfoController {
         BeanUtils.copyProperties(orderRenterInfoDTO,respVO);
         BeanUtils.copyProperties(renterMemberDTO,respVO);
         respVO.setReqAddr(detailRespDTO.getOrderSourceStat().getReqAddr());
-        List<RenterAdditionalDriverEntity> renterAdditionalDriverEntitys = renterAdditionalDriverService.listDriversByRenterOrderNo(detailRespDTO.getRenterOrder().getRenterOrderNo());
-        respVO.setAdditionalDrivers(convert(renterAdditionalDriverEntitys));
+        //List<RenterAdditionalDriverEntity> renterAdditionalDriverEntitys = renterAdditionalDriverService.listDriversByRenterOrderNo(detailRespDTO.getRenterOrder().getRenterOrderNo());
 
+        //respVO.setAdditionalDrivers(convert(renterAdditionalDriverEntitys));
+        respVO.setAdditionalDrivers(convertRenterAdditionalDriverDTO(renterAdditionalDriverDTOS));
         return ResponseData.success(respVO);
     }
 
-    public static List<CommUseDriverInfo> convert(List<RenterAdditionalDriverEntity> dtos){
+    public static List<CommUseDriverInfo> convertRenterAdditionalDriverDTO(List<RenterAdditionalDriverDTO> dtos){
         List<CommUseDriverInfo> commUseDriverInfos = new ArrayList<>();
-        for(RenterAdditionalDriverEntity dto:dtos){
+        for(RenterAdditionalDriverDTO dto:dtos){
             CommUseDriverInfo commUseDriverInfo = new CommUseDriverInfo();
             BeanUtils.copyProperties(dto,commUseDriverInfo);
             if(Objects.nonNull(dto.getPhone())){

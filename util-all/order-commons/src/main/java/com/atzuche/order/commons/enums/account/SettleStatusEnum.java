@@ -17,14 +17,14 @@ public enum SettleStatusEnum {
 	/**
 	 * 订单结算状态
 	 */
-	private Integer code;
+	private int code;
 
 	/**
 	 * 订单结算状态
 	 */
 	private String text;
 
-	SettleStatusEnum(Integer code, String text) {
+	SettleStatusEnum(int code, String text) {
 		this.code = code;
 		this.text = text;
 	}
