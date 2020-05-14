@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atzuche.config.server.mapper.master.CarChargeLevelConfigMapper">
+
+   <resultMap id="baseMap" type="com.atzuche.config.common.entity.CarChargeLevelConfigEntity">
+        <id property="id" column="id"/>
+         <result column="level" property="level"></result>
+         <result column="agreement_stop_freight_rate" property="agreementStopFreightRate"></result>
+         <result column="notagreement_stop_freight_rate" property="notagreementStopFreightRate"></result>
+    </resultMap>
+   
+   <select id="getCarLevelConfigByLevel" resultMap="baseMap">
+	select id,`level`,agreement_stop_freight_rate,notagreement_stop_freight_rate 
+	from car_charge_level_config
+   </select>
+  
+</mapper>

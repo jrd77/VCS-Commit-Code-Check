@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.parentorder.mapper.OrderStopFreightInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.atzuche.order.parentorder.entity.OrderStopFreightInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="agreement_stop_freight_rate" property="agreementStopFreightRate" jdbcType="INTEGER" />
+    <result column="notagreement_stop_freight_rate" property="notagreementStopFreightRate" jdbcType="INTEGER" />
+    <result column="agreement_stop_freight_price" property="agreementStopFreightPrice" jdbcType="INTEGER" />
+    <result column="notagreement_stop_freight_price" property="notagreementStopFreightPrice" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_op" property="createOp" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="update_op" property="updateOp" jdbcType="VARCHAR" />
+    <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_no, agreement_stop_freight_rate, notagreement_stop_freight_rate, agreement_stop_freight_price, 
+    notagreement_stop_freight_price, create_time, create_op, update_time, update_op, 
+    is_delete
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from order_stop_freight_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from order_stop_freight_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.atzuche.order.parentorder.entity.OrderStopFreightInfo" >
+    insert into order_stop_freight_info (id, order_no, agreement_stop_freight_rate, 
+      notagreement_stop_freight_rate, agreement_stop_freight_price, 
+      notagreement_stop_freight_price, create_time, 
+      create_op, update_time, update_op, 
+      is_delete)
+    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{agreementStopFreightRate,jdbcType=INTEGER}, 
+      #{notagreementStopFreightRate,jdbcType=INTEGER}, #{agreementStopFreightPrice,jdbcType=INTEGER}, 
+      #{notagreementStopFreightPrice,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createOp,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{updateOp,jdbcType=VARCHAR}, 
+      #{isDelete,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.atzuche.order.parentorder.entity.OrderStopFreightInfo" >
+    insert into order_stop_freight_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="agreementStopFreightRate != null" >
+        agreement_stop_freight_rate,
+      </if>
+      <if test="notagreementStopFreightRate != null" >
+        notagreement_stop_freight_rate,
+      </if>
+      <if test="agreementStopFreightPrice != null" >
+        agreement_stop_freight_price,
+      </if>
+      <if test="notagreementStopFreightPrice != null" >
+        notagreement_stop_freight_price,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="createOp != null" >
+        create_op,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="updateOp != null" >
+        update_op,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="agreementStopFreightRate != null" >
+        #{agreementStopFreightRate,jdbcType=INTEGER},
+      </if>
+      <if test="notagreementStopFreightRate != null" >
+        #{notagreementStopFreightRate,jdbcType=INTEGER},
+      </if>
+      <if test="agreementStopFreightPrice != null" >
+        #{agreementStopFreightPrice,jdbcType=INTEGER},
+      </if>
+      <if test="notagreementStopFreightPrice != null" >
+        #{notagreementStopFreightPrice,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOp != null" >
+        #{createOp,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOp != null" >
+        #{updateOp,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.parentorder.entity.OrderStopFreightInfo" >
+    update order_stop_freight_info
+    <set >
+      <if test="agreementStopFreightRate != null" >
+        agreement_stop_freight_rate = #{agreementStopFreightRate,jdbcType=INTEGER},
+      </if>
+      <if test="notagreementStopFreightRate != null" >
+        notagreement_stop_freight_rate = #{notagreementStopFreightRate,jdbcType=INTEGER},
+      </if>
+      <if test="agreementStopFreightPrice != null" >
+        agreement_stop_freight_price = #{agreementStopFreightPrice,jdbcType=INTEGER},
+      </if>
+      <if test="notagreementStopFreightPrice != null" >
+        notagreement_stop_freight_price = #{notagreementStopFreightPrice,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOp != null" >
+        create_op = #{createOp,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOp != null" >
+        update_op = #{updateOp,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+    </set>
+    where order_no = #{orderNo}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.atzuche.order.parentorder.entity.OrderStopFreightInfo" >
+    update order_stop_freight_info
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      agreement_stop_freight_rate = #{agreementStopFreightRate,jdbcType=INTEGER},
+      notagreement_stop_freight_rate = #{notagreementStopFreightRate,jdbcType=INTEGER},
+      agreement_stop_freight_price = #{agreementStopFreightPrice,jdbcType=INTEGER},
+      notagreement_stop_freight_price = #{notagreementStopFreightPrice,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_op = #{createOp,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_op = #{updateOp,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="getCountByOrderNo" resultType="Integer" parameterType="String" >
+    select 
+    count(*)
+    from order_stop_freight_info
+    where order_no = #{orderNo}
+    and is_delete=0
+  </select>
+</mapper>

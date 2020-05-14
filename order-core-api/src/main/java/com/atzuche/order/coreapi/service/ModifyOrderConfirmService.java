@@ -91,6 +91,8 @@ public class ModifyOrderConfirmService {
 	private OrderFlowService orderFlowService;
 	@Autowired
 	private OrderSourceStatService orderSourceStatService;
+	@Autowired
+	private SubmitOrderService submitOrderService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -205,6 +207,8 @@ public class ModifyOrderConfirmService {
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
 		}
+		// 换车更新停运费信息
+		submitOrderService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
 	}
 	
 	

@@ -1,5 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CarChargeLevelConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.common.entity.CarChargeLevelConfigEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.car.CarProxyService;
@@ -54,6 +59,8 @@ import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
+import com.atzuche.order.parentorder.entity.OrderStopFreightInfo;
+import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
 import com.atzuche.order.parentorder.service.ParentOrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
@@ -137,6 +144,10 @@ public class SubmitOrderService {
     private LongOrderCostFilterChain longOrderCostFilterChain;
     @Autowired
     private SubmitOrderHandleService submitOrderHandleService;
+    @Autowired
+    private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private CarChargeLevelConfigSDK carChargeLevelConfigSDK;
 
 
 
@@ -286,6 +297,10 @@ public class SubmitOrderService {
             orderInfoDTO.setOrderNo(orderNo);
             stockService.cutCarStock(orderInfoDTO);
         }
+        
+        // 保存车辆停运费信息
+        saveOrderStopFreightInfo(ownerOrderNo, ownerGoodsDetailDTO);
+        
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
@@ -537,6 +552,54 @@ public class SubmitOrderService {
         autoCoinDeductReqVO.setRemarkExtend("租车消费");
         LOGGER.info("Build AutoCoinDeductReqVO result is:[{}]", autoCoinDeductReqVO);
         return autoCoinDeductReqVO;
+    }
+    
+    
+    /**
+     * 保存车辆停运费比例及单价
+     * @param orderNo
+     * @param ownerGoodsDetailDTO
+     */
+    public void saveOrderStopFreightInfo(String orderNo, OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
+    	if (ownerGoodsDetailDTO == null) {
+    		return;
+    	}
+    	Integer carRating = ownerGoodsDetailDTO.getCarRating();
+    	if (carRating == null) {
+    		LOGGER.info("计算车辆停运费等信息车辆等级为空");
+    		return;
+    	}
+    	int dayPrice = ownerGoodsDetailDTO.getDayPrice() == null ? 0:ownerGoodsDetailDTO.getDayPrice();
+    	List<CarChargeLevelConfigEntity> list = carChargeLevelConfigSDK.getConfig(new DefaultConfigContext());
+    	LOGGER.info("carChargeLevelConfigSDK获取停运费配置信息list={}", JSON.toJSONString(list));
+    	// 协议厂停运费比例
+		Integer agreementStopFreightRate = 0;
+		// 非协议厂停运费比例
+		Integer notagreementStopFreightRate = 0;
+    	for (CarChargeLevelConfigEntity cclc:list) {
+    		if (cclc != null && carRating.equals(cclc.getLevel())) {
+    			// 协议厂停运费比例
+    			agreementStopFreightRate = cclc.getAgreementStopFreightRate();
+    			// 非协议厂停运费比例
+    			notagreementStopFreightRate = cclc.getNotagreementStopFreightRate();
+    			break;
+    		}
+    	}
+    	//计算停运费用(停运费单价=停运费比例*平日天单价)
+    			int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
+    			int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
+    	OrderStopFreightInfo orderStopFreightInfo = new OrderStopFreightInfo();
+    	orderStopFreightInfo.setOrderNo(orderNo);
+    	orderStopFreightInfo.setAgreementStopFreightPrice(agreementStopFreightPrice);
+    	orderStopFreightInfo.setAgreementStopFreightRate(notagreementStopFreightRate);
+    	orderStopFreightInfo.setNotagreementStopFreightPrice(notagreementStopFreightPrice);
+    	orderStopFreightInfo.setNotagreementStopFreightRate(notagreementStopFreightRate);
+    	Integer count = orderStopFreightInfoService.getCountByOrderNo(orderNo);
+    	if (count == null || count == 0) {
+    		orderStopFreightInfoService.insertSelective(orderStopFreightInfo);
+    	} else {
+    		orderStopFreightInfoService.updateByPrimaryKeySelective(orderStopFreightInfo);
+    	}
     }
 
 

@@ -81,5 +81,11 @@ public class ConfigServiceConfiguration {
         factory.register(service);
         return service;
     }
-
+    
+    
+    @Bean
+    public CarChargeLevelConfigService registerCarChargeLevelConfigService(@Autowired ConfigRegisterFactory factory,CarChargeLevelConfigService service){
+        factory.register(service);
+        return service;
+    }
 }
