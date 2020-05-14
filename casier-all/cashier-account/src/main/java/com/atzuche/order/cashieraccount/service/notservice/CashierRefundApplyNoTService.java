@@ -252,6 +252,7 @@ public class CashierRefundApplyNoTService {
      * @param cashierRefundApplyReq
      */
     private void updateOrderStatusRefundStatus(CashierRefundApplyReqVO cashierRefundApplyReq) {
+    	log.info("updateOrderStatusRefundStatus线下支付和虚拟支付结算后直接退款成功处理开始 cashierRefundApplyReq=[{}]",cashierRefundApplyReq);
     	if (cashierRefundApplyReq == null) {
     		return;
     	}
@@ -261,13 +262,17 @@ public class CashierRefundApplyNoTService {
     	if (PayCashTypeEnum.RENTER_COST.getValue().equals(payKind)) {
     		// 租车费用
     		orderStatusDTO.setRentCarRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus租车费用");
     	} else if (PayCashTypeEnum.DEPOSIT.getValue().equals(payKind)) {
     		// 车辆押金
     		orderStatusDTO.setDepositRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus车辆押金");
     	} else if (PayCashTypeEnum.WZ_DEPOSIT.getValue().equals(payKind)) {
     		// 违章押金
     		orderStatusDTO.setWzRefundStatus(1);
+    		log.info("updateOrderStatusRefundStatus违章押金");
     	} else {
+    		log.info("updateOrderStatusRefundStatus无");
     		return;
     	}
     	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
