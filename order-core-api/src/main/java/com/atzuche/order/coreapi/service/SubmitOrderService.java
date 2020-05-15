@@ -586,8 +586,8 @@ public class SubmitOrderService {
     		}
     	}
     	//计算停运费用(停运费单价=停运费比例*平日天单价)
-    			int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
-    			int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
+		int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
+		int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
     	OrderStopFreightInfo orderStopFreightInfo = new OrderStopFreightInfo();
     	orderStopFreightInfo.setOrderNo(orderNo);
     	orderStopFreightInfo.setAgreementStopFreightPrice(agreementStopFreightPrice);

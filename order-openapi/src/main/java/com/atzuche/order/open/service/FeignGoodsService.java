@@ -2,6 +2,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -57,4 +58,12 @@ public interface FeignGoodsService {
      */
     @GetMapping("/renter/goods")
     ResponseData<RenterGoodWithoutPriceVO> getRenterGoodsDetailWithoutPrice(@RequestParam("orderNo") String orderNo, @RequestParam("carNo") String carNo);
+    
+    /**
+     * 获取车辆停运费信息
+     * @param orderNo
+     * @return ResponseData<OrderStopFreightInfo>
+     */
+    @GetMapping("/order/stopfreightinfo/detail")
+    public ResponseData<OrderStopFreightInfo> getStopFreightInfo(@RequestParam(value="orderNo",required = true) String orderNo);
 }

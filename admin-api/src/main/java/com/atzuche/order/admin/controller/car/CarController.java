@@ -6,6 +6,7 @@ import com.atzuche.order.car.CarDetailDTO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -98,6 +99,15 @@ public class CarController {
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getCarPlateNum())){
             carBusiness.setPlateNum(ownerGoodsDetailDTO.getCarPlateNum());
         }
+        // 获取车辆停运费信息
+        OrderStopFreightInfo orderStopFreightInfo = remoteFeignService.getStopFreightInfo(orderNo);
+        if (orderStopFreightInfo != null) {
+        	carBusiness.setAgreementStopFreightPrice(orderStopFreightInfo.getAgreementStopFreightPrice());
+        	carBusiness.setAgreementStopFreightRate(orderStopFreightInfo.getAgreementStopFreightRate()+"%");
+        	carBusiness.setNotagreementStopFreightPrice(orderStopFreightInfo.getNotagreementStopFreightPrice());
+        	carBusiness.setNotagreementStopFreightRate(orderStopFreightInfo.getNotagreementStopFreightRate()+"%");
+        }
+        
         return ResponseData.success(carBusiness);
     }
 

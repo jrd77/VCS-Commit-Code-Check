@@ -23,4 +23,8 @@ public class OrderStopFreightInfoService {
 	public int updateByPrimaryKeySelective(OrderStopFreightInfo record) {
 		return orderStopFreightInfoMapper.updateByPrimaryKeySelective(record);
 	}
+	
+	public OrderStopFreightInfo getOrderStopFreightInfoByOrderNo(String orderNo) {
+		return orderStopFreightInfoMapper.getOrderStopFreightInfoByOrderNo(orderNo);
+	}
 }

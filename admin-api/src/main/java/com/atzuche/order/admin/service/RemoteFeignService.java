@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
+import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
@@ -774,4 +775,32 @@ public class RemoteFeignService {
             t.complete();
         }
     }
+    
+    
+    /**
+     * 获取车辆停运费信息
+     * @param orderNo
+     * @return OrderStopFreightInfo
+     */
+    public OrderStopFreightInfo getStopFreightInfo(String orderNo){
+        ResponseData<OrderStopFreightInfo> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取车辆停运费信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.getStopFreightInfo");
+            log.info("Feign 获取车辆停运费信息,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignGoodsService.getStopFreightInfo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取车辆停运费信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取车辆停运费信息异常",e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+    
 }
