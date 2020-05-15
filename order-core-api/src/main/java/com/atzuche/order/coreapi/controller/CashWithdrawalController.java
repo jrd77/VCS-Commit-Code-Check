@@ -9,12 +9,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.atzuche.order.coreapi.entity.vo.OwnerGpsDeductVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.service.AccountDebtService;
@@ -34,6 +36,7 @@ public class CashWithdrawalController {
 	private AccountDebtService accountDebtService;
 	@Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+	
 
 	/**
 	 * 提现
@@ -93,5 +96,20 @@ public class CashWithdrawalController {
 			log.info("getDebtAmt出参=[{}],入参=[{}]",GsonUtils.toJson(debtDetailVO),GsonUtils.toJson(req));
 		}
     	return ResponseData.success(debtDetailVO);
+    } 
+	
+	
+	/**
+	 * 车主车载押金抵扣记录
+	 * @param memNo
+	 * @param carNo
+	 * @return ResponseData<List<AccountOwnerCashExamine>>
+	 */
+	@GetMapping("/owner/gpsdeduct/list")
+    public ResponseData<List<OwnerGpsDeductVO>> listCashWithdrawal(@RequestParam(value="memNo",required = true) String memNo, 
+    		@RequestParam(value="carNo",required = true) Integer carNo) {
+		log.info("获取车主车载押金抵扣记录 memNo=[{}],carNo=[{}]", memNo,carNo);
+		List<OwnerGpsDeductVO> list = cashWithdrawalService.listOwnerGpsDeduct(memNo, carNo);
+    	return ResponseData.success(list);
     } 
 }

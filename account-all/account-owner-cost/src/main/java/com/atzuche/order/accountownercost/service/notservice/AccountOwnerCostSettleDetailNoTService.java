@@ -72,4 +72,15 @@ public class AccountOwnerCostSettleDetailNoTService {
     public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo,String memNo) {
         return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo,memNo);
     }
+    
+    /**
+     * 获取车主结算费用通过费用编码
+     * @param orderNoList
+     * @param memNo
+     * @param sourceCode
+     * @return List<AccountOwnerCostSettleDetailEntity>
+     */
+    public List<AccountOwnerCostSettleDetailEntity> listOwnerSettleCostBySourceCode(List<String> orderNoList,String memNo,String sourceCode) {
+    	return accountOwnerCostSettleDetailMapper.listOwnerSettleCostBySourceCode(orderNoList, memNo, sourceCode);
+    }
 }

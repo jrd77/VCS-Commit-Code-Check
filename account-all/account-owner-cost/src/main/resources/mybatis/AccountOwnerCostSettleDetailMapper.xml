@@ -81,5 +81,13 @@
         select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no = #{orderNo} and mem_no = #{memNo} and is_delete = 0 
     </select>
 
-
+	<select id="listOwnerSettleCostBySourceCode" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no in 
+        <foreach collection="orderNoList" index="index" item="orderNo" open="(" separator="," close=")">
+			#{orderNo}
+		</foreach> 
+        and mem_no = #{memNo} 
+        and source_code = #{sourceCode}
+        and is_delete = 0 
+    </select>
 </mapper>

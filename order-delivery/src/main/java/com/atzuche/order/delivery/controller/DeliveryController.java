@@ -6,22 +6,16 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
+import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
-import com.atzuche.order.mq.common.base.OrderMessage;
-import com.atzuche.order.mq.enums.PushMessageTypeEnum;
-import com.atzuche.order.mq.enums.ShortMessageTypeEnum;
-import com.atzuche.order.mq.util.SmsParamsMapUtil;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -48,7 +42,6 @@ public class DeliveryController {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     CodeUtils codeUtils;
-
 
 
    // @GetMapping("/test")
@@ -203,4 +196,11 @@ public class DeliveryController {
 //            return ResponseData.error();
 //        }
 //    }
+
+    @PostMapping("/cancelRenYun")
+    public ResponseData<?> cancelRenYunFlowOrderInfo(@RequestBody CancelFlowOrderDTO cancelFlowOrderVO){
+        deliveryCarTask.cancelRenYunFlowOrderInfo(cancelFlowOrderVO);
+        return ResponseData.success("取消成功");
+    }
+
 }

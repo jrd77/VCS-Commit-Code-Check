@@ -9,6 +9,7 @@ import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
 import com.atzuche.order.coreapi.service.*;
@@ -62,11 +63,13 @@ public class ModifyOrderController {
     @Autowired
     private OrderStatusService orderStatusService;
     @Autowired
+    private ModifyOrderExtendService modifyOrderExtendService;
+
+    @Autowired
     private OrderCouponService orderCouponService;
     @Autowired
     private RenterOrderService renterOrderService;
-
-	/**
+    /**
 	 * 修改订单（APP端或H5端）
 	 * @param modifyOrderAppReq
 	 * @param bindingResult
@@ -262,11 +265,40 @@ public class ModifyOrderController {
 		changeApplyCount = changeApplyCount == null ? 0:changeApplyCount;
     	return ResponseData.success(changeApplyCount);
     }
+
+
+	/**
+     * 获取修改前数据
+     * @param modifyOrderReq
+     * @param bindingResult
+     * @return ResponseData
+     */
+    @PostMapping("/order/beforemodifydata/get")
+    public ResponseData<ModifyOrderDTO> getInitModifyOrderDTO(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
+        log.info("获取修改前数据 modifyOrderReq=[{}] ", modifyOrderReq);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		ModifyOrderDTO modifyOrderDTO = modifyOrderExtendService.getInitModifyOrderDTO(modifyOrderReq);
+        return ResponseData.success(modifyOrderDTO);
+    }
+
+
+    /**
+	 * 根据订单号获取车牌号
+	 * @param orderNo
+	 * @return ResponseData<String>
+	 */
+	@GetMapping("/order/carplatenum/get")
+    public ResponseData<String> getCarPlateNum(@RequestParam(value="orderNo",required = true) String orderNo) {
+		log.info("/order/carplatenum/get orderNo=[{}]", orderNo);
+		String carPlateNum = modifyOrderExtendService.getCarPlateNum(orderNo);
+    	return ResponseData.success(carPlateNum);
+    }
+
     /*
      * @Author ZhangBin
-     * @Date 2020/5/11 16:41 
+     * @Date 2020/5/11 16:41
      * @Description: 通过订单号查询券信息
-     * 
+     *
      **/
     @GetMapping("/order/coupon/queryCouponByOrderNo")
     public ResponseData<List<OrderCouponDTO>> queryCouponByOrderNo(@RequestParam(value = "orderNo") String orderNo){
