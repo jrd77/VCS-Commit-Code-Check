@@ -105,7 +105,7 @@ public class AdminTransReqVO extends AdminReqBaseVO {
     private String oilType;
 
     @AutoDocProperty(value = "用车城市 例(上海)")
-    @NotBlank(message = "rentCity不能为空")
+    //@NotBlank(message = "rentCity不能为空")
     private String rentCity;
 
 //    @AutoDocProperty(value = "交易来源 1：手机，2：网站 ，3：管理后台, 14:m站")
