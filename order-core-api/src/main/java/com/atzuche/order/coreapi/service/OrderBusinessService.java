@@ -5,6 +5,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEnti
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
@@ -19,7 +20,9 @@ import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
+import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderNoticeEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
@@ -61,6 +64,8 @@ public class OrderBusinessService {
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
     @Autowired
     private RenterDepositDetailService renterDepositDetailService;
+    @Autowired
+    private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -201,5 +206,16 @@ public class OrderBusinessService {
             BeanUtils.copyProperties(renterDepositDetailEntity,renterDepositDetailDTO);
         }
         return renterDepositDetailDTO;
+    }
+
+    public List<OwnerOrderSubsidyDetailDTO> queryOwnerSubsidyByownerOrderNo(String orderNo,String ownerOrderNo) {
+        List<OwnerOrderSubsidyDetailEntity> list = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo, ownerOrderNo);
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = new ArrayList<>();
+        Optional.ofNullable(list).orElseGet(ArrayList::new).stream().forEach(x->{
+            OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = new OwnerOrderSubsidyDetailDTO();
+            BeanUtils.copyProperties(x,ownerOrderSubsidyDetailDTO);
+            ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
+        });
+        return ownerOrderSubsidyDetailDTOS;
     }
 }

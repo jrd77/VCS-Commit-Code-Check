@@ -802,4 +802,31 @@ public class RemoteFeignService {
             t.complete();
         }
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/15 11:42
+     * @Description: 查询车主补贴
+     *
+     **/
+    public List<OwnerOrderSubsidyDetailDTO> queryOwnerSubsidyByownerOrderNo(String orderNo,String ownerOrderNo){
+        ResponseData<List<OwnerOrderSubsidyDetailDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "查询车主补贴");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryrenterDepositDetail");
+            log.info("Feign 查询车主补贴orderNo={},ownerOrderNo={}", orderNo,ownerOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignBusinessService.queryOwnerSubsidyByownerOrderNo(orderNo,ownerOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 查询车主补贴,responseObject={},orderNo={},ownerOrderNo={}",JSON.toJSONString(responseObject),orderNo,ownerOrderNo,e);
+            Cat.logError("Feign 查询车主补贴",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }

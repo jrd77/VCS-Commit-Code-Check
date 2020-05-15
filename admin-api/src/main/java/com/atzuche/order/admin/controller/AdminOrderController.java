@@ -157,9 +157,12 @@ public class AdminOrderController {
          }
          cancelOrderByPlatVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
          adminOrderService.cancelOrderByAdmin(cancelOrderByPlatVO);
+         try{
+            adminLogService.insertLog(AdminOpTypeEnum.CANCEL_ORDER_PLAT,cancelOrderByPlatVO.getOrderNo(),AdminOpTypeEnum.CANCEL_ORDER_PLAT.getOpType());
+         }catch (Exception e){
+             log.error("修改订单-平台取消日志记录异常",e);
+         }
          return ResponseData.success();
-
-
     }
 
     @AutoDocVersion(version = "订单修改")
@@ -169,8 +172,19 @@ public class AdminOrderController {
     public ResponseData cancelOrder(@Valid @RequestBody CancelOrderVO cancelOrderVO, BindingResult bindingResult)throws Exception{
         log.info("车主或者租客取消-reqVo={}", JSON.toJSONString(cancelOrderVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
+        try{
+            AdminOpTypeEnum adminOpTypeEnum = AdminOpTypeEnum.OTHER;
+            if("1".equals(cancelOrderVO.getMemRole())){
+                adminOpTypeEnum = AdminOpTypeEnum.CANCEL_ORDER_OWNER_PLAT;
+            }else if("2".equals(cancelOrderVO.getMemRole())){
+                adminOpTypeEnum = AdminOpTypeEnum.CANCEL_ORDER_RENTER_PLAT;
+            }
+            String desc = adminOpTypeEnum.getOpType()+" 取消原因："+cancelOrderVO.getCancelReason()==null?"":cancelOrderVO.getCancelReason();
+            adminLogService.insertLog(adminOpTypeEnum,cancelOrderVO.getOrderNo(),desc);
+        }catch (Exception e){
+            log.error("修改订单-平台取消日志记录异常",e);
+        }
         return responseData;
     }
 
