@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name="order-center-api",url="http://localhost:1412/")
+@FeignClient(name="order-center-api")
 public interface FeignGoodsService {
 
     /*
