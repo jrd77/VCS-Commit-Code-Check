@@ -46,7 +46,7 @@ public class AdminDeliveryCarService {
         return deliveryRemoteService.getDeliveryCarVO(deliveryCarDTO);
     }
 
-    
+
 
     /**
      * 更新交接车信息
@@ -199,7 +199,7 @@ public class AdminDeliveryCarService {
      */
     public DistributionCostVO findDeliveryCostByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
-        
+
         return deliveryRemoteService.getDistributionCostVO(deliveryCarDTO);
     }
 
