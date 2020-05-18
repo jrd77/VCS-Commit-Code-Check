@@ -1,6 +1,5 @@
 package com.atzuche.order.delivery.service.delivery;
 
-import com.atzuche.order.delivery.common.DeliveryConstants;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
