@@ -9,7 +9,7 @@
          <result column="notagreement_stop_freight_rate" property="notagreementStopFreightRate"></result>
     </resultMap>
    
-   <select id="getCarLevelConfigByLevel" resultMap="baseMap">
+   <select id="listCarLevelConfigByLevel" resultMap="baseMap">
 	select id,`level`,agreement_stop_freight_rate,notagreement_stop_freight_rate 
 	from car_charge_level_config
    </select>
