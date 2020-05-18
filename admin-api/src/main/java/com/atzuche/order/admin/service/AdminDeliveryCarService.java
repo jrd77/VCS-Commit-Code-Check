@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.filter.CityLonLatFilter;
+import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.enums.DeliveryErrorCode;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
@@ -63,7 +64,7 @@ public class AdminDeliveryCarService {
      * @param deliveryCarVO
      * @throws Exception
      */
-    public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
+    public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO)  {
         logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
         OrderReqContext orderReqContext = new OrderReqContext();
         OrderReqVO orderReqVo = new OrderReqVO();
@@ -86,20 +87,24 @@ public class AdminDeliveryCarService {
         orderReqVo.setSrvReturnAddr(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnAddr());
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
-        //ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
-        ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+        try {
 
-        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
-            logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
-            throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
+            ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+        } catch (OrderException e) {
+            if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("400504")) {
+                logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());
+                throw new DeliveryOrderException(e.getErrorCode(), e.getErrorMsg());
+            }
         }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
-        if(Objects.nonNull(ownerTransAddressReqVO)) {
-            //ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
-            ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
-            if (!ownerResponseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !ownerResponseData.getResCode().equals("510004")) {
-                logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
-                throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());
+        if (Objects.nonNull(ownerTransAddressReqVO)) {
+            try {
+                ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
+            } catch (OrderException e) {
+                if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("510004")) {
+                    logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());
+                    throw new DeliveryOrderException(e.getErrorCode(), e.getErrorMsg());
+                }
             }
         }
         // 更新备注
