@@ -45,8 +45,12 @@ public class CarDetailService {
                     return "";
                 }
                 List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
-                if( CollectionUtils.isNotEmpty(carGpsVOS) && SERIAL_NUMBER.equals(carGpsVOS.get(0).getSerialNumber())){
-                    return carGpsVOS.get(0).getSimNo();
+                if( CollectionUtils.isNotEmpty(carGpsVOS)){
+                    for (CarGpsVO carGpsVO:carGpsVOS) {
+                        if (SERIAL_NUMBER.equals(carGpsVO.getSerialNumber())){
+                            return carGpsVO.getSimNo();
+                        }
+                    }
                 }
                 //List<CarGpsVO> collect = carGpsVOS.stream().filter(Objects::nonNull).filter(temp -> SERIAL_NUMBER.equals(temp.getSerialNumber())).collect(Collectors.toList());
                 return "";

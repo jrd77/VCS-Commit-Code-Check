@@ -240,7 +240,7 @@ public class LongRentSubsidyService {
 			return null;
 		}
 		Integer rentAmt = rentAmtEntity.getTotalAmount();
-        if (rentAmt != null && Math.abs(rentAmt) > Math.abs(afterRentAmt)) {
+        if (rentAmt != null && Math.abs(rentAmt) != Math.abs(afterRentAmt)) {
         	Integer subsidyAmount = Math.abs(rentAmt) - Math.abs(afterRentAmt);
         	// 产生补贴
         	return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, subsidyAmount, SubsidyTypeCodeEnum.RENT_AMT,
