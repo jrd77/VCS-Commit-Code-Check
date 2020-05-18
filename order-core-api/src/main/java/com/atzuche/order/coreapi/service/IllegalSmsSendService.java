@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -172,7 +169,10 @@ public class IllegalSmsSendService {
             try {
                 //失败跳过，执行下一次循环
                 String orderNo = detail.getOrderNo();
-                String illegalDate = DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE);
+                String illegalDate = "";
+                if (Objects.nonNull(detail.getIllegalTime())) {
+                    illegalDate = DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE);
+                }
                 String key = orderNo + "#" + illegalDate;
                 if (!map.containsKey(key)) {
                     map.put(key, detail);

@@ -18,7 +18,7 @@ public class PreOrderAdminRequestVO {
     @NotBlank(message = "cityCode cannot be null")
     private String cityCode;
     @AutoDocProperty(value = "下单城市名称")
-    @NotBlank(message = "rentCity cannot be null")
+    //@NotBlank(message = "rentCity cannot be null")
     private String rentCity;
     @AutoDocProperty(value = "会员手机号（会员手机号、会员号必须二者有一个）")
     private String mobile;
