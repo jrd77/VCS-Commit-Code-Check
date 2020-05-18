@@ -162,7 +162,11 @@ public class DeRunService {
             params.put("status", status);
             params.put("login", login);
             params.put("password", password);
-            params.put("group", group(cityName));
+            //如果车辆起租 status要传1  并且group传 某某市    如果车辆租赁结束 status 只穿0  group不要传 市
+            //https://dedao-api.atzuche.com/api/v1/contracts/set_lease_status.json?uid=351631044233853&license_plate=沪ADK168&status=0&orderId=92125341500299&customerId=33049410&login=aotu&password=11111&group=上海市&timeStart=20200514141500&timeEnd=20200516210000
+            if(status.equals("1")){
+                params.put("group", cityName+"市");
+            }
             params.put("customerId",renterNo);
             params.put("timeStart",startTime);
             params.put("timeEnd",endTime);
