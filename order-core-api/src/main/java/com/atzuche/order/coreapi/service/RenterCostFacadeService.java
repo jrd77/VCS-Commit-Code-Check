@@ -202,8 +202,8 @@ public class RenterCostFacadeService {
         detail.setAutoCoinSubsidyAmt(-OrderSubsidyDetailUtils.getRenterAutoCoinSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setGetCarCouponSubsidyAmt(-OrderSubsidyDetailUtils.getRenterGetCarFeeSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setLimitTimeSubsidyAmt(-OrderSubsidyDetailUtils.getRenterRealLimitDeductSubsidyAmt(renterOrderSubsidyDetailEntityList));
-        detail.setUpdateSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList) + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt(consoleSubsidyDetailEntityList))
-                + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt_(consoleSubsidyDetailEntityList));
+        detail.setUpdateSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList) + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt(consoleSubsidyDetailEntityList)+
+                OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt_(consoleSubsidyDetailEntityList)));
 
         detail.setRenter2OwnerSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.OWNER,RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)));
