@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name="order-center-api")
+@FeignClient(name="order-center-api",url="http://localhost:1412/")
 public interface FeignGoodsService {
 
     /*
@@ -56,8 +56,8 @@ public interface FeignGoodsService {
      * @param carNo
      * @return
      */
-    @GetMapping("/renter/goods")
-    ResponseData<RenterGoodWithoutPriceVO> getRenterGoodsDetailWithoutPrice(@RequestParam("orderNo") String orderNo, @RequestParam("carNo") String carNo);
+    @RequestMapping("/goods/owner/queryOwnerGoodsDetail")
+    public ResponseData<OwnerGoodsDetailDTO> queryOwnerGoodsDetail(@RequestParam("ownerOrderNo")String ownerOrderNo,@RequestParam("isNeedPrice") boolean isNeedPrice);
     
     /**
      * 获取车辆停运费信息

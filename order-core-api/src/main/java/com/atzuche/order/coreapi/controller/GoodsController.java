@@ -49,7 +49,17 @@ public class GoodsController {
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, isNeedPrice);
         return ResponseData.success(renterGoodsDetail);
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/28 15:53
+     * @Description: 通过租客子订单号获取租客商品信息
+     *
+     **/
+    @RequestMapping("/goods/owner/queryOwnerGoodsDetail")
+    public ResponseData<OwnerGoodsDetailDTO> queryOwnerGoodsDetail(@RequestParam("ownerOrderNo")String ownerOrderNo,@RequestParam("isNeedPrice") boolean isNeedPrice){
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, isNeedPrice);
+        return ResponseData.success(ownerGoodsDetailDTO);
+    }
     /*
      * @Author ZhangBin
      * @Date 2020/4/28 16:14

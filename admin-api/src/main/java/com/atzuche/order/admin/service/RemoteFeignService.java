@@ -169,23 +169,21 @@ public class RemoteFeignService {
      * @Description: 获取租客商品信息
      * 
      **/
-    public RenterGoodWithoutPriceVO queryRenterGoods(String orderNo, String carNo){
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中租客商品信息");
-        ResponseData<RenterGoodWithoutPriceVO> responseObject = null;
+    public OwnerGoodsDetailDTO queryOwnerGoods(boolean isNeedPrice, String ownerOrderNo){
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单中车主商品信息");
+        ResponseData<OwnerGoodsDetailDTO> responseObject = null;
         try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignRenterGoodsService.getRenterGoodsDetailWithoutPrice");
-            log.info("Feign 开始获取订单中租客商品信息,[orderNo={},carNo={}]", orderNo,JSON.toJSONString(carNo));
-            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(carNo));
-            responseObject = feignGoodsService.getRenterGoodsDetailWithoutPrice(orderNo,carNo);
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryOwnerGoodsDetail");
+            log.info("Feign 开始获取订单中车主商品信息,[isNeedPrice={},ownerOrderNo={}]", isNeedPrice,ownerOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(ownerOrderNo));
+            responseObject = feignGoodsService.queryOwnerGoodsDetail(ownerOrderNo,isNeedPrice);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
-            RenterGoodWithoutPriceVO baseVO = responseObject.getData();
-            log.info("baseVo is {}",baseVO);
             t.setStatus(Transaction.SUCCESS);
-            return baseVO;
+            return responseObject.getData();
         }catch (Exception e){
-            log.error("Feign 订单中租客商品信息,responseObject={},orderCarInfoParamDTO={}",JSON.toJSONString(responseObject),JSON.toJSONString(carNo),e);
-            Cat.logError("Feign 获取订单中租客商品信息异常",e);
+            log.error("Feign 订单中车主商品信息,responseObject={},ownerOrderNo={}",JSON.toJSONString(responseObject),ownerOrderNo,e);
+            Cat.logError("Feign 获取订单中车主商品信息异常",e);
             t.setStatus(e);
             throw e;
         }finally {
