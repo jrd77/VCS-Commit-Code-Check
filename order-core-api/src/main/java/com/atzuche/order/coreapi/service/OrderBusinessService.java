@@ -5,6 +5,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEnti
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
@@ -24,11 +25,14 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +59,8 @@ public class OrderBusinessService {
     private OrderStatusService orderStatusService;
     @Autowired
     private AccountOwnerIncomeExamineNoTService accountOwnerIncomeExamineNoTService;
+    @Autowired
+    private RenterDepositDetailService renterDepositDetailService;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -171,13 +177,15 @@ public class OrderBusinessService {
             List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
             AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = AccountOwnerIncomeExamineUtil.filterByType(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineType.OWNER_INCOME);
             if(accountOwnerIncomeExamineEntity == null){
-                log.error("车主结算收益查询异常");
-                throw new OwnerIncomeExamineNotFoundException();
+                /*log.error("车主结算收益查询异常");
+                throw new OwnerIncomeExamineNotFoundException();*/
+                ownerIncomAmt = 0;
+            }else{
+                List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, null);
+                ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
+                ownerPreAndSettleIncomRespDTO.setAuditStatus(accountOwnerIncomeExamineEntity.getStatus());
             }
-            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, null);
-            ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
             ownerPreAndSettleIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
-            ownerPreAndSettleIncomRespDTO.setAuditStatus(accountOwnerIncomeExamineEntity.getStatus());
         }else{
             OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
             ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
@@ -185,5 +193,15 @@ public class OrderBusinessService {
         }
         ownerPreAndSettleIncomRespDTO.setOwnerIncomAmt(ownerIncomAmt);
         return ownerPreAndSettleIncomRespDTO;
+    }
+
+    public RenterDepositDetailDTO queryrenterDepositDetail(String orderNo) {
+        RenterDepositDetailEntity renterDepositDetailEntity = renterDepositDetailService.queryByOrderNo(orderNo);
+        RenterDepositDetailDTO renterDepositDetailDTO = null;
+        if(renterDepositDetailEntity != null){
+            renterDepositDetailDTO = new RenterDepositDetailDTO();
+            BeanUtils.copyProperties(renterDepositDetailEntity,renterDepositDetailDTO);
+        }
+        return renterDepositDetailDTO;
     }
 }

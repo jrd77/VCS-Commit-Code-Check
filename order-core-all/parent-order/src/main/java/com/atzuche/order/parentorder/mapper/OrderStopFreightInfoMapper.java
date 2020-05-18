@@ -12,7 +12,7 @@ public interface OrderStopFreightInfoMapper {
 
     int insertSelective(OrderStopFreightInfo record);
 
-    OrderStopFreightInfo selectByPrimaryKey(Integer id);
+    OrderStopFreightInfo getOrderStopFreightInfoByOrderNo(String orderNo);
 
     int updateByPrimaryKeySelective(OrderStopFreightInfo record);
 

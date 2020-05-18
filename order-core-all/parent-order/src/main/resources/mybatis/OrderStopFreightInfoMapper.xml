@@ -19,11 +19,13 @@
     notagreement_stop_freight_price, create_time, create_op, update_time, update_op, 
     is_delete
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="getOrderStopFreightInfoByOrderNo" resultMap="BaseResultMap" parameterType="String" >
     select 
     <include refid="Base_Column_List" />
     from order_stop_freight_info
-    where id = #{id,jdbcType=INTEGER}
+    where order_no = #{orderNo}
+    and is_delete=0
+    limit 1
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from order_stop_freight_info

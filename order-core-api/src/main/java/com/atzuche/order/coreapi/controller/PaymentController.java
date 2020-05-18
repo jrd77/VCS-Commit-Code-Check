@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.vo.res.PaymentRespVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,11 @@ public class PaymentController {
 	
 	@AutoDocMethod(description = "查询支付记录", value = "查询支付记录", response = CashierResVO.class)
     @PostMapping("/payment/queryByOrderNo")
-    public ResponseData<List<CashierResVO>> queryByOrderNo(@Valid @RequestBody PaymentReqVO vo, BindingResult bindingResult) throws Exception {
+    public ResponseData<PaymentRespVO> queryByOrderNo(@Valid @RequestBody PaymentReqVO vo, BindingResult bindingResult) throws Exception {
 		logger.info("queryByOrderNo:[{}]", JSON.toJSONString(vo));
         try {
-        	 List<CashierResVO> lst = paymentCashierService.queryPaymentList(vo.getOrderNo());
-             return ResponseData.success(lst);
+        	 PaymentRespVO paymentRespVO = paymentCashierService.queryPaymentList(vo.getOrderNo());
+             return ResponseData.success(paymentRespVO);
 		} catch (Exception e) {
 			logger.error("查询收银台记录异常:",e);
 			return ResponseData.error();

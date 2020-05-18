@@ -1,22 +1,5 @@
 package com.atzuche.order.coreapi.service;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.CarChargeLevelConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
@@ -29,11 +12,7 @@ import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
-import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
@@ -75,6 +54,7 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +63,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -586,8 +567,8 @@ public class SubmitOrderService {
     		}
     	}
     	//计算停运费用(停运费单价=停运费比例*平日天单价)
-    			int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
-    			int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
+		int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
+		int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
     	OrderStopFreightInfo orderStopFreightInfo = new OrderStopFreightInfo();
     	orderStopFreightInfo.setOrderNo(orderNo);
     	orderStopFreightInfo.setAgreementStopFreightPrice(agreementStopFreightPrice);

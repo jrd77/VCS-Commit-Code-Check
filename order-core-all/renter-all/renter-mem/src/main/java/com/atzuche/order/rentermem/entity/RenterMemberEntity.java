@@ -1,5 +1,6 @@
 package com.atzuche.order.rentermem.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -98,6 +99,10 @@ public class RenterMemberEntity implements Serializable {
 	 * 会员来源
 	 */
 	private String outerSource;
+
+    @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
+    private Integer repeatTimeOrder;
+
 	/**
 	 * 创建时间
 	 */

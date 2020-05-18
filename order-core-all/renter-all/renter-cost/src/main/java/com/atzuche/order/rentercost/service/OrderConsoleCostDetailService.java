@@ -1,17 +1,19 @@
 package com.atzuche.order.rentercost.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
-import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.mapper.OrderConsoleCostDetailMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -21,17 +23,35 @@ import com.atzuche.order.rentercost.mapper.OrderConsoleCostDetailMapper;
  * @date 2020-01-16 15:03:47
  */
 @Service
+@Slf4j
 public class OrderConsoleCostDetailService{
     @Autowired
     private OrderConsoleCostDetailMapper orderConsoleCostDetailMapper;
 
-//    public List<OrderConsoleCostDetailEntity> getOrderConsoleCostDetaiByOrderNo(String orderNo){
-//            return orderConsoleCostDetailMapper.selectByOrderNo(orderNo);
-//    }
 
     public List<OrderConsoleCostDetailEntity> selectByOrderNoAndMemNo(String orderNo,String memNo){
         return orderConsoleCostDetailMapper.selectByOrderNoAndMemNo(orderNo,memNo);
     }
+
+    /**
+     * 获取指定费用列表
+     *
+     * @param orderNo 订单号
+     * @param memNo 会员号
+     * @param cashNos 费用编码列表
+     * @return List<OrderConsoleCostDetailEntity>
+     */
+    public List<OrderConsoleCostDetailEntity> getOrderConsoleCostByCondition(String orderNo,String memNo,
+                                                                             List<String> cashNos){
+        List<OrderConsoleCostDetailEntity> list = selectByOrderNoAndMemNo(orderNo,memNo);
+        if(CollectionUtils.isEmpty(list)) {
+            log.info("管理后台维护费用列表为空.orderNo:[{}],memNo:[{}]", orderNo, memNo);
+            return null;
+        }
+        return list.stream().filter(c -> cashNos.contains(c.getSubsidyCostCode())).collect(Collectors.toList());
+    }
+
+
 
     public int getTotalOrderConsoleCostAmt(String orderNo,String memNo){
     	List<OrderConsoleCostDetailEntity> entityList = selectByOrderNoAndMemNo(orderNo, memNo);
@@ -70,18 +90,40 @@ public class OrderConsoleCostDetailService{
     	
     	return 1;
     }
+
+    /**
+     * 新增/更新订单暂扣扣款信息
+     *
+     * @param records 暂扣扣款信息
+     * @return int
+     */
+    public int saveOrderConsoleCostDetai(List<OrderConsoleCostDetailEntity> records) {
+        if (CollectionUtils.isEmpty(records)) {
+            log.info("Save order console cost detail. records is empty!");
+            return OrderConstant.ZERO;
+        }
+
+        int total = OrderConstant.ZERO;
+        for (OrderConsoleCostDetailEntity record : records) {
+
+            if (Objects.isNull(record.getId())) {
+                total = total + orderConsoleCostDetailMapper.insertSelective(record);
+            } else {
+                total = total + orderConsoleCostDetailMapper.updateByPrimaryKeySelective(record);
+            }
+        }
+        return total;
+    }
+
     
     /**
      * 数据转化
      * @param costBaseDTO 基础信息
-     * @param fineAmt 罚金金额
-     * @param code 罚金补贴方编码枚举
      * @param source 罚金来源编码枚举
-     * @param type 罚金类型枚举
      * @return ConsoleRenterOrderFineDeatailEntity
      */
     public OrderConsoleCostDetailEntity buildData(CostBaseDTO costBaseDTO, Integer subsidyAmount, SubsidySourceCodeEnum target, SubsidySourceCodeEnum source, ConsoleCashCodeEnum cash) {
-        if (subsidyAmount == null) {  // || subsidyAmount == 0
+        if (subsidyAmount == null) {
             return null;
         }
         

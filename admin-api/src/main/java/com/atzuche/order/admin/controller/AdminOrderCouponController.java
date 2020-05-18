@@ -1,8 +1,8 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
-import com.atzuche.order.open.service.FeignOrderCouponService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -27,7 +30,7 @@ public class AdminOrderCouponController {
     private static final Logger logger = LoggerFactory.getLogger(AdminOrderCouponController.class);
 
     @Autowired
-    private FeignOrderCouponService feignOrderCouponService;
+    private RemoteFeignService remoteFeignService;
 
     /**
      * 获取订单内租客优惠抵扣信息
@@ -42,7 +45,8 @@ public class AdminOrderCouponController {
         if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        ResponseData<AdminGetDisCouponListResVO>  result = feignOrderCouponService.getDisCouponListByOrderNo(req);
+        ResponseData<AdminGetDisCouponListResVO> result = remoteFeignService.queryDisCouponByOrderNoFromRemote(req);
+        //ResponseData<AdminGetDisCouponListResVO>  result = feignOrderCouponService.getDisCouponListByOrderNo(req);
         logger.info("AdminOrderCouponController queryDisCouponByOrderNo end. result [{}]",result);
         return result;
     }

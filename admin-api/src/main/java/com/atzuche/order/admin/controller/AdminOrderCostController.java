@@ -4,6 +4,20 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import com.atzuche.order.admin.service.OrderCostService;
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
@@ -44,7 +58,7 @@ public class AdminOrderCostController {
     private AdminDeliveryCarService deliveryCarInfoService;
     
 	@AutoDocMethod(description = "计算租客子订单费用", value = "计算租客子订单费用", response = OrderRenterCostResVO.class)
-	@RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
+	@RequestMapping(value="/calculateRenterOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateRenterOrderCost(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCost controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -84,7 +98,7 @@ public class AdminOrderCostController {
 	}
 
     @AutoDocMethod(description = "长租-计算租客子订单费用", value = "长租-计算租客子订单费用", response = OrderRenterCostResVO.class)
-    @RequestMapping(value="calculateRenterOrderCostLongRent",method = RequestMethod.POST)
+    @RequestMapping(value="/calculateRenterOrderCostLongRent",method = RequestMethod.POST)
     public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
         if (bindingResult.hasErrors()) {
@@ -103,7 +117,7 @@ public class AdminOrderCostController {
 
     }
 	@AutoDocMethod(description = "计算车主子订单费用", value = "计算车主子订单费用", response = OrderOwnerCostResVO.class)
-	@RequestMapping(value="calculateOwnerOrderCost",method = RequestMethod.POST)
+	@RequestMapping(value="/calculateOwnerOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateOwnerOrderCost(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -123,7 +137,7 @@ public class AdminOrderCostController {
 		
 	}
     @AutoDocMethod(description = "长租-计算车主子订单费用", value = "长租-计算车主子订单费用", response = OrderOwnerCostResVO.class)
-    @RequestMapping(value="calculateOwnerOrderCostLong",method = RequestMethod.POST)
+    @RequestMapping(value="/calculateOwnerOrderCostLong",method = RequestMethod.POST)
     public ResponseData calculateOwnerOrderCostLong(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
         if (bindingResult.hasErrors()) {

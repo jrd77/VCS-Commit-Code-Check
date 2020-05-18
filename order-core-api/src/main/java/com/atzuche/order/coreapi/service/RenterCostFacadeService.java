@@ -1,26 +1,21 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
-import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositEntity;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
 import com.atzuche.order.accountrenterdeposit.utils.AccountRenterDepositUtils;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
-import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.accountrenterwzdepost.utils.AccountRenterWzDepositUtils;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.NumberUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.rentCost.*;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -39,21 +34,16 @@ import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.service.OwnerCouponLongService;
-import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.settle.vo.res.RenterCostVO;
-import com.autoyol.doc.util.StringUtil;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 提供租客费用的对外接口服务
@@ -109,6 +99,8 @@ public class RenterCostFacadeService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired
+    private OrderConsoleCostHandleService orderConsoleCostHandleService;
     @Autowired
     private OwnerCouponLongService ownerCouponLongService;
 
@@ -405,6 +397,8 @@ public class RenterCostFacadeService {
         carDepositDTO.expDeductionRentAmt = Math.abs(carDeductionRentAmt);
         carDepositDTO.expAndActFlg = carExpAndActFlg;
         carDepositDTO.isDetain = orderStatusEntity.getIsDetain();
+        carDepositDTO.tempCarDepoists =
+                orderConsoleCostHandleService.getTempCarDepoistInfos(orderNo, memNo, OrderConstant.CASHNOS).getTempCarDepoists();
 
         //2.2、统计
         CostStatisticsDTO carDepositStatisticsDTO = new CostStatisticsDTO();

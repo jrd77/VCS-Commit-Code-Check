@@ -38,20 +38,22 @@ public class CarDetailService {
         Cat.logEvent(CatConstants.FEIGN_PARAM, "reqVO=" + JSON.toJSONString(dto));
         try {
             ResponseObject<CarDetailVO> carDetailOfTransByCarNo = carDetailQueryFeignApi.getCarDetailOfTransByCarNo(dto);
+            logger.info("调用车辆服务查询GPS信息入参 [{}],出参 [{}]",JSON.toJSONString(dto),JSON.toJSONString(carDetailOfTransByCarNo));
             if(carDetailOfTransByCarNo != null && carDetailOfTransByCarNo.getResCode().equals(ErrorCode.SUCCESS.getCode())){
                 CarDetailVO data = carDetailOfTransByCarNo.getData();
                 if(data == null){
                     return "";
                 }
                 List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
-                if(CollectionUtils.isEmpty(carGpsVOS)){
-                    return "";
+                if( CollectionUtils.isNotEmpty(carGpsVOS)){
+                    for (CarGpsVO carGpsVO:carGpsVOS) {
+                        if (SERIAL_NUMBER.equals(carGpsVO.getSerialNumber())){
+                            return carGpsVO.getSimNo();
+                        }
+                    }
                 }
-                List<CarGpsVO> collect = carGpsVOS.stream().filter(Objects::nonNull).filter(temp -> SERIAL_NUMBER.equals(temp.getSerialNumber())).collect(Collectors.toList());
-                if(CollectionUtils.isEmpty(collect)){
-                    return "";
-                }
-                return collect.get(0).getSimNo();
+                //List<CarGpsVO> collect = carGpsVOS.stream().filter(Objects::nonNull).filter(temp -> SERIAL_NUMBER.equals(temp.getSerialNumber())).collect(Collectors.toList());
+                return "";
             }
         } catch (BaseException e) {
             t.setStatus(e);
