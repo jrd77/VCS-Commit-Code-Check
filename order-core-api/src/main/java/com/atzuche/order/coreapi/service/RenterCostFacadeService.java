@@ -203,7 +203,7 @@ public class RenterCostFacadeService {
         detail.setGetCarCouponSubsidyAmt(-OrderSubsidyDetailUtils.getRenterGetCarFeeSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setLimitTimeSubsidyAmt(-OrderSubsidyDetailUtils.getRenterRealLimitDeductSubsidyAmt(renterOrderSubsidyDetailEntityList));
         detail.setUpdateSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterUpateSubsidyAmt(renterOrderSubsidyDetailEntityList) + OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt(consoleSubsidyDetailEntityList)+
-                OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmt_(consoleSubsidyDetailEntityList)));
+                OrderSubsidyDetailUtils.getConsoleRenterUpateSubsidyAmtOther(consoleSubsidyDetailEntityList)));
 
         detail.setRenter2OwnerSubsidyAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)+
                 OrderSubsidyDetailUtils.getConsoleSubsidyAmt(consoleSubsidyDetailEntityList, SubsidySourceCodeEnum.OWNER,RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST)));

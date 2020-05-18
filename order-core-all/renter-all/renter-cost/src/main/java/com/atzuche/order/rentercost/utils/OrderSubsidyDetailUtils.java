@@ -150,7 +150,9 @@ public class OrderSubsidyDetailUtils {
     public static int getConsoleRenterUpateSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> all){
         return getConsoleRenterSubsidyAmt(all,RenterCashCodeEnum.DISPATCHING_AMT/*RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT*/);
     }
-
+    public static int getConsoleRenterUpateSubsidyAmtOther(List<OrderConsoleSubsidyDetailEntity> all){
+        return getConsoleRenterSubsidyAmt(all,RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
+    }
     /**
      * 从Console租客订单补贴中获取所有和指定方（平台、车主）相关租客补贴
      * @param all
