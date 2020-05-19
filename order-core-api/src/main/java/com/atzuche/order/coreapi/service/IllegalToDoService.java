@@ -171,7 +171,7 @@ public class IllegalToDoService {
                     List list = (List) result.getData();
                     for (Object object : list) {
                         Violation violation = JSONObject.parseObject(object.toString(), Violation.class);
-                        if(violation != null) {
+                        if(violation != null && Objects.nonNull(violation.getTime())) {
 	                        if (violation.getTime().before(revertTime) && violation.getTime().after(rentTime)) {
 	                            // 车辆有违章信息
 	                            entity.setIllegalFlag(1);
