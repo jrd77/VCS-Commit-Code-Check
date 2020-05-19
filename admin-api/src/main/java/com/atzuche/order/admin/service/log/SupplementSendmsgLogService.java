@@ -72,8 +72,8 @@ public class SupplementSendmsgLogService {
         OrderSupplementPayMq orderSupplementPayMq= new OrderSupplementPayMq();
         orderSupplementPayMq.setAmount("100");
         orderSupplementPayMq.setItem("测试补付项目");
-        orderSupplementPayMq.setOrderNo("92844241500299");
-        orderSupplementPayMq.setRenterMemNo(310140606);
+        orderSupplementPayMq.setOrderNo("93174282400299");
+        orderSupplementPayMq.setRenterMemNo(322257668);
         orderMessage.setMessage(orderSupplementPayMq);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.exchange,
                 NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.routingKey, orderMessage);
