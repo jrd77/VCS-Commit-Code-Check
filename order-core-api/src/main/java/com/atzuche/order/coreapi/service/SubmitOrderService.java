@@ -276,7 +276,7 @@ public class SubmitOrderService {
         }
         
         // 保存车辆停运费信息
-        submitOrderHandleService.saveOrderStopFreightInfo(ownerOrderNo, ownerGoodsDetailDTO);
+        submitOrderHandleService.saveOrderStopFreightInfo(orderNo, ownerGoodsDetailDTO);
         
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
