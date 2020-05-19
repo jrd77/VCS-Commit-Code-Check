@@ -1,16 +1,27 @@
 package com.atzuche.order.admin.service.log;
 
-import com.atzuche.order.admin.entity.SupplementSendmsgLog;
 
+import com.atzuche.order.admin.entity.SupplementSendmsgLog;
+import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogDao;
+import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
+import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
+import com.autoyol.commons.web.ResponseData;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 发送补付消息记录(SupplementSendmsgLog)表服务接口
+ * 发送补付消息记录(SupplementSendmsgLog)表服务实现类
  *
  * @author makejava
- * @since 2020-05-18 20:46:29
+ * @since 2020-05-18 20:46:30
  */
-public interface SupplementSendmsgLogService {
+@Service("supplementSendmsgLogService")
+public class SupplementSendmsgLogService {
+    @Resource
+    private SupplementSendmsgLogDao supplementSendmsgLogDao;
 
     /**
      * 通过ID查询单条数据
@@ -18,7 +29,10 @@ public interface SupplementSendmsgLogService {
      * @param id 主键
      * @return 实例对象
      */
-    SupplementSendmsgLog queryById(Long id);
+
+    public SupplementSendmsgLog queryById(Long id) {
+        return this.supplementSendmsgLogDao.queryById(id);
+    }
 
     /**
      * 查询多条数据
@@ -27,15 +41,24 @@ public interface SupplementSendmsgLogService {
      * @param limit 查询条数
      * @return 对象列表
      */
-    List<SupplementSendmsgLog> queryAllByLimit(int offset, int limit);
+
+    public List<SupplementSendmsgLog> queryAllByLimit(int offset, int limit) {
+        return this.supplementSendmsgLogDao.queryAllByLimit(offset, limit);
+    }
 
     /**
      * 新增数据
      *
-     * @param supplementSendmsgLog 实例对象
+     * @param reqVO 实例对象
      * @return 实例对象
      */
-    SupplementSendmsgLog insert(SupplementSendmsgLog supplementSendmsgLog);
+
+    public Integer insert(MessagePushSendReqVO reqVO) {
+        SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
+        BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
+        int insert = this.supplementSendmsgLogDao.insert(supplementSendmsgLog);
+        return insert;
+    }
 
     /**
      * 修改数据
@@ -43,7 +66,11 @@ public interface SupplementSendmsgLogService {
      * @param supplementSendmsgLog 实例对象
      * @return 实例对象
      */
-    SupplementSendmsgLog update(SupplementSendmsgLog supplementSendmsgLog);
+
+    public SupplementSendmsgLog update(SupplementSendmsgLog supplementSendmsgLog) {
+        this.supplementSendmsgLogDao.update(supplementSendmsgLog);
+        return this.queryById(supplementSendmsgLog.getId());
+    }
 
     /**
      * 通过主键删除数据
@@ -51,6 +78,12 @@ public interface SupplementSendmsgLogService {
      * @param id 主键
      * @return 是否成功
      */
-    boolean deleteById(Long id);
 
+    public boolean deleteById(Long id) {
+        return this.supplementSendmsgLogDao.deleteById(id) > 0;
+    }
+
+    public ResponseData<?> selectByPage(BufuMessagePushRecordListReqVO reqVO) {
+        return null;
+    }
 }

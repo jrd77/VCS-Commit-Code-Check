@@ -2,6 +2,7 @@ package com.atzuche.order.admin.mapper.log;
 
 
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author makejava
  * @since 2020-05-18 20:46:28
  */
+@Mapper
 public interface SupplementSendmsgLogDao {
 
     /**
