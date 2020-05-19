@@ -1,14 +1,15 @@
 package com.atzuche.order.admin.service.log;
 
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
 import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogDao;
 import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
 import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
 import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
-import com.autoyol.commons.web.ResponseData;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class SupplementSendmsgLogService {
     @Resource
     private SupplementSendmsgLogDao supplementSendmsgLogDao;
-
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(SupplementSendmsgLogService.class);
     /**
      * 通过ID查询单条数据
      *
@@ -59,6 +60,7 @@ public class SupplementSendmsgLogService {
     public Integer insert(MessagePushSendReqVO reqVO) {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
+        log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
         int insert = this.supplementSendmsgLogDao.insert(supplementSendmsgLog);
         return insert;
     }
