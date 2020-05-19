@@ -4,7 +4,7 @@ package com.atzuche.order.admin.service.log;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
-import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogDao;
+import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogMapper;
 import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
 import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
 import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
@@ -25,7 +25,7 @@ import java.util.List;
 @Service("supplementSendmsgLogService")
 public class SupplementSendmsgLogService {
     @Resource
-    private SupplementSendmsgLogDao supplementSendmsgLogDao;
+    private SupplementSendmsgLogMapper supplementSendmsgLogMapper;
     private static org.slf4j.Logger log = LoggerFactory.getLogger(SupplementSendmsgLogService.class);
     /**
      * 通过ID查询单条数据
@@ -35,7 +35,7 @@ public class SupplementSendmsgLogService {
      */
 
     public SupplementSendmsgLog queryById(Long id) {
-        return this.supplementSendmsgLogDao.queryById(id);
+        return this.supplementSendmsgLogMapper.queryById(id);
     }
 
     /**
@@ -47,7 +47,7 @@ public class SupplementSendmsgLogService {
      */
 
     public List<SupplementSendmsgLog> queryAllByLimit(int offset, int limit) {
-        return this.supplementSendmsgLogDao.queryAllByLimit(offset, limit);
+        return this.supplementSendmsgLogMapper.queryAllByLimit(offset, limit);
     }
 
     /**
@@ -61,7 +61,7 @@ public class SupplementSendmsgLogService {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
         log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
-        int insert = this.supplementSendmsgLogDao.insertSelective(supplementSendmsgLog);
+        int insert = this.supplementSendmsgLogMapper.insertSelective(supplementSendmsgLog);
         return insert;
     }
 
@@ -73,7 +73,7 @@ public class SupplementSendmsgLogService {
      */
 
     public SupplementSendmsgLog update(SupplementSendmsgLog supplementSendmsgLog) {
-        this.supplementSendmsgLogDao.update(supplementSendmsgLog);
+        this.supplementSendmsgLogMapper.update(supplementSendmsgLog);
         return this.queryById(supplementSendmsgLog.getId());
     }
 
@@ -85,13 +85,13 @@ public class SupplementSendmsgLogService {
      */
 
     public boolean deleteById(Long id) {
-        return this.supplementSendmsgLogDao.deleteById(id) > 0;
+        return this.supplementSendmsgLogMapper.deleteById(id) > 0;
     }
 
     public Page<MessagePushRecordListResVO> selectByPage(BufuMessagePushRecordListReqVO reqVO) {
         //开启分页插件
         PageHelper.startPage(reqVO.getPageNum(), reqVO.getPageSize());
-        List<MessagePushRecordListResVO> bufuRecordListByPage = supplementSendmsgLogDao.selectByPage(reqVO);
+        List<MessagePushRecordListResVO> bufuRecordListByPage = supplementSendmsgLogMapper.selectByPage(reqVO);
         return new Page<>(bufuRecordListByPage);
     }
 

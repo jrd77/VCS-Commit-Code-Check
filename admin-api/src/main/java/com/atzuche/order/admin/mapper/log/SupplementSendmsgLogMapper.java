@@ -15,7 +15,7 @@ import java.util.List;
  * @since 2020-05-18 20:46:28
  */
 @Mapper
-public interface SupplementSendmsgLogDao {
+public interface SupplementSendmsgLogMapper {
 
     /**
      * 通过ID查询单条数据
