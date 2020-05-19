@@ -150,4 +150,28 @@
         delete from order_center.supplement_sendmsg_log where id = #{id}
     </delete>
 
+    <select id="selectByPage" parameterType="com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO" resultType="com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO">
+        SELECT
+        id as id,
+        platform as platform,
+        message_type as messageType,
+        mem_role as memRole,
+        content as content,
+        page_mode as pageMode,
+        url as url,
+        event_name as eventName,
+        send_time as sendTime,
+        create_op as createOp
+        FROM order_supplement_sendmsg_log
+        WHERE order_no = #{orderNo}
+        <if test="orderSupplementDetailId != null">
+            and order_supplement_detail_id #{orderSupplementDetailId}
+        </if>
+        <if test="idSort != null">
+            order by order_supplement_detail_id ${idSort}
+        </if>
+        <if test="sendTimeSort != null">
+            order by send_time ${sendTimeSort}
+        </if>
+    </select>
 </mapper>

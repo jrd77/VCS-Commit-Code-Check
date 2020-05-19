@@ -1,11 +1,14 @@
 package com.atzuche.order.admin.service.log;
 
 
+import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
 import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogDao;
 import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
 import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
+import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
 import com.autoyol.commons.web.ResponseData;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -83,7 +86,11 @@ public class SupplementSendmsgLogService {
         return this.supplementSendmsgLogDao.deleteById(id) > 0;
     }
 
-    public ResponseData<?> selectByPage(BufuMessagePushRecordListReqVO reqVO) {
-        return null;
+    public Page<MessagePushRecordListResVO> selectByPage(BufuMessagePushRecordListReqVO reqVO) {
+        //开启分页插件
+        PageHelper.startPage(reqVO.getPageNum(), reqVO.getPageSize());
+        List<MessagePushRecordListResVO> bufuRecordListByPage = supplementSendmsgLogDao.selectByPage(reqVO);
+        return new Page<>(bufuRecordListByPage);
     }
+
 }

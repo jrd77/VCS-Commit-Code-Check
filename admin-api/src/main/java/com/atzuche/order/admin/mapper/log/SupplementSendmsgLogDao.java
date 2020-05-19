@@ -2,6 +2,8 @@ package com.atzuche.order.admin.mapper.log;
 
 
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
+import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
+import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -65,4 +67,5 @@ public interface SupplementSendmsgLogDao {
      */
     int deleteById(Long id);
 
+    List<MessagePushRecordListResVO> selectByPage(BufuMessagePushRecordListReqVO reqVO);
 }
