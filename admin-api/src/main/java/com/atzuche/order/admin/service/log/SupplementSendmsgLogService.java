@@ -8,9 +8,14 @@ import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogMapper;
 import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
 import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
 import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderSupplementPayMq;
 import com.github.pagehelper.PageHelper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,8 +29,12 @@ import java.util.List;
  */
 @Service("supplementSendmsgLogService")
 public class SupplementSendmsgLogService {
-    @Resource
+    @Autowired
     private SupplementSendmsgLogMapper supplementSendmsgLogMapper;
+
+    @Autowired
+    private BaseProducer baseProducer;
+
     private static org.slf4j.Logger log = LoggerFactory.getLogger(SupplementSendmsgLogService.class);
     /**
      * 通过ID查询单条数据
@@ -60,6 +69,15 @@ public class SupplementSendmsgLogService {
     public Integer insert(MessagePushSendReqVO reqVO) {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        OrderSupplementPayMq orderSupplementPayMq= new OrderSupplementPayMq();
+        orderSupplementPayMq.setAmount("100");
+        orderSupplementPayMq.setItem("测试补付项目");
+        orderSupplementPayMq.setOrderNo("92844241500299");
+        orderSupplementPayMq.setRenterMemNo(310140606);
+        orderMessage.setMessage(orderSupplementPayMq);
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.exchange,
+                NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.routingKey, orderMessage);
         log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
         int insert = this.supplementSendmsgLogMapper.insertSelective(supplementSendmsgLog);
         return insert;
