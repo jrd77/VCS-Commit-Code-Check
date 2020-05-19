@@ -94,7 +94,7 @@
         insert into order_center.supplement_sendmsg_log(platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id)
         values (#{platform}, #{messageType}, #{memRole}, #{memNo}, #{orderNo}, #{content}, #{pageMode}, #{url}, #{eventName}, #{param}, #{event}, #{sendTime}, #{createOp}, #{orderSupplementDetailId})
     </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType=" com.atzuche.order.admin.entity.SupplementSendmsgLog" useGeneratedKeys="true">
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.admin.entity.SupplementSendmsgLog" useGeneratedKeys="true">
         insert into supplement_sendmsg_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="platform != null">
