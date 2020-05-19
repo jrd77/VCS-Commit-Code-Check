@@ -37,7 +37,6 @@ import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.RentCosts;
-import com.atzuche.order.commons.vo.res.RenterCostVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,30 +64,21 @@ public class RenterCostFacadeService {
     private OrderConsoleSubsidyDetailService consoleSubsidyDetailService;
     @Autowired
     private ConsoleRenterOrderFineDeatailService consoleRenterOrderFineDeatailService;
-
     @Autowired
     private WzCostFacadeService wzCostFacadeService;
-
     @Autowired
     private CashierQueryService cashierQueryService;
-
     @Autowired
     private SupplementService supplementService;
     @Autowired
     private OrderSettleService orderSettleService;
-
     @Autowired
     private RenterOrderCostService renterOrderCostService;
     @Autowired
     private CashierSettleService cashierSettleService;
     @Autowired
     private RenterDepositDetailService renterDepositDetailService;
-    @Autowired
-    private AccountRenterCostSettleDetailNoTService accountRenterCostSettleService;
-    @Autowired
-    private CashierPayService cashierPayService;
-    @Autowired
-    private AccountRenterDepositNoTService accountRenterDepositNoTService;
+
     @Autowired
     private AccountRenterDepositDetailNoTService accountRenterDepositDetailNoTService;
     @Autowired
@@ -97,8 +87,6 @@ public class RenterCostFacadeService {
     private OrderStatusService orderStatusService;
     @Autowired
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
-    @Autowired
-    private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
     @Autowired
     private OrderConsoleCostHandleService orderConsoleCostHandleService;
     @Autowired
