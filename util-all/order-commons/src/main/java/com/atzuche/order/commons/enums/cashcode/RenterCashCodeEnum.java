@@ -124,6 +124,8 @@ public enum RenterCashCodeEnum {
     SETTLE_WALLET_TO_RENT_COST("11130032","钱包余额转租车费用"),
     SETTLE_WALLET_TO_WZ_COST("11130033","钱包余额转违章费用"),
 
+    TYRE_INSURE_TOTAL_PRICES("11110015","轮胎/轮毂保障费"),
+    DRIVER_INSURE_TOTAL_PRICES("11110016","驾乘无忧保障费"),
     ;
 	
 	/**
