@@ -1,5 +1,7 @@
 package com.atzuche.order.coreapi.listener;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.renterwz.service.RenterOrderWzSettleFlagService;
@@ -40,7 +42,8 @@ public class WzSettleFailListener {
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"WzSettleFailListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderWzSettleFailJson);
-            OrderMessage orderMessage = GsonUtils.convertObj(orderWzSettleFailJson, OrderMessage.class);
+            //OrderMessage orderMessage = GsonUtils.convertObj(orderWzSettleFailJson, OrderMessage.class);
+            OrderMessage orderMessage  = JSONObject.parseObject(orderWzSettleFailJson, OrderMessage.class);
             OrderWzSettlementMq orderWzSettlementMq = (OrderWzSettlementMq)orderMessage.getMessage();
             renterOrderWzSettleFlagService.updateSettle(orderWzSettlementMq.getOrderNo(),0);
             t.setStatus(Transaction.SUCCESS);
