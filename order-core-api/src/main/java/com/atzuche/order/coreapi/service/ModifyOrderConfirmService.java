@@ -21,7 +21,6 @@ import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -92,7 +91,7 @@ public class ModifyOrderConfirmService {
 	@Autowired
 	private OrderSourceStatService orderSourceStatService;
 	@Autowired
-	private SubmitOrderService submitOrderService;
+	private SubmitOrderHandleService submitOrderHandleService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -208,7 +207,7 @@ public class ModifyOrderConfirmService {
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
 		}
 		// 换车更新停运费信息
-		submitOrderService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
+		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
 	}
 	
 	
