@@ -3,6 +3,7 @@ package com.atzuche.order.admin.controller;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.service.log.SupplementSendmsgLogService;
 import com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO;
 import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
@@ -89,7 +90,7 @@ public class AdminSupplementController {
         log.info("查询消息列表开始,bufuMessagePushRecordListReqNewVO:[{}]", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
         try {
-            ResponseData<?> bufuRecordListByPage = supplementSendmsgLogService.selectByPage(reqVO);
+            Page<MessagePushRecordListResVO> bufuRecordListByPage = supplementSendmsgLogService.selectByPage(reqVO);
             log.info("查询消息列表结束,bufuRecordListByPage:[{}]", JSON.toJSONString(bufuRecordListByPage));
             return ResponseData.success(bufuRecordListByPage);
         } catch (Exception e) {
