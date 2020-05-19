@@ -1,5 +1,12 @@
 package com.atzuche.order.commons;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class StringUtil {
 
 
@@ -17,4 +24,30 @@ public class StringUtil {
         }
         return false;
     }
+
+    public static String getURLConnection(String urlStr) {
+        try{
+            URL url = new URL(urlStr);
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setConnectTimeout(3000);
+            httpConn.setDoInput(true);
+            httpConn.setRequestMethod("GET");
+            int respCode = httpConn.getResponseCode();
+            String result = "";
+            if (respCode == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    result += line;
+                }
+            }
+            return result;
+        }catch (MalformedURLException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }
