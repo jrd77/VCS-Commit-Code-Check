@@ -36,15 +36,16 @@ public class WzSettleFailListener {
     @RabbitListener(queues = ORDER_WZ_SETTLEMENT_FAIL_QUEUE, containerFactory="rabbitListenerContainerFactory")
     public void process(Message message) {
         String orderWzSettleFailJson = new String(message.getBody());
+        JSONObject jsonObject = JSON.parseObject(orderWzSettleFailJson);
+        String messageString = jsonObject.getString("message");
         logger.info("WzSettleFailListener process start param;[{}]", orderWzSettleFailJson);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "违章结算失败mq");
 
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"WzSettleFailListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,orderWzSettleFailJson);
-            //OrderMessage orderMessage = GsonUtils.convertObj(orderWzSettleFailJson, OrderMessage.class);
-            OrderMessage orderMessage  = JSONObject.parseObject(orderWzSettleFailJson, OrderMessage.class);
-            OrderWzSettlementMq orderWzSettlementMq = (OrderWzSettlementMq)orderMessage.getMessage();
+            OrderWzSettlementMq orderWzSettlementMq = JSONObject.parseObject(messageString, OrderWzSettlementMq.class);
+            logger.info("Fail orderWzSettlementMq:[{}]",JSON.toJSONString(orderWzSettlementMq));
             renterOrderWzSettleFlagService.updateSettle(orderWzSettlementMq.getOrderNo(),0);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
