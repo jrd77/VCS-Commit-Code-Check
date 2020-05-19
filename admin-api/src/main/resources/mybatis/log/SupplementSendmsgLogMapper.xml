@@ -252,7 +252,7 @@
         event_name as eventName,
         send_time as sendTime,
         create_op as createOp
-        FROM order_supplement_sendmsg_log
+        FROM supplement_sendmsg_log
         WHERE order_no = #{orderNo}
         <if test="orderSupplementDetailId != null">
             and order_supplement_detail_id #{orderSupplementDetailId}
