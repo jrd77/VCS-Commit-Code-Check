@@ -482,12 +482,9 @@ public class SubmitOrderHandleService {
     	if (ownerGoodsDetailDTO == null) {
     		return;
     	}
-    	Integer carRating = ownerGoodsDetailDTO.getCarRating();
-    	if (carRating == null) {
-    		logger.info("计算车辆停运费等信息车辆等级为空");
-    		return;
-    	}
+    	Integer carChargeLevel = ownerGoodsDetailDTO.getCarChargeLevel() == null ? 1:ownerGoodsDetailDTO.getCarChargeLevel();
     	int dayPrice = ownerGoodsDetailDTO.getDayPrice() == null ? 0:ownerGoodsDetailDTO.getDayPrice();
+    	logger.info("保存车辆停运费比例及单价saveOrderStopFreightInfo orderNo=[{}],carChargeLevel=[{}],dayPrice=[{}]",orderNo,carChargeLevel,dayPrice);
     	List<CarChargeLevelConfigEntity> list = carChargeLevelConfigSDK.getConfig(new DefaultConfigContext());
     	logger.info("carChargeLevelConfigSDK获取停运费配置信息list={}", JSON.toJSONString(list));
     	// 协议厂停运费比例
@@ -495,7 +492,7 @@ public class SubmitOrderHandleService {
 		// 非协议厂停运费比例
 		Integer notagreementStopFreightRate = 0;
     	for (CarChargeLevelConfigEntity cclc:list) {
-    		if (cclc != null && carRating.equals(cclc.getLevel())) {
+    		if (cclc != null && carChargeLevel.equals(cclc.getLevel())) {
     			// 协议厂停运费比例
     			agreementStopFreightRate = cclc.getAgreementStopFreightRate();
     			// 非协议厂停运费比例

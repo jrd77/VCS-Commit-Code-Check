@@ -323,4 +323,6 @@ public class OwnerGoodsDetailDTO {
     
     // 车辆平日价
     private Integer dayPrice;
+    // car_charge_level表的车辆等级
+    private Integer carChargeLevel;
 }

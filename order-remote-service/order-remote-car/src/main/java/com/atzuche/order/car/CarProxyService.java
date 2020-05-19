@@ -182,6 +182,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setDayPrice(carBaseVO.getDayPrice());
         renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
         renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
+        renterGoodsDetailDto.setCarChargeLevel(carChargeLevelVO.getCarLevel());
         renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
         renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
