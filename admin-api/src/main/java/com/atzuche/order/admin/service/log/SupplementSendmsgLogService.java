@@ -61,7 +61,7 @@ public class SupplementSendmsgLogService {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
         log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
-        int insert = this.supplementSendmsgLogDao.insert(supplementSendmsgLog);
+        int insert = this.supplementSendmsgLogDao.insertSelective(supplementSendmsgLog);
         return insert;
     }
 

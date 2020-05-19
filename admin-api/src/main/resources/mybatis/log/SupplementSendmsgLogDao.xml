@@ -94,7 +94,97 @@
         insert into order_center.supplement_sendmsg_log(platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id)
         values (#{platform}, #{messageType}, #{memRole}, #{memNo}, #{orderNo}, #{content}, #{pageMode}, #{url}, #{eventName}, #{param}, #{event}, #{sendTime}, #{createOp}, #{orderSupplementDetailId})
     </insert>
-
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType=" com.atzuche.order.admin.entity.SupplementSendmsgLog" useGeneratedKeys="true">
+        insert into supplement_sendmsg_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="platform != null">
+                platform,
+            </if>
+            <if test="messageType != null">
+                message_type,
+            </if>
+            <if test="memRole != null">
+                mem_role,
+            </if>
+            <if test="memNo != null">
+                mem_no,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="pageMode != null">
+                page_mode,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="eventName != null">
+                event_name,
+            </if>
+            <if test="param != null">
+                param,
+            </if>
+            <if test="event != null">
+                event,
+            </if>
+            <if test="sendTime != null">
+                send_time,
+            </if>
+            <if test="createOp != null">
+                create_op,
+            </if>
+            <if test="orderSupplementDetailId != null">
+                order_supplement_detail_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="platform != null">
+                #{platform,jdbcType=INTEGER},
+            </if>
+            <if test="messageType != null">
+                #{messageType,jdbcType=VARCHAR},
+            </if>
+            <if test="memRole != null">
+                #{memRole,jdbcType=INTEGER},
+            </if>
+            <if test="memNo != null">
+                #{memNo,jdbcType=BIGINT},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo,jdbcType=BIGINT},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="pageMode != null">
+                #{pageMode,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="eventName != null">
+                #{eventName,jdbcType=VARCHAR},
+            </if>
+            <if test="param != null">
+                #{param,jdbcType=VARCHAR},
+            </if>
+            <if test="event != null">
+                #{event,jdbcType=INTEGER},
+            </if>
+            <if test="sendTime != null">
+                #{sendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createOp != null">
+                #{createOp,jdbcType=VARCHAR},
+            </if>
+            <if test="orderSupplementDetailId != null">
+                #{orderSupplementDetailId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
     <!--通过主键修改数据-->
     <update id="update">
         update order_center.supplement_sendmsg_log

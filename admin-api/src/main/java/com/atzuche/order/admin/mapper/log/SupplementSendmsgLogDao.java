@@ -66,6 +66,13 @@ public interface SupplementSendmsgLogDao {
      * @return 影响行数
      */
     int deleteById(Long id);
+    /**
+     * 新增数据
+     *
+     * @param supplementSendmsgLog 实例对象
+     * @return 影响行数
+     */
+    int insertSelective(SupplementSendmsgLog supplementSendmsgLog);
 
     List<MessagePushRecordListResVO> selectByPage(BufuMessagePushRecordListReqVO reqVO);
 }
