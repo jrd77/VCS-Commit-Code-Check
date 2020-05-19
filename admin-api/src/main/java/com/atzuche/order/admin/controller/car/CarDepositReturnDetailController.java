@@ -5,6 +5,7 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.dto.convert.CarDepositDetainOptLogDTO;
 import com.atzuche.order.admin.dto.convert.ConvertUtil;
+import com.atzuche.order.admin.dto.log.AdminOperateLogDTO;
 import com.atzuche.order.admin.entity.AdminOperateLogEntity;
 import com.atzuche.order.admin.mapper.log.QueryVO;
 import com.atzuche.order.admin.service.CarDepositReturnDetailService;
@@ -88,7 +89,6 @@ public class CarDepositReturnDetailController {
                 AdminUserUtil.getAdminUser().getAuthName(), JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
         return remoteFeignService.getTempCarDepoistsFromRemote(reqVO);
-        //return feignOrderCostService.getTempCarDepoists(reqVO);
     }
 
 
@@ -107,14 +107,11 @@ public class CarDepositReturnDetailController {
         //拉取存储数据
         GetTempCarDepositInfoReqVO infoReqVO = new GetTempCarDepositInfoReqVO();
         infoReqVO.setOrderNo(reqVO.getOrderNo());
-        infoReqVO.setMemNo(reqVO.getMemNo());
-        //ResponseData<GetTempCarDepositInfoResVO> res = feignOrderCostService.getTempCarDepoists(infoReqVO);
         ResponseData<GetTempCarDepositInfoResVO> res = remoteFeignService.getTempCarDepoistsFromRemote(infoReqVO);
         //更新数据
         SaveTempCarDepositInfoReqVO req = new SaveTempCarDepositInfoReqVO();
         BeanUtils.copyProperties(reqVO, req);
         req.setOperatorName(AdminUserUtil.getAdminUser().getAuthName());
-        //ResponseData responseData = feignOrderCostService.saveTempCarDepoist(req);
         ResponseData responseData = remoteFeignService.saveTempCarDepoistsFromRemote(req);
         if (Objects.nonNull(responseData) && StringUtils.equals(responseData.getResCode(),
                 ErrorCode.SUCCESS.getCode())) {
@@ -139,7 +136,7 @@ public class CarDepositReturnDetailController {
      * @return ResponseData
      */
     @GetMapping("/console/get/carDpoist/log")
-    public ResponseData<List<AdminOperateLogEntity>> getTempCarDepoistOptLog(@RequestParam("orderNo") String orderNo) {
+    public ResponseData<List<AdminOperateLogDTO>> getTempCarDepoistOptLog(@RequestParam("orderNo") String orderNo) {
         QueryVO vo = new QueryVO();
         vo.setOrderNo(orderNo);
         vo.setOpType(AdminOpTypeEnum.TEMPORARY_CAR_DEPOSIT.getOpCode());
