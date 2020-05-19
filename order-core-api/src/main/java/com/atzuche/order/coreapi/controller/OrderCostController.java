@@ -9,6 +9,7 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.AccountDepositException;
@@ -48,12 +49,15 @@ import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.acl.Owner;
 import java.util.List;
 
 /**
@@ -233,6 +237,7 @@ public class OrderCostController {
 	@PostMapping("/order/cost/owner/get")
 	public ResponseData<OrderOwnerCostResVO> orderCostOwnerGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("车主子订单费用详细 orderCostOwnerGet params=[{}]", req.toString());
+
 		BindingResultUtil.checkBindingResult(bindingResult);
         OwnerOrderEntity ownerOrderEntity = null;
         if(StringUtils.isNotBlank(req.getSubOrderNo())) {
@@ -242,7 +247,12 @@ public class OrderCostController {
                 throw new OwnerOrderNotFoundException(ownerOrderEntity.getOwnerOrderNo());
             }
         }
+        OwnerOrderDTO ownerOrderDTO = new OwnerOrderDTO();
+        BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
+
+        req.setMemNo(ownerOrderEntity.getMemNo());
 		OrderOwnerCostResVO resVo = orderCostService.orderCostOwnerGet(req);
+        resVo.setOwnerOrderDTO(ownerOrderDTO);
 		return ResponseData.success(resVo);
 
 	}
@@ -327,7 +337,7 @@ public class OrderCostController {
      * @param renterOrderNo
      */
     @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
-	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo){
+	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam(value="renterOrderNo",required=false) String renterOrderNo){
     	RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo);
     	return ResponseData.success(renterAndConsoleSubsidyVO);
     }

@@ -730,11 +730,14 @@ public class OrderCostService {
 	      OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
 	      // 管理后台补贴
 		  List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
-		  // 租客子订单补贴
-		  List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo); 
+		  
 		  RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
 		  renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
-		  renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
+		  if (StringUtils.isNotBlank(renterOrderNo)) {
+			  // 租客子订单补贴
+			  List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo); 
+			  renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
+		  }
 		  return renterAndConsoleSubsidyVO;
 	}
 	

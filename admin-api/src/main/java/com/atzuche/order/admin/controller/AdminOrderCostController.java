@@ -58,7 +58,7 @@ public class AdminOrderCostController {
     private AdminDeliveryCarService deliveryCarInfoService;
     
 	@AutoDocMethod(description = "计算租客子订单费用", value = "计算租客子订单费用", response = OrderRenterCostResVO.class)
-	@RequestMapping(value="calculateRenterOrderCost",method = RequestMethod.POST)
+	@RequestMapping(value="/calculateRenterOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateRenterOrderCost(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCost controller params={}",renterCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -98,7 +98,7 @@ public class AdminOrderCostController {
 	}
 
     @AutoDocMethod(description = "长租-计算租客子订单费用", value = "长租-计算租客子订单费用", response = OrderRenterCostResVO.class)
-    @RequestMapping(value="calculateRenterOrderCostLongRent",method = RequestMethod.POST)
+    @RequestMapping(value="/calculateRenterOrderCostLongRent",method = RequestMethod.POST)
     public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
         if (bindingResult.hasErrors()) {
@@ -117,7 +117,7 @@ public class AdminOrderCostController {
 
     }
 	@AutoDocMethod(description = "计算车主子订单费用", value = "计算车主子订单费用", response = OrderOwnerCostResVO.class)
-	@RequestMapping(value="calculateOwnerOrderCost",method = RequestMethod.POST)
+	@RequestMapping(value="/calculateOwnerOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateOwnerOrderCost(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
 		if (bindingResult.hasErrors()) {
@@ -137,7 +137,7 @@ public class AdminOrderCostController {
 		
 	}
     @AutoDocMethod(description = "长租-计算车主子订单费用", value = "长租-计算车主子订单费用", response = OrderOwnerCostResVO.class)
-    @RequestMapping(value="calculateOwnerOrderCostLong",method = RequestMethod.POST)
+    @RequestMapping(value="/calculateOwnerOrderCostLong",method = RequestMethod.POST)
     public ResponseData calculateOwnerOrderCostLong(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
         if (bindingResult.hasErrors()) {

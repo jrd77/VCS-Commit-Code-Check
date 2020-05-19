@@ -3,6 +3,8 @@ package com.atzuche.order.cashieraccount.vo.req;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
+import lombok.ToString;
+
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  * @author haibao.yan
  */
 @Data
+@ToString
 public class CashierRefundApplyReqVO {
 
     /**

@@ -827,8 +827,9 @@ public class RemoteFeignService {
 
     /**
      * 根据订单号获取车牌号
-     * @param modifyOrderReq
-     * @return ModifyOrderConsoleDTO
+     *
+     * @param orderNo
+     * @return String
      */
     public String getCarPlateNum(String orderNo) {
         ResponseData<String> responseObject = null;

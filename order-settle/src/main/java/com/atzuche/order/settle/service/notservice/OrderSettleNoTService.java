@@ -49,6 +49,7 @@ import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineS
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
@@ -1381,7 +1382,17 @@ public class OrderSettleNoTService {
                     cashierService.refundRentCost(cashierRefundApplyReqs.get(i));
                 }
             }
-            orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            Integer payLine = null;
+            if (cashierRefundApplyReqs != null && cashierRefundApplyReqs.get(0) != null) {
+            	payLine = cashierRefundApplyReqs.get(0).getPayLine();
+            }
+            // 0-线上支付，1-线下支付，2-虚拟支付
+            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+            	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            } else {
+            	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
         }
         //4 车辆押金退还
         if(settleCancelOrdersAccount.getRentSurplusDepositAmt()>0){
@@ -1402,8 +1413,14 @@ public class OrderSettleNoTService {
             	//退货
             	cashierService.refundDepositPurchase(settleCancelOrdersAccount.getRentSurplusDepositAmt(), cashierEntity, cashierRefundApply,RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
             }
-            
-            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            Integer payLine = cashierRefundApply.getPayLine();
+            // 0-线上支付，1-线下支付，2-虚拟支付
+            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            } else {
+            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
         }
         // 5 违章押金退还
         if(settleCancelOrdersAccount.getRentSurplusWzDepositAmt()>0){
@@ -1420,8 +1437,14 @@ public class OrderSettleNoTService {
             	//退货
             	cashierService.refundWzDepositPurchase(settleCancelOrdersAccount.getRentSurplusWzDepositAmt(), cashierEntity, cashierRefundApply,RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
             }
-            
-            orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            Integer payLine = cashierRefundApply.getPayLine();
+            // 0-线上支付，1-线下支付，2-虚拟支付
+            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+            	orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            } else {
+            	orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
         }
     }
 

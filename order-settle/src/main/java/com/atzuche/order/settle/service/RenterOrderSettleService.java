@@ -9,6 +9,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReq
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
@@ -81,6 +82,10 @@ public class RenterOrderSettleService {
             if(renterOrder == null){
                 log.error("车租客子订单获取为空 renterOrderNo={}",renterOrderNo);
                 throw new RenterOrderNotFoundException(renterOrderNo);
+            }
+            if(RenterChildStatusEnum.SETTLED.getCode() ==  renterOrder.getChildStatus()){
+                log.info("租客子订单号renterOrderNo={}已经结算过",renterOrderNo);
+                return;
             }
             //1、获取子订单信息
             SettleOrders settleOrders = new SettleOrders();

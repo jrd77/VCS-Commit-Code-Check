@@ -37,6 +37,7 @@ import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
@@ -292,7 +293,17 @@ public class OrderSettleNewService {
                     int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
                     // 计算剩余待退
                     rentCostSurplusAmt = rentCostSurplusAmt+returnAmt;
-                    orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+                    Integer payLine = null;
+                    if (cashierRefundApplyReqs != null && cashierRefundApplyReqs.get(0) != null) {
+                    	payLine = cashierRefundApplyReqs.get(0).getPayLine();
+                    }
+                    // 0-线上支付，1-线下支付，2-虚拟支付
+                    if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+                    		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+                    	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+                    } else {
+                    	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+                    }
                 }
             }
 
@@ -375,7 +386,14 @@ public class OrderSettleNewService {
             entity.setCostDetail(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(id));
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
-            orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            Integer payLine = cashierRefundApply.getPayLine();
+            // 0-线上支付，1-线下支付，2-虚拟支付
+            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
+            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
+            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            } else {
+            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+            }
 
         }
 

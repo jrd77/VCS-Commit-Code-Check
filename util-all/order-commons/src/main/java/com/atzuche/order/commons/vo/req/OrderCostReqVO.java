@@ -19,7 +19,7 @@ public class OrderCostReqVO {
 	@AutoDocProperty(value="订单编号,必填，",required=true)
 	private String orderNo;
 	
-	@NotBlank(message="memNo不能为空")
+	//@NotBlank(message="memNo不能为空")
 	@AutoDocProperty(value="memNo,必填，",required=true)
 	private String memNo;
 	

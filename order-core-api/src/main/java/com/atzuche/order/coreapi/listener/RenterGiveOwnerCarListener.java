@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.listener;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.coreapi.service.DeRunService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
@@ -36,13 +37,15 @@ public class RenterGiveOwnerCarListener {
     @RabbitListener(queues = ORDER_PRESETTLEMENT_QUEUE , containerFactory="rabbitListenerContainerFactory")
     public void process(Message message) {
         String renterGiveOwnerCarJson = new String(message.getBody());
+        JSONObject jsonObject = JSON.parseObject(renterGiveOwnerCarJson);
+        String messageString = jsonObject.getString("message");
         logger.info("RenterGiveOwnerCarListener process start param;[{}]", renterGiveOwnerCarJson);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "租客还车告知德润MQ");
 
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD,"RenterGiveOwnerCarListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM,renterGiveOwnerCarJson);
-            OrderStatusMq orderStatusMq = JSON.parseObject(renterGiveOwnerCarJson, OrderStatusMq.class);
+            OrderStatusMq orderStatusMq = JSON.parseObject(messageString, OrderStatusMq.class);
             deRunService.changeRentStatus(orderStatusMq.getOrderNo(),0);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {

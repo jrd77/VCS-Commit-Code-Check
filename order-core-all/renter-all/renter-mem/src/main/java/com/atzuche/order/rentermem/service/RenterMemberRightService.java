@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,7 +60,7 @@ public class RenterMemberRightService{
             return memRightCarDepositAmtRespDTO;
         }
         //企业用户
-        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
         log.info("会员权益-企业用户权益-renterMemberRightDTO={}", JSON.toJSONString(renterMemberRightDTO));
         if(renterMemberRightDTO != null){
             if(memRightCarDepositAmtReqDTO.getOrderCategory()!= null &&
@@ -125,7 +126,7 @@ public class RenterMemberRightService{
             throw calWzDepositAmtException;
         }
         //企业用户
-        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, MemberFlagEnum.QYYH, "1");
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOList, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
         if(renterMemberRightDTO != null){
             if(orderCategory!= null && (orderCategory.equals(CategoryEnum.ORDINARY.getCode()) || orderCategory.equals(CategoryEnum.LONG_ORDER.getCode()))){
                 return GlobalConstant.MEMBER_RIGHT_QYYH_WZ_DEPOSIT;
