@@ -74,5 +74,6 @@ dependencies {
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
+    compile project(":order-mq")
 
 }
