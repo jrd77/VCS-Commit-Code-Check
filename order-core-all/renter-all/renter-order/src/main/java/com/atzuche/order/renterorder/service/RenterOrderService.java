@@ -243,6 +243,8 @@ public class RenterOrderService {
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
         record.setCreateOp(renterOrderReqVO.getOperator());
         record.setChangeSource(renterOrderReqVO.getChangeSource());
+        record.setTyreInsurFlag(renterOrderReqVO.getTyreInsurFlag());
+        record.setDriverInsurFlag(renterOrderReqVO.getDriverInsurFlag());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());

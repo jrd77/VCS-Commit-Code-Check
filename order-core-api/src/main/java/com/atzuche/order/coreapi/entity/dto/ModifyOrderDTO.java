@@ -169,4 +169,12 @@ public class ModifyOrderDTO {
      * 长租优惠券码
      */
     private String longCouponCode;
+    /**
+	 * 是否购买轮胎保障服务
+	 */
+	private Integer tyreInsurFlag;
+	/**
+	 * 是否购买驾乘无忧保障服务
+	 */
+	private Integer driverInsurFlag;
 }

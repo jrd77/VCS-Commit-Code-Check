@@ -145,5 +145,10 @@ public class RenterOrderDTO implements Serializable {
 
         @AutoDocProperty(value = "订单是否查看,1:是，0：否")
         private Integer seeFlag;
+        
+        @AutoDocProperty(value = "是否购买轮胎保障服务 0-不购买，1-购买")
+    	private Integer tyreInsurFlag;
+        @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
+    	private Integer driverInsurFlag;
     					
 }

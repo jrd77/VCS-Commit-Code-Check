@@ -12,7 +12,9 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
+import com.atzuche.order.commons.enums.BuyInsurKeyEnum;
 import com.atzuche.order.commons.vo.DebtDetailVO;
+import com.atzuche.order.commons.vo.req.ModifyInsurFlagVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -83,6 +85,43 @@ public class AdminOrderController {
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         //adminOrderService.modifyOrder(modifyOrderReqVO);
+        remoteFeignService.modifyOrder(modifyOrderReqVO);
+        return ResponseData.success();
+    }
+    
+    
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "修改是否购买保费", value = "修改是否购买保费",response = ResponseData.class)
+    @RequestMapping(value="console/order/modifyinsurflag",method = RequestMethod.POST)
+    public ResponseData modifyInsurFlag(@RequestBody ModifyInsurFlagVO modifyInsurFlagVO, BindingResult bindingResult)throws Exception{
+        log.info("修改是否购买保费-modifyInsurFlagVO={}", modifyInsurFlagVO);
+        if (bindingResult.hasErrors()) {
+            Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
+            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), error.isPresent() ?
+                    error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
+        }
+        String orderNo = modifyInsurFlagVO.getOrderNo();
+        ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
+
+        OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
+        String  memNo = detailRespDTO.getRenterMember().getMemNo();
+        ModifyOrderReqVO modifyOrderReqVO = new ModifyOrderReqVO();
+        modifyOrderReqVO.setOrderNo(orderNo);
+        modifyOrderReqVO.setMemNo(memNo);
+        modifyOrderReqVO.setConsoleFlag(true);
+        modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
+        if (BuyInsurKeyEnum.ABATEMENTFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+        	modifyOrderReqVO.setAbatementFlag(modifyInsurFlagVO.getBuyValue());
+        } else if (BuyInsurKeyEnum.TYREINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+        	modifyOrderReqVO.setTyreInsurFlag(modifyInsurFlagVO.getBuyValue());
+        	Integer abatementFlag = detailRespDTO.getRenterOrder().getIsAbatement();
+        	if (abatementFlag == null || !abatementFlag.equals(1)) {
+        		return ResponseData.createErrorCodeResponse("601234", "不能单独购买轮胎/轮毂保障服务，必须同时购买补充保障服务。");
+        	}
+        } else if (BuyInsurKeyEnum.DRIVERINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+        	modifyOrderReqVO.setDriverInsurFlag(modifyInsurFlagVO.getBuyValue());
+        }
         remoteFeignService.modifyOrder(modifyOrderReqVO);
         return ResponseData.success();
     }
