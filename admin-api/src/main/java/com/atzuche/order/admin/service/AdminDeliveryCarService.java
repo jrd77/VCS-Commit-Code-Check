@@ -3,6 +3,7 @@ package com.atzuche.order.admin.service;
 import com.atzuche.order.admin.filter.CityLonLatFilter;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.enums.DeliveryErrorCode;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
@@ -34,6 +35,8 @@ public class AdminDeliveryCarService {
     private DeliveryRemoteService deliveryRemoteService;
     @Autowired
     private RemoteFeignService remoteFeignService;
+    @Autowired
+    private ModificationOrderService modificationOrderService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,8 +90,9 @@ public class AdminDeliveryCarService {
         orderReqVo.setSrvReturnAddr(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnAddr());
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
+        // 获取修改前数据
+  		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(createModifyOrderInfoParams(deliveryCarVO));
         try {
-
             ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
         } catch (OrderException e) {
             if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("400504")) {
@@ -96,6 +100,8 @@ public class AdminDeliveryCarService {
                 throw new DeliveryOrderException(e.getErrorCode(), e.getErrorMsg());
             }
         }
+        // 保存操作日志
+        modificationOrderService.saveModifyOrderLog(createModifyOrderInfoParams(deliveryCarVO), modifyOrderConsoleDTO);
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if (Objects.nonNull(ownerTransAddressReqVO)) {
             try {

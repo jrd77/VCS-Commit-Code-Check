@@ -304,7 +304,7 @@ public class CashierNoTService {
 		}
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   //考虑到带小数点的情况。
 			//预授权方式
-			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Double.valueOf(notifyDataVo.getSettleAmount()).intValue();
 		    vo.setAuthorizeDepositAmt(settleAmount);
 		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
 		    vo.setIsAuthorize(1); //普通预授权
@@ -313,19 +313,19 @@ public class CashierNoTService {
 			vo.setIsAuthorize(2);
 			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  
 				//全部按信用支付
-				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Double.valueOf(notifyDataVo.getSettleAmount()).intValue();
 		        vo.setCreditPayAmt(settleAmount);
 		        vo.setSurplusCreditPayAmt(settleAmount);
 			}else {
 				//一半一半的情况，转换成整数。
-				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeFundAmount());
+				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).intValue();
 //		        vo.setShifuDepositAmt(fundAmount);
 //		        vo.setSurplusDepositAmt(fundAmount);
 				//存在一半一半的情况，预授权和信用是共存的， 信用和资金预授权是共存的。!!
 		        vo.setAuthorizeDepositAmt(fundAmount);
 			    vo.setSurplusAuthorizeDepositAmt(fundAmount);
 		        
-		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeCreditAmount());
+		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).intValue();
 		        vo.setCreditPayAmt(creditAmount);
 		        vo.setSurplusCreditPayAmt(creditAmount);
 			}
@@ -508,26 +508,26 @@ public class CashierNoTService {
 		
 		if(Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).doubleValue() == 0d) {   
 			//预授权方式
-			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+			Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Double.valueOf(notifyDataVo.getSettleAmount()).intValue();
 		    vo.setAuthorizeDepositAmt(settleAmount);
 		    vo.setSurplusAuthorizeDepositAmt(settleAmount);
 		    vo.setIsAuthorize(1);
 		}else {  //存在信用支付的方式
 			vo.setIsAuthorize(2);
 			if(Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).doubleValue() == 0d) {  //全部按信用支付
-				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
+				Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Double.valueOf(notifyDataVo.getSettleAmount()).intValue();
 		        vo.setCreditPayAmt(settleAmount);
 		        vo.setSurplusCreditPayAmt(settleAmount);
 			}else {
 				//一半一半的情况
-				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeFundAmount());
+				Integer fundAmount = notifyDataVo.getTotalFreezeFundAmount()==null?0:Double.valueOf(notifyDataVo.getTotalFreezeFundAmount()).intValue();
 //		        vo.setShishouDeposit(fundAmount);
 //		        vo.setSurplusDepositAmt(fundAmount);
 				//存在一半一半的情况，预授权和信用是共存的， 信用和资金预授权是共存的。!!
 		        vo.setAuthorizeDepositAmt(fundAmount);
 			    vo.setSurplusAuthorizeDepositAmt(fundAmount);
 		        
-		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Integer.parseInt(notifyDataVo.getTotalFreezeCreditAmount());
+		        Integer creditAmount = notifyDataVo.getTotalFreezeCreditAmount()==null?0:Double.valueOf(notifyDataVo.getTotalFreezeCreditAmount()).intValue();
 		        vo.setCreditPayAmt(creditAmount);
 		        vo.setSurplusCreditPayAmt(creditAmount);
 		        

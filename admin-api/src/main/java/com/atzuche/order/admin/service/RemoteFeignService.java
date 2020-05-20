@@ -56,7 +56,28 @@ public class RemoteFeignService {
     FeignOrderModifyService feignOrderModifyService;
     @Autowired
     FeignModifyOwnerAddrService feignModifyOwnerAddrService;
-    
+
+    public OrderStatusDTO queryOrderStatusByOrderNo(String orderNo){
+        ResponseData<OrderStatusDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "根据订单号查询订单状态");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.queryOrderStatusByOrderNo");
+            log.info("Feign 根据订单号查询订单状态,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignOrderService.queryOrderStatusByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 根据订单号查询订单状态异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 根据订单号查询订单状态异常",e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 10:38
@@ -78,10 +99,10 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 获取主订单信息异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取主订单信息异常",e);
-            throw e;
         }finally {
             t.complete();
         }
+        return null;
     }
 
     /*
@@ -499,7 +520,7 @@ public class RemoteFeignService {
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.getTempCarDepoists");
             log.info("Feign 开始获取订单车辆押金暂扣扣款明细接口req={}", JSON.toJSONString(req));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(req));
-            feignOrderCostService.getTempCarDepoists(req);
+            responseObject = feignOrderCostService.getTempCarDepoists(req);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
@@ -801,4 +822,116 @@ public class RemoteFeignService {
         return null;
     }
     
+
+    /**
+     * 获取修改前数据
+     * @param modifyOrderReq
+     * @return ModifyOrderConsoleDTO
+     */
+    public ModifyOrderConsoleDTO getInitModifyOrderDTO(ModifyOrderReqVO modifyOrderReq) {
+        ResponseData<ModifyOrderConsoleDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取修改前数据");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderModifyService.getInitModifyOrderDTO");
+            log.info("Feign 获取修改前数据,modifyOrderReq={}", JSON.toJSONString(modifyOrderReq));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(modifyOrderReq));
+            responseObject = feignOrderModifyService.getInitModifyOrderDTO(modifyOrderReq);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取修改前数据异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
+            Cat.logError("Feign 获取修改前数据异常",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据订单号获取车牌号
+     *
+     * @param orderNo
+     * @return String
+     */
+    public String getCarPlateNum(String orderNo) {
+        ResponseData<String> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "根据订单号获取车牌号");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderModifyService.getCarPlateNum");
+            log.info("Feign 根据订单号获取车牌号,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignOrderModifyService.getCarPlateNum(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 根据订单号获取车牌号异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 根据订单号获取车牌号异常",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/11 16:58
+     * @Description: 获取优惠券信息
+     *
+     **/
+    public List<OrderCouponDTO> queryCouponByOrderNoFromRemote(String orderNo){
+        ResponseData<List<OrderCouponDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取优惠券信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.orderCostOwnerGet");
+            log.info("Feign 获取优惠券信息,orderNo={}", JSON.toJSONString(orderNo));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderNo));
+            responseObject =feignOrderCouponService.queryCouponByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取优惠券信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取优惠券信息异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/15 11:42
+     * @Description: 查询车主补贴
+     *
+     **/
+    public List<OwnerOrderSubsidyDetailDTO> queryOwnerSubsidyByownerOrderNo(String orderNo,String ownerOrderNo){
+        ResponseData<List<OwnerOrderSubsidyDetailDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "查询车主补贴");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignPaymentService.queryrenterDepositDetail");
+            log.info("Feign 查询车主补贴orderNo={},ownerOrderNo={}", orderNo,ownerOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject = feignBusinessService.queryOwnerSubsidyByownerOrderNo(orderNo,ownerOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 查询车主补贴,responseObject={},orderNo={},ownerOrderNo={}",JSON.toJSONString(responseObject),orderNo,ownerOrderNo,e);
+            Cat.logError("Feign 查询车主补贴",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 }
