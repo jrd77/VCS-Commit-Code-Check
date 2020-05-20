@@ -151,5 +151,14 @@ public class RenterOrderEntity implements Serializable {
      * 需补付金额
      */
     private Integer supplementAmt;
+    
+    /**
+	 * 是否购买轮胎保障服务
+	 */
+	private Integer tyreInsurFlag;
+	/**
+	 * 是否购买驾乘无忧保障服务
+	 */
+	private Integer driverInsurFlag;
 
 }

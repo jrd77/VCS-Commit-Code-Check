@@ -105,6 +105,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setCarShowLon(goodsDetail.getCarShowLon());
         renterOrderReqVO.setCarRealLat(goodsDetail.getCarRealLat());
         renterOrderReqVO.setCarRealLon(goodsDetail.getCarRealLon());
+        renterOrderReqVO.setSeatNum(goodsDetail.getSeatNum());
 
         RenterMemberDTO renterMember = reqContext.getRenterMemberDto();
         renterOrderReqVO.setCertificationTime(renterMember.getCertificationTime());

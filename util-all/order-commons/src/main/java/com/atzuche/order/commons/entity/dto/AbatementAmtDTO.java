@@ -41,4 +41,8 @@ public class AbatementAmtDTO {
      * 是否计算全面保障费
      */
 	private Boolean isAbatement;
+	/**
+	 * 驾驶行为评分
+	 */
+	private Integer driverScore;
 }

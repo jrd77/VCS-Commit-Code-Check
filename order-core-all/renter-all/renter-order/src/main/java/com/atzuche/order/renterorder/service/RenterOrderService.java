@@ -325,6 +325,10 @@ public class RenterOrderService {
         insurAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
         insurAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         insurAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
+        insurAmtDTO.setDriverScore(renterOrderReqVO.getDriverScore());
+        insurAmtDTO.setSeatNum(renterOrderReqVO.getSeatNum());
+        insurAmtDTO.setTyreInsurFlag(renterOrderReqVO.getTyreInsurFlag());
+        insurAmtDTO.setDriverInsurFlag(renterOrderReqVO.getDriverInsurFlag());
 
         //补充全险计算相关信息
         AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
@@ -336,6 +340,7 @@ public class RenterOrderService {
         abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
         abatementAmtDTO.setIsAbatement(null != renterOrderReqVO.getAbatement() && renterOrderReqVO.getAbatement() == 1 );
+        abatementAmtDTO.setDriverScore(renterOrderReqVO.getDriverScore());
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();

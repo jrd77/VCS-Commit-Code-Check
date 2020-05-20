@@ -214,6 +214,15 @@ public class OrderReqVO extends BaseVO {
      * 来源
      */
     private String changeSource;
+    
+    /**
+	 * 是否购买轮胎保障服务
+	 */
+	private Integer tyreInsurFlag;
+	/**
+	 * 是否购买驾乘无忧保障服务
+	 */
+	private Integer driverInsurFlag;
 
     public LocalDateTime getReqTime() {
         return reqTime;
@@ -678,4 +687,21 @@ public class OrderReqVO extends BaseVO {
     public void setLongOwnerCouponNo(String longOwnerCouponNo) {
         this.longOwnerCouponNo = longOwnerCouponNo;
     }
+
+	public Integer getTyreInsurFlag() {
+		return tyreInsurFlag;
+	}
+
+	public void setTyreInsurFlag(Integer tyreInsurFlag) {
+		this.tyreInsurFlag = tyreInsurFlag;
+	}
+
+	public Integer getDriverInsurFlag() {
+		return driverInsurFlag;
+	}
+
+	public void setDriverInsurFlag(Integer driverInsurFlag) {
+		this.driverInsurFlag = driverInsurFlag;
+	}
+    
 }

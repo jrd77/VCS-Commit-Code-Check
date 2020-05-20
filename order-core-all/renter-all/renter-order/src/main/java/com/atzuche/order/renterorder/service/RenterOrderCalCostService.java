@@ -134,6 +134,20 @@ public class RenterOrderCalCostService {
             subsidyList.addAll(comprehensiveEnsureSubsidy);
         }
         LOGGER.info("租客费用-获取全面保障费-comprehensiveEnsureAmount=[{}]", comprehensiveEnsureAmount);
+        
+        //获取轮胎/轮毂保障费
+        RenterOrderCostDetailEntity tyreInsurAmtEntity = renterOrderCostCombineService.getTyreInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
+        if (tyreInsurAmtEntity != null) {
+        	detailList.add(tyreInsurAmtEntity);
+            LOGGER.info("租客轮胎/轮毂保障费-tyreInsurAmt=[{}]", tyreInsurAmtEntity.getTotalAmount());
+        }
+        
+        //获取驾乘无忧保障费
+        RenterOrderCostDetailEntity driverInsurAmtEntity = renterOrderCostCombineService.getDriverInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
+        if (driverInsurAmtEntity != null) {
+        	detailList.add(driverInsurAmtEntity);
+            LOGGER.info("获取驾乘无忧保障费-driverInsurAmt=[{}]", driverInsurAmtEntity.getTotalAmount());
+        }
 
         //获取附加驾驶人保险金额
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());

@@ -272,6 +272,21 @@ public class RenterOrderReqVO implements Serializable {
      * 来源
      */
     private String changeSource;
-
+    /**
+	 * 驾驶行为评分
+	 */
+	private Integer driverScore;
+    /**
+     * 座位数
+     */
+    private Integer seatNum;
+    /**
+	 * 是否购买轮胎保障服务
+	 */
+	private Integer tyreInsurFlag;
+	/**
+	 * 是否购买驾乘无忧保障服务
+	 */
+	private Integer driverInsurFlag;
 
 }

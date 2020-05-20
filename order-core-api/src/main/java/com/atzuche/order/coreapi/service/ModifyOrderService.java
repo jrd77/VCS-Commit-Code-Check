@@ -1488,6 +1488,7 @@ public class ModifyOrderService {
 		if (renterGoodsDetailDTO.getCarNo() != null) {
 			renterOrderReqVO.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
 		}
+		renterOrderReqVO.setSeatNum(renterGoodsDetailDTO.getSeatNum());
 		return renterOrderReqVO;
 	}
 	
