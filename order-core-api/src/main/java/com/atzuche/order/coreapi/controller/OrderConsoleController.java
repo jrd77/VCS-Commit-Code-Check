@@ -4,14 +4,16 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.entity.OrderStopFreightInfo;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocVersion;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,8 @@ public class OrderConsoleController {
     private OrderStatusService orderStatusService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private OrderStopFreightInfoService orderStopFreightInfoService;
 
     /*
      * @Author ZhangBin
@@ -56,5 +60,16 @@ public class OrderConsoleController {
             BeanUtils.copyProperties(orderEntity,orderDTO);
         }
         return ResponseData.success(orderDTO);
+    }
+    
+    /**
+     * 获取车辆停运费信息
+     * @param orderNo
+     * @return ResponseData<OrderStopFreightInfo>
+     */
+    @GetMapping("/order/stopfreightinfo/detail")
+    public ResponseData<OrderStopFreightInfo> getStopFreightInfo(@RequestParam(value="orderNo",required = true) String orderNo){
+    	OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
+    	return ResponseData.success(orderStopFreightInfo);
     }
 }

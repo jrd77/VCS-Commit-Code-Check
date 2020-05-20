@@ -6,6 +6,7 @@ import com.atzuche.order.car.CarDetailDTO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -36,16 +37,13 @@ public class CarController {
 
     @AutoDocMethod(description = "订单详细信息-查看车辆信息", value = "订单详细信息-查看车辆信息", response = CarDetailDTO.class)
     @GetMapping(value = "console/car/detail")
-    public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo,@RequestParam("orderNo")String orderNo) {
+    public ResponseData <CarDetailDTO> getCarBusiness(@RequestParam("carNo")String carNo,@RequestParam("orderNo")String orderNo,@RequestParam("ownerOrderNo")String ownerOrderNo) {
         CarDetailDTO carBusiness = carProxyService.getCarDetail(carNo);
-        RenterGoodWithoutPriceVO renterGoodWithoutPriceVO = remoteFeignService.queryRenterGoods(orderNo,carNo);
-        BeanUtils.copyProperties(renterGoodWithoutPriceVO,carBusiness);
-        carBusiness.setGps(renterGoodWithoutPriceVO.getGpsSerialNumber());
-        carBusiness.setDayMileage(renterGoodWithoutPriceVO.getCarDayMileage());
-        carBusiness.setEngineNum(renterGoodWithoutPriceVO.getEngineNum());
-        //OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getLastOwnerGoodsByOrderNo(orderNo);
-        OwnerGoodsDetailDTO ownerGoodsDetailDTO = remoteFeignService.getOwnerGoodsFromRemot(orderNo);
-        //从owner_goods 表取已有数据LocalDateTimeUtils.strToDateLong(date)
+        OwnerGoodsDetailDTO ownerGoodsDetailDTO = remoteFeignService.queryOwnerGoods(false, ownerOrderNo);
+        BeanUtils.copyProperties(ownerGoodsDetailDTO,carBusiness);
+        carBusiness.setGps(ownerGoodsDetailDTO.getGpsSerialNumber());
+        carBusiness.setDayMileage(ownerGoodsDetailDTO.getCarDayMileage());
+        carBusiness.setEngineNum(ownerGoodsDetailDTO.getEngineNum());
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getLicenseExpire())){
             String date = LocalDateTimeUtils.formatDateTime(ownerGoodsDetailDTO.getLicenseExpire());
             carBusiness.setLicenseExpire(date);
@@ -98,6 +96,15 @@ public class CarController {
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getCarPlateNum())){
             carBusiness.setPlateNum(ownerGoodsDetailDTO.getCarPlateNum());
         }
+        // 获取车辆停运费信息
+        OrderStopFreightInfo orderStopFreightInfo = remoteFeignService.getStopFreightInfo(orderNo);
+        if (orderStopFreightInfo != null) {
+        	carBusiness.setAgreementStopFreightPrice(orderStopFreightInfo.getAgreementStopFreightPrice());
+        	carBusiness.setAgreementStopFreightRate(orderStopFreightInfo.getAgreementStopFreightRate()+"%");
+        	carBusiness.setNotagreementStopFreightPrice(orderStopFreightInfo.getNotagreementStopFreightPrice());
+        	carBusiness.setNotagreementStopFreightRate(orderStopFreightInfo.getNotagreementStopFreightRate()+"%");
+        }
+        
         return ResponseData.success(carBusiness);
     }
 
