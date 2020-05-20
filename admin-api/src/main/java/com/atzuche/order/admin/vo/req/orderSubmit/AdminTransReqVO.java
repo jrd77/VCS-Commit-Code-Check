@@ -41,7 +41,7 @@ public class AdminTransReqVO extends AdminReqBaseVO {
     private String cityCode;
 
     @AutoDocProperty(value = "下单城市")
-    @NotBlank(message ="city不能为空")
+    @NotBlank(message ="下单城市")
     private String city;
 
 //    @AutoDocProperty(value = "场景编码(例S009)")

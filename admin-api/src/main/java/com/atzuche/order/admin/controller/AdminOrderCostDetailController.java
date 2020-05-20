@@ -441,6 +441,8 @@ public class AdminOrderCostDetailController {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
                 RenterCostReqVO req = new RenterCostReqVO();
+                req.setOrderNo(renterCostReqVO.getOrderNo());
+                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
                 RenterToPlatformVO oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
                 RenterToPlatformVO newData = new RenterToPlatformVO();
                 newData.setOliAmt(renterCostReqVO.getOliAmt());
