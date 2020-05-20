@@ -396,10 +396,10 @@ public class ModificationOrderService {
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) || 
 					changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
 				// 修改租期
-				String strBeforeRentTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRentTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
-				String strBeforeRevertTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
-				String strAfterRentTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
-				String strAfterRevertTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
+				String strAfterRentTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRentTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
+				String strAfterRevertTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
+				String strBeforeRentTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
+				String strBeforeRevertTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
 				desc = "将【租期】从'"+strBeforeRentTime+"~"+strBeforeRevertTime+"'改成'"+strAfterRentTime+"~"+strAfterRevertTime+"',修改原因："+modifyOrderReqVO.getModifyReason()+";";
 			} else {
 				ModifyOrderReqVO oldObj = new ModifyOrderReqVO();

@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.service;
 
 import com.atzuche.order.admin.filter.CityLonLatFilter;
+import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.enums.DeliveryErrorCode;
@@ -49,7 +50,7 @@ public class AdminDeliveryCarService {
         return deliveryRemoteService.getDeliveryCarVO(deliveryCarDTO);
     }
 
-    
+
 
     /**
      * 更新交接车信息
@@ -66,7 +67,7 @@ public class AdminDeliveryCarService {
      * @param deliveryCarVO
      * @throws Exception
      */
-    public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
+    public void updateDeliveryCarInfo(DeliveryCarVO deliveryCarVO)  {
         logger.info("入参deliveryReqVO：[{}]", deliveryCarVO.toString());
         OrderReqContext orderReqContext = new OrderReqContext();
         OrderReqVO orderReqVo = new OrderReqVO();
@@ -89,23 +90,27 @@ public class AdminDeliveryCarService {
         orderReqVo.setSrvReturnAddr(deliveryReqVO.getRenterDeliveryReqDTO().getRenterGetReturnAddr());
         orderReqContext.setOrderReqVO(orderReqVo);
         cityLonLatFilter.validate(orderReqContext);
-        //ResponseData responseData = feignOrderModifyService.modifyOrderForConsole(createModifyOrderInfoParams(deliveryCarVO));
         // 获取修改前数据
- 		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(createModifyOrderInfoParams(deliveryCarVO));
-        ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+  		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(createModifyOrderInfoParams(deliveryCarVO));
+        try {
+            ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+        } catch (OrderException e) {
+            if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("400504")) {
+                logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());
+                throw new DeliveryOrderException(e.getErrorCode(), e.getErrorMsg());
+            }
+        }
         // 保存操作日志
         modificationOrderService.saveModifyOrderLog(createModifyOrderInfoParams(deliveryCarVO), modifyOrderConsoleDTO);
-        if (!responseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !responseData.getResCode().equals("400504")) {
-            logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), responseData.getResCode()+"--"+responseData.getResMsg());
-            throw  new DeliveryOrderException(responseData.getResCode(),responseData.getResMsg());
-        }
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
-        if(Objects.nonNull(ownerTransAddressReqVO)) {
-            //ResponseData ownerResponseData = feignModifyOwnerAddrService.updateOwnerAddrInfo(ownerTransAddressReqVO);
-            ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
-            if (!ownerResponseData.getResCode().equals(ErrorCode.SUCCESS.getCode()) && !ownerResponseData.getResCode().equals("510004")) {
-                logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), ownerResponseData.getResCode()+"--"+ownerResponseData.getResMsg());
-                throw  new DeliveryOrderException(ownerResponseData.getResCode(),ownerResponseData.getResMsg());
+        if (Objects.nonNull(ownerTransAddressReqVO)) {
+            try {
+                ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
+            } catch (OrderException e) {
+                if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("510004")) {
+                    logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());
+                    throw new DeliveryOrderException(e.getErrorCode(), e.getErrorMsg());
+                }
             }
         }
         // 更新备注
@@ -205,7 +210,7 @@ public class AdminDeliveryCarService {
      */
     public DistributionCostVO findDeliveryCostByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         logger.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
-        
+
         return deliveryRemoteService.getDistributionCostVO(deliveryCarDTO);
     }
 
