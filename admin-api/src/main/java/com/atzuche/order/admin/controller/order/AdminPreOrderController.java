@@ -121,6 +121,8 @@ public class AdminPreOrderController {
         // 设置是否禁用全面保障服务标记
         responseVO.setNoAbatementFlag(getNoAbatementFlagByCarNo(carPriceDetail.getInmsrp(), carPriceDetail.getGuidePrice(), carPriceDetail.getCarLevel()));
         List<CarPriceOfDayVO> renterGoodsPriceDetailDTOList = carPriceDetail.getCarPriceOfDayVOList();
+        //是否可购买驾乘无忧险
+        responseVO.setIsDriverInsure(isDriverInsure(carPriceDetail));
 
         List<PreOrderAdminResponseVO.CarDayPrice> carDayPrices = new ArrayList<>();
 
@@ -186,6 +188,17 @@ public class AdminPreOrderController {
         responseVO.setCountDays(memAvailableCouponVO.getCountDays());
         return ResponseData.success(responseVO);
 
+    }
+
+    private int isDriverInsure(CarProxyService.CarPriceDetail carPriceDetail) {
+        if(carPriceDetail == null || carPriceDetail.getSeatNum() == null){
+            return 0;
+        }
+        Integer seatNum = carPriceDetail.getSeatNum();
+        if(seatNum == 5 || seatNum == 7){
+            return 1;
+        }
+        return 0;
     }
 
     public static Date string2Date(String dateStr,String pattern){

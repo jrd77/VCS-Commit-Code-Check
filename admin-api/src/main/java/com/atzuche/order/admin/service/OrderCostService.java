@@ -29,6 +29,7 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -67,7 +68,6 @@ public class OrderCostService {
 		OrderRenterCostResVO realVo = new OrderRenterCostResVO();
 		
 		//主订单
-        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
         OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
         if(orderDTO == null){
         	logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
@@ -83,7 +83,6 @@ public class OrderCostService {
 		realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
 		realVo.setAddOilSrvAmt("0");
 		
-		//ResponseData<com.atzuche.order.commons.vo.res.OrderRenterCostResVO> resData = feignOrderCostService.orderCostRenterGet(req);
         ResponseData<com.atzuche.order.commons.vo.res.OrderRenterCostResVO> resData = remoteFeignService.orderCostRenterGetFromRemote(req);
         com.atzuche.order.commons.vo.res.OrderRenterCostResVO data = resData.getData();
         if(data == null) {
@@ -599,13 +598,21 @@ public class OrderCostService {
 		String returnCostCashNo = RenterCashCodeEnum.SRV_RETURN_COST.getCashNo();
 		String getBeyondCostCashNo = RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo();
 		String returnBeyondCostCashNo = RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo();
-		
+
+        String tyreInsurCashNo = RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo();
+        String driverInsurCashNo = RenterCashCodeEnum. DRIVER_INSURE_TOTAL_PRICES.getCashNo();
 		//默认0
 		int rentAmount = 0;
 
 		int additionalDriverInsuranceAmount = 0;
 		int serviceCharge = 0;
 		int carServiceFee = 0;
+        //轮胎保障服务费
+        int tyreInsurAmt = 0;
+
+        //驾乘无忧保障服务费
+        int driverInsurAmt = 0;
+
 		
 		//费用列表
 		List<RenterOrderCostDetailResVO> costList = data.getRenterOrderCostDetailList();
@@ -631,7 +638,13 @@ public class OrderCostService {
 				}else if(returnBeyondCostCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
 					carServiceFee +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
 					
-				}
+				}else if(tyreInsurCashNo.equals(renterOrderCostDetailResVO.getCostCode())){
+                    tyreInsurAmt += renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }else if(driverInsurCashNo.equals(renterOrderCostDetailResVO.getCostCode())){
+                    driverInsurAmt += renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }
 			}
 		}
 		//租客租金
@@ -642,7 +655,11 @@ public class OrderCostService {
 		realVo.setServiceCharge(String.valueOf(NumberUtils.convertNumberToZhengshu(serviceCharge)));
 		//配送费用
 		realVo.setCarServiceFee(String.valueOf(NumberUtils.convertNumberToZhengshu(carServiceFee)));
-		
+		//轮胎险
+        realVo.setTyreInsurAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(tyreInsurAmt)));
+        //驾乘无忧险
+        realVo.setDriverInsurAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(driverInsurAmt)));
+
 	}
 
 	/**

@@ -55,6 +55,12 @@ public class OrderRenterCostResVO {
 	
 	@AutoDocProperty(value="取还车服务违约金(违约罚金)")
 	private String carServiceFine;
+
+    @AutoDocProperty(value = "轮胎保障服务费")
+    private String tyreInsurAmt;
+
+    @AutoDocProperty(value = "驾乘无忧保障服务费")
+    private String driverInsurAmt;
 	
 	//--------------------------------------------
 	
