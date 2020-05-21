@@ -248,14 +248,19 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        PlatformToRenterSubsidyResVO newData = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            newData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
+        }catch (Exception e){
+            log.error("平台给租客的补贴-记录日志查询时异常",e);
+        }
         try {
         	orderCostDetailService.updatePlatFormToRenterListByOrderNo(renterCostReqVO);
         	try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                PlatformToRenterSubsidyResVO newData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
+
                 PlatformToRenterSubsidyResVO oldData = new PlatformToRenterSubsidyResVO();
                 oldData.setDispatchingSubsidy(renterCostReqVO.getDispatchingSubsidy());
                 oldData.setOilSubsidy(renterCostReqVO.getOilSubsidy());
@@ -295,10 +300,15 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        ResponseData<PlatformToOwnerSubsidyDTO> responseData = null;
+        try{
+            responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        }catch (Exception e){
+		    log.error("平台给车主的补贴-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	try{
-                ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
                 PlatformToOwnerSubsidyDTO oldData = responseData.getData();
                 PlatformToOwnerSubsidyDTO newData = new PlatformToOwnerSubsidyDTO();
                 newData.setMileageAmt(Integer.valueOf(ownerCostReqVO.getMileageAmt()==null?"0":ownerCostReqVO.getMileageAmt()));
@@ -335,18 +345,22 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        RenterPriceAdjustmentResVO resp = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setOwnerOrderNo(renterCostReqVO.getOwnerOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(req);
+        }catch (Exception e){
+            log.error("租客车主互相调价-日志记录查询异常",e);
+        }
         try {
         	/**
         	 * 全局补贴
         	 */
         	orderCostDetailService.updateRenterPriceAdjustmentByOrderNo(renterCostReqVO);
             try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setOwnerOrderNo(renterCostReqVO.getOwnerOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                RenterPriceAdjustmentResVO resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(req);
                 if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())){
                     String oldData = resp.getOwnerToRenterAdjustAmt();
                     String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
@@ -437,13 +451,18 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        RenterToPlatformVO oldData = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
+        }catch (Exception e){
+            log.error("租客需支付给平台的费用-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                RenterToPlatformVO oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
                 RenterToPlatformVO newData = new RenterToPlatformVO();
                 newData.setOliAmt(renterCostReqVO.getOliAmt());
                 newData.setTimeOut(renterCostReqVO.getTimeOut());
@@ -523,10 +542,15 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = null;
+		try{
+            ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());
+        }catch (Exception e){
+		 log.error("车主给租客的租金补贴-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
         	try{
-                List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());
                 OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = CostStatUtils.ownerSubsidtyFilterByCashNo(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo(), ownerOrderSubsidyDetailDTOS);
                 String desc = "租客租金补贴：";
                 if(ownerOrderSubsidyDetailDTO == null){
