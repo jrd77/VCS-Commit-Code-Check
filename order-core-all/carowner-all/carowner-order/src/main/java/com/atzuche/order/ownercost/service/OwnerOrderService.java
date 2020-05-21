@@ -120,6 +120,7 @@ public class OwnerOrderService {
         ownerOrderCostReqDTO.setCostBaseDTO(costBaseDTO);
         ownerOrderCostReqDTO.setServiceRate(null == ownerOrderReqDTO.getServiceRate() ? 0D : ownerOrderReqDTO.getServiceRate());
         ownerOrderCostReqDTO.setServiceProxyRate(null == ownerOrderReqDTO.getServiceProxyRate() ? 0D : ownerOrderReqDTO.getServiceProxyRate());
+        ownerOrderCostReqDTO.setUseServiceRate(ownerOrderReqDTO.getUseServiceRate());
         ownerOrderCostReqDTO.setGpsSerialNumber(ownerOrderReqDTO.getGpsSerialNumber());
         log.info("下单-车主端-准备保存车主费用明细 ownerOrderNo=[{}],ownerOrderCostReqDTO=[{}]", ownerOrderReqDTO.getOwnerOrderNo(),JSON.toJSONString(ownerOrderCostReqDTO));
         ownerOrderCalCostService.getOrderCostAndDeailList(ownerOrderCostReqDTO);

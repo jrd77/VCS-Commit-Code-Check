@@ -242,17 +242,10 @@ public class CarProxyService {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
         renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
-
-        renterGoodsDetailDto.setServiceRate(data.getServiceProportion() == null ? 0D : Double.valueOf(data.getServiceProportion()));
-        renterGoodsDetailDto.setServiceProxyRate(0D);
-        if(null != carBaseVO.getOwnerType()) {
-            if(CarOwnerTypeEnum.G.getCode() == carBaseVO.getOwnerType() || CarOwnerTypeEnum.H.getCode() == carBaseVO.getOwnerType()) {
-                //代管车
-                renterGoodsDetailDto.setServiceProxyRate(null == data.getServiceProxyProportion() ? 0D : Double.valueOf(data.getServiceProxyProportion()));
-                renterGoodsDetailDto.setServiceRate(0D);
-            }
-        }
-
+        renterGoodsDetailDto.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));//平台服务费比例
+        renterGoodsDetailDto.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProxyProportion()));//代官车服务费比例
+        renterGoodsDetailDto.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//固定平台服务费比例
+        renterGoodsDetailDto.setUseServiceRate(getRateByCarOwnerType(data));
         renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
         renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
         String serialNumbers = Optional.ofNullable(carGpsVOS)
@@ -277,6 +270,28 @@ public class CarProxyService {
         renterGoodsDetailDto.setRenterGoodsPriceDetailDTOList(list);
         return renterGoodsDetailDto;
     }
+
+    private Double getRateByCarOwnerType(CarDetailVO data) {
+        if(data == null){
+            throw new RuntimeException();
+        }
+        Integer ownerType = data.getCarBaseVO().getOwnerType();
+        CarOwnerTypeEnum carOwnerTypeEnum = CarOwnerTypeEnum.getEnumByCode(ownerType);
+
+        Integer fixedServiceRate = data.getServiceProportion();//固定平台服务费比例
+        Integer serviceRate = data.getDeductibleRate();//平台服务费比例
+        Integer serviceProxyRate = data.getServiceProxyProportion();//代管车服务费比例
+        log.info("fixedServiceRate={},serviceRate={},serviceProxyRate={}",fixedServiceRate,serviceRate,serviceProxyRate);
+        Integer currentRate = serviceRate;
+        switch (carOwnerTypeEnum.getServiceRateType()){
+            case 1: currentRate = serviceRate; break;
+            case 2: currentRate = fixedServiceRate;break;
+            case 3: currentRate = serviceProxyRate;break;
+            default: currentRate = serviceRate;
+        }
+        return currentRate==null?0D: Double.valueOf(currentRate);
+    }
+
     //获取车主商品信息
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) {
         OwnerGoodsDetailDTO ownerGoodsDetailDto = new OwnerGoodsDetailDTO();
