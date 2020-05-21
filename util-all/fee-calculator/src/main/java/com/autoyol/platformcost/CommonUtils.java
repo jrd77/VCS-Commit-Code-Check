@@ -50,7 +50,7 @@ public class CommonUtils {
     
 	private static final double DRIVERCOEFFICIENT_NOVICE = 1.3;
 	
-	private static final int DRIVER_SCORE_MIN = 30; 
+	private static final double DRIVER_SCORE_MIN = 30.0; 
 	
 	private static final String[] CAR_EASY_TAG = {"370","371"};
 	
@@ -707,12 +707,17 @@ public class CommonUtils {
 	}
 	
 	
-	public static Double getDriverCoefficient(Integer driverScore) {
-		if (driverScore == null) {
+	public static Double getDriverCoefficient(String driverScore) {
+		if (StringUtils.isBlank(driverScore)) {
 			return DRIVERCOEFFICIENT_INIT;
 		}
-		if (driverScore.intValue() <= DRIVER_SCORE_MIN) {
-			return DRIVERCOEFFICIENT_NOVICE;
+		try {
+			double driverScoreD = Double.valueOf(driverScore);
+			if (driverScoreD <= DRIVER_SCORE_MIN) {
+				return DRIVERCOEFFICIENT_NOVICE;
+			}
+		} catch (Exception e) {
+			log.error("getDriverCoefficient driverScore数据异常");
 		}
 		return DRIVERCOEFFICIENT_INIT;
 	}

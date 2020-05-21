@@ -41,7 +41,7 @@ public class InsurAmtDTO {
 	/**
 	 * 驾驶行为评分
 	 */
-	private Integer driverScore;
+	private String driverScore;
 	/**
 	 * 车辆座位数
 	 */

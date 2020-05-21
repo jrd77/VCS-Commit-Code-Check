@@ -140,6 +140,9 @@ public class AdminTransReqVO extends AdminReqBaseVO {
     @AutoDocProperty(value = "长租订单车主折扣券编码:(LONG_2020041518010000)")
     private String longOwnerCouponNo;
 
-
+    @AutoDocProperty(value = "是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+    @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 
 }

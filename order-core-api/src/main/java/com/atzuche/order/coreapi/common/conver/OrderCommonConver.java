@@ -115,6 +115,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
         renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
         renterOrderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
+        renterOrderReqVO.setDriverScore(renterMember.getDriverScore());
         logger.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;

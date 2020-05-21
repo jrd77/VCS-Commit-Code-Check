@@ -130,4 +130,8 @@ public class RenterMemberDTO {
 
     @AutoDocProperty(value = "是否可下重复时间段订单:0否 1是")
     private Integer repeatTimeOrder;
+    /**
+     * 租客驾驶行为评分
+     */
+    private String driverScore;
 }

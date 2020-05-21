@@ -123,5 +123,9 @@ public class RenterMemberEntity implements Serializable {
 	 * 0-正常，1-已逻辑删除
 	 */
 	private Integer isDelete;
+	/**
+	 * 租客驾驶行为评分
+	 */
+	private String driverScore;
 
 }

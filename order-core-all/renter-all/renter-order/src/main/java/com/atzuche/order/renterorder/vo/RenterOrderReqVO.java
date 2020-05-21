@@ -275,7 +275,7 @@ public class RenterOrderReqVO implements Serializable {
     /**
 	 * 驾驶行为评分
 	 */
-	private Integer driverScore;
+	private String driverScore;
     /**
      * 座位数
      */

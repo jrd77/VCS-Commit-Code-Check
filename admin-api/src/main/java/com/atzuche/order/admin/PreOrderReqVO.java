@@ -90,5 +90,8 @@ public class PreOrderReqVO implements Serializable {
 
     @AutoDocProperty(value = "虚拟地址序列号,默认为0")
     private String carAddrIndex;
-
+    @AutoDocProperty(value = "是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+    @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 }

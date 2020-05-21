@@ -6,6 +6,7 @@ import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
+import com.atzuche.order.coreapi.modifyorder.exception.CanNotBuyException;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +65,11 @@ public class AdditionalDriverService {
         if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus() || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
             log.error("已经结算不允许编辑orderNo={}",renterCostReqVO.getOrderNo());
             throw new NotAllowedEditException();
+        }
+        LocalDateTime nowTime = LocalDateTime.now();
+        if (orderEntity.getExpRentTime() != null && nowTime.isAfter(orderEntity.getExpRentTime())) {
+        	// 订单开始后不能购买
+        	throw new CanNotBuyException();
         }
         //封装对象
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();

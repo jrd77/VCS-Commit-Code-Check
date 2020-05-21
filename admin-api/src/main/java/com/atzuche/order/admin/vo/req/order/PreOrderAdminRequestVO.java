@@ -88,4 +88,8 @@ public class PreOrderAdminRequestVO {
     @AutoDocProperty(value = "是否购买补充保障", required = true)
     @NotBlank(message = "是否购买补充保障不能为空")
     private String abatement;
+    @AutoDocProperty(value = "是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+    @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 }

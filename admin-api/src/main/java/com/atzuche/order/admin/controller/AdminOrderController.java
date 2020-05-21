@@ -41,6 +41,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -106,6 +108,12 @@ public class AdminOrderController {
 
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
+        LocalDateTime rentTime = detailRespDTO.getRenterOrder().getExpRentTime();
+        LocalDateTime nowTime = LocalDateTime.now();
+        if (rentTime != null && nowTime.isAfter(rentTime)) {
+        	// 订单开始后不能修改
+        	return ResponseData.createErrorCodeResponse("601233", "订单开始后不允许购买。");
+        }
         ModifyOrderReqVO modifyOrderReqVO = new ModifyOrderReqVO();
         modifyOrderReqVO.setOrderNo(orderNo);
         modifyOrderReqVO.setMemNo(memNo);
