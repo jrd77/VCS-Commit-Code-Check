@@ -19,7 +19,7 @@ public class RenterSubsidyDetailVO {
     private Integer ownerCouponSubsidyAmt;
     @AutoDocProperty(value = "凹凸币补贴")
     private Integer autoCoinSubsidyAmt;
-    @AutoDocProperty(value = "升级补贴")
+    @AutoDocProperty(value = "升级车辆补贴")
     private Integer updateSubsidyAmt;
     @AutoDocProperty(value = "限时红包补贴")
     private Integer limitTimeSubsidyAmt;
