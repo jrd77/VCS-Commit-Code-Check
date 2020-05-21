@@ -106,7 +106,11 @@ public class IllegalSmsSendService {
                             templateMap.put("templateId", templateId);
                             templateMap.put("memberNo", String.valueOf(renterNo));
                             templateMap.put("sendMsg", MSG);
-                            templateMap.put("violationTime", DateUtils.formate(illegalDetail.getIllegalTime(),STYLE_2));
+                            if (Objects.nonNull(illegalDetail.getIllegalTime())) {
+                            	templateMap.put("violationTime", DateUtils.formate(illegalDetail.getIllegalTime(),STYLE_2));
+                            }else {
+                            	templateMap.put("violationTime", "");
+                            }
                             templateMap.put("violationAddress", illegalDetail.getIllegalAddr());
                             templateMap.put("violationType", illegalDetail.getIllegalReason());
                             templateMap.put("violationFine", illegalDetail.getIllegalAmt()+"元");
