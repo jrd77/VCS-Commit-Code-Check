@@ -8,6 +8,7 @@ import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
 import com.atzuche.order.admin.dto.remark.OrderRiskStatusRequestDTO;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
+import com.atzuche.order.admin.service.OperatorLogService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
 import com.atzuche.order.admin.vo.req.remark.OrderCarServiceRemarkRequestVO;
@@ -17,7 +18,9 @@ import com.atzuche.order.admin.vo.req.remark.OrderRiskStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderOtherInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.service.FeignOrderUpdateService;
@@ -61,6 +64,8 @@ public class OrderOtherInformationController extends BaseController{
 
     @Autowired
     RemoteFeignService remoteFeignService;
+    @Autowired
+    private OperatorLogService operatorLogService;
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
@@ -73,7 +78,10 @@ public class OrderOtherInformationController extends BaseController{
             rentCityAndRiskAccidentReqDTO.setOrderNo(orderRentCityRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setRentCity(orderRentCityRequestVO.getRentCity());
             //ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(orderRentCityRequestVO.getOrderNo());
             ResponseData<?> responseData =  remoteFeignService.updateRentCityAndRiskAccidentFromRemote(rentCityAndRiskAccidentReqDTO);
+            // 记录操作日志
+            operatorLogService.saveUpdRentCityLog(rentCityAndRiskAccidentReqDTO, orderDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
                 if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                     CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_RENT_CITY_UPDATE,  orderRentCityRequestVO);
@@ -101,7 +109,10 @@ public class OrderOtherInformationController extends BaseController{
             rentCityAndRiskAccidentReqDTO.setOrderNo(orderRiskStatusRequestVO.getOrderNo());
             rentCityAndRiskAccidentReqDTO.setIsRiskAccident(Integer.parseInt(orderRiskStatusRequestVO.getRiskAccidentStatus()));
             //ResponseData<?> responseData = feignOrderUpdateService.updateRentCityAndRiskAccident(rentCityAndRiskAccidentReqDTO);
+            OrderStatusDTO orderStatusDTO = remoteFeignService.queryOrderStatusByOrderNo(orderRiskStatusRequestVO.getOrderNo());
             ResponseData<?> responseData =  remoteFeignService.updateRentCityAndRiskAccidentFromRemote(rentCityAndRiskAccidentReqDTO);
+            // 记录操作日志
+            operatorLogService.saveUpdateRiskStatusLog(rentCityAndRiskAccidentReqDTO, orderStatusDTO);
             if(!ObjectUtils.isEmpty(responseData)) {
                 if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
                     //修改成功发送MQ事件
@@ -129,7 +140,12 @@ public class OrderOtherInformationController extends BaseController{
         validateParameter(bindingResult);
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE, DescriptionConstant.INPUT_TEXT),orderCarServiceRemarkRequestVO.toString());
+            OrderRemarkRequestVO orderRemarkRequestVO = new OrderRemarkRequestVO();
+            orderRemarkRequestVO.setOrderNo(orderCarServiceRemarkRequestVO.getOrderNo());
+            OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
             orderRemarkService.updateCarServiceRemarkByOrderNo(orderCarServiceRemarkRequestVO);
+            // 保存操作日志
+            operatorLogService.saveUpdateGetReturnCarRemarkLog(orderCarServiceRemarkRequestVO, orderRemarkResponseVO);
             CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE,  orderCarServiceRemarkRequestVO);
 
             return ResponseData.success();

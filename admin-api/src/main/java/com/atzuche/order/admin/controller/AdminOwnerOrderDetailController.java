@@ -188,6 +188,7 @@ public class AdminOwnerOrderDetailController {
             return responseData;
         }
         ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(orderNo,ownerOrderNo);
+
         return responseData;
     }
 

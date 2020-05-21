@@ -4,6 +4,9 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
+import com.atzuche.order.admin.service.log.AdminLogService;
+import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.ModificationOrderResponseVO;
@@ -11,11 +14,15 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
+import com.atzuche.order.commons.entity.dto.OrderChangeItemDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
+import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
@@ -32,12 +39,14 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -52,6 +61,8 @@ public class ModificationOrderService {
 	FeignOrderModifyService feignOrderModifyService;
     @Autowired
     RemoteFeignService remoteFeignService;
+    @Autowired
+    private AdminLogService adminLogService;
 
 	public ModificationOrderListResponseVO queryModifyList(ModificationOrderRequestVO modificationOrderRequestVO) {
 		ModificationOrderListResponseVO respVo = new ModificationOrderListResponseVO();
@@ -359,6 +370,80 @@ public class ModificationOrderService {
 	private void putPaymentAmount(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
 			ModifyOrderResVO subData) {
 		realVo.setPaymentAmount(String.valueOf(data.getNeedIncrementAmt()));
+	}
+	
+	
+	/**
+	 * 保存修改订单操作日志
+	 * @param modifyOrderReqVO
+	 */
+	@SuppressWarnings("unlikely-arg-type")
+	public void saveModifyOrderLog(ModifyOrderReqVO modifyOrderReqVO, ModifyOrderConsoleDTO modifyOrderConsoleDTO) {
+		if (modifyOrderReqVO == null) {
+			return;
+		}
+		if (modifyOrderConsoleDTO == null) {
+			return;
+		}
+		List<OrderChangeItemDTO> changeItemList = modifyOrderConsoleDTO.getChangeItemList();
+		List<String> changeCodeList = listChangeCode(changeItemList);
+		if (changeCodeList == null || changeCodeList.isEmpty()) {
+			return;
+		}
+		try {
+			// 修改项目描述
+			String desc = "";
+			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) || 
+					changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+				// 修改租期
+				String strBeforeRentTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRentTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
+				String strBeforeRevertTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
+				String strAfterRentTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
+				String strAfterRevertTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
+				desc = "将【租期】从'"+strBeforeRentTime+"~"+strBeforeRevertTime+"'改成'"+strAfterRentTime+"~"+strAfterRevertTime+"',修改原因："+modifyOrderReqVO.getModifyReason()+";";
+			} else {
+				ModifyOrderReqVO oldObj = new ModifyOrderReqVO();
+				BeanUtils.copyProperties(modifyOrderConsoleDTO, oldObj);
+				oldObj.setRentTime(modifyOrderReqVO.getRentTime());
+				oldObj.setRevertTime(modifyOrderReqVO.getRevertTime());
+				CompareBeanUtils<ModifyOrderReqVO> compareBeanUtils = CompareBeanUtils.newInstance(oldObj, modifyOrderReqVO);
+				desc = compareBeanUtils.compare();
+			}
+			// 保存
+			adminLogService.insertLog(AdminOpTypeEnum.CHANGE_ODER_REQ, modifyOrderReqVO.getOrderNo(), desc);
+		} catch (Exception e) {
+			log.error("管理后台保存修改订单操作日志异常  modifyOrderReqVO=[{}]", modifyOrderReqVO, e);
+		}
+	}
+	
+	
+	/**
+	 * 转换List<String>
+	 * @param changeItemList
+	 * @return List<String>
+	 */
+	public List<String> listChangeCode(List<OrderChangeItemDTO> changeItemList) {
+		if (changeItemList == null || changeItemList.isEmpty()) {
+			return null;
+		}
+		return changeItemList.stream().map(chit -> {return chit.getChangeCode();}).collect(Collectors.toList());
+	}
+	
+	
+	/**
+	 * 保存换车操作日志
+	 * @param oldPlateNum
+	 * @param updPlateNum
+	 */
+	public void saveTransferLog(String orderNo, String oldPlateNum, String updPlateNum) {
+		try {
+			// 描述
+			String desc = "将【更换车辆】从'"+oldPlateNum+"'改成'"+updPlateNum+"';";
+			// 保存
+			adminLogService.insertLog(AdminOpTypeEnum.TRANSFER_CAR, orderNo, desc);
+		} catch (Exception e) {
+			log.error("管理后台保存修改订单操作日志异常  orderNo=[{}],oldPlateNum=[{}],updPlateNum=[{}]", orderNo,oldPlateNum,updPlateNum, e);
+		}
 	}
 	
 }

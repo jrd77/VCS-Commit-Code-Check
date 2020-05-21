@@ -47,8 +47,7 @@ public class OrderConsoleCostHandleController {
                                            BindingResult bindingResult) {
         log.info("Get order temp car depoist info.param is,reqVO:[{}]", JSON.toJSONString(reqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-        GetTempCarDepositInfoResVO resVO = orderConsoleCostHandleService.getTempCarDepoistInfos(reqVO.getOrderNo(),
-                reqVO.getMemNo(), OrderConstant.CASHNOS);
+        GetTempCarDepositInfoResVO resVO = orderConsoleCostHandleService.getTempCarDepoistInfos(reqVO.getOrderNo(), OrderConstant.CASHNOS);
         return ResponseData.success(resVO);
     }
 
