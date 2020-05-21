@@ -11,7 +11,7 @@ import com.atzuche.order.admin.service.OwnerOrderDetailService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.util.CompareBeanUtils;
-import com.atzuche.order.admin.vo.req.cost.*;
+import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
@@ -19,13 +19,11 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidy
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.CostStatUtils;
-import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
@@ -37,7 +35,6 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.XSlf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +76,18 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        RenterAndConsoleFineVO fineList = null;
+        try{
+            fineList = orderCostRemoteService.getRenterAndConsoleFineVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+        }catch (Exception e){
+            log.error("违约罚金-记录日志查询异常",e);
+        }
         try {
         	//无需返回值
         	orderCostDetailService.updatefineAmtListByOrderNo(renterCostReqVO);
             //记录日志
         	try{
-                RenterAndConsoleFineVO fineList = orderCostRemoteService.getRenterAndConsoleFineVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+
                 List<ConsoleRenterOrderFineDeatailEntity> list = fineList == null ? null : fineList.getConsoleFineList();
                 // 累计求和
                 int renterBeforeReturnCarFineAmount = 0;
