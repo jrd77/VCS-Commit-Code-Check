@@ -126,7 +126,9 @@ public class CashierRefundApplyNoTService {
             cashierRefundApplyUpdate.setRefundTime(LocalDateTime.now());
             int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
             if(result==0){
-                throw new OrderPayRefundCallBackAsnyException();
+//                throw new OrderPayRefundCallBackAsnyException();
+            	//cat报错提示
+            	log.info("cashierRefundApply 修改无变更,params=[{}]",GsonUtils.toJson(cashierRefundApplyUpdate));
             }
             
             //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing  do  200302
