@@ -168,6 +168,10 @@ public class CarProxyService {
         }
 
         CarDetailVO data = responseObject.getData();
+        if(data == null){
+            throw new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_DATA_FAIL.getCode(),
+                    com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_DATA_FAIL.getText());
+        }
         List<CarInspectVO> carInspectS = data.getCarInspectS();
         CarChargeLevelVO carChargeLevelVO = data.getCarChargeLevelVO();
         CarBaseVO carBaseVO = data.getCarBaseVO();
@@ -177,41 +181,62 @@ public class CarProxyService {
         CarAddressOfTransVO carAddressOfTransVO = data.getCarAddressOfTransVO();
         CarTagListVO carTagVO = data.getCarTagVO();
         List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
-        TransReplyVO transReplyVO = carBaseVO.getTransReplyVO();
+
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
-        renterGoodsDetailDto.setDayPrice(carBaseVO.getDayPrice());
-        renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
         renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
-        renterGoodsDetailDto.setCarChargeLevel(carChargeLevelVO.getCarLevel());
-        renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
-        renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
+        renterGoodsDetailDto.setCarChargeLevel(carChargeLevelVO!=null?carChargeLevelVO.getCarLevel():null);
+        if(carBaseVO != null){
+            renterGoodsDetailDto.setDayPrice(carBaseVO.getDayPrice());
+            renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
+            renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
+            renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
+            renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
+            renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum());
+            renterGoodsDetailDto.setCarBrand(carBaseVO.getBrand());
+            renterGoodsDetailDto.setCarBrandTxt(carBaseVO.getBrandTxt());
+            renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
+            renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
+            renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
+            renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null ? 0D:Double.valueOf(carBaseVO.getCc()));
+            renterGoodsDetailDto.setCarCcUnit(carBaseVO.getCcUnit());
+            renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
+            renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
+            renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
+            renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
+            renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
+            renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
+            renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
+            renterGoodsDetailDto.setCarOwnerType(carBaseVO.getOwnerType());
+            renterGoodsDetailDto.setCarUseType(carBaseVO.getUseType());
+            renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
+            renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
+            renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
+            renterGoodsDetailDto.setWeekendPrice(null == carBaseVO.getWeekendPrice() ? 0 : carBaseVO.getWeekendPrice());
+            renterGoodsDetailDto.setOwnerMemNo(carAddressOfTransVO==null || carBaseVO.getOwnerNo()==null? "" : String.valueOf(carBaseVO.getOwnerNo()));
+            renterGoodsDetailDto.setType(carBaseVO.getType());
+            renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
+            renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
+            renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+            renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
+            renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpireDate()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpireDate()));
+            renterGoodsDetailDto.setIsPlatformShow(carBaseVO.getIsPlatformShow());
+            renterGoodsDetailDto.setSeatNum(carBaseVO.getSeatNum());
+            renterGoodsDetailDto.setEngineSource(carBaseVO.getEngineSource());
+            renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());
+            renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
+            renterGoodsDetailDto.setLastMileage(StringUtils.isNotBlank(carBaseVO.getLastMileage()) ? Integer.valueOf(carBaseVO.getLastMileage()) : 0);
+            renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
+            renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
+
+        }
+
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
+        TransReplyVO transReplyVO = carBaseVO==null?null:carBaseVO.getTransReplyVO();
         renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
         renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
-        renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
-        renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum());
-        renterGoodsDetailDto.setCarBrand(carBaseVO.getBrand());
-        renterGoodsDetailDto.setCarBrandTxt(carBaseVO.getBrandTxt());
-        renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
-        renterGoodsDetailDto.setCarType(Integer.valueOf(carBaseVO.getType()));
-        renterGoodsDetailDto.setCarTypeTxt(carBaseVO.getTypeTxt());
-        renterGoodsDetailDto.setCarCylinderCapacity(carBaseVO.getCc()==null ? 0D:Double.valueOf(carBaseVO.getCc()));
-        renterGoodsDetailDto.setCarCcUnit(carBaseVO.getCcUnit());
-        renterGoodsDetailDto.setCarGearboxType(carBaseVO.getGbType());
-        renterGoodsDetailDto.setCarDayMileage(carBaseVO.getDayMileage());
-        renterGoodsDetailDto.setCarIntrod(carBaseVO.getCarDesc());
-        renterGoodsDetailDto.setCarSurplusPrice(carBaseVO.getSurplusPrice());
-        renterGoodsDetailDto.setCarGuidePrice(carBaseVO.getGuidePrice());
-        renterGoodsDetailDto.setCarStatus(carBaseVO.getStatus());
-        renterGoodsDetailDto.setCarImageUrl(getCoverPic(detailImageVO));
-        renterGoodsDetailDto.setCarOwnerType(carBaseVO.getOwnerType());
-        renterGoodsDetailDto.setCarUseType(carBaseVO.getUseType());
-        renterGoodsDetailDto.setCarOilVolume(carBaseVO.getOilVolume());
-        renterGoodsDetailDto.setCarEngineType(carBaseVO.getEngineType());
-        renterGoodsDetailDto.setCarDesc(carBaseVO.getCarDesc());
-        renterGoodsDetailDto.setWeekendPrice(null == carBaseVO.getWeekendPrice() ? 0 : carBaseVO.getWeekendPrice());
+
         renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));
         renterGoodsDetailDto.setCarCheckStatus(carDetect == null ? null : carDetect.getDetectStatus());
         renterGoodsDetailDto.setCarShowAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarVirtualAddress());
@@ -220,24 +245,15 @@ public class CarProxyService {
         renterGoodsDetailDto.setCarRealAddr(carAddressOfTransVO==null ? "" : carAddressOfTransVO.getCarRealAddress());
         renterGoodsDetailDto.setCarRealLon(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLon()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLon()));
         renterGoodsDetailDto.setCarRealLat(carAddressOfTransVO==null || carAddressOfTransVO.getRealAddressLat()==null ? "" : String.valueOf(carAddressOfTransVO.getRealAddressLat()));
-        renterGoodsDetailDto.setOwnerMemNo(carAddressOfTransVO==null || carBaseVO.getOwnerNo()==null? "" : String.valueOf(carBaseVO.getOwnerNo()));
+
         renterGoodsDetailDto.setLabelIds(carTagVO == null ? new ArrayList<>():carTagVO.getLabelIds());
-        renterGoodsDetailDto.setEngineSource(carBaseVO.getEngineSource());
-        renterGoodsDetailDto.setFrameNo(carBaseVO.getFrameNo());
-        renterGoodsDetailDto.setEngineNum(carBaseVO.getEngineNum());
+
         renterGoodsDetailDto.setCarTag(carTagVO == null ? "" : String.join(",",carTagVO.getLabelIds()));
-        renterGoodsDetailDto.setType(carBaseVO.getType());
-        renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
-        renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
-        renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
-        renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
-        renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpireDate()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpireDate()));
-        renterGoodsDetailDto.setIsPlatformShow(carBaseVO.getIsPlatformShow());
-        renterGoodsDetailDto.setSeatNum(carBaseVO.getSeatNum());
+
         CarInspectVO carInspectVO = carInspectS != null && carInspectS.size() > 0 ? carInspectS.get(0) : null;
         String inspectExpire = carInspectVO != null ? carInspectVO.getInspectExpire() : null;
         renterGoodsDetailDto.setInspectExpire(inspectExpire!=null?LocalDateTimeUtils.parseStringToLocalDate(inspectExpire):null);
-        renterGoodsDetailDto.setLastMileage(StringUtils.isNotBlank(carBaseVO.getLastMileage()) ? Integer.valueOf(carBaseVO.getLastMileage()) : 0);
+
         if (data.getCarModelParam() != null) {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
@@ -245,7 +261,7 @@ public class CarProxyService {
 
         renterGoodsDetailDto.setServiceRate(data.getServiceProportion() == null ? 0D : Double.valueOf(data.getServiceProportion()));
         renterGoodsDetailDto.setServiceProxyRate(0D);
-        if(null != carBaseVO.getOwnerType()) {
+        if(carBaseVO!= null && null != carBaseVO.getOwnerType()) {
             if(CarOwnerTypeEnum.G.getCode() == carBaseVO.getOwnerType() || CarOwnerTypeEnum.H.getCode() == carBaseVO.getOwnerType()) {
                 //代管车
                 renterGoodsDetailDto.setServiceProxyRate(null == data.getServiceProxyProportion() ? 0D : Double.valueOf(data.getServiceProxyProportion()));
@@ -253,8 +269,6 @@ public class CarProxyService {
             }
         }
 
-        renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
-        renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
         String serialNumbers = Optional.ofNullable(carGpsVOS)
                 .orElseGet(ArrayList::new)
                 .stream()
