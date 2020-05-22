@@ -4,6 +4,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.OwnerPreIncomRespDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.ReturnCarIncomeResultDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(name="order-center-api")
 public interface FeignBusinessService {
@@ -50,4 +53,7 @@ public interface FeignBusinessService {
 
     @GetMapping("/orderBusiness/queryrenterDepositDetail")
     public ResponseData<RenterDepositDetailDTO> queryrenterDepositDetail(@RequestParam(name = "orderNo",required = true) String orderNo);
+
+    @GetMapping("/orderBusiness/queryOwnerSubsidyByownerOrderNo")
+    public ResponseData<List<OwnerOrderSubsidyDetailDTO>> queryOwnerSubsidyByownerOrderNo(@RequestParam(name = "orderNo")String orderNo, @RequestParam(name = "ownerOrderNo")String ownerOrderNo);
 }

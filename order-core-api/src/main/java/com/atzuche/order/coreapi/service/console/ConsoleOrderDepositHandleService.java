@@ -102,6 +102,7 @@ public class ConsoleOrderDepositHandleService {
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
 
         if (SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getWzSettleStatus()
+                || orderStatusEntity.getWzPayStatus() == OrderConstant.ZERO
                 || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()) {
             log.error("已经结算不允许编辑orderNo:[{}]", orderNo);
             throw new NotAllowedEditException();
@@ -128,8 +129,9 @@ public class ConsoleOrderDepositHandleService {
     public void carDepositDetainHandle(CarDepositTemporaryRefundReqDTO carDepositTemporaryRefund) {
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(carDepositTemporaryRefund.getOrderNo());
 
-        if (SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getWzSettleStatus()
-                || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()) {
+        if (SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getCarDepositSettleStatus()
+                || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()
+                || orderStatusEntity.getDepositPayStatus() == OrderConstant.ZERO) {
             log.error("已经结算不允许编辑orderNo:[{}]", carDepositTemporaryRefund.getOrderNo());
             throw new NotAllowedEditException();
         }

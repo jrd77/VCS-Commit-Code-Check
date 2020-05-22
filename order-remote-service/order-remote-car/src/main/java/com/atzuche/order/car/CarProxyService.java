@@ -179,8 +179,10 @@ public class CarProxyService {
         List<CarGpsVO> carGpsVOS = data.getCarGpsVOS();
         TransReplyVO transReplyVO = carBaseVO.getTransReplyVO();
         RenterGoodsDetailDTO renterGoodsDetailDto = new RenterGoodsDetailDTO();
+        renterGoodsDetailDto.setDayPrice(carBaseVO.getDayPrice());
         renterGoodsDetailDto.setCarAge(carBaseVO.getCarAge());
         renterGoodsDetailDto.setSucessRate(carChargeLevelVO!=null?carChargeLevelVO.getSucessRate():null);
+        renterGoodsDetailDto.setCarChargeLevel(carChargeLevelVO.getCarLevel());
         renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
         renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());

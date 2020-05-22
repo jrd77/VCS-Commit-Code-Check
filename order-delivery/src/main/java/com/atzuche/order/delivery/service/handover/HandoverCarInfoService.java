@@ -190,7 +190,7 @@ public class HandoverCarInfoService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public void updateDeliveryCarRemarkInfo(DeliveryReqDTO deliveryReqVO,Integer type) throws Exception {
+    public void updateDeliveryCarRemarkInfo(DeliveryReqDTO deliveryReqVO,Integer type) {
         if(Objects.nonNull(deliveryReqVO)){
             RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqVO.getOrderNo(), type);
             if(Objects.isNull(renterOrderDeliveryEntity))

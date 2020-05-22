@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.service.PaymentService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.open.service.FeignPayService;
 import com.atzuche.order.open.vo.OfflinePayVO;
@@ -23,12 +24,16 @@ public class AdminPayController {
 
     @Autowired
     private FeignPayService payFeignService;
+    @Autowired
+    private PaymentService paymentService;
 
     @AutoDocMethod(description = "虚拟支付", value = "虚拟支付")
     @PostMapping("console/pay/virtual")
     public ResponseData virtualPay(@Valid @RequestBody VirtualPayVO virtualPayVO, BindingResult result){
         BindingResultUtil.checkBindingResult(result);
         payFeignService.virtualPay(virtualPayVO);
+        // 保存操作日志
+        paymentService.saveVirtualPayLog(virtualPayVO);
         return ResponseData.success();
     }
     @AutoDocMethod(description = "线下支付", value = "线下支付")
@@ -36,6 +41,8 @@ public class AdminPayController {
     public ResponseData offlinePay(@Valid @RequestBody OfflinePayVO offlinePayVO, BindingResult result){
         BindingResultUtil.checkBindingResult(result);
         payFeignService.offlinePay(offlinePayVO);
+        // 保存操作日志
+        paymentService.saveOfflinePayLog(offlinePayVO);
         return ResponseData.success();
     }
 }
