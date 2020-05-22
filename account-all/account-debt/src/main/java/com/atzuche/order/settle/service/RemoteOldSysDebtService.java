@@ -106,6 +106,7 @@ public class RemoteOldSysDebtService {
             log.error("Feign 获取用户的欠款失败,ResponseData={},memNo={}",responseData,memNo,e);
             Cat.logError("Feign 获取用户的欠款失败",e);
             t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
         }
