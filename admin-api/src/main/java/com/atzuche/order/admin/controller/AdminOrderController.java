@@ -79,7 +79,7 @@ public class AdminOrderController {
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "修改订单", value = "修改订单",response = ResponseData.class)
     @RequestMapping(value="console/order/modifyOrder",method = RequestMethod.POST)
-    public ResponseData modifyOrder(@RequestBody ModifyOrderReqVO modifyOrderReqVO, BindingResult bindingResult)throws Exception{
+    public ResponseData modifyOrder(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO, BindingResult bindingResult)throws Exception{
         log.info("车辆押金信息-modifyOrderReqVO={}", JSON.toJSONString(modifyOrderReqVO));
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
@@ -111,7 +111,7 @@ public class AdminOrderController {
     @AutoDocGroup(group = "订单修改")
     @AutoDocMethod(description = "修改是否购买保费", value = "修改是否购买保费",response = ResponseData.class)
     @RequestMapping(value="console/order/modifyinsurflag",method = RequestMethod.POST)
-    public ResponseData modifyInsurFlag(@RequestBody ModifyInsurFlagVO modifyInsurFlagVO, BindingResult bindingResult)throws Exception{
+    public ResponseData modifyInsurFlag(@Valid @RequestBody ModifyInsurFlagVO modifyInsurFlagVO, BindingResult bindingResult)throws Exception{
         log.info("修改是否购买保费-modifyInsurFlagVO={}", modifyInsurFlagVO);
         if (bindingResult.hasErrors()) {
             Optional<FieldError> error = bindingResult.getFieldErrors().stream().findFirst();
