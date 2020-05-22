@@ -5,6 +5,7 @@ import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.AdminOrderService;
 import com.atzuche.order.admin.service.ModificationOrderService;
+import com.atzuche.order.admin.service.OperatorLogService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.car.CarService;
 import com.atzuche.order.admin.service.log.AdminLogService;
@@ -71,6 +72,8 @@ public class AdminOrderController {
     private CarService carService;
     @Autowired
     private ModificationOrderService modificationOrderService;
+    @Autowired
+    private OperatorLogService operatorLogService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -143,6 +146,8 @@ public class AdminOrderController {
         	modifyOrderReqVO.setDriverInsurFlag(modifyInsurFlagVO.getBuyValue());
         }
         remoteFeignService.modifyOrder(modifyOrderReqVO);
+        // 记录购买日志
+        operatorLogService.saveBuyAbatementLog(modifyInsurFlagVO);
         return ResponseData.success();
     }
 
