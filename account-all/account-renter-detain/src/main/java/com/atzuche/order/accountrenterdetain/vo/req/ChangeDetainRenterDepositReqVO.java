@@ -62,6 +62,5 @@ public class ChangeDetainRenterDepositReqVO {
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getRenterCashCodeEnum(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getIsDetain(), ErrorCode.PARAMETER_ERROR.getText());
-        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
     }
 }
