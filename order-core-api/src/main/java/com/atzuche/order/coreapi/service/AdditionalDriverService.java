@@ -7,6 +7,8 @@ import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.coreapi.modifyorder.exception.CanNotBuyException;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
@@ -17,7 +19,10 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +50,10 @@ public class AdditionalDriverService {
     private RenterOrderCostDetailService renterOrderCostDetailService;
     @Autowired
     private RenterAdditionalDriverService renterAdditionalDriverService;
+    @Autowired
+    private DeliveryCarService deliveryCarService;
+    @Autowired
+    private RenterOrderService renterOrderService;
 
     /**
      * 新增附加驾驶人
@@ -137,7 +146,15 @@ public class AdditionalDriverService {
         }
         renterAdditionalDriverService.insertBatchAdditionalDriverBeforeDel(renterCostReqVO.getOrderNo(),
                 renterCostReqVO.getRenterOrderNo(),driverIds,commUseDriverList);
-
+        // 获取有效的租客子订单
+    	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
+    	if ((renterOrderEntity.getIsGetCar() != null && renterOrderEntity.getIsGetCar() == 1) || 
+    			(renterOrderEntity.getIsReturnCar() != null && renterOrderEntity.getIsReturnCar() == 1)) {
+    		ChangeOrderInfoDTO changeOrderInfoDTO = new ChangeOrderInfoDTO();
+            changeOrderInfoDTO.setOrderNo(renterCostReqVO.getOrderNo());
+            changeOrderInfoDTO.setExtraDriverFlag("1");
+            deliveryCarService.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+    	}
         log.info("保存附加驾驶人信息SUCCESS");
     }
 
