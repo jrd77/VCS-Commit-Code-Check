@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
@@ -36,7 +37,8 @@ public class CashWithdrawalController {
 	private AccountDebtService accountDebtService;
 	@Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
-	
+	@Autowired
+    private CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
 	/**
 	 * 提现
@@ -91,10 +93,14 @@ public class CashWithdrawalController {
 		log.info("获取用户总欠款 req=[{}]", GsonUtils.toJson(req));
 		BindingResultUtil.checkBindingResult(bindingResult);
 		DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(req.getMemNo());
-		debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(req.getMemNo()));
 		if(debtDetailVO != null) {
 			log.info("getDebtAmt出参=[{}],入参=[{}]",GsonUtils.toJson(debtDetailVO),GsonUtils.toJson(req));
+			debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(req.getMemNo()));
+			 //4小时
+			Integer sum = cashierRefundApplyNoTService.getCashierRefundApplyByTimeForPreAuthSum(req.getMemNo());
+			debtDetailVO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt().intValue() + Math.abs(sum));
 		}
+
     	return ResponseData.success(debtDetailVO);
     } 
 	

@@ -46,6 +46,7 @@ public class AccountDebtService{
     private AccountDebtReceivableaDetailNoTService accountDebtReceivableaDetailNoTService;
     @Autowired
     private RemoteOldSysDebtService remoteOldSysDebtService;
+    
 
 
     /**
@@ -230,6 +231,7 @@ public class AccountDebtService{
     	Integer orderDebtAmt = debtDetailVO.getOrderDebtAmt() == null ? 0:debtDetailVO.getOrderDebtAmt();
     	debtDetailVO.setOrderDebtAmt(curDebtAmt + orderDebtAmt);
     	debtDetailVO.setHistoryDebtAmt(historyDebtAmt);
+    	
     	return debtDetailVO;
     }
     
