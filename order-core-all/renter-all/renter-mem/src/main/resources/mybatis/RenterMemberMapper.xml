@@ -249,7 +249,7 @@
     </select>
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
-        SELECT
+        SELECT DISTINCT 
             order_no,
             mem_no,
             phone

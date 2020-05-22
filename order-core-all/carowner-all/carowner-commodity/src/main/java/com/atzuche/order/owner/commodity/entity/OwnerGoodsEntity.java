@@ -199,6 +199,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 代官车服务费比例（仅车主端有）
 	 */
 	private Double serviceProxyRate;
+    /**
+     * 固定平台服务费比例
+     */
+    private Double fixedServiceRate;
+    /**
+     * 当前使用的服务费比例(平台服务费比例/代官车服务费比例/固定平台服务费比例)
+     */
+    private Double useServiceRate;
 	/**
 	 * 是否超证:0否 1是
 	 */

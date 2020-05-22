@@ -72,10 +72,10 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 根据订单号查询订单状态异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 根据订单号查询订单状态异常",e);
+            throw e;
         }finally {
             t.complete();
         }
-        return null;
     }
 
     /*
@@ -99,10 +99,10 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 获取主订单信息异常,responseObject={},orderNo={}", JSON.toJSONString(responseObject),orderNo,e);
             Cat.logError("Feign 获取主订单信息异常",e);
+            throw e;
         }finally {
             t.complete();
         }
-        return null;
     }
 
     /*

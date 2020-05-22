@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -201,6 +202,15 @@ public class CashierRefundApplyNoTService {
         List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTimeForPreAuth(date);
         return result;
     }    
+    
+    public Integer getCashierRefundApplyByTimeForPreAuthSum(String memNo) {
+    	Integer sum = cashierRefundApplyMapper.getCashierRefundApplyByTimeForPreAuthSum(memNo);
+    	if(sum == null) {
+    		return 0;
+    	}else {
+    		return sum;
+    	}
+    }
     
     /**
      * 保存虚拟退款记录

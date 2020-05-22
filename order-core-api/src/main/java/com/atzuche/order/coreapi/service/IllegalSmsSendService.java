@@ -106,15 +106,17 @@ public class IllegalSmsSendService {
                             templateMap.put("templateId", templateId);
                             templateMap.put("memberNo", String.valueOf(renterNo));
                             templateMap.put("sendMsg", MSG);
-                            if (Objects.nonNull(illegalDetail.getIllegalTime())) {
+                            if(illegalDetail != null){
+                                templateMap.put("violationAddress", illegalDetail.getIllegalAddr());
+                                templateMap.put("violationType", illegalDetail.getIllegalReason());
+                                templateMap.put("violationFine", illegalDetail.getIllegalAmt()+"元");
+                                templateMap.put("violationPoints", "扣"+illegalDetail.getIllegalDeduct()+"分");
+                            }
+                            if (illegalDetail != null && Objects.nonNull(illegalDetail.getIllegalTime())) {
                             	templateMap.put("violationTime", DateUtils.formate(illegalDetail.getIllegalTime(),STYLE_2));
                             }else {
                             	templateMap.put("violationTime", "");
                             }
-                            templateMap.put("violationAddress", illegalDetail.getIllegalAddr());
-                            templateMap.put("violationType", illegalDetail.getIllegalReason());
-                            templateMap.put("violationFine", illegalDetail.getIllegalAmt()+"元");
-                            templateMap.put("violationPoints", "扣"+illegalDetail.getIllegalDeduct()+"分");
                             templateMap.put("remark", "");
                             templateMap.put("url", h5Url + "/" + orderNo);
                             templateMap.put("pagePath", "");
