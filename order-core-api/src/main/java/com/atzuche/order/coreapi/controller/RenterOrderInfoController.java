@@ -21,6 +21,7 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.web.ResponseData;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/sms/renter")
+@Slf4j
 public class RenterOrderInfoController {
 
     @Autowired
@@ -88,7 +90,9 @@ public class RenterOrderInfoController {
      */
     @GetMapping("/memberPhoneByMainOrderNo")
     public ResponseData<String> selectrenterMemberByOrderNo(@RequestParam(value = "orderNo",required = false) String orderNo) {
+        log.info("查询租客手机号入参[{}]",orderNo);
         String phone = renterMemberService.queryRenterPhoneByOrderNo(orderNo);
+        log.info("查询租客手机号出参[{}]",phone);
         return ResponseData.success(phone);
     }
 
