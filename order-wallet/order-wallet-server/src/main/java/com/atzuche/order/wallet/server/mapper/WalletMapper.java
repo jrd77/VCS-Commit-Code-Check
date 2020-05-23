@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface WalletMapper {
 
+    void insertWallet(WalletEntity entity);
+
     public WalletEntity getWalletByMemNo(String memNo);
 
     public int updateWallet(@Param("memNo") String memNo,@Param("expPay") int expensePay,@Param("expGive") int expenseGive);

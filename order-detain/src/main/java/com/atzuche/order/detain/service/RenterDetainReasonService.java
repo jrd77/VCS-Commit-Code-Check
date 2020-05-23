@@ -3,8 +3,13 @@ package com.atzuche.order.detain.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDetainReasonDTO;
+import com.atzuche.order.commons.enums.detain.DetainClaimsReasonEnum;
+import com.atzuche.order.commons.enums.detain.DetainRiskReasonEnum;
+import com.atzuche.order.commons.enums.detain.DetainTransReasonEnum;
+import com.atzuche.order.commons.enums.detain.DetainTypeEnum;
 import com.atzuche.order.detain.entity.RenterDetainReasonEntity;
 import com.atzuche.order.detain.mapper.RenterDetainReasonMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -58,9 +63,8 @@ public class RenterDetainReasonService {
 
     public List<RenterDetainReasonDTO> getListByOrderNo(String orderNo) {
         List<RenterDetainReasonEntity> list = renterDetainReasonMapper.selectListByOrderNo(orderNo);
-
         if (CollectionUtils.isEmpty(list)) {
-            return null;
+            return initRenterDetainReason(orderNo);
         }
 
         List<RenterDetainReasonDTO> reasonList = new ArrayList<>();
@@ -70,6 +74,35 @@ public class RenterDetainReasonService {
             reasonList.add(dto);
         });
 
+        return reasonList;
+    }
+
+
+
+    private List<RenterDetainReasonDTO> initRenterDetainReason(String orderNo) {
+        List<RenterDetainReasonDTO> reasonList = new ArrayList<>();
+        //风控
+        RenterDetainReasonDTO fk = new RenterDetainReasonDTO();
+        fk.setOrderNo(orderNo);
+        fk.setDetainTypeCode(DetainTypeEnum.risk.getCode());
+        fk.setDetainTypeName(DetainTypeEnum.risk.getName());
+        fk.setDetainStatus(OrderConstant.NO);
+        //交易
+        RenterDetainReasonDTO jy = new RenterDetainReasonDTO();
+        jy.setOrderNo(orderNo);
+        jy.setDetainTypeCode(DetainTypeEnum.trans.getCode());
+        jy.setDetainTypeName(DetainTypeEnum.trans.getName());
+        jy.setDetainStatus(OrderConstant.NO);
+        //理赔
+        RenterDetainReasonDTO lp = new RenterDetainReasonDTO();
+        lp.setOrderNo(orderNo);
+        lp.setDetainTypeCode(DetainTypeEnum.claims.getCode());
+        lp.setDetainTypeName(DetainTypeEnum.claims.getName());
+        lp.setDetainStatus(OrderConstant.NO);
+
+        reasonList.add(fk);
+        reasonList.add(jy);
+        reasonList.add(lp);
         return reasonList;
     }
 

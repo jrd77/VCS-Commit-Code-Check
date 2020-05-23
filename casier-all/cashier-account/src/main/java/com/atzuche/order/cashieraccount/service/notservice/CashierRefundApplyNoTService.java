@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -126,7 +127,9 @@ public class CashierRefundApplyNoTService {
             cashierRefundApplyUpdate.setRefundTime(LocalDateTime.now());
             int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
             if(result==0){
-                throw new OrderPayRefundCallBackAsnyException();
+//                throw new OrderPayRefundCallBackAsnyException();
+            	//cat报错提示
+            	log.info("cashierRefundApply 修改无变更,params=[{}]",GsonUtils.toJson(cashierRefundApplyUpdate));
             }
             
             //4.如果是预授权完成的操作成功，检测该订单是否存在预授权解冻的记录。修改status=01退款中。 todo huangjing  do  200302
@@ -199,6 +202,15 @@ public class CashierRefundApplyNoTService {
         List<CashierRefundApplyEntity> result = cashierRefundApplyMapper.getCashierRefundApplyByTimeForPreAuth(date);
         return result;
     }    
+    
+    public Integer getCashierRefundApplyByTimeForPreAuthSum(String memNo) {
+    	Integer sum = cashierRefundApplyMapper.getCashierRefundApplyByTimeForPreAuthSum(memNo);
+    	if(sum == null) {
+    		return 0;
+    	}else {
+    		return sum;
+    	}
+    }
     
     /**
      * 保存虚拟退款记录

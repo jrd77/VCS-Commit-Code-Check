@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.OrderCostDetailService;
 import com.atzuche.order.admin.service.OrderCostRemoteService;
+import com.atzuche.order.admin.service.OwnerOrderDetailService;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.admin.vo.req.cost.*;
@@ -16,10 +18,15 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetai
 import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
+import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.StringUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
@@ -60,6 +67,10 @@ public class AdminOrderCostDetailController {
     AdminLogService adminLogService;
     @Autowired
     OrderCostRemoteService orderCostRemoteService;
+    @Autowired
+    RemoteFeignService remoteFeignService;
+    @Autowired
+    OwnerOrderDetailService ownerOrderDetailService;
 	
 	@AutoDocMethod(description = "违约罚金 修改违约罚金", value = "违约罚金 修改违约罚金",response = ResponseData.class)
     @PostMapping("fineAmt/update")
@@ -286,6 +297,22 @@ public class AdminOrderCostDetailController {
         }
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
+        	try{
+                ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+                PlatformToOwnerSubsidyDTO oldData = responseData.getData();
+                PlatformToOwnerSubsidyDTO newData = new PlatformToOwnerSubsidyDTO();
+                newData.setMileageAmt(Integer.valueOf(ownerCostReqVO.getMileageAmt()==null?"0":ownerCostReqVO.getMileageAmt()));
+                newData.setOilSubsidyAmt(Integer.valueOf(ownerCostReqVO.getOilSubsidyAmt()==null?"0":ownerCostReqVO.getOilSubsidyAmt()));
+                newData.setWashCarSubsidyAmt(Integer.valueOf(ownerCostReqVO.getWashCarSubsidyAmt()==null?"0":ownerCostReqVO.getWashCarSubsidyAmt()));
+                newData.setCarGoodsLossSubsidyAmt(Integer.valueOf(ownerCostReqVO.getCarGoodsLossSubsidyAmt()==null?"0":ownerCostReqVO.getCarGoodsLossSubsidyAmt()));
+                newData.setDelaySubsidyAmt(Integer.valueOf(ownerCostReqVO.getDelaySubsidyAmt()==null?"0":ownerCostReqVO.getDelaySubsidyAmt()));
+                newData.setTrafficSubsidyAmt(Integer.valueOf(ownerCostReqVO.getTrafficSubsidyAmt()==null?"0":ownerCostReqVO.getTrafficSubsidyAmt()));
+                newData.setIncomeSubsidyAmt(Integer.valueOf(ownerCostReqVO.getIncomeSubsidyAmt()==null?"0":ownerCostReqVO.getIncomeSubsidyAmt()));
+                newData.setOtherSubsidyAmt(Integer.valueOf(ownerCostReqVO.getOtherSubsidyAmt()==null?"0":ownerCostReqVO.getOtherSubsidyAmt()));
+                adminLogService.insertLog(AdminOpTypeEnum.PLATFORM_TO_OWNER,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),CompareBeanUtils.newInstance(oldData,newData).compare());
+            }catch (Exception e){
+        	    log.error("平台给车主的补贴操作异常",e);
+            }
         	return ResponseData.success();
 		} catch (Exception e) {
 			Cat.logError("updatePlatFormToOwnerListByOrderNo exception params="+ownerCostReqVO.toString(),e);
@@ -414,6 +441,8 @@ public class AdminOrderCostDetailController {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
                 RenterCostReqVO req = new RenterCostReqVO();
+                req.setOrderNo(renterCostReqVO.getOrderNo());
+                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
                 RenterToPlatformVO oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
                 RenterToPlatformVO newData = new RenterToPlatformVO();
                 newData.setOliAmt(renterCostReqVO.getOliAmt());
@@ -494,9 +523,21 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
         try {
         	orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
+        	try{
+                List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());
+                OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = CostStatUtils.ownerSubsidtyFilterByCashNo(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo(), ownerOrderSubsidyDetailDTOS);
+                String desc = "租客租金补贴：";
+                if(ownerOrderSubsidyDetailDTO == null){
+                    desc += "将 0 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
+                }else{
+                    desc += "将 "+ownerOrderSubsidyDetailDTO.getSubsidyAmount()+" 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
+                }
+                adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_RENTER,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),desc);
+            }catch (Exception e){
+        	    log.error("车主给租客的租金补贴修改操作异常",e);
+            }
         	return ResponseData.success();
 		} catch (Exception e) {
 			Cat.logError("ownerToRenterRentAmtSubsidy exception params="+ownerCostReqVO.toString(),e);

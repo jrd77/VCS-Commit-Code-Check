@@ -20,10 +20,6 @@ public class CarDepositDetainInfoReqVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
 
-    @AutoDocProperty(value = "租客会员号", required = true)
-    @NotBlank(message = "租客会员号不能为空")
-    private String memNo;
-
     @AutoDocProperty(value = "订单车辆押金暂扣扣款信息列表", required = true)
     private List<TempCarDepoistInfoResVO> tempCarDepoists;
 
