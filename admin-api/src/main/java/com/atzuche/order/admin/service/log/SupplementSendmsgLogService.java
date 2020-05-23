@@ -99,7 +99,6 @@ public class SupplementSendmsgLogService {
     private void sendShortMessage(MessagePushSendReqVO reqVO,OrderMessage orderMessage) {
         Map map = Maps.newHashMap();
         map.put("textCode", "SupplementPayMassage2Renter");
-        map.put("mobile", reqVO.getMobile());
         map.put("message",reqVO.getContent() );
         map.put("sender", 3);
         map.put("type", 3);

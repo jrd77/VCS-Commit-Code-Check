@@ -47,8 +47,4 @@ public class MessagePushSendReqVO {
 
     @AutoDocProperty("补付金额")
     private String amount;
-
-    @AutoDocProperty("发送人手机号")
-    private String mobile;
-
 }

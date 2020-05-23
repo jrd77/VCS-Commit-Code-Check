@@ -156,4 +156,7 @@ public class RenterMemberService{
     }
 
 
+    public String queryRenterPhoneByOrderNo(String orderNo) {
+        return renterMemberMapper.queryRenterPhoneByOrderNo(orderNo);
+    }
 }

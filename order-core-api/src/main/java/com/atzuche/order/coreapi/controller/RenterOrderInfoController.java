@@ -82,6 +82,17 @@ public class RenterOrderInfoController {
     }
 
     /**
+     * 根据主订单号查询租客手机号
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/memberPhoneByMainOrderNo")
+    public ResponseData<String> selectrenterMemberByOrderNo(@RequestParam("orderNo") String orderNo) {
+        String phone = renterMemberService.queryRenterPhoneByOrderNo(orderNo);
+        return ResponseData.success(phone);
+    }
+
+    /**
      * 获取租客子订单信息
      * @param orderNo
      * @return

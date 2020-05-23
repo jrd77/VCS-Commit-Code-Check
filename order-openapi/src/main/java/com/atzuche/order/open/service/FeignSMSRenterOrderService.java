@@ -72,4 +72,11 @@ public interface FeignSMSRenterOrderService {
     @GetMapping("/getListRenterOrderCostDetail")
     ResponseData<List<RenterOrderCostDetailDTO>> listRenterOrderCostDetail(@RequestParam("orderNo") String orderNo);
 
+    /**
+     * 根据主订单号查询租客手机号
+     * @param orderNo
+     * @return
+     */
+    @GetMapping("/memberPhoneByMainOrderNo")
+     ResponseData<String> selectrenterMemberByOrderNo(@RequestParam("orderNo") String orderNo);
 }
