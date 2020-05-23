@@ -2,14 +2,19 @@ package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.ModificationOrderService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.car.CarService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.AdminTransferCarReqVO;
 import com.atzuche.order.admin.vo.req.order.*;
 import com.atzuche.order.admin.vo.resp.order.AdminModifyOrderFeeCompareVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderCouponDTO;
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
@@ -39,6 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -55,9 +62,12 @@ public class AdminOrderController {
     private AdminOrderService adminOrderService;
     @Autowired
     private RemoteFeignService remoteFeignService;
-
+    @Autowired
+    private AdminLogService adminLogService;
     @Autowired
     private CarService carService;
+    @Autowired
+    private ModificationOrderService modificationOrderService;
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -71,21 +81,77 @@ public class AdminOrderController {
                     error.get().getDefaultMessage() : ErrorCode.INPUT_ERROR.getText());
         }
         String orderNo = modifyOrderReqVO.getOrderNo();
-        //OrderDetailReqDTO reqDTO = new OrderDetailReqDTO();
-        //reqDTO.setOrderNo(orderNo);
-
-        //ResponseData<OrderDetailRespDTO> respDTOResponseData =feignOrderDetailService.getOrderDetail(reqDTO);
         ResponseData<OrderDetailRespDTO> respDTOResponseData =remoteFeignService.getOrderdetailFromRemote(orderNo);
-
         OrderDetailRespDTO detailRespDTO = respDTOResponseData.getData();
         String  memNo = detailRespDTO.getRenterMember().getMemNo();
         modifyOrderReqVO.setMemNo(memNo);
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         //adminOrderService.modifyOrder(modifyOrderReqVO);
+        // 获取修改前数据
+ 		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(modifyOrderReqVO);
         remoteFeignService.modifyOrder(modifyOrderReqVO);
+        // 保存操作日志
+        modificationOrderService.saveModifyOrderLog(modifyOrderReqVO, modifyOrderConsoleDTO);
+
+        //记录日志
+        adminlog(modifyOrderReqVO);
+
         return ResponseData.success();
     }
+
+
+    private void adminlog(ModifyOrderReqVO modifyOrderReqVO){
+        try{
+            String orderNo = modifyOrderReqVO.getOrderNo();
+            if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId()) ||
+                    StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId()) ||
+                    StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
+                List<OrderCouponDTO> orderCouponDTOS = remoteFeignService.queryCouponByOrderNoFromRemote(orderNo);
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getCarOwnerCouponId())){
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getCarOwnerCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
+
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getSrvGetReturnCouponId())){
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getSrvGetReturnCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
+
+                if(StringUtils.isNotBlank(modifyOrderReqVO.getPlatformCouponId())){
+                    OrderCouponDTO orderCouponDTO = filterOrderCouponByCouponId(orderCouponDTOS, modifyOrderReqVO.getPlatformCouponId());
+                    if(orderCouponDTO != null){
+                        String desc = "添加 【"+orderCouponDTO.getCouponName()+"】 "+ orderCouponDTO.getCouponDesc();
+                        adminLogService.insertLog(AdminOpTypeEnum.COUPON_EDIT,orderNo,orderCouponDTO.getRenterOrderNo(),null,desc);
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error("优惠券编辑记录日志异常",e);
+        }
+    }
+    private OrderCouponDTO filterOrderCouponByCouponId(List<OrderCouponDTO> orderCouponDTOS, String couponId){
+        if(StringUtils.isBlank(couponId)){
+            return null;
+        }
+        Optional<OrderCouponDTO> first = Optional.ofNullable(orderCouponDTOS)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> couponId.equals(x.getCouponId()))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
+
+
 
     @AutoDocVersion(version = "订单修改")
     @AutoDocGroup(group = "订单修改")
@@ -100,9 +166,12 @@ public class AdminOrderController {
          }
          cancelOrderByPlatVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
          adminOrderService.cancelOrderByAdmin(cancelOrderByPlatVO);
+         try{
+            adminLogService.insertLog(AdminOpTypeEnum.CANCEL_ORDER_PLAT,cancelOrderByPlatVO.getOrderNo(),AdminOpTypeEnum.CANCEL_ORDER_PLAT.getOpType());
+         }catch (Exception e){
+             log.error("修改订单-平台取消日志记录异常",e);
+         }
          return ResponseData.success();
-
-
     }
 
     @AutoDocVersion(version = "订单修改")
@@ -112,8 +181,19 @@ public class AdminOrderController {
     public ResponseData cancelOrder(@Valid @RequestBody CancelOrderVO cancelOrderVO, BindingResult bindingResult)throws Exception{
         log.info("车主或者租客取消-reqVo={}", JSON.toJSONString(cancelOrderVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-
         ResponseData responseData = adminOrderService.cancelOrder(cancelOrderVO);
+        try{
+            AdminOpTypeEnum adminOpTypeEnum = AdminOpTypeEnum.OTHER;
+            if("1".equals(cancelOrderVO.getMemRole())){
+                adminOpTypeEnum = AdminOpTypeEnum.CANCEL_ORDER_OWNER_PLAT;
+            }else if("2".equals(cancelOrderVO.getMemRole())){
+                adminOpTypeEnum = AdminOpTypeEnum.CANCEL_ORDER_RENTER_PLAT;
+            }
+            String desc = adminOpTypeEnum.getOpType()+" 取消原因："+cancelOrderVO.getCancelReason()==null?"":cancelOrderVO.getCancelReason();
+            adminLogService.insertLog(adminOpTypeEnum,cancelOrderVO.getOrderNo(),desc);
+        }catch (Exception e){
+            log.error("修改订单-平台取消日志记录异常",e);
+        }
         return responseData;
     }
 
@@ -219,7 +299,11 @@ public class AdminOrderController {
         req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         BeanUtils.copyProperties(reqVO,req);
         req.setCarNo(carNo);
+        String oldPlateNum = remoteFeignService.getCarPlateNum(reqVO.getOrderNo());
         adminOrderService.transferCar(req);
+        String updPlateNum = remoteFeignService.getCarPlateNum(reqVO.getOrderNo());
+        // 保存操作日志
+        modificationOrderService.saveTransferLog(reqVO.getOrderNo(), oldPlateNum, updPlateNum);
         return ResponseData.success();
 
 

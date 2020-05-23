@@ -3,6 +3,7 @@
  */
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
@@ -79,4 +80,21 @@ public interface FeignOrderModifyService {
 	 */
 	@GetMapping("/order/transferrecord/list")
 	public ResponseData<List<OrderTransferRecordDTO>> listTransferRecord(@RequestParam(value="orderNo",required = true) String orderNo);
+	
+	/**
+     * 获取修改前数据
+     * @param modifyOrderReq
+     * @param bindingResult
+     * @return ResponseData
+     */
+    @PostMapping("/order/beforemodifydata/get")
+    public ResponseData<ModifyOrderConsoleDTO> getInitModifyOrderDTO(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
+    
+    /**
+	 * 根据订单号获取车牌号
+	 * @param orderNo
+	 * @return ResponseData<String>
+	 */
+	@GetMapping("/order/carplatenum/get")
+    public ResponseData<String> getCarPlateNum(@RequestParam(value="orderNo",required = true) String orderNo);
 }

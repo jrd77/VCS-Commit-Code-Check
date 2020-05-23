@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.vo.resp;
 
+import com.atzuche.order.admin.dto.log.AdminOperateLogDTO;
 import com.atzuche.order.admin.entity.AdminOperateLogEntity;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -13,5 +14,5 @@ import java.util.List;
 @Data
 public class LogListRespVO {
     @AutoDocProperty(value = "日志记录列表")
-    private List<AdminOperateLogEntity> logs;
+    private List<AdminOperateLogDTO> logs;
 }

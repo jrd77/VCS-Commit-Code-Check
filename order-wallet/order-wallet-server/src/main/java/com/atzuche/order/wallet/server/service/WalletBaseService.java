@@ -24,6 +24,15 @@ public class WalletBaseService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     public void doUpdateWallet(String memNo, String orderNo, int expensePayBalance, int expenseGiveBalance,String expDesc){
+        WalletEntity entity = walletMapper.getWalletByMemNo(memNo);
+        if(entity==null){
+            entity = new WalletEntity();
+            entity.setBalance(0);
+            entity.setGiveBalance(0);
+            entity.setMemNo(memNo);
+            entity.setPayBalance(0);
+            walletMapper.insertWallet(entity);
+        }
         int count = walletMapper.updateWallet(memNo,expensePayBalance,expenseGiveBalance);
         if(count==0){
             throw new RuntimeException("update wallet version error");

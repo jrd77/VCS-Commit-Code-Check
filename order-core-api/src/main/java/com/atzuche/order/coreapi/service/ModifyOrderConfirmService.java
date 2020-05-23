@@ -21,7 +21,6 @@ import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -91,6 +90,8 @@ public class ModifyOrderConfirmService {
 	private OrderFlowService orderFlowService;
 	@Autowired
 	private OrderSourceStatService orderSourceStatService;
+	@Autowired
+	private SubmitOrderHandleService submitOrderHandleService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -205,6 +206,8 @@ public class ModifyOrderConfirmService {
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
 		}
+		// 换车更新停运费信息
+		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
 	}
 	
 	
@@ -237,6 +240,8 @@ public class ModifyOrderConfirmService {
 			req.setSceneCode(orderEntity.getEntryCode());
 			req.setSource(orderEntity.getSource()+"");
 		}
+		req.setRentTime(modifyOrderDTO.getRentTime());
+		req.setRevertTime(modifyOrderDTO.getRevertTime());
 		reqContext.setOrderReqVO(req);
 		return reqContext;
 	}

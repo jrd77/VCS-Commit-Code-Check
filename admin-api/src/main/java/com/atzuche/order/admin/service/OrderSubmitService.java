@@ -77,7 +77,7 @@ public class OrderSubmitService {
         param.setUseSpecialPrice(reqVO.getUseSpecialPrice());
         param.setOperator(AdminUserUtil.getAdminUser().getAuthName());
 
-        param.setCityName(reqVO.getRentCity());
+        param.setCityName(reqVO.getCity());
 
 
         param.setMemNo(reqVO.getMemNo());

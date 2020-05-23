@@ -12,6 +12,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,23 +39,24 @@ public class OrderConsoleCostHandleService {
     private OrderConsoleCostDetailService orderConsoleCostDetailService;
     @Autowired
     private OrderStatusService orderStatusService;
-
+    @Autowired
+    private RenterOrderService renterOrderService;
 
     /**
      * 获取订单车辆押金暂扣扣款信息
      *
      * @param orderNo 订单号
-     * @param memNo   租客会员号
      * @param cashNos 费用项列表
      * @return GetTempCarDepositInfoResVO
      */
-    public GetTempCarDepositInfoResVO getTempCarDepoistInfos(String orderNo, String memNo, List<String> cashNos) {
-        log.info("获取订单车辆押金暂扣扣款信息.param is,orderNo:[{}],memNo:[{}],cashNos:[{}]", orderNo, memNo, cashNos);
+    public GetTempCarDepositInfoResVO getTempCarDepoistInfos(String orderNo, List<String> cashNos) {
+        log.info("获取订单车辆押金暂扣扣款信息.param is,orderNo:[{}],cashNos:[{}]", orderNo, cashNos);
+        String memNo = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo).getRenterMemNo();
         List<OrderConsoleCostDetailEntity> costList =
                 orderConsoleCostDetailService.getOrderConsoleCostByCondition(orderNo, memNo, cashNos);
         List<TempCarDepoistInfoResVO> tempCarDepoists = new ArrayList<>();
         if (CollectionUtils.isEmpty(costList)) {
-            tempCarDepoists = initTempCarDepoistList(cashNos, OrderConstant.ZERO);
+            tempCarDepoists = initTempCarDepoistList(cashNos);
         } else {
             List<String> cashNoList = costList.stream().map(OrderConsoleCostDetailEntity::getSubsidyTypeCode).collect(Collectors.toList());
             Map<String, OrderConsoleCostDetailEntity> dataMap =
@@ -99,9 +101,11 @@ public class OrderConsoleCostHandleService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveTempCarDeposit(SaveTempCarDepositInfoReqVO reqVO) {
-        int total = orderConsoleCostDetailService.saveOrderConsoleCostDetai(buildOrderConsoleCostDetailEntity(reqVO));
+        String memNo = renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo()).getRenterMemNo();
+        int total = orderConsoleCostDetailService.saveOrderConsoleCostDetai(buildOrderConsoleCostDetailEntity(memNo,
+                reqVO));
         log.info("Save temp car depoist. result is, orderNo:[{}], memNo:[{}], total:[{}]", reqVO.getOrderNo(),
-                reqVO.getMemNo(), total);
+                memNo, total);
     }
 
 
@@ -109,13 +113,12 @@ public class OrderConsoleCostHandleService {
      * 初始化费用列表
      *
      * @param cashNos 费用项集合
-     * @param amt     费用项金额
      * @return List<TempCarDepoistInfoResVO>
      */
-    private List<TempCarDepoistInfoResVO> initTempCarDepoistList(List<String> cashNos, int amt) {
+    private List<TempCarDepoistInfoResVO> initTempCarDepoistList(List<String> cashNos) {
         List<TempCarDepoistInfoResVO> list = new ArrayList<>();
         cashNos.forEach(c -> {
-            TempCarDepoistInfoResVO res = buildTempCarDepoistInfoResVO(OrderConstant.ZERO, c, amt);
+            TempCarDepoistInfoResVO res = buildTempCarDepoistInfoResVO(OrderConstant.ZERO, c, OrderConstant.ZERO);
             list.add(res);
         });
         log.info("Init temp carDepoist list. result is,list:[{}]", JSON.toJSONString(list));
@@ -145,9 +148,11 @@ public class OrderConsoleCostHandleService {
      * 构建OrderConsoleCostDetailEntity
      *
      * @param reqVO 请求参数
+     * @param memNo 会员号
      * @return List<OrderConsoleCostDetailEntity>
      */
-    private List<OrderConsoleCostDetailEntity> buildOrderConsoleCostDetailEntity(SaveTempCarDepositInfoReqVO reqVO) {
+    private List<OrderConsoleCostDetailEntity> buildOrderConsoleCostDetailEntity(String memNo,
+                                                                                 SaveTempCarDepositInfoReqVO reqVO) {
 
         List<OrderConsoleCostDetailEntity> list = new ArrayList<>();
         List<TempCarDepoistInfoResVO> tempCarDepoists = reqVO.getTempCarDepoists();
@@ -163,7 +168,7 @@ public class OrderConsoleCostHandleService {
                 } else {
                     //新增
                     entity.setOrderNo(reqVO.getOrderNo());
-                    entity.setMemNo(reqVO.getMemNo());
+                    entity.setMemNo(memNo);
                     entity.setSubsidyTypeCode(t.getCashNo());
                     entity.setSubsidTypeName(t.getCashTitle());
                     entity.setSubsidyCostCode(t.getCashNo());

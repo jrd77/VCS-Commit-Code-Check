@@ -106,11 +106,17 @@ public class IllegalSmsSendService {
                             templateMap.put("templateId", templateId);
                             templateMap.put("memberNo", String.valueOf(renterNo));
                             templateMap.put("sendMsg", MSG);
-                            templateMap.put("violationTime", DateUtils.formate(illegalDetail.getIllegalTime(),STYLE_2));
-                            templateMap.put("violationAddress", illegalDetail.getIllegalAddr());
-                            templateMap.put("violationType", illegalDetail.getIllegalReason());
-                            templateMap.put("violationFine", illegalDetail.getIllegalAmt()+"元");
-                            templateMap.put("violationPoints", "扣"+illegalDetail.getIllegalDeduct()+"分");
+                            if(illegalDetail != null){
+                                templateMap.put("violationAddress", illegalDetail.getIllegalAddr());
+                                templateMap.put("violationType", illegalDetail.getIllegalReason());
+                                templateMap.put("violationFine", illegalDetail.getIllegalAmt()+"元");
+                                templateMap.put("violationPoints", "扣"+illegalDetail.getIllegalDeduct()+"分");
+                            }
+                            if (illegalDetail != null && Objects.nonNull(illegalDetail.getIllegalTime())) {
+                            	templateMap.put("violationTime", DateUtils.formate(illegalDetail.getIllegalTime(),STYLE_2));
+                            }else {
+                            	templateMap.put("violationTime", "");
+                            }
                             templateMap.put("remark", "");
                             templateMap.put("url", h5Url + "/" + orderNo);
                             templateMap.put("pagePath", "");
@@ -135,11 +141,11 @@ public class IllegalSmsSendService {
         List<OwnerMemberEntity> owners = ownerMemberService.queryMemNoAndPhoneByOrderList(orderNos);
         Map<String, RenterMemberEntity> renterMap = new HashMap<>(renters.size());
         if(!CollectionUtils.isEmpty(renters)){
-            renterMap = renters.stream().collect(Collectors.toMap(RenterMemberEntity::getOrderNo, Function.identity()));
+            renterMap = renters.stream().collect(Collectors.toMap(RenterMemberEntity::getOrderNo, Function.identity(),(x,y)->x));
         }
         Map<String, OwnerMemberEntity> ownerMap = new HashMap<>(owners.size());
         if(!CollectionUtils.isEmpty(owners)){
-            ownerMap = owners.stream().collect(Collectors.toMap(OwnerMemberEntity::getOrderNo, Function.identity()));
+            ownerMap = owners.stream().collect(Collectors.toMap(OwnerMemberEntity::getOrderNo, Function.identity(),(x,y)->x));
         }
         for (String orderNo : orderNos) {
             Illegal illegal = new Illegal();

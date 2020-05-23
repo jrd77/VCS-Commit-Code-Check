@@ -3,7 +3,9 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.vo.req.SubmitOrderRiskCheckReqVO;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
 import com.autoyol.commons.web.ResponseData;
@@ -12,9 +14,13 @@ import com.autoyol.riskCheckService.api.VO.CreateOrderRiskCheckReponseVO;
 import com.autoyol.riskCheckService.api.VO.CreateOrderRiskCheckRequestVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,7 +45,12 @@ public class SubmitOrderRiskAuditService {
      * @param submitOrderRiskCheckReqVO 请求参数
      * @return Integer riskAuditId
      */
-    public String check(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
+    public String check(OrderReqContext context) {
+    	//提前返回
+    	if(context == null) {
+    		return "";
+    	}
+    	SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO = buildSubmitOrderRiskCheckReqVO(context.getOrderReqVO(), context.getOrderReqVO().getReqTime(),context.getRenterGoodsDetailDto().getWeekendPrice());
         logger.info("Submit order risk audit check.param is,submitOrderRiskCheckReqVO:[{}]",
                 JSON.toJSONString(submitOrderRiskCheckReqVO));
         
@@ -54,7 +65,11 @@ public class SubmitOrderRiskAuditService {
             logger.info("Invoke riskCheckServiceFeignService.checkWhenCreateOrder api. result is, responseData:[{}]",
                     JSON.toJSONString(responseData));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
-
+            
+            //封装RiskAuditId  200521
+            if(responseData != null && responseData.getData() != null) {
+            	context.setRiskAuditId(responseData.getData().getRiskReqId());
+            }
             ResponseCheckUtil.checkResponse(responseData);
 
             t.setStatus(Transaction.SUCCESS);
@@ -69,7 +84,16 @@ public class SubmitOrderRiskAuditService {
             t.complete();
         }
     }
-
+    
+    
+    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime,Integer weekendPrice) {
+		SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO = new SubmitOrderRiskCheckReqVO();
+		BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, SubmitOrderRiskCheckReqVO.class, false);
+		beanCopier.copy(orderReqVO, submitOrderRiskCheckReqVO, null);
+		submitOrderRiskCheckReqVO.setReqTime(LocalDateTimeUtils.localDateTimeToDate(reqTime));
+		submitOrderRiskCheckReqVO.setWeekendPrice(weekendPrice);
+		return submitOrderRiskCheckReqVO;
+	}
 
     private CreateOrderRiskCheckRequestVO buildCreateOrderRiskCheckRequestVO(SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO) {
         CreateOrderRiskCheckRequestVO createOrderRiskCheckRequestVO = new CreateOrderRiskCheckRequestVO();

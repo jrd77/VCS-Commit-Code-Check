@@ -121,5 +121,12 @@ public class CarDetailDTO {
     private Integer useType;
     @AutoDocProperty("功能类型文字释义")
     private String useTypeTxt;
-
+    @AutoDocProperty("协议厂车主交通费比例")
+    private String agreementStopFreightRate;
+    @AutoDocProperty("非协议厂车主交通费比例")
+    private String notagreementStopFreightRate;
+    @AutoDocProperty("协议厂车主交通费单价")
+    private Integer agreementStopFreightPrice;
+    @AutoDocProperty("非协议厂车主交通费单价")
+    private Integer notagreementStopFreightPrice;
 }
