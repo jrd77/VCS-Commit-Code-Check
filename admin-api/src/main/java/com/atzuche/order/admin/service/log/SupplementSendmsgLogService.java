@@ -10,15 +10,16 @@ import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
 import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
-import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSupplementPayMq;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 发送补付消息记录(SupplementSendmsgLog)表服务实现类
@@ -28,6 +29,12 @@ import java.util.List;
  */
 @Service("supplementSendmsgLogService")
 public class SupplementSendmsgLogService {
+
+    /**
+     * 发送补付短信消息的message
+     */
+    private static final String BUFU_ORDER_MESSAGE = "补付订单发送短信消息";
+
     @Autowired
     private SupplementSendmsgLogMapper supplementSendmsgLogMapper;
 
@@ -65,20 +72,55 @@ public class SupplementSendmsgLogService {
      * @return 实例对象
      */
 
-    public Integer insert(MessagePushSendReqVO reqVO) {
+    public Integer insert(MessagePushSendReqVO reqVO) throws Exception {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
+        Integer platform = reqVO.getPlatform();
         OrderMessage orderMessage = OrderMessage.builder().build();
-        OrderSupplementPayMq orderSupplementPayMq= new OrderSupplementPayMq();
-        orderSupplementPayMq.setAmount("100");
-        orderSupplementPayMq.setItem("测试补付项目");
-        orderSupplementPayMq.setOrderNo("81163141500299");
+        OrderSupplementPayMq orderSupplementPayMq = new OrderSupplementPayMq();
+        orderSupplementPayMq.setOrderNo(reqVO.getOrderNo()+"");
+        orderSupplementPayMq.setType(reqVO.getMessageType());
         orderMessage.setMessage(orderSupplementPayMq);
-        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.exchange,
-                NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.routingKey, orderMessage);
+        switch(platform){
+            case 0 ://系统
+                sendPlatformMessage(reqVO,orderMessage);
+                break;
+            case 1 :// 短信
+                sendShortMessage(reqVO,orderMessage);
+                break;
+        }
+      /*  baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.exchange,
+                NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.routingKey, orderMessage);*/
         log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
         int insert = this.supplementSendmsgLogMapper.insertSelective(supplementSendmsgLog);
         return insert;
+    }
+
+    private void sendShortMessage(MessagePushSendReqVO reqVO,OrderMessage orderMessage) {
+        Map map = Maps.newHashMap();
+        map.put("textCode", "SupplementPayMassage2Renter");
+        map.put("mobile", reqVO.getMobile());
+        map.put("message",reqVO.getContent() );
+        map.put("sender", 3);
+        map.put("type", 3);
+        map.put("item", reqVO.getItem());
+        map.put("amount", reqVO.getAmount());
+        map.put("orderNo",reqVO.getOrderNo());
+        map.put("url",reqVO.getUrl());
+        orderMessage.setMap(map);
+        baseProducer.sendTopicMessage("auto-order-action","test", orderMessage);
+    }
+
+    private void sendPlatformMessage(MessagePushSendReqVO reqVO,OrderMessage orderMessage) {
+        Map pushParamMap = Maps.newHashMap();
+        pushParamMap.put("consoleDynamicContent", reqVO.getContent());
+        pushParamMap.put("renterFlag",reqVO.getEvent());
+        pushParamMap.put("messageType",reqVO.getMessageType());
+        pushParamMap.put("event",reqVO.getEvent());
+        pushParamMap.put("orderNo",reqVO.getOrderNo());
+        // app推送
+        orderMessage.setPushMap(pushParamMap);
+        baseProducer.sendTopicMessage("auto-order-action","test", orderMessage);
     }
 
     /**

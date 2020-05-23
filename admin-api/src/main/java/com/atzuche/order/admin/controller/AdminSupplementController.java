@@ -11,6 +11,7 @@ import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.dianping.cat.Cat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,14 +30,15 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 
 import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @RestController
 @AutoDocVersion(version = "订单补付")
 public class AdminSupplementController {
+
 	@Autowired
 	private AdminSupplementService adminSupplementService;
-
+	@Value("${sms_send_platform_service}")
+    public String reqUrl;
     @Autowired
     private SupplementSendmsgLogService supplementSendmsgLogService;
 
@@ -69,9 +71,22 @@ public class AdminSupplementController {
     }
     @AutoDocMethod(description = "新后台发送补付消息", value = "新后台发送补付消息")
     @RequestMapping(value = "console/order/supplement/sendMsg", method = RequestMethod.POST)
-    public ResponseData<?> send(@Validated @RequestBody MessagePushSendReqVO messagePushSendReqVO, BindingResult bindingResult) {
+    public ResponseData<?> send(@Validated @RequestBody MessagePushSendReqVO messagePushSendReqVO, BindingResult bindingResult) throws Exception {
         log.info("发送消息开始,messagePushSendReqVO:[{}]", JSON.toJSONString(messagePushSendReqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
+       /* String ss = "textcode=ExemptPreOrderAutoCancelOrder2Owner";
+        String resContext = HttpReqUtil.get(reqUrl+"/template/get",ss);
+        Map<String,Object> cMap=jsonMapper.fromJson(resContext, Map.class);
+        if(cMap.get("resCode").equals("000000")){
+            String data = JSON.toJSONString(cMap.get("data"));
+            JSONObject parse = (JSONObject)JSONObject.parse(data);
+            Map map = Maps.newHashMap();
+            map.put("content",messagePushSendReqVO.getContent());
+            map.put("id",parse.get("id"));
+            HttpReqUtil.postByJson(reqUrl+"/template/update",JSON.toJSONString(map));
+        }
+        System.out.println( "fasssssssssssssssssssssss"+JSON.toJSONString(cMap)
+        );*/
         Integer res;
         try {
             res = supplementSendmsgLogService.insert(messagePushSendReqVO);
