@@ -89,7 +89,7 @@ public class RenterOrderInfoController {
      * @return
      */
     @GetMapping("/memberPhoneByMainOrderNo")
-    public ResponseData<String> selectrenterMemberByOrderNo(@RequestParam(value = "orderNo",required = false) String orderNo) {
+    public ResponseData<String> selectrenterMemberByOrderNo(String orderNo) {
         log.info("查询租客手机号入参[{}]",orderNo);
         String phone = renterMemberService.queryRenterPhoneByOrderNo(orderNo);
         log.info("查询租客手机号出参[{}]",phone);
