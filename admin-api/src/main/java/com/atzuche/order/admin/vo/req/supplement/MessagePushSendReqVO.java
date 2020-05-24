@@ -19,6 +19,10 @@ public class MessagePushSendReqVO {
     @NotNull(message = "订单号不能为空")
     private Long orderNo;
 
+    @AutoDocProperty("会员号,发短信需要该字段")
+    @NotNull(message = "会员号不能为空")
+    private Integer memNo;
+
     @AutoDocProperty("平台，0：app，1：短信")
     @NotNull(message = "平台不能为空")
     private Integer platform;

@@ -74,19 +74,6 @@ public class AdminSupplementController {
     public ResponseData<?> send(@Validated @RequestBody MessagePushSendReqVO messagePushSendReqVO, BindingResult bindingResult) throws Exception {
         log.info("发送消息开始,messagePushSendReqVO:[{}]", JSON.toJSONString(messagePushSendReqVO));
         BindingResultUtil.checkBindingResult(bindingResult);
-       /* String ss = "textcode=ExemptPreOrderAutoCancelOrder2Owner";
-        String resContext = HttpReqUtil.get(reqUrl+"/template/get",ss);
-        Map<String,Object> cMap=jsonMapper.fromJson(resContext, Map.class);
-        if(cMap.get("resCode").equals("000000")){
-            String data = JSON.toJSONString(cMap.get("data"));
-            JSONObject parse = (JSONObject)JSONObject.parse(data);
-            Map map = Maps.newHashMap();
-            map.put("content",messagePushSendReqVO.getContent());
-            map.put("id",parse.get("id"));
-            HttpReqUtil.postByJson(reqUrl+"/template/update",JSON.toJSONString(map));
-        }
-        System.out.println( "fasssssssssssssssssssssss"+JSON.toJSONString(cMap)
-        );*/
         Integer res;
         try {
             res = supplementSendmsgLogService.insert(messagePushSendReqVO);

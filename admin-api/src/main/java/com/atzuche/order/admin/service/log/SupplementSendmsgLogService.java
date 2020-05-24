@@ -2,6 +2,8 @@ package com.atzuche.order.admin.service.log;
 
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUser;
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.entity.SupplementSendmsgLog;
 import com.atzuche.order.admin.mapper.log.SupplementSendmsgLogMapper;
@@ -75,11 +77,14 @@ public class SupplementSendmsgLogService {
     public Integer insert(MessagePushSendReqVO reqVO) throws Exception {
         SupplementSendmsgLog supplementSendmsgLog = new SupplementSendmsgLog();
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
+        AdminUser adminUser = AdminUserUtil.getAdminUser();
+        supplementSendmsgLog.setCreateOp(adminUser.getAuthName());
         Integer platform = reqVO.getPlatform();
         OrderMessage orderMessage = OrderMessage.builder().build();
         OrderSupplementPayMq orderSupplementPayMq = new OrderSupplementPayMq();
         orderSupplementPayMq.setOrderNo(reqVO.getOrderNo()+"");
         orderSupplementPayMq.setType(reqVO.getMessageType());
+        orderSupplementPayMq.setRenterMemNo(reqVO.getMemNo());
         orderMessage.setMessage(orderSupplementPayMq);
         switch(platform){
             case 0 ://系统
