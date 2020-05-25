@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.accountownerincome.mapper.AddIncomeExcelEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="excel_href" property="excelHref" jdbcType="VARCHAR" />
+    <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP" />
+    <result column="uploder" property="uploder" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="operate_time" property="operateTime" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, file_name, excel_href, upload_time, uploder, status, operate, operate_time, del_flag
+  </sql>
+  
+  <sql id="whereCond">
+  	<where>
+  		del_flag=0
+  		<if test="fileName != null and fileName != ''">
+  			and file_name like concat('%',#{fileName},'%')
+  		</if>
+  	</where>
+  </sql>
+  
+  <select id ="queryListCount" resultType= "int" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO">
+        SELECT COUNT(*) FROM add_income_excel 
+        <include refid="whereCond" />
+  </select >
+  
+  <select id ="queryList" resultMap="BaseResultMap" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExcelQueryDTO">
+       SELECT <include refid="Base_Column_List" /> FROM add_income_excel
+         <include refid="whereCond" />
+       ORDER BY upload_time DESC LIMIT #{startIndex} , #{pageSize}
+  </select >
+     
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from add_income_excel
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from add_income_excel
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity" >
+    insert into add_income_excel (id, file_name, excel_href, 
+      upload_time, uploder, status, 
+      operate, operate_time, del_flag
+      )
+    values (#{id,jdbcType=BIGINT}, #{fileName,jdbcType=VARCHAR}, #{excelHref,jdbcType=VARCHAR}, 
+      #{uploadTime,jdbcType=TIMESTAMP}, #{uploder,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{operate,jdbcType=VARCHAR}, #{operateTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into add_income_excel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="excelHref != null" >
+        excel_href,
+      </if>
+      <if test="uploadTime != null" >
+        upload_time,
+      </if>
+      <if test="uploder != null" >
+        uploder,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="operate != null" >
+        operate,
+      </if>
+      <if test="operateTime != null" >
+        operate_time,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="excelHref != null" >
+        #{excelHref,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null" >
+        #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uploder != null" >
+        #{uploder,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="operate != null" >
+        #{operate,jdbcType=VARCHAR},
+      </if>
+      <if test="operateTime != null" >
+        #{operateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity" >
+    update add_income_excel
+    <set >
+      <if test="fileName != null" >
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="excelHref != null" >
+        excel_href = #{excelHref,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null" >
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uploder != null" >
+        uploder = #{uploder,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="operate != null" >
+        operate = #{operate,jdbcType=VARCHAR},
+      </if>
+      <if test="operateTime != null" >
+        operate_time = #{operateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity" >
+    update add_income_excel
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      excel_href = #{excelHref,jdbcType=VARCHAR},
+      upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      uploder = #{uploder,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      operate = #{operate,jdbcType=VARCHAR},
+      operate_time = #{operateTime,jdbcType=TIMESTAMP},
+      del_flag = #{delFlag,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

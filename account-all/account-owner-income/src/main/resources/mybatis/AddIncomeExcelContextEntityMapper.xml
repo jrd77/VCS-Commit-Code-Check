@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atzuche.order.accountownerincome.mapper.AddIncomeExcelContextEntityMapper" >
+  <resultMap id="BaseResultMap" type="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="add_id" property="addId" jdbcType="BIGINT" />
+    <result column="order_no" property="orderNo" jdbcType="BIGINT" />
+    <result column="mem_no" property="memNo" jdbcType="INTEGER" />
+    <result column="mobile" property="mobile" jdbcType="BIGINT" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="amt" property="amt" jdbcType="INTEGER" />
+    <result column="department" property="department" jdbcType="VARCHAR" />
+    <result column="apply_time" property="applyTime" jdbcType="VARCHAR" />
+    <result column="detail_type" property="detailType" jdbcType="VARCHAR" />
+    <result column="order_date" property="orderDate" jdbcType="VARCHAR" />
+    <result column="settle_mon" property="settleMon" jdbcType="VARCHAR" />
+    <result column="mem_type" property="memType" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" extends="BaseResultMap" >
+    <result column="describe" property="describe" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, add_id, order_no, mem_no, mobile, type, amt, department, apply_time, detail_type, 
+    order_date, settle_mon, mem_type
+  </sql>
+  <sql id="Blob_Column_List" >
+    describe
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from add_income_excel_context
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from add_income_excel_context
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    insert into add_income_excel_context (id, add_id, order_no, 
+      mem_no, mobile, type, 
+      amt, department, apply_time, 
+      detail_type, order_date, settle_mon, 
+      mem_type, describe)
+    values (#{id,jdbcType=BIGINT}, #{addId,jdbcType=BIGINT}, #{orderNo,jdbcType=BIGINT}, 
+      #{memNo,jdbcType=INTEGER}, #{mobile,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, 
+      #{amt,jdbcType=INTEGER}, #{department,jdbcType=VARCHAR}, #{applyTime,jdbcType=VARCHAR}, 
+      #{detailType,jdbcType=VARCHAR}, #{orderDate,jdbcType=VARCHAR}, #{settleMon,jdbcType=VARCHAR}, 
+      #{memType,jdbcType=INTEGER}, #{describe,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    insert into add_income_excel_context
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="addId != null" >
+        add_id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="memNo != null" >
+        mem_no,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="amt != null" >
+        amt,
+      </if>
+      <if test="department != null" >
+        department,
+      </if>
+      <if test="applyTime != null" >
+        apply_time,
+      </if>
+      <if test="detailType != null" >
+        detail_type,
+      </if>
+      <if test="orderDate != null" >
+        order_date,
+      </if>
+      <if test="settleMon != null" >
+        settle_mon,
+      </if>
+      <if test="memType != null" >
+        mem_type,
+      </if>
+      <if test="describe != null" >
+        describe,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="addId != null" >
+        #{addId,jdbcType=BIGINT},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=BIGINT},
+      </if>
+      <if test="memNo != null" >
+        #{memNo,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=BIGINT},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null" >
+        #{amt,jdbcType=INTEGER},
+      </if>
+      <if test="department != null" >
+        #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="detailType != null" >
+        #{detailType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        #{orderDate,jdbcType=VARCHAR},
+      </if>
+      <if test="settleMon != null" >
+        #{settleMon,jdbcType=VARCHAR},
+      </if>
+      <if test="memType != null" >
+        #{memType,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    update add_income_excel_context
+    <set >
+      <if test="addId != null" >
+        add_id = #{addId,jdbcType=BIGINT},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=BIGINT},
+      </if>
+      <if test="memNo != null" >
+        mem_no = #{memNo,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=BIGINT},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null" >
+        amt = #{amt,jdbcType=INTEGER},
+      </if>
+      <if test="department != null" >
+        department = #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        apply_time = #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="detailType != null" >
+        detail_type = #{detailType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        order_date = #{orderDate,jdbcType=VARCHAR},
+      </if>
+      <if test="settleMon != null" >
+        settle_mon = #{settleMon,jdbcType=VARCHAR},
+      </if>
+      <if test="memType != null" >
+        mem_type = #{memType,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        describe = #{describe,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    update add_income_excel_context
+    set add_id = #{addId,jdbcType=BIGINT},
+      order_no = #{orderNo,jdbcType=BIGINT},
+      mem_no = #{memNo,jdbcType=INTEGER},
+      mobile = #{mobile,jdbcType=BIGINT},
+      type = #{type,jdbcType=VARCHAR},
+      amt = #{amt,jdbcType=INTEGER},
+      department = #{department,jdbcType=VARCHAR},
+      apply_time = #{applyTime,jdbcType=VARCHAR},
+      detail_type = #{detailType,jdbcType=VARCHAR},
+      order_date = #{orderDate,jdbcType=VARCHAR},
+      settle_mon = #{settleMon,jdbcType=VARCHAR},
+      mem_type = #{memType,jdbcType=INTEGER},
+      describe = #{describe,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
+    update add_income_excel_context
+    set add_id = #{addId,jdbcType=BIGINT},
+      order_no = #{orderNo,jdbcType=BIGINT},
+      mem_no = #{memNo,jdbcType=INTEGER},
+      mobile = #{mobile,jdbcType=BIGINT},
+      type = #{type,jdbcType=VARCHAR},
+      amt = #{amt,jdbcType=INTEGER},
+      department = #{department,jdbcType=VARCHAR},
+      apply_time = #{applyTime,jdbcType=VARCHAR},
+      detail_type = #{detailType,jdbcType=VARCHAR},
+      order_date = #{orderDate,jdbcType=VARCHAR},
+      settle_mon = #{settleMon,jdbcType=VARCHAR},
+      mem_type = #{memType,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <insert id ="saveAddIncomeExcelContextBatch" parameterType="java.util.List" >
+  	insert into add_income_excel_context (add_id, order_no, 
+      mem_no, mobile, type, 
+      amt, department, apply_time, 
+      detail_type, order_date, settle_mon, 
+      mem_type, describe)
+    values 
+    <foreach collection ="list" item="aiec" index= "index" separator =",">
+    (#{aiec.addId}, #{aiec.orderNo}, 
+      #{aiec.memNo}, #{aiec.mobile}, #{aiec.type}, 
+      #{aiec.amt}, #{aiec.department}, #{aiec.applyTime}, 
+      #{aiec.detailType}, #{aiec.orderDate}, #{aiec.settleMon}, 
+      #{aiec.memType}, #{aiec.describe})
+     </foreach>
+  </insert>
+  
+</mapper>
