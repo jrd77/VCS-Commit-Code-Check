@@ -41,7 +41,7 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="平台保障费  基础保障费")
 	private String insuranceAmount;
 
-	@AutoDocProperty(value="全面保障服务费 全面保障服务费")
+	@AutoDocProperty(value="补充保障服务费 补充保障服务费")
 	private String supperInsuranceAmount;
 
 	@AutoDocProperty(value="手续费")
@@ -61,6 +61,17 @@ public class OrderRenterCostResVO {
 
     @AutoDocProperty(value = "驾乘无忧保障服务费")
     private String driverInsurAmt;
+
+    @AutoDocProperty(value = "是否可以购买驾乘无忧保障险 0：否,  1:是")
+    private Integer isDriverInsur = 1;
+
+    @AutoDocProperty(value = "是否可以购买轮胎保障服务费险 0：否,  1:是")
+    private Integer isTyreInsur = 1;
+
+    @AutoDocProperty(value="是否可以购买补充保障服务费  0：否,  1:是")
+    private Integer isSupperInsurance = 1;
+
+
 	
 	//--------------------------------------------
 	

@@ -39,7 +39,7 @@ public class ModificationOrderResponseVO implements Serializable{
 	@AutoDocProperty(value="平台保障费")
 	private String insuranceAmount;
 
-	@AutoDocProperty(value="全面保障服务费")
+	@AutoDocProperty(value="补充保障服务费")
 	private String supperInsuranceAmount;
 
 	@AutoDocProperty(value="附加驾驶员险")

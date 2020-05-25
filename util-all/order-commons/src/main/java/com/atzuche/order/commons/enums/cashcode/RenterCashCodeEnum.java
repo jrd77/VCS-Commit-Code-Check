@@ -56,8 +56,8 @@ public enum RenterCashCodeEnum {
 	SUBSIDY_RENTAMT("12120009","租金补贴"),
 	//其他补贴
 	SUBSIDY_OTHER("12120010","其他补贴"),
-	//全面保障服务费补贴
-	SUBSIDY_ABATEMENT("12120011","全面保障服务费补贴"),
+	//补充保障服务费补贴
+	SUBSIDY_ABATEMENT("12120011","补充保障服务费补贴"),
 	//手续费补贴
 	SUBSIDY_FEE("12120012","手续费补贴"),
 	//租客给车主的调价

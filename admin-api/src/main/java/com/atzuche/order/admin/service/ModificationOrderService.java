@@ -222,7 +222,7 @@ public class ModificationOrderService {
 		String rentAmtCashNo =  RenterCashCodeEnum.RENT_AMT.getCashNo();
 		//平台保障费
 		String insureCashNo = RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo();
-		//全面保障服务费
+		//补充保障服务费
 		String abatementCashNo = RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo();
 		//附加驾驶员险
 		String driverCashNo = RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo();

@@ -3,6 +3,7 @@
  */
 package com.atzuche.order.admin.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
@@ -11,11 +12,14 @@ import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
@@ -93,10 +97,12 @@ public class OrderCostService {
         if(costVo != null) {
              logger.info("costVo toString=[{}]",costVo.toString());
         }
+        //是否可以购买驾乘无忧险，补充保障费和轮胎险
+        isPurchaseInsurance(realVo,data,req);
 
         //租金费用  费用明细表renter_order_cost_detail
         putRenterOrderCostDetail(realVo,data);
-        //平台保障费、全面保障服务费 （长租不需要这两个费用）
+        //平台保障费、补充保障服务费 （长租不需要这两个费用）
         putInsureAbatementAmt(realVo,data);
         //租客订单对象
 
@@ -129,10 +135,37 @@ public class OrderCostService {
         //rentFeeBase基础费用
         putRentFeeBase(realVo,data);
 
+
+
+
 		return realVo;
 	}
-	
-	/*
+
+    private void isPurchaseInsurance(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data,OrderCostReqVO req) {
+
+        OrderStatusDTO orderStatusDTO = data.getOrderStatusDTO();
+        if(orderStatusDTO == null || orderStatusDTO.getStatus() == null){
+            logger.error("订单状态查询失败,订单状态为空 req={}", JSON.toJSONString(req));
+            throw new OrderStatusNotFoundException();
+        }
+        if(orderStatusDTO.getStatus() >= OrderStatusEnum.TO_RETURN_CAR.getStatus() || orderStatusDTO.getStatus() == OrderStatusEnum.CLOSED.getStatus()){
+            realVo.setIsDriverInsur(0);
+            realVo.setIsTyreInsur(0);
+            realVo.setIsSupperInsurance(0);
+            return;
+        }
+        List<RenterOrderCostDetailResVO> renterOrderCostDetailList = data.getRenterOrderCostDetailList();
+        Optional.ofNullable(renterOrderCostDetailList).orElseGet(ArrayList::new).stream().forEach(x->{
+           if(RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo().equals(x.getCostCode())){
+               realVo.setIsTyreInsur(0);
+           }else if(RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo().equals(x.getCostCode())){
+               realVo.setIsDriverInsur(0);
+           }else if(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(x.getCostCode())){
+               realVo.setIsSupperInsurance(0);
+           }
+       });
+    }
+    /*
 	 * 租客支付给平台的费用
 	 */
 	private void putRenterToPlatformCost(OrderRenterCostResVO realVo,
@@ -559,7 +592,7 @@ public class OrderCostService {
     private void putInsureAbatementAmt(OrderRenterCostResVO realVo,com.atzuche.order.commons.vo.res.OrderRenterCostResVO data){
         //平台保障费
         String insureCashNo = RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo();
-        //全面保障服务费
+        //补充保障服务费
         String abatementCashNo = RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo();
         //费用列表
         List<RenterOrderCostDetailResVO> costList = data.getRenterOrderCostDetailList();
@@ -578,7 +611,7 @@ public class OrderCostService {
         }
         //基础保障费
         realVo.setInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(insuranceAmount)));
-        //全面保障服务费
+        //补充保障服务费
         realVo.setSupperInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(supperInsuranceAmount)));
     }
 
@@ -1103,6 +1136,8 @@ public class OrderCostService {
         }
         RenterCostVO costVo = data.getRenterCostVO();
         RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
+        //是否可以购买驾乘无忧险，补充保障费和轮胎险
+        isPurchaseInsurance(realVo,data,req);
         //租金费用  费用明细表renter_order_cost_detail
         putRenterOrderCostDetail(realVo,data);
         //优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
