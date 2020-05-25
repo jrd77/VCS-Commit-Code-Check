@@ -10,14 +10,14 @@ public class DebtDetailVO {
 	/**
 	 * 会员历史欠款
 	 */
-	private Integer historyDebtAmt;
+	private Integer historyDebtAmt = 0;
 	/**
 	 * 会员订单欠款
 	 */
-	private Integer orderDebtAmt;
+	private Integer orderDebtAmt = 0;
 	
 	/**
 	 * 未支付的补付
 	 */
-	private Integer noPaySupplementAmt;
+	private Integer noPaySupplementAmt = 0;
 }

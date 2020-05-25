@@ -56,6 +56,8 @@ public class PreOrderAdminResponseVO {
     private List<DisCouponMemInfoVO> platCouponList;
     @AutoDocProperty(value = "取还车优惠券列表")
     private List<DisCouponMemInfoVO> getCarCouponList;
+    @AutoDocProperty(value = "是否可购买驾乘无忧险 0：不可以购买 1：可以购买")
+    private Integer isDriverInsure =0;
 
 
     @Data

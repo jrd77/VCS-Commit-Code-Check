@@ -255,7 +255,7 @@
     </select>
 
     <select id="queryMemNoAndPhoneByOrderList" resultMap="BaseResultMap">
-        SELECT
+        SELECT DISTINCT
             order_no,
             mem_no,
             phone
@@ -271,6 +271,9 @@
 
     <select id="queryRenterInfoByOrderNoAndRenterNo" resultMap="BaseResultMap">
         select mem_no,phone,real_name from renter_member where order_no = #{orderNo} and mem_no = #{renterNo} and is_delete = 0 order by id desc limit 1
+    </select>
+    <select id="queryRenterPhoneByOrderNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select phone from renter_member where order_no = #{orderNo} limit 1
     </select>
 
 </mapper>

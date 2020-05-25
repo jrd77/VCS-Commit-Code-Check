@@ -4,6 +4,7 @@
 package com.atzuche.order.commons.vo.res;
 
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostSettleResVO;
@@ -24,6 +25,11 @@ import java.util.List;
  */
 @Data
 public class OrderRenterCostResVO {
+    /*
+    * 订单状态
+    * */
+    private OrderStatusDTO orderStatusDTO;
+
 	/*
 	 * 需要补付金额
 	 */

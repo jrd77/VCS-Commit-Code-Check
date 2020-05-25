@@ -56,15 +56,18 @@ public enum RenterCashCodeEnum {
 	SUBSIDY_RENTAMT("12120009","租金补贴"),
 	//其他补贴
 	SUBSIDY_OTHER("12120010","其他补贴"),
-	//全面保障服务费补贴
-	SUBSIDY_ABATEMENT("12120011","全面保障服务费补贴"),
+	//补充保障服务费补贴
+	SUBSIDY_ABATEMENT("12120011","补充保障服务费补贴"),
 	//手续费补贴
 	SUBSIDY_FEE("12120012","手续费补贴"),
 	//租客给车主的调价
 	SUBSIDY_RENTERTOOWNER_ADJUST("12120013","租客给车主的调价补贴"),
 	//车主给租客的调价
 	SUBSIDY_OWNERTORENTER_ADJUST("12120014","车主给租客的调价补贴"),
-	
+    //轮胎、轮毂保障费补贴
+    SUBSIDY_TYRE_INSURE_TOTAL_PRICES("12120015","轮胎/轮毂保障费补贴"),
+    //驾乘无忧保障费补贴
+    SUBSIDY_DRIVER_INSURE_TOTAL_PRICES("12120016","驾乘无忧保障费补贴"),
     
 	//	第三区域块 看第4位，从3开始。  后4位从0001开始
     ACCOUNT_WALLET_COST("11130001","个人钱包"),

@@ -54,9 +54,9 @@ public class AccountRenterDetainCostNoTService {
      * @param detainRenterDeposit 暂扣信息
      */
     public void changeRenterDetainCost(ChangeDetainRenterDepositReqVO detainRenterDeposit) {
-        if (detainRenterDeposit.getAmt() == 0) {
-            throw new AccountRenterDetainDetailException();
-        }
+//        if (detainRenterDeposit.getAmt() == 0) {
+//            throw new AccountRenterDetainDetailException();
+//        }
         AccountRenterDetainCostEntity accountRenterWzDepositCost = accountRenterDetainCostMapper.getRenterDetainAmt(detainRenterDeposit.getOrderNo(), detainRenterDeposit.getMemNo());
         AccountRenterDetainCostEntity accountRenterDetainCostEntity = new AccountRenterDetainCostEntity();
         if (null == accountRenterWzDepositCost) {

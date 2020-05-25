@@ -235,6 +235,18 @@ public class RenterGoodsDetailDTO {
     private Double serviceProxyRate;
 
     /**
+     * 固定平台服务费比例
+     */
+    @AutoDocProperty("固定平台服务费比例")
+    private Double fixedServiceRate;
+    /**
+     * 当前使用的服务费比例(平台服务费比例/代官车服务费比例/固定平台服务费比例)
+     */
+    @AutoDocProperty("当前使用的服务费比例(平台服务费比例/代官车服务费比例/固定平台服务费比例)")
+    private Double useServiceRate;
+
+
+    /**
      * 一天一价
      */
     @AutoDocProperty("一天一价")

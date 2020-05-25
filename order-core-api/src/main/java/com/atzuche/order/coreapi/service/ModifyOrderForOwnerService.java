@@ -315,10 +315,15 @@ public class ModifyOrderForOwnerService {
 		// 获取车主还车费用
 		OwnerOrderIncrementDetailEntity srvReturnFeeEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvReturnFlag());
 		// 平台服务费比例
-		Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
+		//Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
 		// 代管车服务费比例
-		Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
-		if (CommonUtils.isEscrowCar(ownerGoodsDetailDTO.getCarOwnerType())) {
+		//Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
+
+
+        Double useServiceRate = ownerGoodsDetailDTO.getUseServiceRate();
+
+
+        /*if (CommonUtils.isEscrowCar(ownerGoodsDetailDTO.getCarOwnerType())) {
 			serviceRate = serviceProxyRate;
 		}
 		if (serviceRate != null ) {
@@ -331,7 +336,20 @@ public class ModifyOrderForOwnerService {
 			if (serviceFeeEntity != null) {
 				incrementList.add(serviceFeeEntity);
 			}
-		}
+		}*/
+        if (useServiceRate != null ) {
+            // 租金总和
+            Integer purchaseAmount = 0;
+            if (purchaseList != null && !purchaseList.isEmpty()) {
+                purchaseAmount = purchaseList.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
+            }
+            OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount, useServiceRate.intValue());
+            if (serviceFeeEntity != null) {
+                incrementList.add(serviceFeeEntity);
+            }
+        }
+
+
 		// gps费
 		String gpsSerialNumber = ownerGoodsDetailDTO.getGpsSerialNumber();
 		List<Integer> lsGpsSerialNumber = null;
