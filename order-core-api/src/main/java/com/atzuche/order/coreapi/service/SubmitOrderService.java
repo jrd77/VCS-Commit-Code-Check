@@ -200,6 +200,7 @@ public class SubmitOrderService {
         ownerOrderReqDTO.setShowRevertTime(null == carRentTimeRangeResVO ? null : carRentTimeRangeResVO.getDelayEndDate());
         ownerOrderReqDTO.setMemNo(renterGoodsDetailDTO.getOwnerMemNo());
         ownerOrderReqDTO.setGpsSerialNumber(renterGoodsDetailDTO.getGpsSerialNumber());
+        ownerOrderReqDTO.setUseServiceRate(ownerOrderReqDTO.getUseServiceRate());
         ownerOrderService.generateRenterOrderInfo(ownerOrderReqDTO);
         //5.3.接收车主订单返回信息
 
@@ -479,7 +480,7 @@ public class SubmitOrderService {
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
-
+        ownerOrderReqDTO.setUseServiceRate(reqContext.getOwnerGoodsDetailDto().getUseServiceRate());
         LOGGER.info("Build owner order reqDTO,result is ,ownerOrderReqDTO:[{}]",
                 JSON.toJSONString(ownerOrderReqDTO));
 

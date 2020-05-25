@@ -35,6 +35,8 @@ public interface CashierRefundApplyMapper{
     
     List<CashierRefundApplyEntity> getCashierRefundApplyByTime(@Param("date")LocalDateTime date);
     List<CashierRefundApplyEntity> getCashierRefundApplyByTimeForPreAuth(@Param("date")LocalDateTime date);
+    //统计4小时循环扣款的金额
+    Integer getCashierRefundApplyByTimeForPreAuthSum(@Param("memNo") String memNo);
     
     List<CashierRefundApplyEntity> getRefundApplyByOrderNo(@Param("orderNo")String orderNo);
     List<CashierRefundApplyEntity> getRefundApplyByOrderNoPayKind(@Param("orderNo")String orderNo,@Param("payKind")String payKind);

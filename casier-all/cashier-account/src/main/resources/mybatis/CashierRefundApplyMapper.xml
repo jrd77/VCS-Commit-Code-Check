@@ -175,7 +175,13 @@
     <!-- 去掉  limit 100  -->
     <select id="getCashierRefundApplyByTimeForPreAuth" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        <![CDATA[ where status ='01' and create_time &gt;= #{date} and num &gt;= 3 and pay_type = '03' ]]>
+        <![CDATA[ where status ='01' and create_time < #{date} and num >= 3 and pay_type = '03' ]]>
+    </select>
+    
+    <!-- 去掉 and create_time < #{date} -->
+    <select id="getCashierRefundApplyByTimeForPreAuthSum" resultType="java.lang.Integer">
+        select SUM(amt) from cashier_refund_apply
+        <![CDATA[ where mem_no= #{memNo} and status ='01' and num >= 3 and pay_type = '03' ]]>
     </select>
     
     <select id="getRefundApplyByOrderNo" resultMap="BaseResultMap">

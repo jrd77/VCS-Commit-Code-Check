@@ -41,6 +41,7 @@ dependencies {
     compile('com.ctrip.framework.apollo:apollo-client:0.11.0-SNAPSHOT')
     compile ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     compile("org.mybatis:mybatis-typehandlers-jsr310:1.0.1")
+    compile("com.github.pagehelper:pagehelper:4.1.0")
     compile('net.coobird:thumbnailator:0.4.8')
 	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
@@ -49,9 +50,9 @@ dependencies {
         exclude module:'servlet-api'
     }
     compile("com.caucho:hessian:4.0.38")
-    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
+    compile("com.autoframework:auto-mq-event:2.0.1-SNAPSHOT")
 
-   
+
 
     //compile project(":casier-all:cashier-account")
 
@@ -73,5 +74,6 @@ dependencies {
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
+    compile project(":order-mq")
 
 }

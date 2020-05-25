@@ -1,6 +1,10 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.vo.delivery.OrderCarTrusteeshipVO;
 import com.atzuche.order.commons.vo.delivery.SimpleOrderInfoVO;
 import com.atzuche.order.commons.vo.req.DeliveryCarPriceReqVO;
@@ -18,6 +22,8 @@ import com.atzuche.order.delivery.vo.delivery.rep.DeliveryCarVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryCarRepVO;
 import com.atzuche.order.delivery.vo.delivery.req.DeliveryReqVO;
 import com.atzuche.order.delivery.vo.trusteeship.OrderCarTrusteeshipReqVO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.google.common.collect.Lists;
@@ -47,6 +53,8 @@ public class DeliveryCarInfoController {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     private DeliveryOrderService deliveryOrderService;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     /**
      * 获取油费
@@ -119,6 +127,12 @@ public class DeliveryCarInfoController {
      */
     @PostMapping("/updateHandoverCarInfo")
     public ResponseData<?> updateHandoverCarInfo(@RequestBody DeliveryCarVO deliveryCarVO) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(deliveryCarVO.getOrderNo());
+        if (orderStatusEntity.getStatus() > OrderStatusEnum.TO_SETTLE.getStatus()
+                || orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()) {
+            log.error("已经结算不允许编辑orderNo:[{}]", deliveryCarVO.getOrderNo());
+            throw new NotAllowedEditException();
+        }
     	try {
 			deliveryOrderService.updateHandoverCarInfo(deliveryCarVO);
 		} catch (Exception e) {
