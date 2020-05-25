@@ -79,6 +79,12 @@ public class SupplementSendmsgLogService {
         BeanUtils.copyProperties(reqVO,supplementSendmsgLog);
         AdminUser adminUser = AdminUserUtil.getAdminUser();
         supplementSendmsgLog.setCreateOp(adminUser.getAuthName());
+        if(reqVO.getEvent()!=null && reqVO.getEvent()==274){
+            supplementSendmsgLog.setUrl("订单详情页");
+        }
+        if(reqVO.getEvent()!=null && reqVO.getEvent()==286){
+            supplementSendmsgLog.setUrl("订单-补付详情页");
+        }
         Integer platform = reqVO.getPlatform();
         OrderMessage orderMessage = OrderMessage.builder().build();
         OrderSupplementPayMq orderSupplementPayMq = new OrderSupplementPayMq();
