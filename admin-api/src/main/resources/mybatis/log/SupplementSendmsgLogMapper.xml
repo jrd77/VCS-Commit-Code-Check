@@ -255,7 +255,7 @@
         FROM supplement_sendmsg_log
         WHERE order_no = #{orderNo}
         <if test="orderSupplementDetailId != null">
-            and order_supplement_detail_id #{orderSupplementDetailId}
+            and order_supplement_detail_id  = #{orderSupplementDetailId}
         </if>
         <if test="idSort != null">
             order by order_supplement_detail_id ${idSort}
