@@ -20,6 +20,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.StringUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
@@ -193,7 +194,9 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+        //orderDetailReqDTO
+        //remoteFeignService.getOrderStatusFromRemote();
         try {
         	orderCostDetailService.insertAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
             //日志记录
