@@ -36,6 +36,10 @@ public class OrderSettleProxyServiceTest {
 		//没有记录
 		boolean f3 = orderSettleProxyService.checkMileageData("57391181500299");
 		assertFalse(f3);
+		// 0 的情况
+//		1297821150029910010
+		boolean f4 = orderSettleProxyService.checkMileageData("1297821150029910010");
+		assertFalse(f4);
 		
 	}
 	

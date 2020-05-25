@@ -159,7 +159,7 @@ public class OrderSettleProxyService {
                 if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum())) {
+                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0)) {
                     	return false;
                     }
                 }
@@ -167,7 +167,7 @@ public class OrderSettleProxyService {
                 if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum())){
+                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0)){
                     	return false;
                     }
                 }
