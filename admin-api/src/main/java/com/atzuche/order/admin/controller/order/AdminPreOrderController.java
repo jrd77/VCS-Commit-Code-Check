@@ -111,6 +111,10 @@ public class AdminPreOrderController {
 
 
         CarProxyService.CarPriceDetail carPriceDetail = carProxyService.getCarPriceDetail(carDetailReqVO);
+        if(carPriceDetail != null && carPriceDetail.getSeatNum()!= null && carPriceDetail.getSeatNum()==5 || carPriceDetail.getSeatNum()==7){
+            responseVO.setIsDriverInsure(1);
+        }
+
         responseVO.setCarPlatNo(carPriceDetail.getPlateNum());
         OwnerMemberDTO ownerMemberDTO = memProxyService.getOwnerMemberInfo(carPriceDetail.getOwnerNo().toString());
         responseVO.setOwnerMemNo(ownerMemberDTO.getMemNo());
