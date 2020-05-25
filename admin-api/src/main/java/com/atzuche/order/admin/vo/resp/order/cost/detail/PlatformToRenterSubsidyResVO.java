@@ -42,13 +42,22 @@ public class PlatformToRenterSubsidyResVO {
     @AutoDocProperty(value="基础保障费补贴（系统自动计算）")
     String insureSubsidySystem;
 
+    @AutoDocProperty(value = "轮胎保障服务费补贴")
+    private String tyreInsurSubsidy;
+    @AutoDocProperty(value = "轮胎保障服务费补贴(系统自动计算)")
+    private String tyreInsurSubsidySystem;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
+    private String driverInsurSubsidy;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴(系统自动计算)")
+    private String driverInsurSubsidySystem;
+
 	@AutoDocProperty(value="租金补贴")
     String rentAmtSubsidy;
 	@AutoDocProperty(value="其他补贴")
     String otherSubsidy;
-	@AutoDocProperty(value="全面保障服务费补贴")
+	@AutoDocProperty(value="补充（全面）保障服务费补贴")
     String abatementSubsidy;
-    @AutoDocProperty(value="全面保障服务费补贴（系统自动计算）")
+    @AutoDocProperty(value="补充（全面）保障服务费补贴（系统自动计算）")
     String abatementSubsidySystem;
 	@AutoDocProperty(value="手续费补贴")
     String feeSubsidy;

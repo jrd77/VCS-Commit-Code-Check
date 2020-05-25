@@ -20,13 +20,18 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.StringUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderIngNotOperateException;
+import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
@@ -193,7 +198,19 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+        orderDetailReqDTO.setOrderNo(renterCostReqVO.getOrderNo());
+        orderDetailReqDTO.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+        ResponseData<OrderStatusRespDTO> respDTOResponseData = remoteFeignService.getOrderStatusFromRemote(orderDetailReqDTO);
+        if(respDTOResponseData == null || respDTOResponseData.getData() == null || respDTOResponseData.getData().getOrderStatusDTO()==null){
+            log.error("订单状态查询为空 orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO));
+            throw new OrderStatusNotFoundException();
+        }
+        Integer status = respDTOResponseData.getData().getOrderStatusDTO().getStatus();
+        if(status >= OrderStatusEnum.TO_RETURN_CAR.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()){
+            log.error("订单已经开始，不允许操作renterCostReqVO={}",JSON.toJSONString(renterCostReqVO));
+            throw new OrderIngNotOperateException(renterCostReqVO.getOrderNo());
+        }
         try {
         	orderCostDetailService.insertAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
             //日志记录

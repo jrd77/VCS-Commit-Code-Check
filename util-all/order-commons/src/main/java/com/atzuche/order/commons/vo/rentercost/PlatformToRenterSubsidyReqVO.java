@@ -57,4 +57,12 @@ public class PlatformToRenterSubsidyReqVO {
     String feeSubsidy;
 	// 操作人
     private String operatorName;
+
+    @AutoDocProperty(value = "轮胎保障服务费补贴")
+    private String tyreInsurSubsidy;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
+    private String driverInsurSubsidy;
+
+
+
 }
