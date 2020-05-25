@@ -60,8 +60,8 @@ public enum ErrorCode {
     IS_GET_CAR_OVER_ERROR("700006","取车是否超运能接口异常"),
     IS_RETURN_CAR_OVER_FAIL("700007","还车是否超运能获取失败"),
     IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常"),
-    REMOTE_CALL_FAIL("700008","远程操作失败"),
-
+    REMOTE_CALL_FAIL("700009","远程操作失败"),
+    REMOTE_CALL_DATA_FAIL("700010","远程获取数据失败"),
 
     FEIGN_MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
     FEIGN_MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),

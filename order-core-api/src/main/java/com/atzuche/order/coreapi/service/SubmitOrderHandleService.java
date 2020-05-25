@@ -428,6 +428,7 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
+        ownerOrderReqDTO.setUseServiceRate(reqContext.getOwnerGoodsDetailDto().getUseServiceRate());
 
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails = new ArrayList<>();
         Optional<OrderCouponDTO> ownerCoupon =
