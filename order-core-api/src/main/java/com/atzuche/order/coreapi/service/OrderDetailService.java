@@ -185,6 +185,8 @@ public class OrderDetailService {
     private RenterDetainReasonService renterDetainReasonService;
     @Autowired
     private OrderSettleService orderSettleService;
+    @Autowired
+    private OrderStopFreightInfoService orderStopFreightInfoService;
 
     private static final String UNIT_HOUR = "小时";
 
@@ -328,6 +330,13 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
+        // 获取停运费信息
+        OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
+        if (orderStopFreightInfo != null) {
+        	OrderStopFreightDTO orderStopFreightDTO = new OrderStopFreightDTO();
+        	BeanUtils.copyProperties(orderStopFreightInfo, orderStopFreightDTO);
+        	orderDetailRespDTO.orderStopFreightDTO = orderStopFreightDTO;
+        }
         return orderDetailRespDTO;
 
     }

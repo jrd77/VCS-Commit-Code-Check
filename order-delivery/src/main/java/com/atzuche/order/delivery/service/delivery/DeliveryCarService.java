@@ -478,5 +478,14 @@ public class DeliveryCarService {
         addHandoverCarInfo(orderDelivery, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
         addHandoverCarInfo(orderDelivery, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
     }
+    
+    
+    /**
+     * 实时更新订单信息到流程系统
+     * @param changeOrderInfoDTO
+     */
+    public void changeRenYunFlowOrderInfo(ChangeOrderInfoDTO changeOrderInfoDTO) {
+    	deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+    }
 
 }

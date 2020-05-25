@@ -277,8 +277,10 @@ public class ModifyOrderService {
 	 * @return RenterOrderSubsidyDetailDTO
 	 */
 	public OrderConsoleSubsidyDetailEntity getDispatchingAmtSubsidy(ModifyOrderDTO modifyOrderDTO, CostBaseDTO costBaseDTO, Integer supplementAmt) {
-		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag() && 
-				supplementAmt != null && supplementAmt > 0) {
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			if (supplementAmt == null || supplementAmt < 0) {
+				supplementAmt = 0;
+			}
 			// 如果是换车操作计算升级车辆补贴
         	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(costBaseDTO, supplementAmt, SubsidyTypeCodeEnum.RENT_COST_AMT, 
         			SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.DISPATCHING_AMT, "换车补贴");
@@ -1499,6 +1501,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setSeatNum(renterGoodsDetailDTO.getSeatNum());
 		renterOrderReqVO.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
 		renterOrderReqVO.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
+		renterOrderReqVO.setDriverScore(renterMemberDTO.getDriverScore());
 		return renterOrderReqVO;
 	}
 	

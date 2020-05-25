@@ -21,7 +21,6 @@ import com.atzuche.order.commons.enums.OrderChangeItemEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OrderTransferSourceEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyConfirmDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -33,6 +32,7 @@ import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -91,6 +91,8 @@ public class ModifyOrderConfirmService {
 	private OrderFlowService orderFlowService;
 	@Autowired
 	private OrderSourceStatService orderSourceStatService;
+	@Autowired
+	private SubmitOrderHandleService submitOrderHandleService;
 	
 	private static final Integer ALREADY_PAY_SUCCESS = 1;
 	
@@ -205,6 +207,8 @@ public class ModifyOrderConfirmService {
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
 		}
+		// 换车更新停运费信息
+		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
 	}
 	
 	
@@ -237,6 +241,8 @@ public class ModifyOrderConfirmService {
 			req.setSceneCode(orderEntity.getEntryCode());
 			req.setSource(orderEntity.getSource()+"");
 		}
+		req.setRentTime(modifyOrderDTO.getRentTime());
+		req.setRevertTime(modifyOrderDTO.getRevertTime());
 		reqContext.setOrderReqVO(req);
 		return reqContext;
 	}
@@ -417,6 +423,8 @@ public class ModifyOrderConfirmService {
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 				}
 			}
+			// 修改购买保费标志通知流程系统
+			getChangeOrderInfoDTO(modify, changeItemList);
 		} catch (Exception e) {
 			log.error("modifyorder sent to renyun exception:", e);
 		}
@@ -578,5 +586,48 @@ public class ModifyOrderConfirmService {
 			return listDTO;
 		}
 		return null;
+	}
+	
+	
+	/**
+	 * 修改购买保费标志
+	 * @param modify
+	 * @param changeItemList
+	 */
+	public void getChangeOrderInfoDTO(ModifyOrderOwnerDTO modify, List<String> changeItemList) {
+		if (modify == null) {
+			return;
+		}
+		if (changeItemList == null || changeItemList.isEmpty()) {
+			return;
+		}
+		// 取车服务标志
+		Integer srvGetFlag = modify.getSrvGetFlag();
+		// 还车服务标志
+		Integer srvReturnFlag = modify.getSrvReturnFlag();
+		if ((srvGetFlag != null && srvGetFlag == 1) || (srvReturnFlag != null && srvReturnFlag == 1)) {
+			boolean flag = false;
+			ChangeOrderInfoDTO changeOrderInfoDTO = new ChangeOrderInfoDTO();
+			changeOrderInfoDTO.setOrderNo(modify.getOrderNo());
+			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_ABATEMENT.getCode())) {
+				changeOrderInfoDTO.setSsaRisks("1");
+				flag = true;
+			}
+			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_DRIVER.getCode())) {
+				changeOrderInfoDTO.setExtraDriverFlag("1");
+				flag = true;
+			}
+			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_TYREINSUR.getCode())) {
+				changeOrderInfoDTO.setTyreInsurFlag("1");
+				flag = true;
+			}
+			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_DRIVERINSUR.getCode())) {
+				changeOrderInfoDTO.setDriverInsurFlag("1");
+				flag = true;
+			}
+			if (flag) {
+				deliveryCarService.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+			}
+		}
 	}
 }

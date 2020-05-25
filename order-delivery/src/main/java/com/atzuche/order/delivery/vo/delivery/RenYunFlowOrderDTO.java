@@ -305,6 +305,23 @@ public class RenYunFlowOrderDTO implements Serializable {
      * 合作方
      **/
     private String partner;
+    /**
+     * 平台保障服务是否购买
+     */
+    private String baseInsurFlag;
+    /**
+     * 附加驾驶人保障服务是否购买
+     */
+    private String extraDriverFlag;
+    /**
+     * 轮胎保障服务是否购买
+     */
+    private String tyreInsurFlag;
+    /**
+     * 驾乘无忧保障服务是否购买
+     */
+    private String driverInsurFlag;
+     
 
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
         if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
