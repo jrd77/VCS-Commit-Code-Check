@@ -251,7 +251,8 @@
         url as url,
         event_name as eventName,
         send_time as sendTime,
-        create_op as createOp
+        create_op as createOp,
+        order_supplement_detail_id as orderSupplementDetailId
         FROM supplement_sendmsg_log
         WHERE order_no = #{orderNo}
         <if test="orderSupplementDetailId != null">

@@ -21,7 +21,7 @@ public class MessagePushSendReqVO {
 
     @AutoDocProperty("会员号,发短信需要该字段")
     @NotNull(message = "会员号不能为空")
-    private Integer memNo;
+    private Long memNo;
 
     @AutoDocProperty("平台，0：app，1：短信")
     @NotNull(message = "平台不能为空")
@@ -44,7 +44,7 @@ public class MessagePushSendReqVO {
     private String createOp;
 
     @AutoDocProperty("补付ID")
-    private Integer orderSupplementDetailId;
+    private Long orderSupplementDetailId;
 
     @AutoDocProperty("补付项目")
     private String item;

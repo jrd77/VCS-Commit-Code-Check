@@ -84,7 +84,7 @@ public class SupplementSendmsgLogService {
         OrderSupplementPayMq orderSupplementPayMq = new OrderSupplementPayMq();
         orderSupplementPayMq.setOrderNo(reqVO.getOrderNo()+"");
         orderSupplementPayMq.setType(reqVO.getMessageType());
-        orderSupplementPayMq.setRenterMemNo(reqVO.getMemNo());
+        orderSupplementPayMq.setRenterMemNo(reqVO.getMemNo().intValue());
         orderMessage.setMessage(orderSupplementPayMq);
         switch(platform){
             case 0 ://系统

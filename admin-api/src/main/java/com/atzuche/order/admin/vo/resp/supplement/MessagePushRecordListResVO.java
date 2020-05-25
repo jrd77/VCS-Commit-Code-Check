@@ -10,7 +10,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class MessagePushRecordListResVO implements Serializable {
     private static final long serialVersionUID = 6277947143171115766L;
-    @AutoDocProperty("补付ID")
+    @AutoDocProperty("id")
     private String id;
 
     @AutoDocProperty("平台，0：app，1：短信")
@@ -39,4 +39,6 @@ public class MessagePushRecordListResVO implements Serializable {
 
     @AutoDocProperty("操作人")
     private String createOp;
+    @AutoDocProperty("补付ID")
+    private String orderSupplementDetailId;
 }
