@@ -20,6 +20,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
@@ -160,6 +161,14 @@ public class OrderCostService {
 		String orderNo = req.getOrderNo();
 		String memNo = req.getMemNo();
 		String renterOrderNo = req.getSubOrderNo();
+
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OrderStatusDTO orderStatusDTO = null;
+        if(orderStatusEntity != null){
+            orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+            resVo.setOrderStatusDTO(orderStatusDTO);
+        }
 
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
         RenterOrderDTO renterOrderDTO = null;
