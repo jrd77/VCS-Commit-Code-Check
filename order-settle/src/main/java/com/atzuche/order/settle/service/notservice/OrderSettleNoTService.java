@@ -234,6 +234,13 @@ public class OrderSettleNoTService {
      */
     public void check(SettleOrders settleOrders) {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
+    	
+    	//判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
+    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getRenterOrderNo());
+    	if(flagMileage == false) {
+    		throw new RuntimeException("租客取车或还车里程数不完整不能结算");
+    	}
+    	
         // 1 订单校验是否可以结算
         OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() 

@@ -3,6 +3,15 @@
  */
 package com.atzuche.order.settle.service.notservice;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
@@ -14,7 +23,9 @@ import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
@@ -22,14 +33,6 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author jhuang
@@ -40,6 +43,8 @@ import java.util.Objects;
 public class OrderSettleProxyService {
 	@Autowired
 	private CashierNoTService cashierNoTService;
+	@Autowired
+	private HandoverCarService handoverCarService;
 	
 	public CostTypeEnum getCostTypeEnumByConsoleCost(String fineSubsidyCode){
         CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_CONSOLE_COST;
@@ -130,6 +135,48 @@ public class OrderSettleProxyService {
         }
         return mileageAmtDTO;
     }
+    
+    /**
+     * 结算查询确认里程数是否完善。
+     * @param renterOrderNo
+     * @return
+     */
+    public boolean checkMileageData(String renterOrderNo) {
+    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
+    	handoverCarReq.setRenterOrderNo(renterOrderNo);
+    	//取送车里程数
+        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+
+        
+        List<RenterHandoverCarInfoEntity> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoEntities();
+        if(CollectionUtils.isEmpty(renterHandoverCarInfos)) {
+        	return false;
+        }
+        
+        if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
+            for(int i=0;i<renterHandoverCarInfos.size();i++){
+                RenterHandoverCarInfoEntity renterHandoverCarInfo = renterHandoverCarInfos.get(i);
+                if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                ){
+                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum())) {
+                    	return false;
+                    }
+                }
+
+                if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
+                ){
+                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum())){
+                    	return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
     
     
     /**
