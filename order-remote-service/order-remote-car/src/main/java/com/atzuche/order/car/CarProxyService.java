@@ -309,7 +309,7 @@ public class CarProxyService {
             case 2:
                 currentRate = fixedServiceRate;
                 renterGoodsDetailDTO.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));
-                renterGoodsDetailDTO.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//将固定平台服务费率存到带管服务费率字段上
+                renterGoodsDetailDTO.setServiceRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//将固定平台服务费率存到平台服务费率字段上
                 break;
             case 3:
                 currentRate = serviceProxyRate;
