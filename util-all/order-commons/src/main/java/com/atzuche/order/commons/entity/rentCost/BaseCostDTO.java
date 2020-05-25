@@ -30,4 +30,10 @@ public class BaseCostDTO {
     public Integer payToPlatFormFee = 0;
     @AutoDocProperty("租客车主互相调价")
     public Integer renterOWnerAdjustmentFee = 0;
+    @AutoDocProperty(value = "轮胎保障服务费")
+    public Integer tyreInsurAmt;
+    @AutoDocProperty(value = "驾乘无忧保障服务费")
+    public Integer driverInsurAmt;
+
+
 }
