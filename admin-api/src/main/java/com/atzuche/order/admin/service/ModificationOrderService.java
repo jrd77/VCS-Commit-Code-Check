@@ -123,7 +123,6 @@ public class ModificationOrderService {
 							
 							//取还车服务违约金   renter_order_fine_deatail  取还车服务违约金
 							putRenterOrderFine(realVo,data,subData);
-							
 							//需补付金额   需补付金额
 							//putPaymentAmount(realVo,data,subData);
 							realVo.setPaymentAmount(renterOrderResVO.getSupplementAmt() == null ? null:String.valueOf(renterOrderResVO.getSupplementAmt()));
@@ -145,7 +144,7 @@ public class ModificationOrderService {
 		return respVo;
 	}
 
-	private void putRenterOrderFine(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
+    private void putRenterOrderFine(ModificationOrderResponseVO realVo, ModifyOrderMainResVO data,
 			ModifyOrderResVO subData) {
 		int carServiceFine = 0;
 		List<RenterOrderFineDeatailResVO> fineLst = subData.getFineLst();
@@ -233,6 +232,9 @@ public class ModificationOrderService {
 		String returnCostCashNo = RenterCashCodeEnum.SRV_RETURN_COST.getCashNo();
 		String getBeyondCostCashNo = RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo();
 		String returnBeyondCostCashNo = RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo();
+
+        String tyreInsureTotalPricesCashNo = RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo();
+        String driverInsureTotalPricesCashNo = RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo();
 		
 		//默认0
 		int rentAmount = 0;
@@ -241,6 +243,8 @@ public class ModificationOrderService {
 		int additionalDriverInsuranceAmount = 0;
 		int serviceCharge = 0;
 		int carServiceFee = 0;
+        int driverInsurAmt = 0;
+        int tyreInsurAmt = 0;
 		
 		//费用列表
 		List<RenterOrderCostDetailResVO> costList = subData.getRenterOrderCostDetailList();
@@ -273,7 +277,13 @@ public class ModificationOrderService {
 				}else if(returnBeyondCostCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
 					carServiceFee +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
 					
-				}
+				}else if(tyreInsureTotalPricesCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+                    tyreInsurAmt +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }else if(driverInsureTotalPricesCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+                    driverInsurAmt +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+
+                }
 			}
 		}
 		realVo.setRentAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(rentAmount)));
@@ -282,6 +292,9 @@ public class ModificationOrderService {
 		realVo.setAdditionalDriverInsuranceAmount(String.valueOf(NumberUtils.convertNumberToZhengshu(additionalDriverInsuranceAmount)));
 		realVo.setServiceCharge(String.valueOf(NumberUtils.convertNumberToZhengshu(serviceCharge)));
 		realVo.setCarServiceFee(String.valueOf(NumberUtils.convertNumberToZhengshu(carServiceFee)));
+        realVo.setDriverInsurAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(driverInsurAmt)));
+        realVo.setTyreInsurAmt(String.valueOf(NumberUtils.convertNumberToZhengshu(tyreInsurAmt)));
+
 		
 	}
 

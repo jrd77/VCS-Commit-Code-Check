@@ -78,7 +78,29 @@ public class ModificationOrderResponseVO implements Serializable{
 	@AutoDocProperty(value="车主操作状态:未处理，已同意，已拒绝")
 	private String operatorStatus;
 
-	public String getRenterOrderNo() {
+    @AutoDocProperty(value = "轮胎保障服务费")
+    public String tyreInsurAmt;
+
+    @AutoDocProperty(value = "驾乘无忧保障服务费")
+    public String driverInsurAmt;
+
+    public String getTyreInsurAmt() {
+        return tyreInsurAmt;
+    }
+
+    public void setTyreInsurAmt(String tyreInsurAmt) {
+        this.tyreInsurAmt = tyreInsurAmt;
+    }
+
+    public String getDriverInsurAmt() {
+        return driverInsurAmt;
+    }
+
+    public void setDriverInsurAmt(String driverInsurAmt) {
+        this.driverInsurAmt = driverInsurAmt;
+    }
+
+    public String getRenterOrderNo() {
 		return renterOrderNo;
 	}
 
