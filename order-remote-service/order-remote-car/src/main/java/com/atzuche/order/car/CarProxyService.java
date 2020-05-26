@@ -216,7 +216,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setType(carBaseVO.getType());
             renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
             renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
-            renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+            renterGoodsDetailDto.setLicenseDay(carBaseVO.getLicenseDay()== null?null:LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
             renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
             renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpireDate()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpireDate()));
             renterGoodsDetailDto.setIsPlatformShow(carBaseVO.getIsPlatformShow());
