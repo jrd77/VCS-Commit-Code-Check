@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.filter;
 
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.exceptions.FreeDepositModeException;
 import com.atzuche.order.commons.filter.OrderFilter;
@@ -29,6 +30,8 @@ public class FreeDepositModeFilter implements OrderFilter {
 	private AccountDebtService accountDebtService;
 	@Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
+	@Autowired
+	private CashierRefundApplyNoTService cashierRefundApplyNoTService;
 	
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
@@ -45,7 +48,12 @@ public class FreeDepositModeFilter implements OrderFilter {
         //如果存在欠款的方式：200506
         String renterNo = orderReqVO.getMemNo();
         DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(renterNo);
-		debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(renterNo));
+        if(debtDetailVO != null) {
+			debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(renterNo));
+			 //4小时
+			Integer sum = cashierRefundApplyNoTService.getCashierRefundApplyByTimeForPreAuthSum(renterNo);
+			debtDetailVO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt().intValue() + Math.abs(sum));
+        }
 		if(checkDebt(debtDetailVO)) {
 			freeDoubleTypeId = "3";//走普通的方式
 			context.getOrderReqVO().setFreeDoubleTypeId(freeDoubleTypeId);

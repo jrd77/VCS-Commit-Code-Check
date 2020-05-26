@@ -240,6 +240,8 @@ public class ModifyOrderConfirmService {
 			req.setSceneCode(orderEntity.getEntryCode());
 			req.setSource(orderEntity.getSource()+"");
 		}
+		req.setRentTime(modifyOrderDTO.getRentTime());
+		req.setRevertTime(modifyOrderDTO.getRevertTime());
 		reqContext.setOrderReqVO(req);
 		return reqContext;
 	}

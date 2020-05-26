@@ -3,6 +3,7 @@ package com.atzuche.order.ownercost.entity.dto;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -34,6 +35,17 @@ public class OwnerOrderCostReqDTO {
      * 代管车服务费比例（仅车主端有）
      */
     private Double serviceProxyRate;
+
+    /**
+     * 固定平台服务费比例
+     */
+    //@AutoDocProperty("固定平台服务费比例")
+    //private Double fixedServiceRate;
+    /**
+     * 当前使用的服务费比例(平台服务费比例/代官车服务费比例/固定平台服务费比例)
+     */
+    @AutoDocProperty("当前使用的服务费比例(平台服务费比例/代官车服务费比例/固定平台服务费比例)")
+    private Double useServiceRate;
     /**
      * GPS序号
      */

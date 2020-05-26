@@ -50,6 +50,8 @@
         <result property="engineNum" column="engine_num"/>
         <result property="serviceRate" column="service_rate"/>
         <result property="serviceProxyRate" column="service_proxy_rate"/>
+        <result property="fixedServiceRate" column="fixed_service_rate"/>
+        <result property="useServiceRate" column="use_service_rate"/>
         <result property="moreLicenseFlag" column="more_license_flag"/>
         <result property="licenseExpire" column="license_expire"/>
         <result property="inspectExpire" column="inspect_expire"/>
@@ -114,6 +116,8 @@
 	`engine_num`,
 	`service_rate`,
 	`service_proxy_rate`,
+	`fixed_service_rate`,
+	`use_service_rate`,
 	`more_license_flag`,
 	`license_expire`,
 	`inspect_expire`,
@@ -183,6 +187,8 @@
         `engine_num`,
         `service_rate`,
         `service_proxy_rate`,
+        `fixed_service_rate`,
+        `use_service_rate`,
         `more_license_flag`,
         `license_expire`,
         `inspect_expire`,
@@ -242,6 +248,8 @@
         #{engineNum},
         #{serviceRate},
         #{serviceProxyRate},
+        #{fixedServiceRate},
+        #{useServiceRate},
         #{moreLicenseFlag},
         #{licenseExpire},
         #{inspectExpire},
@@ -304,6 +312,8 @@
             <if test="engineNum != null">`engine_num`, </if>
             <if test="serviceRate != null">`service_rate`, </if>
             <if test="serviceProxyRate != null">`service_proxy_rate`, </if>
+            <if test="fixedServiceRate != null">`fixed_service_rate`, </if>
+            <if test="useServiceRate != null">`use_service_rate`, </if>
             <if test="moreLicenseFlag != null">`more_license_flag`, </if>
             <if test="licenseExpire != null">`license_expire`, </if>
             <if test="inspectExpire != null">`inspect_expire`, </if>
@@ -362,6 +372,8 @@
             <if test="engineNum != null">#{engineNum},  </if>
             <if test="serviceRate != null">#{serviceRate},  </if>
             <if test="serviceProxyRate != null">#{serviceProxyRate},  </if>
+            <if test="fixedServiceRate != null">#{fixedServiceRate},  </if>
+            <if test="useServiceRate != null">#{useServiceRate},  </if>
             <if test="moreLicenseFlag != null">#{moreLicenseFlag},  </if>
             <if test="licenseExpire != null">#{licenseExpire},  </if>
             <if test="inspectExpire != null">#{inspectExpire},  </if>
@@ -425,6 +437,8 @@
             <if test="engineNum != null">`engine_num` = #{engineNum}, </if>
             <if test="serviceRate != null">`service_rate` = #{serviceRate}, </if>
             <if test="serviceProxyRate != null">`service_proxy_rate` = #{serviceProxyRate}, </if>
+            <if test="fixedServiceRate != null">`fixed_service_rate` = #{fixedServiceRate}, </if>
+            <if test="useServiceRate != null">`use_service_rate` = #{useServiceRate}, </if>
             <if test="moreLicenseFlag != null">`more_license_flag` = #{moreLicenseFlag}, </if>
             <if test="licenseExpire != null">`license_expire` = #{licenseExpire}, </if>
             <if test="createOp != null">`create_op` = #{createOp}, </if>
@@ -484,6 +498,8 @@
             `engine_num` = #{engineNum},
             `service_rate` = #{serviceRate},
             `service_proxy_rate` = #{serviceProxyRate},
+            `fixed_service_rate` = #{fixedServiceRate},
+            `use_service_rate` = #{useServiceRate},
             `more_license_flag` = #{moreLicenseFlag},
             `license_expire` = #{licenseExpire},
             `create_op` = #{createOp},

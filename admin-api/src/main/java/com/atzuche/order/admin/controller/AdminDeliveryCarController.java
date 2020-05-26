@@ -102,6 +102,8 @@ public class AdminDeliveryCarController extends BaseController {
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
         }
+
+
         try {
             deliveryCarInfoService.updateHandoverCarInfo(deliveryCarVO);
             return ResponseData.success();

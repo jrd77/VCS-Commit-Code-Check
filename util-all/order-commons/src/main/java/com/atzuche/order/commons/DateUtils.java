@@ -102,6 +102,10 @@ public class DateUtils {
      * @return
      */
     public static String formate(Date date, String format){
+    	//非空处理
+    	if(date == null) {
+    		return "";
+    	}
         Instant instant = date.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
