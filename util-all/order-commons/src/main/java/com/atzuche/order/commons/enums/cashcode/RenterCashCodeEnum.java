@@ -14,7 +14,7 @@ public enum RenterCashCodeEnum {
 	//第一区域块 看第4位，从1开始。  后4位从0001开始
 	RENT_AMT("11110001","租金"),
 	INSURE_TOTAL_PRICES("11110002","平台保障费"),
-	ABATEMENT_INSURE("11110003","全面保障费"),
+	ABATEMENT_INSURE("11110003","补充保障服务费"),
 	FEE("11110004","平台手续费"),
 	SRV_GET_COST("11110005","取车费用"),
 	SRV_RETURN_COST("11110006","还车费用"),

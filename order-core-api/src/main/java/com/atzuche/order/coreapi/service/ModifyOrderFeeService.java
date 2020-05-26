@@ -174,6 +174,8 @@ public class ModifyOrderFeeService {
 			totalRentCarFee += (modifyOrderCostVO.getReturnCost() == null ? 0:modifyOrderCostVO.getReturnCost());
 			totalRentCarFee += (modifyOrderCostVO.getGetBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getGetBlockedRaiseAmt());
 			totalRentCarFee += (modifyOrderCostVO.getReturnBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getReturnBlockedRaiseAmt());
+			totalRentCarFee += (modifyOrderCostVO.getTyreInsurAmt() == null ? 0:modifyOrderCostVO.getTyreInsurAmt());
+			totalRentCarFee += (modifyOrderCostVO.getDriverInsurAmt() == null ? 0:modifyOrderCostVO.getDriverInsurAmt());
 		}
 		ModifyOrderDeductVO modifyOrderDeductVO = updateModifyOrderFeeVO.getModifyOrderDeductVO();
 		if (modifyOrderDeductVO != null) {
