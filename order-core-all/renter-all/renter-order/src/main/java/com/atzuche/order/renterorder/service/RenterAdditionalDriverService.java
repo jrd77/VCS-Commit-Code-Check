@@ -2,12 +2,16 @@ package com.atzuche.order.renterorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.CommUseDriverInfoDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.mapper.RenterAdditionalDriverMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -219,5 +223,22 @@ public class RenterAdditionalDriverService {
         return renterAdditionalDriverMapper.selectByRenterOrderNo(renterOrderNo);
     }
 
+    /**
+     * 获得订单中的租客附加驾驶人信息
+     * @param renterOrderNo
+     * @return
+     */
+    public List<RenterAdditionalDriverDTO> getRenterOrderExtraDrivers(String renterOrderNo){
+        List<RenterAdditionalDriverEntity> additionalDriverEntities = renterAdditionalDriverMapper.selectByRenterOrderNo(renterOrderNo);
+        List<RenterAdditionalDriverDTO> renterAdditionalDriverDTOS = new ArrayList<>();
+        Optional.ofNullable(additionalDriverEntities).orElseGet(ArrayList::new).stream().forEach(x->{
+            RenterAdditionalDriverDTO renterAdditionalDriverDTO = new RenterAdditionalDriverDTO();
+            BeanUtils.copyProperties(x,renterAdditionalDriverDTO);
+            renterAdditionalDriverDTOS.add(renterAdditionalDriverDTO);
+        });
+
+
+        return renterAdditionalDriverDTOS;
+    }
 
 }

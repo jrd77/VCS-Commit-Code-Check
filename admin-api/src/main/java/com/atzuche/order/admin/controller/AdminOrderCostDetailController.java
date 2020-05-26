@@ -20,6 +20,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
@@ -195,12 +196,34 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        List<RenterAdditionalDriverDTO> oldData = null;
+		try{
+            oldData = remoteFeignService.queryAdditionalDriverListFromRemot(renterCostReqVO.getRenterOrderNo());
+        }catch (Exception e){
+		    log.error("查询附加驾驶人异常",e);
+        }
+
         try {
         	orderCostDetailService.insertAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
             //日志记录
+
+
             try{
-                adminLogService.insertLog(AdminOpTypeEnum.ADDITIONAL_DRIVER_ADD, renterCostReqVO.getOrderNo(), JSON.toJSONString(renterCostReqVO));
+                if(oldData != null){
+                    String desc = "附加驾驶人 由原来的 【";
+                    List<RenterAdditionalDriverDTO> newData = remoteFeignService.queryAdditionalDriverListFromRemot(renterCostReqVO.getRenterOrderNo());
+                    for (RenterAdditionalDriverDTO oldDatum : oldData) {
+                        desc += oldDatum.getRealName()+" ";
+                    }
+                    desc += "】 修改为 【";
+                    for (RenterAdditionalDriverDTO newDatum : newData) {
+                        desc += newDatum.getRealName()+" ";
+                    }
+                    desc += "】";
+
+                    adminLogService.insertLog(AdminOpTypeEnum.ADDITIONAL_DRIVER_ADD, renterCostReqVO.getOrderNo(), desc);
+                }
+
             }catch (Exception e){
                 log.error("记录日志失败",e);
             }
