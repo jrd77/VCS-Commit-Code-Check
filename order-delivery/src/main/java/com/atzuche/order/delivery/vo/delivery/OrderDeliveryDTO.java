@@ -126,6 +126,8 @@ public class OrderDeliveryDTO {
     private String renterRealGetReturnRemark;
 
     private String ownerRealGetReturnRemark;
+    
+    private LocalDateTime aheadOrDelayLocalDateTime;
 
     /**
      * 设置信息参数

@@ -231,6 +231,13 @@ public class DeliveryCarService {
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
                 OrderDeliveryFlowEntity orderDeliveryFlowEntity = createUpdateFlow(lastOrderDeliveryEntity,lastOrderDeliveryEntity.getType(),orderDeliveryVO.getOrderDeliveryDTO());
+                if (orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime() != null) {
+                	if (orderDeliveryVO.getOrderDeliveryDTO().getType() != null && orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
+                		orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
+                	} else {
+                		orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
+                	}
+                }
                 orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
             }
         }
