@@ -18,6 +18,7 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetai
 import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
@@ -76,9 +77,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("fineAmt/update")
     public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO, BindingResult bindingResult) {
     	logger.info("updatefineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	//无需返回值
@@ -120,9 +119,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("fineAmt/list")
     public ResponseData<OrderRenterFineAmtDetailResVO> findfineAmtListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findfineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	OrderRenterFineAmtDetailResVO resp = orderCostDetailService.findfineAmtListByOrderNo(renterCostReqVO);
@@ -144,9 +141,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("reductionDetails/list")
     public ResponseData<ReductionDetailResVO> findReductionDetailsListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findReductionDetailsListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	ReductionDetailResVO resp = orderCostDetailService.findReductionDetailsListByOrderNo(renterCostReqVO);
@@ -167,9 +162,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("additionalDriverInsurance/list")
     public ResponseData<?> findAdditionalDriverInsuranceByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	AdditionalDriverInsuranceVO resp = orderCostDetailService.findAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
@@ -190,9 +183,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("additionalDriverInsurance/add")
     public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody @Validated AdditionalDriverInsuranceIdsReqVO renterCostReqVO,BindingResult bindingResult) {
     	logger.info("insertAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	orderCostDetailService.insertAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
@@ -219,9 +210,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToRenter/list")
     public ResponseData<PlatformToRenterSubsidyResVO> findPlatFormToRenterListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findPlatFormToRenterListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	PlatformToRenterSubsidyResVO resp = orderCostDetailService.findPlatFormToRenterListByOrderNo(renterCostReqVO);
@@ -245,9 +234,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToRenter/update")
     public ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO renterCostReqVO,BindingResult bindingResult) {
     	logger.info("updatePlatFormToRenterListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	orderCostDetailService.updatePlatFormToRenterListByOrderNo(renterCostReqVO);
@@ -292,9 +279,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToOwner/update")
     public ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updatePlatFormToOwnerListByOrderNo controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	try{
@@ -332,9 +317,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterPriceAdjustment/update")
     public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response, BindingResult bindingResult) {
     	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	/**
@@ -381,9 +364,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterPriceAdjustment/list")
     public ResponseData<RenterPriceAdjustmentResVO> findRenterPriceAdjustmentByOrderNo(@RequestBody  RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	RenterPriceAdjustmentResVO resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(renterCostReqVO);
@@ -407,9 +388,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterToPlatForm/list")
     public ResponseData<RenterToPlatformVO> findRenterToPlatFormListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	/**
@@ -434,9 +413,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterToPlatForm/update")
     public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterToPlatformCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         try {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
@@ -476,9 +453,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterRentAmt/list")
     public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findTenantRentListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	RenterRentDetailDTO resp = orderCostDetailService.findRenterRentAmtListByOrderNo(renterCostReqVO);
@@ -502,9 +477,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("ownerToPlatForm/update")
     public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateOwnerToPlatFormListByOrderNo controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	orderCostDetailService.updateOwnerToPlatFormListByOrderNo(ownerCostReqVO);
@@ -520,9 +493,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("ownerToRenterRentAmtSubsidy/update")
     public ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("ownerToRenterRentAmtSubsidy controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         try {
         	orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
         	try{

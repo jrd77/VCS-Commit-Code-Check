@@ -6,6 +6,7 @@ import com.atzuche.order.admin.vo.req.order.ModificationOrderRequestVO;
 import com.atzuche.order.admin.vo.req.order.OrderStatusRequestVO;
 import com.atzuche.order.admin.vo.resp.order.OrderStatusListResponseVO;
 import com.atzuche.order.admin.vo.resp.order.OrderStatusResponseVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.OrderFlowDTO;
 import com.atzuche.order.commons.entity.dto.OrderFlowListResponseDTO;
 import com.atzuche.order.commons.entity.dto.OrderFlowRequestDTO;
@@ -47,9 +48,7 @@ public class AdminOrderStatusController {
 	@AutoDocMethod(description = "订单状态流转列表", value = "订单状态流转列表", response = OrderStatusListResponseVO.class)
 	@GetMapping("status/list")
 	public ResponseData statusList(OrderStatusRequestVO orderStatusRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         logger.info("订单状态流转列表入参{}",orderStatusRequestVO);
         OrderStatusListResponseVO orderStatusListResponseVO = new OrderStatusListResponseVO();
