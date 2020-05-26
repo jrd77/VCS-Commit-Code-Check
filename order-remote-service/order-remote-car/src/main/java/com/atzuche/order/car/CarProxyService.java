@@ -296,22 +296,19 @@ public class CarProxyService {
         Integer serviceRate = data.getDeductibleRate();//平台服务费比例
         Integer serviceProxyRate = data.getServiceProxyProportion();//代管车服务费比例
         log.info("fixedServiceRate={},serviceRate={},serviceProxyRate={}",fixedServiceRate,serviceRate,serviceProxyRate);
-        //renterGoodsDetailDTO.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));//平台服务费比例
-        //renterGoodsDetailDTO.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProxyProportion()));//代官车服务费比例
-        //renterGoodsDetailDTO.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//固定平台服务费比例
 
         Integer currentRate = serviceRate;
         switch (carOwnerTypeEnum.getServiceRateType()){
-            case 1:
+            case 1://平台服务费比例
                 currentRate = serviceRate;
                 renterGoodsDetailDTO.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));
                 break;
-            case 2:
+            case 2://固定平台服务费比例
                 currentRate = fixedServiceRate;
                 renterGoodsDetailDTO.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));
                 renterGoodsDetailDTO.setServiceRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//将固定平台服务费率存到平台服务费率字段上
                 break;
-            case 3:
+            case 3://代官车服务费比例
                 currentRate = serviceProxyRate;
                 renterGoodsDetailDTO.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProxyProportion()));
                 break;
