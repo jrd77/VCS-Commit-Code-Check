@@ -370,7 +370,7 @@ public class AdminOrderCostDetailController {
                             renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
                 }
                 if(StringUtils.isNotBlank(renterCostReqVO.getRenterToOwnerAdjustAmt())){
-                    String oldData = resp.getOwnerToRenterAdjustAmt();
+                    String oldData = resp.getRenterToOwnerAdjustAmt();
                     String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
                     adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
                             renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);

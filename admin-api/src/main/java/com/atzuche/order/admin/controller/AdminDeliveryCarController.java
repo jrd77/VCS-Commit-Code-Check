@@ -1,9 +1,14 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
+import com.atzuche.order.admin.service.DeliveryRemoteService;
+import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarVO;
+import com.atzuche.order.commons.vo.delivery.OwnerGetAndReturnCarDTO;
+import com.atzuche.order.commons.vo.delivery.RenterGetAndReturnCarDTO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocGroup;
@@ -31,7 +36,10 @@ public class AdminDeliveryCarController extends BaseController {
 
     @Autowired
     private AdminDeliveryCarService deliveryCarInfoService;
-
+    @Autowired
+    private DeliveryRemoteService deliveryRemoteService;
+    @Autowired
+    private AdminLogService adminLogService;
     /**
      * 获取配送信息
      * @param deliveryCarDTO
@@ -102,16 +110,84 @@ public class AdminDeliveryCarController extends BaseController {
         if (bindingResult.hasErrors()) {
             return validate(bindingResult);
         }
-
+        DeliveryCarVO deliveryCarDTO = null;
+        try{
+            DeliveryCarRepVO deliveryCarRepVO = new DeliveryCarRepVO();
+            deliveryCarRepVO.setOrderNo(deliveryCarVO.getOrderNo());
+            deliveryCarDTO = deliveryRemoteService.getDeliveryCarVO(deliveryCarRepVO);
+        }catch (Exception e){
+            log.error("保存日志时查询异常",e);
+        }
 
         try {
             deliveryCarInfoService.updateHandoverCarInfo(deliveryCarVO);
-            return ResponseData.success();
         } catch (Exception e) {
             log.error("取还车更新接口出现异常", e);
             Cat.logError("取还车更新接口出现异常", e);
             return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "取还车更新接口出现错误");
         }
+        try{
+            String desc = "";
+            //记录日志
+            if(deliveryCarDTO != null){
+                OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = deliveryCarDTO.getOwnerGetAndReturnCarDTO();
+                RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarDTO.getRenterGetAndReturnCarDTO();
+                if(ownerGetAndReturnCarDTO!= null){
+                    desc += "车主处取还车 ：【";
+                    if(compareString(ownerGetAndReturnCarDTO.getKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM)){
+                        desc += "取车里程数 " + ownerGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM;
+                    }
+                    if(compareString(ownerGetAndReturnCarDTO.returnKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM)){
+                        desc += "还车里程数 " + ownerGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM;
+                    }
+                    if(compareString(ownerGetAndReturnCarDTO.getCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil)){
+                        desc += "取车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                    }
+                    if(compareString(ownerGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnCarOil)){
+                        desc += "还车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                    }
+                    desc += "】";
+                }
+
+                if(renterGetAndReturnCarDTO != null){
+                    desc += "  租客处取还车 ：【";
+                    if(compareString(renterGetAndReturnCarDTO.getKM,deliveryCarVO.getRenterGetAndReturnCarDTO().getKM)){
+                        desc += "交车里程数 " + ownerGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM;
+                    }
+                    if(compareString(renterGetAndReturnCarDTO.returnKM,deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM)){
+                        desc += "收车里程数 " + ownerGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM;
+                    }
+                    if(compareString(renterGetAndReturnCarDTO.getCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil)){
+                        desc += "交车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                    }
+                    if(compareString(renterGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().returnCarOil)){
+                        desc += "收车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                    }
+                    desc += "】";
+                }
+                adminLogService.insertLog(AdminOpTypeEnum.OWNER_RENTER_GET_RETURN_CAR,deliveryCarVO.getOrderNo(),null,null,desc);
+            }
+
+        }catch (Exception e){
+
+        }
+        return ResponseData.success();
+    }
+
+    public static boolean compareString(String oldStr,String newStr){
+        if(oldStr == null && newStr == null){
+            return false;
+        }
+        if(oldStr == null && oldStr != newStr){
+            return true;
+        }
+        if(oldStr != null && oldStr.equals(newStr)){
+            return false;
+        }
+        if(oldStr != null && !oldStr.equals(newStr)){
+            return true;
+        }
+        return false;
     }
 
 }
