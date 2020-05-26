@@ -9,9 +9,7 @@ import org.springframework.util.ReflectionUtils;
 import java.beans.PropertyEditor;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 比较对象之间属性是否变化，并以指定标签返回变化内容
@@ -45,6 +43,9 @@ public class CompareBeanUtils<T> {
      * 变更内容
      */
     private StringBuffer content;
+
+    public static List<String> excludeColumnList = Arrays.asList("dispatchingSubsidySystem","abatementSubsidySystem",
+            "insureSubsidySystem","dispatchingSubsidySystem","insureSubsidySystem","abatementSubsidySystem");
 
     /**
      * 需要对比字段描述
@@ -186,6 +187,9 @@ public class CompareBeanUtils<T> {
         }
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
+            if(excludeColumnList.contains(field.getName())){
+                continue;
+            }
             String fieldChName = PropertitesUtil.getFieldChName(field.getName());
             compare(field.getName(), StringUtils.isNotBlank(fieldChName) ? fieldChName : field.getName());
         }

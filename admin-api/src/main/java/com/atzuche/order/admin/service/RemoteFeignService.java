@@ -317,7 +317,32 @@ public class RemoteFeignService {
             t.complete();
         }
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/30 11:02
+     * @Description: 查询附加驾驶人
+     *
+     **/
+    public List<RenterAdditionalDriverDTO> queryAdditionalDriverListFromRemot(String renterOrderNo){
+        ResponseData<List<RenterAdditionalDriverDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "查询附加驾驶人");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignAdditionDriverService.queryAdditionalDriver");
+            log.info("Feign renterOrderNo={}", renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignAdditionDriverService.queryAdditionalDriverList(renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 查询附加驾驶人异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 查询附加驾驶人异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
     /*
      * @Author ZhangBin
      * @Date 2020/4/30 14:58
