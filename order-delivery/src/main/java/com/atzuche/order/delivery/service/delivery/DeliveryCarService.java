@@ -90,7 +90,7 @@ public class DeliveryCarService {
 
 
     /**
-     * 更新车辆数据到仁云
+     * 更新车辆数据到仁云（特殊场景不做取消配送订单操作） 2:还车  1：其他
      * @param getMinutes
      * @param returnMinutes
      * @param orderReqContext
@@ -104,7 +104,7 @@ public class DeliveryCarService {
         }
         //开始取消仁云订单数据
         Future<Boolean> result = cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setRenterOrderNo(orderDeliveryVO.getOrderDeliveryDTO().getRenterOrderNo())
-                .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())));
+                .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())),2);
         if (result.isDone()) {
             //开始新增数据并发送仁云
             //insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
@@ -169,21 +169,21 @@ public class DeliveryCarService {
      * 取消配送订单到仁云流程系统
      */
     @Transactional(rollbackFor = Exception.class)
-    public Future<Boolean> cancelRenYunFlowOrderInfo(CancelOrderDeliveryVO cancelOrderDeliveryVO) {
+    public Future<Boolean> cancelRenYunFlowOrderInfo(CancelOrderDeliveryVO cancelOrderDeliveryVO,Integer type) {
         if (null == cancelOrderDeliveryVO || cancelOrderDeliveryVO.getCancelFlowOrderDTO() == null || StringUtils.isBlank(cancelOrderDeliveryVO.getRenterOrderNo())) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
         int serviceType;
         if (cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals("all")) {
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
-            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO);
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO,type);
             deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 1,cancelOrderDeliveryVO);
             cancelOrderDeliveryVO.getCancelFlowOrderDTO().setServicetype(ServiceTypeEnum.BACK_TYPE.getValue());
-            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO,type);
             deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), 2,cancelOrderDeliveryVO);
         } else {
             serviceType = cancelOrderDeliveryVO.getCancelFlowOrderDTO().getServicetype().equals(ServiceTypeEnum.TAKE_TYPE.getValue()) ? 1 : 2;
-            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
+            addHandoverInfo(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO,type);
            return deliveryCarTask.cancelOrderDelivery(cancelOrderDeliveryVO.getRenterOrderNo(), serviceType,cancelOrderDeliveryVO);
         }
         return null;
@@ -473,15 +473,17 @@ public class DeliveryCarService {
      * @param cancelOrderDeliveryVO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void addHandoverInfo(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO) {
+    public void addHandoverInfo(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO,Integer type) {
         RenterOrderDeliveryEntity orderDelivery = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType);
 
         if (null == orderDelivery) {
-            log.info("没有找到该配送订单信息，renterOrderNo：{}",renterOrderNo);
+            log.info("没有找到该配送订单信息，renterOrderNo：{}", renterOrderNo);
             return;
         }
-        orderDelivery.setStatus(3);
-        orderDelivery.setIsNotifyRenyun(0);
+        if (2 != type) {
+            orderDelivery.setStatus(3);
+            orderDelivery.setIsNotifyRenyun(0);
+        }
         orderDelivery.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDelivery);
         addHandoverCarInfo(orderDelivery, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
