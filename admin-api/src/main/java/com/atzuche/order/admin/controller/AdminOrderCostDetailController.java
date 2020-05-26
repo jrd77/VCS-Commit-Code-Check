@@ -273,12 +273,12 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        PlatformToRenterSubsidyResVO newData = null;
+        PlatformToRenterSubsidyResVO oldData = null;
         try{
             RenterCostReqVO req = new RenterCostReqVO();
             req.setOrderNo(renterCostReqVO.getOrderNo());
             req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-            newData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
+            oldData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
         }catch (Exception e){
             log.error("平台给租客的补贴-记录日志查询时异常",e);
         }
@@ -286,18 +286,18 @@ public class AdminOrderCostDetailController {
         	orderCostDetailService.updatePlatFormToRenterListByOrderNo(renterCostReqVO);
         	try{
 
-                PlatformToRenterSubsidyResVO oldData = new PlatformToRenterSubsidyResVO();
-                oldData.setDispatchingSubsidy(renterCostReqVO.getDispatchingSubsidy());
-                oldData.setOilSubsidy(renterCostReqVO.getOilSubsidy());
-                oldData.setCleanCarSubsidy(renterCostReqVO.getCleanCarSubsidy());
-                oldData.setGetReturnDelaySubsidy(renterCostReqVO.getGetReturnDelaySubsidy());
-                oldData.setDelaySubsidy(renterCostReqVO.getDelaySubsidy());
-                oldData.setTrafficSubsidy(renterCostReqVO.getTrafficSubsidy());
-                oldData.setInsureSubsidy(renterCostReqVO.getInsureSubsidy());
-                oldData.setRentAmtSubsidy(renterCostReqVO.getRentAmtSubsidy());
-                oldData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
-                oldData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
-                oldData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
+                PlatformToRenterSubsidyResVO newData = new PlatformToRenterSubsidyResVO();
+                newData.setDispatchingSubsidy(renterCostReqVO.getDispatchingSubsidy());
+                newData.setOilSubsidy(renterCostReqVO.getOilSubsidy());
+                newData.setCleanCarSubsidy(renterCostReqVO.getCleanCarSubsidy());
+                newData.setGetReturnDelaySubsidy(renterCostReqVO.getGetReturnDelaySubsidy());
+                newData.setDelaySubsidy(renterCostReqVO.getDelaySubsidy());
+                newData.setTrafficSubsidy(renterCostReqVO.getTrafficSubsidy());
+                newData.setInsureSubsidy(renterCostReqVO.getInsureSubsidy());
+                newData.setRentAmtSubsidy(renterCostReqVO.getRentAmtSubsidy());
+                newData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
+                newData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
+                newData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
                 adminLogService.insertLog(AdminOpTypeEnum.PLATFORM_TO_RENTER,renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),null,CompareBeanUtils.newInstance(oldData,newData).compare());
             }catch (Exception e){
         	    log.error("平台给租客的补贴修改日志记录异常",e);
