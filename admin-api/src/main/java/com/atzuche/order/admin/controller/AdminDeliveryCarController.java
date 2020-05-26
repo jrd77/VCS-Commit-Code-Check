@@ -127,12 +127,13 @@ public class AdminDeliveryCarController extends BaseController {
             return ResponseData.createErrorCodeResponse(ErrorCode.FAILED.getCode(), "取还车更新接口出现错误");
         }
         try{
-            String desc = "";
+
             //记录日志
             if(deliveryCarDTO != null){
                 OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = deliveryCarDTO.getOwnerGetAndReturnCarDTO();
                 RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarDTO.getRenterGetAndReturnCarDTO();
-                if(ownerGetAndReturnCarDTO!= null){
+                String desc = "";
+                if(ownerGetAndReturnCarDTO!= null && deliveryCarVO.getOwnerGetAndReturnCarDTO()!= null){
                     desc += "车主处取还车 ：【";
                     if(compareString(ownerGetAndReturnCarDTO.getKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM)){
                         desc += "取车里程数 " + ownerGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM;
@@ -148,20 +149,19 @@ public class AdminDeliveryCarController extends BaseController {
                     }
                     desc += "】";
                 }
-
-                if(renterGetAndReturnCarDTO != null){
+                if(renterGetAndReturnCarDTO != null  && deliveryCarVO.getRenterGetAndReturnCarDTO()!= null){
                     desc += "  租客处取还车 ：【";
                     if(compareString(renterGetAndReturnCarDTO.getKM,deliveryCarVO.getRenterGetAndReturnCarDTO().getKM)){
-                        desc += "交车里程数 " + ownerGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM;
+                        desc += "交车里程数 " + renterGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getKM;
                     }
                     if(compareString(renterGetAndReturnCarDTO.returnKM,deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM)){
-                        desc += "收车里程数 " + ownerGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM;
+                        desc += "收车里程数 " + renterGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM;
                     }
                     if(compareString(renterGetAndReturnCarDTO.getCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil)){
-                        desc += "交车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                        desc += "交车油表刻度 " + renterGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil;
                     }
                     if(compareString(renterGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().returnCarOil)){
-                        desc += "收车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
+                        desc += "收车油表刻度 " + renterGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil;
                     }
                     desc += "】";
                 }
@@ -169,7 +169,7 @@ public class AdminDeliveryCarController extends BaseController {
             }
 
         }catch (Exception e){
-
+            log.error("租客车主处取还车 日志记录异常",e);
         }
         return ResponseData.success();
     }
