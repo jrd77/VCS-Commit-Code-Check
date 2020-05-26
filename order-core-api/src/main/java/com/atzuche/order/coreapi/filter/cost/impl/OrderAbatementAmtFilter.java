@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 计算全面保障服务费
+ * 计算补充保障服务费
  *
  * @author pengcheng.fu
  * @date 2020/3/30 11:05

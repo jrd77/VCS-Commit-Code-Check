@@ -369,6 +369,15 @@ public class CashierPayService{
     private Boolean isChangeOrderStatus(OrderStatusDTO orderStatusDTO){
         OrderStatusEntity entity = orderStatusService.getByOrderNo(orderStatusDTO.getOrderNo());
         boolean getCar = false;
+        if(entity != null) {
+        	log.info("支付变更订单状态回调通知OrderStatusEntity result=[{}]",GsonUtils.toJson(entity));
+        }
+        //如果是调度中的状态，不修改为“待取车”
+        if(entity != null && entity.getStatus() != null && OrderStatusEnum.TO_DISPATCH.getStatus() == entity.getStatus().intValue()) {
+        	log.info("当前订单状态为调度中的状态，不修改status主订单状态。OrderStatusEntity result=[{}]",GsonUtils.toJson(entity));
+        	return getCar;
+        }
+        
         //以参数的为准。
         Integer rentCarPayStatus = Objects.isNull(orderStatusDTO.getRentCarPayStatus())?entity.getRentCarPayStatus():orderStatusDTO.getRentCarPayStatus();
         Integer depositPayStatus = Objects.isNull(orderStatusDTO.getDepositPayStatus())?entity.getDepositPayStatus():orderStatusDTO.getDepositPayStatus();

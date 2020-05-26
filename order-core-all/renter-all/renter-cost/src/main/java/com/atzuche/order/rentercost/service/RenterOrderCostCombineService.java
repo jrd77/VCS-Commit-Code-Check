@@ -40,6 +40,7 @@ import com.autoyol.platformcost.RenterFeeCalculatorUtils;
 import com.autoyol.platformcost.model.CarDepositAmtVO;
 import com.autoyol.platformcost.model.CarPriceOfDay;
 import com.autoyol.platformcost.model.FeeResult;
+import com.autoyol.platformcost.model.InsuranceCommonDTO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +104,12 @@ public class RenterOrderCostCombineService {
     private Integer configHours;
     @Value("${auto.cost.unitExtraDriverInsure}")
     private Integer unitExtraDriverInsure;
+    @Value("${auto.cost.tyrePrice}")
+    private Integer tyrePrice;
+    @Value("${auto.cost.driverFiveSeatsPrice}")
+    private Integer driverFiveSeatsPrice;
+    @Value("${auto.cost.driverSevenSeatsPrice}")
+    private Integer driverSevenSeatsPrice;
     
     private static final Integer [] ORDER_TYPES = {1,2,3};
 	
@@ -120,6 +127,8 @@ public class RenterOrderCostCombineService {
         add(RenterCashCodeEnum.MILEAGE_COST_RENTER);
         add(RenterCashCodeEnum.OIL_COST_RENTER);
         add(RenterCashCodeEnum.EXTRA_DRIVER_INSURE);
+        add(RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES);
+        add(RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES);
     }};
 
 	/**
@@ -290,8 +299,12 @@ public class RenterOrderCostCombineService {
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
 		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
-		FeeResult feeResult = RenterFeeCalculatorUtils.calInsurAmt(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
-				insurAmtDTO.getGetCarBeforeTime(), insurAmtDTO.getReturnCarAfterTime(), configHours, guidPrice, coefficient, easyCoefficient, insuranceConfigs);
+		// 驾驶行为系数
+		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
+		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
+				insurAmtDTO.getGetCarBeforeTime(), insurAmtDTO.getReturnCarAfterTime(), 
+				configHours, guidPrice, coefficient, easyCoefficient, driverCoefficient);
+		FeeResult feeResult = RenterFeeCalculatorUtils.calInsurAmt(insCom, insuranceConfigs);
 		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
 		return result;
 	}
@@ -328,10 +341,108 @@ public class RenterOrderCostCombineService {
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(abatementAmtDTO.getCertificationTime());
 		// 车辆标签系数
 		Double easyCoefficient = CommonUtils.getEasyCoefficient(abatementAmtDTO.getCarLabelIds());
-		List<FeeResult> feeResultList = RenterFeeCalculatorUtils.calcAbatementAmt(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), abatementAmtDTO.getGetCarBeforeTime(), abatementAmtDTO.getReturnCarAfterTime(), configHours, guidPrice, coefficient, easyCoefficient);
+		// 驾驶行为系数
+		Double driverCoefficient = CommonUtils.getDriverCoefficient(abatementAmtDTO.getDriverScore());
+		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
+				abatementAmtDTO.getGetCarBeforeTime(), abatementAmtDTO.getReturnCarAfterTime(), 
+				configHours, guidPrice, coefficient, easyCoefficient, driverCoefficient);
+		List<FeeResult> feeResultList = RenterFeeCalculatorUtils.calcAbatementAmt(insCom);
 		List<RenterOrderCostDetailEntity> resultList = feeResultList.stream().map(fr -> costBaseConvert(costBaseDTO, fr, RenterCashCodeEnum.ABATEMENT_INSURE)).collect(Collectors.toList());
 		return resultList;
 	}
+	
+	
+	/**
+	 * 计算轮胎/轮毂保障费
+	 * @param insurAmtDTO
+	 * @return RenterOrderCostDetailEntity
+	 */
+	public RenterOrderCostDetailEntity getTyreInsurAmtEntity(InsurAmtDTO insurAmtDTO) {
+		log.info("getTyreInsurAmtEntity insurAmtDTO=[{}]",insurAmtDTO);
+		if (insurAmtDTO == null) {
+			log.error("getTyreInsurAmtEntity 计算轮胎/轮毂保障费insurAmtDTO对象为空");
+			Cat.logError("计算轮胎/轮毂保障费insurAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = insurAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getTyreInsurAmtEntity 计算轮胎/轮毂保障费insurAmtDTO.costBaseDTO对象为空");
+			Cat.logError("计算轮胎/轮毂保障费insurAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		if (insurAmtDTO.getTyreInsurFlag() == null || insurAmtDTO.getTyreInsurFlag() != 1) {
+			// 没购买
+			return null;
+		}
+		// 指导价
+		Integer guidPrice = insurAmtDTO.getGuidPrice();
+		if (insurAmtDTO.getInmsrp() != null && insurAmtDTO.getInmsrp() != 0) {
+			guidPrice = insurAmtDTO.getInmsrp();
+		}
+		// 会员系数
+		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
+		// 车辆标签系数
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		// 驾驶行为系数
+		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
+		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
+				insurAmtDTO.getGetCarBeforeTime(), insurAmtDTO.getReturnCarAfterTime(), 
+				configHours, guidPrice, coefficient, easyCoefficient, driverCoefficient);
+		FeeResult feeResult = RenterFeeCalculatorUtils.calTyreInsurAmt(insCom, tyrePrice);
+		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES);
+		return result;
+	}
+	
+	
+	/**
+	 * 获取驾乘无忧保障费
+	 * @param insurAmtDTO
+	 * @return RenterOrderCostDetailEntity
+	 */
+	public RenterOrderCostDetailEntity getDriverInsurAmtEntity(InsurAmtDTO insurAmtDTO) {
+		log.info("getDriverInsurAmtEntity insurAmtDTO=[{}]",insurAmtDTO);
+		if (insurAmtDTO == null) {
+			log.error("getDriverInsurAmtEntity 获取驾乘无忧保障费insurAmtDTO对象为空");
+			Cat.logError("获取驾乘无忧保障费insurAmtDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		CostBaseDTO costBaseDTO = insurAmtDTO.getCostBaseDTO();
+		if (costBaseDTO == null) {
+			log.error("getDriverInsurAmtEntity 获取驾乘无忧保障费insurAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取驾乘无忧保障费insurAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			throw new RenterCostParameterException();
+		}
+		if (insurAmtDTO.getDriverInsurFlag() == null || insurAmtDTO.getDriverInsurFlag() != 1) {
+			// 没购买
+			return null;
+		}
+		// 指导价
+		Integer guidPrice = insurAmtDTO.getGuidPrice();
+		if (insurAmtDTO.getInmsrp() != null && insurAmtDTO.getInmsrp() != 0) {
+			guidPrice = insurAmtDTO.getInmsrp();
+		}
+		// 会员系数
+		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
+		// 车辆标签系数
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		// 驾驶行为系数
+		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
+		// 车辆座位数
+		int seatNum = insurAmtDTO.getSeatNum() == null ? 0:insurAmtDTO.getSeatNum().intValue();
+		Integer driverPrice = null;
+		if (seatNum == 5) {
+			driverPrice = driverFiveSeatsPrice;
+		} else if (seatNum == 7) {
+			driverPrice = driverSevenSeatsPrice;
+		}
+		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
+				insurAmtDTO.getGetCarBeforeTime(), insurAmtDTO.getReturnCarAfterTime(), 
+				configHours, guidPrice, coefficient, easyCoefficient, driverCoefficient);
+		FeeResult feeResult = RenterFeeCalculatorUtils.calDriverInsurAmt(insCom, driverPrice);
+		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES);
+		return result;
+	}
+	
 	
 	/**
 	 * 获取附加驾驶人费用返回结果
@@ -1399,6 +1510,27 @@ public class RenterOrderCostCombineService {
 			}
 			throw remoteCallException;
 		}
+	}
+	
+	
+	/**
+	 * 保费计算用通用对象封装
+	 * @param rentTime
+	 * @param revertTime
+	 * @param getCarBeforeTime
+	 * @param returnCarAfterTime
+	 * @param configHours
+	 * @param guidPrice
+	 * @param coefficient
+	 * @param easyCoefficient
+	 * @param driverCoefficient
+	 * @return InsuranceCommonDTO
+	 */
+	public InsuranceCommonDTO convertInsuranceCommonDTO(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,
+			Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient,
+			Double easyCoefficient, Double driverCoefficient) {
+		return new InsuranceCommonDTO(rentTime, revertTime, getCarBeforeTime, returnCarAfterTime, 
+				configHours, guidPrice, coefficient, easyCoefficient, driverCoefficient);
 	}
 
 }

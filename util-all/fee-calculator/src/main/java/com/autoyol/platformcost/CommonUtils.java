@@ -46,6 +46,12 @@ public class CommonUtils {
     
 	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
 	
+	private static final double DRIVERCOEFFICIENT_INIT = 1.0;
+    
+	private static final double DRIVERCOEFFICIENT_NOVICE = 1.3;
+	
+	private static final double DRIVER_SCORE_MIN = 30.0; 
+	
 	private static final String[] CAR_EASY_TAG = {"370","371"};
 	
 	public static final float FINE_AMT_RATIO_BIG = 0.3F;
@@ -85,19 +91,19 @@ public class CommonUtils {
 		private static final long serialVersionUID = -7734039511976536462L;
 
 	{
-        add(new AbatementConfig(0, 250000, 40, 30, 25, 20));
-        add(new AbatementConfig(250000, 400000, 50, 40, 35, 30));
-        add(new AbatementConfig(400000, 600000, 90, 70, 60, 50));
-        add(new AbatementConfig(600000, 800000, 100, 80, 70, 60));
-        add(new AbatementConfig(800000, 1000000, 120, 100, 80, 70));
-        add(new AbatementConfig(1000000, 1500000, 225, 180, 144, 115));
-        add(new AbatementConfig(1500000, 2000000, 300, 240, 192, 154));
-        add(new AbatementConfig(2000000, 2500000, 375, 300, 240, 192));
-        add(new AbatementConfig(2500000, 3000000, 450, 360, 288, 230));
-        add(new AbatementConfig(3000000, 3500000, 525, 420, 336, 269));
-        add(new AbatementConfig(3500000, 4000000, 600, 480, 384, 307));
-        add(new AbatementConfig(4000000, 4500000, 675, 540, 432, 346));
-        add(new AbatementConfig(4500000, Integer.MAX_VALUE, 750, 600, 480, 384));
+        add(new AbatementConfig(0, 250000, 40, 40, 40, 40));
+        add(new AbatementConfig(250000, 400000, 50, 50, 50, 50));
+        add(new AbatementConfig(400000, 600000, 90, 90, 90, 90));
+        add(new AbatementConfig(600000, 800000, 100, 100, 100, 100));
+        add(new AbatementConfig(800000, 1000000, 120, 120, 120, 120));
+        add(new AbatementConfig(1000000, 1500000, 225, 225, 225, 225));
+        add(new AbatementConfig(1500000, 2000000, 300, 300, 300, 300));
+        add(new AbatementConfig(2000000, 2500000, 375, 375, 375, 375));
+        add(new AbatementConfig(2500000, 3000000, 450, 450, 450, 450));
+        add(new AbatementConfig(3000000, 3500000, 525, 525, 525, 525));
+        add(new AbatementConfig(3500000, 4000000, 600, 600, 600, 600));
+        add(new AbatementConfig(4000000, 4500000, 675, 675, 675, 675));
+        add(new AbatementConfig(4500000, Integer.MAX_VALUE, 750, 750, 750, 750));
     }};
 
 	/**
@@ -699,6 +705,23 @@ public class CommonUtils {
 		}
 		return INSURE_DISCOUNT_NORMAL;
 	}
+	
+	
+	public static Double getDriverCoefficient(String driverScore) {
+		if (StringUtils.isBlank(driverScore)) {
+			return DRIVERCOEFFICIENT_INIT;
+		}
+		try {
+			double driverScoreD = Double.valueOf(driverScore);
+			if (driverScoreD <= DRIVER_SCORE_MIN) {
+				return DRIVERCOEFFICIENT_NOVICE;
+			}
+		} catch (Exception e) {
+			log.error("getDriverCoefficient driverScore数据异常");
+		}
+		return DRIVERCOEFFICIENT_INIT;
+	}
+	
 	
 	public static void main(String[] args) {
 		LocalDateTime rentTime = LocalDateTime.of(2020, 1, 17, 21, 30, 0);

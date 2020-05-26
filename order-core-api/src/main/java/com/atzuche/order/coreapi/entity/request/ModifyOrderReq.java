@@ -108,4 +108,9 @@ public class ModifyOrderReq {
      * 是否扫码还车的修改还车时间
      */
     private Boolean scanCodeFlag;
+    
+    @AutoDocProperty(value="是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+	@AutoDocProperty(value="是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 }

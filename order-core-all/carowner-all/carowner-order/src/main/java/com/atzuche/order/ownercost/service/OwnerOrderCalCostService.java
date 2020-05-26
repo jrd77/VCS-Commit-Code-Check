@@ -33,7 +33,7 @@ public class OwnerOrderCalCostService {
     private OwnerOrderCostCombineService ownerOrderCostCombineService;
     @Autowired
     private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-    
+
     /**
      * 下单-车主端租车费用+明细+补贴 落库
      *
@@ -112,12 +112,14 @@ public class OwnerOrderCalCostService {
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = new ArrayList<>();
         ownerOrderIncrementDetailList.add(ownerSrvGetAmtEntity);
         ownerOrderIncrementDetailList.add(ownerSrvReturnAmtEntity);
-        if(null != serviceExpenseEntity) {
-            ownerOrderIncrementDetailList.add(serviceExpenseEntity);
-        }
+        //if(null != serviceExpenseEntity) {
+        //    ownerOrderIncrementDetailList.add(serviceExpenseEntity);
+        //}
 
-        if(null != proxyServiceExpenseEntity) {
+        if(null != proxyServiceExpenseEntity) {//如果托管车有值就优先取脱管车服务费
             ownerOrderIncrementDetailList.add(proxyServiceExpenseEntity);
+        }else if(null != serviceExpenseEntity){
+            ownerOrderIncrementDetailList.add(serviceExpenseEntity);
         }
 
         if(CollectionUtils.isNotEmpty(gpsServiceAmtIncrementEntity)) {

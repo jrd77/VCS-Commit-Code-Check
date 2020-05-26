@@ -850,7 +850,7 @@ public class RenterFeeCalculatorUtils {
 			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
 		}
 		if (driverPrice == null) {
-			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_UNIT_PRICE_EXCEPTION);
+			return null;
 		}
 		coefficient = coefficient == null ? 1.0:coefficient;
 		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;

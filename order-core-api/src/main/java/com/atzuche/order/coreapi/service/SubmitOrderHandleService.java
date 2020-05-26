@@ -1,12 +1,16 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CarChargeLevelConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.common.entity.CarChargeLevelConfigEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
@@ -32,6 +36,8 @@ import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
+import com.atzuche.order.parentorder.entity.OrderStopFreightInfo;
+import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
 import com.atzuche.order.parentorder.service.ParentOrderService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -96,6 +102,10 @@ public class SubmitOrderHandleService {
     private CashierService cashierService;
     @Autowired
     private OrderCommonConver orderCommonConver;
+    @Autowired
+    private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private CarChargeLevelConfigSDK carChargeLevelConfigSDK;
 
 
     /**
@@ -152,7 +162,8 @@ public class SubmitOrderHandleService {
         if (replyFlag) {
             orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
         }
-
+        // 保存停运费信息
+        saveOrderStopFreightInfo(baseReqDTO.getOrderNo(), context.getOwnerGoodsDetailDto());
         // 换车记录初始化(orderTransferRecordService.saveOrderTransferRecord)
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
         return parentOrderDTO.getOrderStatusDTO().getStatus();
@@ -417,6 +428,7 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
+        ownerOrderReqDTO.setUseServiceRate(reqContext.getOwnerGoodsDetailDto().getUseServiceRate());
 
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetails = new ArrayList<>();
         Optional<OrderCouponDTO> ownerCoupon =
@@ -459,6 +471,51 @@ public class SubmitOrderHandleService {
         logger.info("Build owner order reqDTO,result is ,ownerOrderReqDTO:[{}]",
                 JSON.toJSONString(ownerOrderReqDTO));
         return ownerOrderReqDTO;
+    }
+    
+    
+    /**
+     * 保存车辆停运费比例及单价
+     * @param orderNo
+     * @param ownerGoodsDetailDTO
+     */
+    public void saveOrderStopFreightInfo(String orderNo, OwnerGoodsDetailDTO ownerGoodsDetailDTO) {
+    	if (ownerGoodsDetailDTO == null) {
+    		return;
+    	}
+    	Integer carChargeLevel = ownerGoodsDetailDTO.getCarChargeLevel() == null ? 1:ownerGoodsDetailDTO.getCarChargeLevel();
+    	int dayPrice = ownerGoodsDetailDTO.getDayPrice() == null ? 0:ownerGoodsDetailDTO.getDayPrice();
+    	logger.info("保存车辆停运费比例及单价saveOrderStopFreightInfo orderNo=[{}],carChargeLevel=[{}],dayPrice=[{}]",orderNo,carChargeLevel,dayPrice);
+    	List<CarChargeLevelConfigEntity> list = carChargeLevelConfigSDK.getConfig(new DefaultConfigContext());
+    	logger.info("carChargeLevelConfigSDK获取停运费配置信息list={}", JSON.toJSONString(list));
+    	// 协议厂停运费比例
+		Integer agreementStopFreightRate = 0;
+		// 非协议厂停运费比例
+		Integer notagreementStopFreightRate = 0;
+    	for (CarChargeLevelConfigEntity cclc:list) {
+    		if (cclc != null && carChargeLevel.equals(cclc.getLevel())) {
+    			// 协议厂停运费比例
+    			agreementStopFreightRate = cclc.getAgreementStopFreightRate();
+    			// 非协议厂停运费比例
+    			notagreementStopFreightRate = cclc.getNotagreementStopFreightRate();
+    			break;
+    		}
+    	}
+    	//计算停运费用(停运费单价=停运费比例*平日天单价)
+		int agreementStopFreightPrice = (int)Math.round(dayPrice*agreementStopFreightRate*0.01D);
+		int notagreementStopFreightPrice = (int)Math.round(dayPrice*notagreementStopFreightRate*0.01D);
+    	OrderStopFreightInfo orderStopFreightInfo = new OrderStopFreightInfo();
+    	orderStopFreightInfo.setOrderNo(orderNo);
+    	orderStopFreightInfo.setAgreementStopFreightPrice(agreementStopFreightPrice);
+    	orderStopFreightInfo.setAgreementStopFreightRate(agreementStopFreightRate);
+    	orderStopFreightInfo.setNotagreementStopFreightPrice(notagreementStopFreightPrice);
+    	orderStopFreightInfo.setNotagreementStopFreightRate(notagreementStopFreightRate);
+    	Integer count = orderStopFreightInfoService.getCountByOrderNo(orderNo);
+    	if (count == null || count == 0) {
+    		orderStopFreightInfoService.insertSelective(orderStopFreightInfo);
+    	} else {
+    		orderStopFreightInfoService.updateByPrimaryKeySelective(orderStopFreightInfo);
+    	}
     }
 
 

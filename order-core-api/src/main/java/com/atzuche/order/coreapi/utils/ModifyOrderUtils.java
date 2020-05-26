@@ -138,6 +138,12 @@ public class ModifyOrderUtils {
 		if (getModifyFlag(initRenterOrder.getIsAbatement(), updModifyOrder.getAbatementFlag())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_ABATEMENT.getCode(), OrderChangeItemEnum.MODIFY_ABATEMENT.getName()));
 		}
+		if (getModifyFlag(initRenterOrder.getTyreInsurFlag(), updModifyOrder.getTyreInsurFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_TYREINSUR.getCode(), OrderChangeItemEnum.MODIFY_ABATEMENT.getName()));
+		}
+		if (getModifyFlag(initRenterOrder.getDriverInsurFlag(), updModifyOrder.getDriverInsurFlag())) {
+			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_DRIVERINSUR.getCode(), OrderChangeItemEnum.MODIFY_ABATEMENT.getName()));
+		}
 		if (getModifyDriverFlag(updModifyOrder.getDriverIds())) {
 			changeItemList.add(new OrderChangeItemDTO(initRenterOrder.getOrderNo(), renterOrderNo, OrderChangeItemEnum.MODIFY_DRIVER.getCode(), OrderChangeItemEnum.MODIFY_DRIVER.getName()));
 		}

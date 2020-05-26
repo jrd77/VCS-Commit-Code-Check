@@ -121,6 +121,12 @@ public class AdminModifyOrderFeeVO {
      */
     @AutoDocProperty(value = "长租折扣抵扣金额")
     private Integer longRentDeductAmt;
+    
+    @AutoDocProperty(value = "轮胎保障服务费")
+    private Integer tyreInsurAmt;
+    
+    @AutoDocProperty(value = "驾乘无忧保障服务费")
+    private Integer driverInsurAmt;
 
     public Integer getRentAmt() {
         return minusFee(rentAmt);
@@ -192,6 +198,14 @@ public class AdminModifyOrderFeeVO {
     
     public Integer getLongRentDeductAmt() {
         return minusFee(longRentDeductAmt);
+    }
+    
+    public Integer getTyreInsurAmt() {
+        return minusFee(tyreInsurAmt);
+    }
+    
+    public Integer getDriverInsurAmt() {
+        return minusFee(driverInsurAmt);
     }
     
 }

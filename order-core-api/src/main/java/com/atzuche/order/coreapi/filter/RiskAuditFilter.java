@@ -25,19 +25,9 @@ public class RiskAuditFilter implements OrderFilter {
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
 
-        String riskAuditId = submitOrderRiskAuditService.check(buildSubmitOrderRiskCheckReqVO(context.getOrderReqVO(), context.getOrderReqVO().getReqTime(),
-                context.getRenterGoodsDetailDto().getWeekendPrice()));
+        String riskAuditId = submitOrderRiskAuditService.check(context);
         context.setRiskAuditId(riskAuditId);
     }
 
-    private SubmitOrderRiskCheckReqVO buildSubmitOrderRiskCheckReqVO(OrderReqVO orderReqVO, LocalDateTime reqTime,
-                                                                     Integer weekendPrice) {
-
-        SubmitOrderRiskCheckReqVO submitOrderRiskCheckReqVO = new SubmitOrderRiskCheckReqVO();
-        BeanCopier beanCopier = BeanCopier.create(OrderReqVO.class, SubmitOrderRiskCheckReqVO.class, false);
-        beanCopier.copy(orderReqVO, submitOrderRiskCheckReqVO, null);
-        submitOrderRiskCheckReqVO.setReqTime(LocalDateTimeUtils.localDateTimeToDate(reqTime));
-        submitOrderRiskCheckReqVO.setWeekendPrice(weekendPrice);
-        return submitOrderRiskCheckReqVO;
-    }
+    
 }

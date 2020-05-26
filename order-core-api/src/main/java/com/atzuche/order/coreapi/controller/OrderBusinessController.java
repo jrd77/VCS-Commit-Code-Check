@@ -2,20 +2,24 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.coreapi.service.OrderBusinessService;
+import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.vo.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -121,4 +125,15 @@ public class OrderBusinessController {
         return ResponseData.success(renterDepositDetailDTO);
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/15 11:36
+     * @Description: 通过车主子订单号查询车主补贴
+     *
+     **/
+    @GetMapping("/orderBusiness/queryOwnerSubsidyByownerOrderNo")
+    public ResponseData<List<OwnerOrderSubsidyDetailDTO>> queryOwnerSubsidyByownerOrderNo(@RequestParam(name = "orderNo")String orderNo,@RequestParam(name = "ownerOrderNo")String ownerOrderNo){
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOList = orderBusinessService.queryOwnerSubsidyByownerOrderNo(orderNo,ownerOrderNo);
+        return ResponseData.success(ownerOrderSubsidyDetailDTOList);
+    }
 }

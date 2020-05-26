@@ -341,6 +341,7 @@ public class MemProxyService {
         MemberStatisticsInfo memberStatisticsInfo = memberTotalInfo.getMemberStatisticsInfo();
         MemberRoleInfo memberRoleInfo = memberTotalInfo.getMemberRoleInfo();
         RenterMemberDTO renterMemberDto = new RenterMemberDTO();
+        renterMemberDto.setDriverScore(memberBaseInfo.getTotalScore());
         renterMemberDto.setRepeatTimeOrder(memberCoreInfo.getRepeatTimeOrder());
         renterMemberDto.setMemNo(memNo);
         renterMemberDto.setPhone(memberCoreInfo.getMobile()==null ? "" : String.valueOf(memberCoreInfo.getMobile()));

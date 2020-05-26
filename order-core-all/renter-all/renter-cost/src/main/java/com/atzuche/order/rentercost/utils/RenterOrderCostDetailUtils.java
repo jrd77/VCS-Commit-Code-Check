@@ -116,6 +116,22 @@ public class RenterOrderCostDetailUtils {
     public static int getReturnBlockedRaiseAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
         return getAmt(costDetailEntityList,RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT);
     }
+    /**
+     * 从列表中获取轮台险
+     * @param costDetailEntityList
+     * @return
+     */
+    public static int getTyreInsureTotalPricesAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES);
+    }
+    /**
+     * 从列表中获取驾乘无忧险
+     * @param costDetailEntityList
+     * @return
+     */
+    public static int getDriverInsureTotalPricesAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES);
+    }
 
     /**
      * 获取配送费用
@@ -126,4 +142,5 @@ public class RenterOrderCostDetailUtils {
         return getReturnBlockedRaiseAmt(costDetailEntityList) + getGetBlockedRaiseAmt(costDetailEntityList)
                 + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList);
     }
+
 }

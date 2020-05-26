@@ -32,7 +32,6 @@ public class InsuranceCommonDTO {
 	public InsuranceCommonDTO(LocalDateTime rentTime, LocalDateTime revertTime, Integer getCarBeforeTime,
 			Integer returnCarAfterTime, Integer configHours, Integer guidPrice, Double coefficient,
 			Double easyCoefficient, Double driverCoefficient) {
-		super();
 		this.rentTime = rentTime;
 		this.revertTime = revertTime;
 		this.getCarBeforeTime = getCarBeforeTime;
