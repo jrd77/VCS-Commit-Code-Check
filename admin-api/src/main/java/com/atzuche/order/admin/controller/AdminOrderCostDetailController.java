@@ -99,8 +99,8 @@ public class AdminOrderCostDetailController {
                         renterDelayReturnCarFineAmount = consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
                     }
                 }
-                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+":原值 "+renterBeforeReturnCarFineAmount+" 修改为 " +renterCostReqVO.getRenterBeforeReturnCarFineAmt()+"\n"
-                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值 "+ renterDelayReturnCarFineAmount+ " 修改为 "+ renterCostReqVO.getRenterDelayReturnCarFineAmt();
+                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())+"\n"
+                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
                 adminLogService.insertLog(AdminOpTypeEnum.RENTER_UPDATE_FINE, renterCostReqVO.getOrderNo(), desc);
             }catch (Exception e){
         	    log.error("记录日志失败",e);
@@ -558,7 +558,7 @@ public class AdminOrderCostDetailController {
                 if(ownerOrderSubsidyDetailDTO == null){
                     desc += "将 0 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
                 }else{
-                    desc += "将 "+ownerOrderSubsidyDetailDTO.getSubsidyAmount()+" 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
+                    desc += "将 "+ownerOrderSubsidyDetailDTO.getSubsidyAmount()+" 修改为 "+ -Integer.valueOf(ownerCostReqVO.getOwnerSubsidyRentAmt());
                 }
                 adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_RENTER,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),desc);
             }catch (Exception e){
