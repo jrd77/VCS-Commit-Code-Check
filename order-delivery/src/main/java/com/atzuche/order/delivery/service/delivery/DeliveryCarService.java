@@ -375,7 +375,9 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
         orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
         orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getCarOwnerType()));
+        //需要订单来源场景名称20200525
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
+
         orderDeliveryFlowEntity.setIsDelete(0);
         
         //0,普通订单 1,代步车订单 2,携程套餐订单 3,携程到店订单 4,同程套餐订单 5,安联代步车订单 6,普通套餐订单 7,VIP订单,8.线上长租订单
