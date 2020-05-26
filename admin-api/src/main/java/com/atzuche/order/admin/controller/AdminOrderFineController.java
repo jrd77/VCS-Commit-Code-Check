@@ -2,6 +2,7 @@ package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.vo.req.order.OrderFineRequestVO;
 import com.atzuche.order.admin.vo.resp.order.OrderFineResponseVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -24,9 +25,7 @@ public class AdminOrderFineController {
 	@AutoDocMethod(description = "违约金信息", value = "违约金信息", response = OrderFineResponseVO.class)
 	@GetMapping("fine/information")
 	public ResponseData fineInformation(OrderFineRequestVO orderFineRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 		return ResponseData.success(null);
 	}
 
