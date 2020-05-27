@@ -22,4 +22,6 @@ public interface AddIncomeExcelContextEntityMapper {
     int updateByPrimaryKey(AddIncomeExcelContextEntity record);
     
     int saveAddIncomeExcelContextBatch(List<AddIncomeExcelContextEntity> list);
+    
+    List<AddIncomeExcelContextEntity> listAddIncomeExcelContextByAddId(Long addId);
 }

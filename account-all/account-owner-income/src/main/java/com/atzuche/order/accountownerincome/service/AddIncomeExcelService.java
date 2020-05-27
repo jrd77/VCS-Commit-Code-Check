@@ -9,24 +9,36 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelVO;
+import com.atzuche.order.accountownerincome.exception.AddIncomeCanNotWithdrawException;
+import com.atzuche.order.accountownerincome.mapper.AddIncomeExamineMapper;
 import com.atzuche.order.accountownerincome.mapper.AddIncomeExcelContextEntityMapper;
 import com.atzuche.order.accountownerincome.mapper.AddIncomeExcelEntityMapper;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.PageBean;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelQueryDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AddIncomeExcelService {
 
 	@Autowired
 	private AddIncomeExcelEntityMapper addIncomeExcelEntityMapper;
 	@Autowired
 	private AddIncomeExcelContextEntityMapper addIncomeExcelContextEntityMapper;
+	@Autowired
+	private AddIncomeExamineMapper addIncomeExamineMapper;
+	
+	private static final int ADD_INCOME_PASS = 1;
+	private static final int ADD_INCOME_WITHDRAW = 3;
 	
 	/**
 	 * 获取追加收益文件列表
@@ -88,11 +100,65 @@ public class AddIncomeExcelService {
 	 * @param addIncomeExcelOptDTO
 	 */
 	public void updateStatus(AddIncomeExcelOptDTO addIncomeExcelOptDTO) {
+		log.info("追加收益操作 addIncomeExcelOptDTO=[{}]",addIncomeExcelOptDTO);
+		if (addIncomeExcelOptDTO == null) {
+			return;
+		}
+		int flag = addIncomeExcelOptDTO.getFlag() == null ? 0:addIncomeExcelOptDTO.getFlag().intValue();
+		Long addId = addIncomeExcelOptDTO.getId() == null ? null:Long.valueOf(addIncomeExcelOptDTO.getId().toString());
+		if (addId == null) {
+			return;
+		}
+		if (flag == ADD_INCOME_PASS) {
+			// 审核通过
+			passAddIncome(addId);
+		} else if (flag == ADD_INCOME_WITHDRAW) {
+			// 撤回
+			withdrawAddIncome(addId);
+		}
 		AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
-		addIncomeExcelEntity.setId(Long.valueOf(addIncomeExcelOptDTO.getId().toString()));
+		addIncomeExcelEntity.setId(addId);
 		addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
 		addIncomeExcelEntity.setOperateTime(new Date());
 		addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
 		addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+	}
+	
+	/**
+	 * 审核通过
+	 * @param addId
+	 */
+	public void passAddIncome(Long addId) {
+		List<AddIncomeExcelContextEntity> contextList = addIncomeExcelContextEntityMapper.listAddIncomeExcelContextByAddId(addId);
+		if (contextList == null || contextList.isEmpty()) {
+			return;
+		}
+		List<AddIncomeExamine> examineList = new ArrayList<AddIncomeExamine>();
+		for (AddIncomeExcelContextEntity context:contextList) {
+			AddIncomeExamine examine = new AddIncomeExamine();
+			BeanUtils.copyProperties(context, examine);
+			examine.setAddId(addId);
+			String applyTime = context.getApplyTime();
+			if (StringUtils.isNotBlank(applyTime)) {
+				Date applyDate = DateUtils.parseDate(applyTime, DateUtils.fmt_yyyyMMdd);
+				examine.setApplyTime(applyDate);
+			}
+			examineList.add(examine);
+		}
+		addIncomeExamineMapper.saveAddIncomeExamineBatch(examineList);
+	}
+	
+	/**
+	 * 追加收益撤回
+	 * @param addId
+	 */
+	public void withdrawAddIncome(Long addId) {
+		// 查询该批次下已经操作过的追加收益数量
+		int count = addIncomeExamineMapper.getCountByAddIdAndStatus(addId);
+		if (count > 0) {
+			throw new AddIncomeCanNotWithdrawException();
+		}
+		// 删除该批次的追加收益
+		addIncomeExamineMapper.delAddIncomeExamineByAddId(addId);
 	}
 }

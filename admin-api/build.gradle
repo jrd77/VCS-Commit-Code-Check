@@ -75,4 +75,5 @@ dependencies {
     compile project(":order-remote-service:order-remote-car")
 	
 	compile("org.apache.poi:poi:3.9")
+	compile("org.apache.poi:poi-ooxml:3.9")
 }

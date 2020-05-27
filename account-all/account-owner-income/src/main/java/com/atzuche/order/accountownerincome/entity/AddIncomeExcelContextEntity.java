@@ -5,9 +5,11 @@ public class AddIncomeExcelContextEntity {
 
     private Long addId;
 
-    private Long orderNo;
+    private String orderNo;
 
     private Integer memNo;
+    
+    private String name;
 
     private Long mobile;
 
@@ -45,11 +47,11 @@ public class AddIncomeExcelContextEntity {
         this.addId = addId;
     }
 
-    public Long getOrderNo() {
+    public String getOrderNo() {
         return orderNo;
     }
 
-    public void setOrderNo(Long orderNo) {
+    public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
     }
 
@@ -61,7 +63,15 @@ public class AddIncomeExcelContextEntity {
         this.memNo = memNo;
     }
 
-    public Long getMobile() {
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Long getMobile() {
         return mobile;
     }
 

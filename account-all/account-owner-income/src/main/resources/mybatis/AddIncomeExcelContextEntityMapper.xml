@@ -4,8 +4,9 @@
   <resultMap id="BaseResultMap" type="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="add_id" property="addId" jdbcType="BIGINT" />
-    <result column="order_no" property="orderNo" jdbcType="BIGINT" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
     <result column="mem_no" property="memNo" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="mobile" property="mobile" jdbcType="BIGINT" />
     <result column="type" property="type" jdbcType="VARCHAR" />
     <result column="amt" property="amt" jdbcType="INTEGER" />
@@ -15,22 +16,15 @@
     <result column="order_date" property="orderDate" jdbcType="VARCHAR" />
     <result column="settle_mon" property="settleMon" jdbcType="VARCHAR" />
     <result column="mem_type" property="memType" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" extends="BaseResultMap" >
-    <result column="describe" property="describe" jdbcType="LONGVARCHAR" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, add_id, order_no, mem_no, mobile, type, amt, department, apply_time, detail_type, 
-    order_date, settle_mon, mem_type
+    id, add_id, order_no, mem_no, name, mobile, type, amt, department, apply_time, detail_type, 
+    order_date, settle_mon, mem_type, describe
   </sql>
-  <sql id="Blob_Column_List" >
-    describe
-  </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from add_income_excel_context
     where id = #{id,jdbcType=BIGINT}
   </select>
@@ -44,7 +38,7 @@
       amt, department, apply_time, 
       detail_type, order_date, settle_mon, 
       mem_type, describe)
-    values (#{id,jdbcType=BIGINT}, #{addId,jdbcType=BIGINT}, #{orderNo,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{addId,jdbcType=BIGINT}, #{orderNo,jdbcType=VARCHAR}, 
       #{memNo,jdbcType=INTEGER}, #{mobile,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, 
       #{amt,jdbcType=INTEGER}, #{department,jdbcType=VARCHAR}, #{applyTime,jdbcType=VARCHAR}, 
       #{detailType,jdbcType=VARCHAR}, #{orderDate,jdbcType=VARCHAR}, #{settleMon,jdbcType=VARCHAR}, 
@@ -104,7 +98,7 @@
         #{addId,jdbcType=BIGINT},
       </if>
       <if test="orderNo != null" >
-        #{orderNo,jdbcType=BIGINT},
+        #{orderNo,jdbcType=VARCHAR},
       </if>
       <if test="memNo != null" >
         #{memNo,jdbcType=INTEGER},
@@ -148,7 +142,7 @@
         add_id = #{addId,jdbcType=BIGINT},
       </if>
       <if test="orderNo != null" >
-        order_no = #{orderNo,jdbcType=BIGINT},
+        order_no = #{orderNo,jdbcType=VARCHAR},
       </if>
       <if test="memNo != null" >
         mem_no = #{memNo,jdbcType=INTEGER},
@@ -189,7 +183,7 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
     update add_income_excel_context
     set add_id = #{addId,jdbcType=BIGINT},
-      order_no = #{orderNo,jdbcType=BIGINT},
+      order_no = #{orderNo,jdbcType=VARCHAR},
       mem_no = #{memNo,jdbcType=INTEGER},
       mobile = #{mobile,jdbcType=BIGINT},
       type = #{type,jdbcType=VARCHAR},
@@ -206,7 +200,7 @@
   <update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
     update add_income_excel_context
     set add_id = #{addId,jdbcType=BIGINT},
-      order_no = #{orderNo,jdbcType=BIGINT},
+      order_no = #{orderNo,jdbcType=VARCHAR},
       mem_no = #{memNo,jdbcType=INTEGER},
       mobile = #{mobile,jdbcType=BIGINT},
       type = #{type,jdbcType=VARCHAR},
@@ -222,18 +216,25 @@
   
   <insert id ="saveAddIncomeExcelContextBatch" parameterType="java.util.List" >
   	insert into add_income_excel_context (add_id, order_no, 
-      mem_no, mobile, type, 
+      mem_no, name, mobile, type, 
       amt, department, apply_time, 
       detail_type, order_date, settle_mon, 
       mem_type, describe)
     values 
     <foreach collection ="list" item="aiec" index= "index" separator =",">
     (#{aiec.addId}, #{aiec.orderNo}, 
-      #{aiec.memNo}, #{aiec.mobile}, #{aiec.type}, 
+      #{aiec.memNo}, #{aiec.name}, #{aiec.mobile}, #{aiec.type}, 
       #{aiec.amt}, #{aiec.department}, #{aiec.applyTime}, 
       #{aiec.detailType}, #{aiec.orderDate}, #{aiec.settleMon}, 
       #{aiec.memType}, #{aiec.describe})
      </foreach>
   </insert>
+  
+  <select id="listAddIncomeExcelContextByAddId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from add_income_excel_context
+    where add_id = #{addId}
+  </select>
   
 </mapper>

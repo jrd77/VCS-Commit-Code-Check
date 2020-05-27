@@ -155,5 +155,7 @@ public class RenterMemberService{
         return renterMemberMapper.queryRenterInfoByOrderNoAndRenterNo(orderNo,renterNo);
     }
 
-
+    public RenterMemberEntity getRenterMemberByOrderNo(String orderNo) {
+    	return renterMemberMapper.getRenterMemberByOrderNo(orderNo);
+    }
 }
