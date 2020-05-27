@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * 计算全面保障费参数
+ * 计算补充保障服务费参数
  *
  * @author pengcheng.fu
  * @date 2020/3/27 16:45
@@ -40,7 +40,7 @@ public class OrderCostAbatementAmtReqDTO {
      */
     private List<String> carLabelIds;
     /**
-     * 是否计算全面保障费
+     * 是否计算补充保障服务费
      */
     private Boolean isAbatement;
 

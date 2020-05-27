@@ -42,9 +42,9 @@ public class OrderCostFilterChain implements ApplicationContextAware {
         orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtFilter.class));
         //基础保险费折扣
         orderCostFilterList.add(applicationContext.getBean(OrderInsurAmtDeductionFilter.class));
-        //全面保障费
+        //补充保障服务费
         orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtFilter.class));
-        //全面保障费折扣
+        //补充保障服务费折扣
         orderCostFilterList.add(applicationContext.getBean(OrderAbatementAmtDeductionFilter.class));
         //附加驾驶人保险费
         orderCostFilterList.add(applicationContext.getBean(OrderExtraDriverInsureAmtFilter.class));

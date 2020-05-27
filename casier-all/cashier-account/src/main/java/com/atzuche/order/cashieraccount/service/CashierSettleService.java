@@ -198,7 +198,7 @@ public class CashierSettleService {
             int additionalDrivingEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
                 return RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo().equals(obj.getCostCode());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-            //全面保障费用
+            //补充保障服务费
             int comprehensiveEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
                 return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(obj.getCostCode());
             }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();

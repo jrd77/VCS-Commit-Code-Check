@@ -168,7 +168,7 @@ public class GetReturnCarCostService extends DeliveryCarFeeBaseService implement
         String channelCode = GetReturnCarCostNeedUtil.getChannelCodeByEntryCode(null).getTypeCode();
         // 租金+保险+不计免赔+手续费(传入)
         Integer sumJudgeFreeFee =null;
-        // 订单的租金，平台保障费，全面保障费，平台手续费总和小于300，则取还车服务不享受免费
+        // 订单的租金，平台保障费，补充保障服务费，平台手续费总和小于300，则取还车服务不享受免费
         sumJudgeFreeFee = sumJudgeFreeFee == null ? 0:sumJudgeFreeFee;
         String sumJudgeFreeFeeStr = String.valueOf(sumJudgeFreeFee);
         log.info("取还车费用计算，租金+保险+不计免赔+手续费 sumJudgeFreeFee=[{}]", sumJudgeFreeFee);

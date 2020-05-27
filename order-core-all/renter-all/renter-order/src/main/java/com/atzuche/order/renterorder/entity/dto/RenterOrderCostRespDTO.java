@@ -38,7 +38,7 @@ public class RenterOrderCostRespDTO {
      */
     private Integer basicEnsureAmount;
     /**
-     * 全面保障费用(不计免赔)
+     * 补充保障服务费(不计免赔)
      */
     private Integer comprehensiveEnsureAmount;
     /**

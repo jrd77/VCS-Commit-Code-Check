@@ -28,7 +28,7 @@ public class OrderCostReqContext {
     private OrderCostInsurAmtReqDTO insurAmtReqDTO;
 
     /**
-     * 计算全面保障费参数
+     * 计算补充保障服务费参数
      */
     private OrderCostAbatementAmtReqDTO abatementAmtReqDTO;
 

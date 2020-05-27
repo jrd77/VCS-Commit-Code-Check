@@ -52,7 +52,7 @@ public class RenterOrderCostDetailUtils {
     }
 
     /**
-     * 从列表中获得全面保障费总额(负值）
+     * 从列表中获得补充保障服务费总额(负值）
      * @param costDetailEntityList
      * @return
      */
@@ -88,8 +88,6 @@ public class RenterOrderCostDetailUtils {
     public static int getSrvReturnCostAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
         return getAmt(costDetailEntityList,RenterCashCodeEnum.SRV_RETURN_COST);
     }
-
-
     /**
      * 从列表中获得附加驾驶人费用
      * @param costDetailEntityList

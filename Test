@@ -1,30 +1,8 @@
-@AutoDocProperty(value="升级车辆补贴")
-dispatchingSubsidy;
-@AutoDocProperty(value="升级车辆补贴（系统自动计算）")
-dispatchingSubsidySystem;
-@AutoDocProperty(value="油费补贴")
-oilSubsidy;
-@AutoDocProperty(value="洗车费补贴")
-cleanCarSubsidy;
-@AutoDocProperty(value="取还车迟到补贴")
-getReturnDelaySubsidy;
-@AutoDocProperty(value="延时补贴")
-delaySubsidy;
-@AutoDocProperty(value="交通费补贴")
-trafficSubsidy;
-@AutoDocProperty(value="基础保障费补贴")
-insureSubsidy;
-@AutoDocProperty(value="基础保障费补贴（系统自动计算）")
-insureSubsidySystem;
-@AutoDocProperty(value="租金补贴")
-rentAmtSubsidy;
-@AutoDocProperty(value="其他补贴")
-otherSubsidy;
-@AutoDocProperty(value="全面保障服务费补贴")
-abatementSubsidy;
-@AutoDocProperty(value="全面保障服务费补贴（系统自动计算）")
-abatementSubsidySystem;
-@AutoDocProperty(value="手续费补贴")
-feeSubsidy;
-@AutoDocProperty(value="长租-取还车费用补贴")
-longGetReturnCarCostSubsidy;
+  @AutoDocProperty(value = "轮胎保障服务费补贴")
+    private String tyreInsurSubsidy;
+    @AutoDocProperty(value = "轮胎保障服务费补贴(系统自动计算)")
+    private String tyreInsurSubsidySystem;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
+    private String driverInsurSubsidy;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴(系统自动计算)")
+    private String driverInsurSubsidySystem;

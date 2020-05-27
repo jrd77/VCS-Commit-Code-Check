@@ -27,12 +27,18 @@ public class RenterCostDetailVO {
     private Integer rentAmt;
     @AutoDocProperty(value = "平台保障费总额")
     private Integer insuranceAmt;
-    @AutoDocProperty(value = "全面保障费总额")
+    @AutoDocProperty(value = "补充保障服务费总额")
     private Integer abatementInsuranceAmt;
     @AutoDocProperty(value = "手续费")
     private Integer fee;
     @AutoDocProperty(value = "附加驾驶人保险总额")
     private Integer extraDriverInsuranceAmt;
+
+    @AutoDocProperty(value = "轮胎保障服务费")
+    public Integer tyreInsurAmt;
+
+    @AutoDocProperty(value = "驾乘无忧保障服务费")
+    public Integer driverInsurAmt;
 
     @AutoDocProperty(value = "配送费详情及其总额")
     private RenterDeliveryFeeDetailVO deliveryFeeDetail;
@@ -64,7 +70,13 @@ public class RenterCostDetailVO {
 
 
     public int getTotalAmt(){
-        int total= rentAmt+insuranceAmt+abatementInsuranceAmt+fee+extraDriverInsuranceAmt;
+        int total= (rentAmt==null?0:rentAmt)
+                +(insuranceAmt==null?0:insuranceAmt)
+                +(abatementInsuranceAmt==null?0:abatementInsuranceAmt)
+                +(fee==null?0:fee)
+                +(extraDriverInsuranceAmt==null?0:extraDriverInsuranceAmt)
+                +(tyreInsurAmt==null?0:tyreInsurAmt)
+                +(driverInsurAmt==null?0:driverInsurAmt);
         if(deliveryFeeDetail!=null){
             total= total+deliveryFeeDetail.getDeliveryTotal();
         }

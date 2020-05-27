@@ -45,7 +45,8 @@ public class CompareBeanUtils<T> {
     private StringBuffer content;
 
     public static List<String> excludeColumnList = Arrays.asList("dispatchingSubsidySystem","abatementSubsidySystem",
-            "insureSubsidySystem","dispatchingSubsidySystem","insureSubsidySystem","abatementSubsidySystem");
+            "insureSubsidySystem","dispatchingSubsidySystem","insureSubsidySystem","abatementSubsidySystem",
+            "driverInsurSubsidySystem","tyreInsurSubsidySystem");
 
     /**
      * 需要对比字段描述
