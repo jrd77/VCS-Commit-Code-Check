@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity;
@@ -69,6 +70,7 @@ public class AddIncomeExcelService {
 	 * 保存追加收益
 	 * @param addIncomeImportDTO
 	 */
+	@Transactional(rollbackFor=Exception.class)
 	public void saveAddIncomeExcel(AddIncomeImportDTO addIncomeImportDTO) {
 		if (addIncomeImportDTO == null) {
 			return;

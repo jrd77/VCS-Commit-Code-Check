@@ -311,4 +311,38 @@
 	DELETE FROM add_income_examine WHERE add_id=#{addId}
   </delete>
   
+  <sql id="whereCondition">
+		<where>
+			AND is_delete=0
+			<if test="orderNo != null and orderNo != 0">AND order_no=#{orderNo}</if>
+			<if test="mobile != null and mobile != ''">AND mobile=#{mobile}</if>
+			<if test="memNo != null and memNo != ''">AND mem_no=#{memNo}</if>
+			<if test="name != null and name != ''">AND name=#{name}</if>
+			<if test="department != null and department != ''">AND department=#{department}</if>
+			<if test="status != null and status != ''">AND status=#{status}</if>
+			<if test="createTimeBegin != null and createTimeBegin != ''">AND create_time &gt;= STR_TO_DATE('${createTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
+			<if test="createTimeEnd != null and createTimeEnd != ''">AND create_time &lt;= STR_TO_DATE('${createTimeEnd}', '%Y-%m-%d %k:%i:%s')</if>
+			<if test="examineTimeBegin != null and examineTimeBegin != ''">AND update_time &gt;= STR_TO_DATE('${examineTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
+			<if test="examineTimeEnd != null and examineTimeEnd != ''">AND update_time &lt;= STR_TO_DATE('${examineTimeEnd}', '%Y-%m-%d %k:%i:%s')</if>
+			<if test="applyDateBegin != null and applyDateBegin != ''">AND apply_time &gt;= STR_TO_DATE('${applyDateBegin}', '%Y-%m-%d')</if>
+			<if test="applyDateEnd != null and applyDateEnd != ''">AND apply_time &lt;= STR_TO_DATE('${applyDateEnd}', '%Y-%m-%d')</if>
+		</where>
+	</sql>
+  
+  <select id="queryAddIncomeExamine" resultMap="BaseResultMap" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExamineQueryDTO" >
+    select 
+    <include refid="Base_Column_List" />
+    from add_income_examine
+    <include refid="whereCondition"/> 
+	ORDER BY id DESC 
+	LIMIT #{startIndex}, #{pageSize} 
+  </select>
+  
+  <select id="queryCount" resultType="Integer" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO" >
+    select 
+    count(*)
+    from add_income_examine
+    <include refid="whereCondition"/> 
+  </select>
+  
 </mapper>

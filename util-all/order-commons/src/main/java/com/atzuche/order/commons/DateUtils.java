@@ -106,10 +106,15 @@ public class DateUtils {
     	if(date == null) {
     		return "";
     	}
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
-        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    	try {
+    		Instant instant = date.toInstant();
+            ZoneId zone = ZoneId.systemDefault();
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+            return DateTimeFormatter.ofPattern(format).format(localDateTime);
+		} catch (Exception e) {
+			logger.error("formate exception date=[{}],format=[{}] e:",date,format,e);
+		}
+        return "";
     }
 
     /**

@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamineVO;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelVO;
+import com.atzuche.order.accountownerincome.service.AddIncomeExamineService;
 import com.atzuche.order.accountownerincome.service.AddIncomeExcelService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
@@ -27,6 +30,8 @@ public class AddIncomeController {
 	private AddIncomeExcelService addIncomeExcelService;
 	@Autowired
 	private AddIncomeService addIncomeService;
+	@Autowired
+	private AddIncomeExamineService addIncomeExamineService;
 
 	/**
 	 * 获取追加收益文件列表
@@ -34,10 +39,9 @@ public class AddIncomeController {
 	 * @return ResponseData<AddIncomeExcelVO>
 	 */
 	@GetMapping("/income/excel/list")
-    public ResponseData<AddIncomeExcelVO> getAddIncomeExcelVO(@Valid AddIncomeExcelConsoleDTO aie, BindingResult bindingResult) {
-		log.info("获取追加收益文件列表 AddIncomeExcelConsoleDTO=[{}]", aie);
-		BindingResultUtil.checkBindingResult(bindingResult);
-		AddIncomeExcelVO addIncomeExcelVO = addIncomeExcelService.getAddIncomeExcelVO(aie);
+    public ResponseData<AddIncomeExcelVO> getAddIncomeExcelVO(@Valid AddIncomeExcelConsoleDTO req) {
+		log.info("获取追加收益文件列表 AddIncomeExcelConsoleDTO=[{}]", req);
+		AddIncomeExcelVO addIncomeExcelVO = addIncomeExcelService.getAddIncomeExcelVO(req);
     	return ResponseData.success(addIncomeExcelVO);
     }
 	
@@ -68,5 +72,18 @@ public class AddIncomeController {
 		BindingResultUtil.checkBindingResult(bindingResult);
 		addIncomeExcelService.updateStatus(req);
         return ResponseData.success();
+    }
+	
+	
+	/**
+	 * 获取追加收益审核列表
+	 * @param req
+	 * @return ResponseData<AddIncomeExamineVO>
+	 */
+	@GetMapping("/income/examine/list")
+    public ResponseData<AddIncomeExamineVO> getAddIncomeExcelVO(@Valid AddIncomeExamineDTO req) {
+		log.info("获取追加收益审核列表 AddIncomeExamineDTO=[{}]", req);
+		AddIncomeExamineVO addIncomeExamineVO = addIncomeExamineService.getAddIncomeExamineVO(req);
+    	return ResponseData.success(addIncomeExamineVO);
     }
 }

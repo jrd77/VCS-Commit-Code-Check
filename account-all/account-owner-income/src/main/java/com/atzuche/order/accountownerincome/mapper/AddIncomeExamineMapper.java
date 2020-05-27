@@ -3,6 +3,8 @@ package com.atzuche.order.accountownerincome.mapper;
 import java.util.List;
 
 import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineQueryDTO;
 
 public interface AddIncomeExamineMapper {
     int deleteByPrimaryKey(Integer id);
@@ -22,4 +24,8 @@ public interface AddIncomeExamineMapper {
     int getCountByAddIdAndStatus(Long addId);
     
     int delAddIncomeExamineByAddId(Long addId);
+    
+    List<AddIncomeExamine> queryAddIncomeExamine(AddIncomeExamineQueryDTO addIncomeExamineQueryDTO);
+    
+    int queryCount(AddIncomeExamineDTO addIncomeExamineDTO);
 }

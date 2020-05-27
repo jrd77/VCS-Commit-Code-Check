@@ -2,22 +2,33 @@ package com.atzuche.order.commons.entity.dto;
 
 import java.util.Date;
 
+import com.atzuche.order.commons.DateUtils;
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 public class AddIncomeExcelEntity {
+	@AutoDocProperty(value = "收益记录id")
     private Long id;
-
+	@AutoDocProperty(value = "文件名称")
     private String fileName;
-
+	@AutoDocProperty(value = "文件路径")
     private String excelHref;
-
+	
     private Date uploadTime;
-
+    @AutoDocProperty(value = "上传时间")
+	private String uploadTimeStr;
+	@AutoDocProperty(value = "上传人")
     private String uploder;
-
+	@AutoDocProperty(value = "状态，0:未审核 1:审核通过 2：驳回 3：撤回")
     private Integer status;
-
+    @AutoDocProperty(value = "审核状态中文描述")
+    private String statusStr;
+    
+    @AutoDocProperty(value = "操作人")
     private String operate;
 
     private Date operateTime;
+    @AutoDocProperty(value = "操作时间")
+    private String operateTimeStr;
 
     private Integer delFlag;
 
@@ -92,4 +103,46 @@ public class AddIncomeExcelEntity {
     public void setDelFlag(Integer delFlag) {
         this.delFlag = delFlag;
     }
+
+	public String getUploadTimeStr() {
+		if (uploadTime != null) {
+			uploadTimeStr = DateUtils.formate(uploadTime, DateUtils.DATE_DEFAUTE1);
+		}
+		return uploadTimeStr;
+	}
+
+	public void setUploadTimeStr(String uploadTimeStr) {
+		this.uploadTimeStr = uploadTimeStr;
+	}
+
+	public String getStatusStr() {
+		if (status != null) {
+			if (status.intValue() == 0) {
+				statusStr = "未审核";
+			} else if (status.intValue() == 1) {
+				statusStr = "审核通过";
+			} else if (status.intValue() == 2) {
+				statusStr = "驳回";
+			} else if (status.intValue() == 3) {
+				statusStr = "撤回";
+			}
+		}
+		return statusStr;
+	}
+
+	public void setStatusStr(String statusStr) {
+		this.statusStr = statusStr;
+	}
+
+	public String getOperateTimeStr() {
+		if (operateTime != null) {
+			operateTimeStr = DateUtils.formate(operateTime, DateUtils.DATE_DEFAUTE1);
+		}
+		return operateTimeStr;
+	}
+
+	public void setOperateTimeStr(String operateTimeStr) {
+		this.operateTimeStr = operateTimeStr;
+	}
+    
 }

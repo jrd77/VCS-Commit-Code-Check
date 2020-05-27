@@ -2,44 +2,55 @@ package com.atzuche.order.commons.vo;
 
 import java.util.Date;
 
+import com.atzuche.order.commons.DateUtils;
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 public class AddIncomeExamine {
     private Integer id;
-
+    @AutoDocProperty(value = "订单号")
     private String orderNo;
-
+    @AutoDocProperty(value = "会员号")
     private Integer memNo;
-
+    @AutoDocProperty(value = "手机号")
     private Long mobile;
-
+    @AutoDocProperty(value = "会员姓名")
     private String name;
-
     private Integer memType;
-
+    @AutoDocProperty(value = "会员身份")
+    private String memTypeStr;
+    @AutoDocProperty(value = "追加类型")
     private String type;
-
+    @AutoDocProperty(value = "明细类型")
     private String detailType;
-
+    @AutoDocProperty(value = "追加金额")
     private Integer amt;
-
+    @AutoDocProperty(value = "追加说明")
     private String describe;
-
+    @AutoDocProperty(value = "申请部门")
     private String department;
-
+   
     private Date applyTime;
-
+    @AutoDocProperty(value = "申请日志")
+    private String applyTimeStr;
     private Integer origDebt;
 
     private Integer nowDebt;
-
+    
     private Integer status;
-
+    @AutoDocProperty(value = "审核状态")
+    private String statusStr;
+    @AutoDocProperty(value = "备注")
     private String remark;
-
+    
     private Date createTime;
+    @AutoDocProperty(value = "创建时间")
+    private String createTimeStr;
 
     private String createOp;
 
     private Date updateTime;
+    @AutoDocProperty(value = "审核时间")
+    private String examineTime;
 
     private String updateOp;
 
@@ -212,4 +223,76 @@ public class AddIncomeExamine {
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
     }
+
+	public String getMemTypeStr() {
+		if (memType != null) {
+			if (memType.intValue() == 0) {
+				memTypeStr = "租客";
+			} else {
+				memTypeStr = "车主";
+			}
+		}
+		return memTypeStr;
+	}
+
+	public void setMemTypeStr(String memTypeStr) {
+		this.memTypeStr = memTypeStr;
+	}
+
+	public String getApplyTimeStr() {
+		if (applyTime != null) {
+			applyTimeStr = DateUtils.formate(applyTime, DateUtils.fmt_yyyyMMdd);
+		}
+		return applyTimeStr;
+	}
+
+	public void setApplyTimeStr(String applyTimeStr) {
+		this.applyTimeStr = applyTimeStr;
+	}
+	
+	public String getStatusStr() {
+		if (status != null) {
+			if (status.intValue() == 0) {
+				statusStr = "未审核";
+			} else if (status.intValue() == 1) {
+				statusStr = "审核通过";
+			} else if (status.intValue() == 2) {
+				statusStr = "审核不通过";
+			} else if (status.intValue() == 3) {
+				statusStr = "审核中，待核查（异常）";
+			} else if (status.intValue() == 4) {
+				statusStr = "审核中，待核查（测试）";
+			} else if (status.intValue() == 5) {
+				statusStr = "其他";
+			}
+		}
+		return statusStr;
+	}
+
+	public void setStatusStr(String statusStr) {
+		this.statusStr = statusStr;
+	}
+
+	public String getCreateTimeStr() {
+		if (createTime != null) {
+			createTimeStr = DateUtils.formate(createTime, DateUtils.DATE_DEFAUTE1);
+		}
+		return createTimeStr;
+	}
+
+	public void setCreateTimeStr(String createTimeStr) {
+		this.createTimeStr = createTimeStr;
+	}
+
+	public String getExamineTime() {
+		if (updateTime != null) {
+			examineTime = DateUtils.formate(updateTime, DateUtils.DATE_DEFAUTE1);
+		}
+		return examineTime;
+	}
+
+	public void setExamineTime(String examineTime) {
+		this.examineTime = examineTime;
+	}
+    
 }
