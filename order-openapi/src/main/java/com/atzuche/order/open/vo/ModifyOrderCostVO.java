@@ -58,4 +58,14 @@ public class ModifyOrderCostVO implements Serializable{
      * 还车运能加价（还车受阻继续下单加价）
      */
     private Integer returnBlockedRaiseAmt;
+    
+    /**
+     * 轮胎保障服务费
+     */
+    private Integer tyreInsurAmt;
+    
+    /**
+     * 驾乘无忧保障服务费
+     */
+    private Integer driverInsurAmt;
 }

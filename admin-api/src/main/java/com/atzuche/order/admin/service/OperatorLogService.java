@@ -10,6 +10,9 @@ import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.enums.BuyInsurKeyEnum;
+import com.atzuche.order.commons.vo.req.ModifyInsurFlagVO;
+import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,6 +90,37 @@ public class OperatorLogService {
 			adminLogService.insertLog(AdminOpTypeEnum.UPDATE_GETRETURN_REMARK, req.getOrderNo(), desc);
 		} catch (Exception e) {
 			log.error("修改取送车备注操作日志异常  req=[{}]",req,e);
+		}
+    }
+    
+    
+    /**
+     * 购买保障服务记录日志
+     * @param modifyInsurFlagVO
+     */
+    public void saveBuyAbatementLog(ModifyInsurFlagVO modifyInsurFlagVO) {
+    	if (modifyInsurFlagVO == null) {
+    		return;
+    	}
+    	try {
+    		String tex = modifyInsurFlagVO.getBuyValue() != null && modifyInsurFlagVO.getBuyValue() == 1 ? "购买":"未购买";
+    		// 描述
+    		String desc = "";
+    		AdminOpTypeEnum opType = AdminOpTypeEnum.ABATEMENTFLAG;
+    		if (BuyInsurKeyEnum.ABATEMENTFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+    			desc = "将【"+AdminOpTypeEnum.ABATEMENTFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+    			opType = AdminOpTypeEnum.ABATEMENTFLAG;
+            } else if (BuyInsurKeyEnum.TYREINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+            	desc = "将【"+AdminOpTypeEnum.TYREINSURFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+            	opType = AdminOpTypeEnum.TYREINSURFLAG;
+            } else if (BuyInsurKeyEnum.DRIVERINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
+            	desc = "将【"+AdminOpTypeEnum.DRIVERINSURFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+            	opType = AdminOpTypeEnum.DRIVERINSURFLAG;
+            }
+			// 保存
+			adminLogService.insertLog(opType, modifyInsurFlagVO.getOrderNo(), desc);
+		} catch (Exception e) {
+			log.error("购买保障服务记录日志异常  modifyInsurFlagVO=[{}]",modifyInsurFlagVO,e);
 		}
     }
 }

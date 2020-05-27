@@ -14,4 +14,7 @@ public class DeliveryRenYunConfig {
 
     @Value("${auto.cancel_flow_order}")
     public String CANCEL_FLOW_ORDER;
+    
+    @Value("${auto.other_change_flow_order}")
+    public String OTHER_CHANGE_FLOW_ORDER;
 }

@@ -6,6 +6,7 @@ import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.delivery.CancelFlowOrderDTO;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,22 @@ public class RenYunDeliveryCarService {
             return null;
         }
     }
+    
+    
+    /**
+     * 实时更新订单信息到流程系统
+     */
+    public String changeRenYunFlowOrderInfo(ChangeOrderInfoDTO changeOrderInfoDTO) {
+        try {
+            String flowOrderMap = getFlowOrderMap(changeOrderInfoDTO);
+            String result = retryDeliveryCarService.sendHttpToRenYun(deliveryRenYunConfig.OTHER_CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CHANGE_TYPE.getValue().intValue());
+            return result;
+        } catch (Exception e) {
+            log.error("changeRenYunFlowOrderInfo实时更新订单信息到流程系统失败，changeOrderInfoDTO={},失败原因：{}",changeOrderInfoDTO, e.getMessage());
+            return null;
+        }
+    }
+    
 
     /**
      * 获取参数Map

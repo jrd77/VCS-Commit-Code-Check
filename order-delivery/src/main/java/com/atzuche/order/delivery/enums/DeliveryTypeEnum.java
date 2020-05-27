@@ -8,7 +8,8 @@ public enum DeliveryTypeEnum {
 
     ADD_TYPE(1, "新增订单"),
     UPDATE_TYPE(2, "更新订单"),
-    CANCEL_TYPE(3, "取消订单");
+    CANCEL_TYPE(3, "取消订单"),
+    CHANGE_TYPE(4,"实时更新订单信息到流程系统");
 
     private Integer value;
 

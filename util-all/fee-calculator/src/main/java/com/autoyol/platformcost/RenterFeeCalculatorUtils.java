@@ -624,4 +624,250 @@ public class RenterFeeCalculatorUtils {
 	}
 	
 	
+	/**
+	 * 计算平台保障费
+	 * @param insCom 保费计算用对象
+	 * @param insuranceConfigs 平台保障费配置列表
+	 * @return FeeResult
+	 */
+	public static FeeResult calInsurAmt(InsuranceCommonDTO insCom, List<InsuranceConfigEntity> insuranceConfigs) {
+		if (insCom == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.PARAM_ERROR);
+		}
+		LocalDateTime rentTime = insCom.getRentTime();
+		LocalDateTime revertTime = insCom.getRevertTime();
+		Integer getCarBeforeTime = insCom.getGetCarBeforeTime();
+		Integer returnCarAfterTime = insCom.getReturnCarAfterTime();
+		Integer configHours = insCom.getConfigHours();
+		Integer guidPrice = insCom.getGuidPrice();
+		Double coefficient = insCom.getCoefficient();
+		Double easyCoefficient = insCom.getEasyCoefficient();
+		Double driverCoefficient = insCom.getDriverCoefficient();
+		
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (insuranceConfigs == null || insuranceConfigs.isEmpty()) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_CONFIG_LIST_IS_EMPTY);
+		}
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
+		driverCoefficient = driverCoefficient == null ? 1.0:driverCoefficient;
+		// 计算提前延后时间
+		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
+		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
+		// 计算租期
+		Double insurDays = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (insurDays == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
+		// 计算单价
+		Integer unitInsurance = getUnitInsurance(guidPrice, insuranceConfigs);
+		if (unitInsurance == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_UNIT_PRICE_EXCEPTION);
+		}
+		// 经过系数后的单价
+		unitInsurance = (int) Math.ceil(unitInsurance*coefficient*easyCoefficient*driverCoefficient);
+		// 总价
+		Integer totalInsurAmt = (int) Math.ceil(unitInsurance*insurDays);
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(totalInsurAmt);
+		feeResult.setUnitCount(insurDays);
+		feeResult.setUnitPrice(unitInsurance);
+		return feeResult;
+	}
+	
+	
+	/**
+	 * 计算总的全面保障费
+	 * @param insCom 保费计算用通用参数
+	 * @return List<FeeResult>
+	 */
+	public static List<FeeResult> calcAbatementAmt(InsuranceCommonDTO insCom) {
+		if (insCom == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.PARAM_ERROR);
+		}
+		LocalDateTime rentTime = insCom.getRentTime();
+		LocalDateTime revertTime = insCom.getRevertTime();
+		Integer getCarBeforeTime = insCom.getGetCarBeforeTime();
+		Integer returnCarAfterTime = insCom.getReturnCarAfterTime();
+		Integer configHours = insCom.getConfigHours();
+		Integer guidPrice = insCom.getGuidPrice();
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		// 计算提前延后时间
+		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
+		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
+		// 计算租期
+		Double abatementDay = CommonUtils.getRentDays(rentTime, revertTime, configHours);
+		if (abatementDay == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
+		}
+		if (guidPrice == null) {
+			guidPrice = CARPURCHASEPRICE_250000;
+		}
+		int purchasePrice = guidPrice.intValue();
+		AbatementConfig abatementConfig = null;
+		for (AbatementConfig ac:CommonUtils.ABATEMENTCONFIG_List) {
+			if (ac.getGuidPriceBegin() < purchasePrice && purchasePrice <= ac.getGuidPriceEnd()) {
+				abatementConfig = ac;
+				break;
+			}
+		}
+		if (abatementDay.doubleValue() <= 7) {
+			return getFeeResultList(abatementConfig, abatementDay, insCom, 1);
+		} else if (7 < abatementDay.doubleValue() && abatementDay.doubleValue() <= 15) {
+			return getFeeResultList(abatementConfig, abatementDay, insCom, 2);
+		} else if (15 < abatementDay.doubleValue() && abatementDay.doubleValue() <= 25) {
+			return getFeeResultList(abatementConfig, abatementDay, insCom, 3);
+		} else {
+			return getFeeResultList(abatementConfig, abatementDay, insCom, 4);
+		}
+	}
+	
+	
+	/**
+	 * 获取全面保障费阶梯价格
+	 * @param abatementConfig 价格配置
+	 * @param abatementDay 租期
+	 * @param insCom 保费计算用通用参数
+	 * @param size 大小
+	 * @return List<FeeResult>
+	 */
+	public static List<FeeResult> getFeeResultList(AbatementConfig abatementConfig, Double abatementDay, InsuranceCommonDTO insCom, Integer size) {
+		if (insCom == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.PARAM_ERROR);
+		}
+		Double coefficient = insCom.getCoefficient();
+		Double easyCoefficient = insCom.getEasyCoefficient();
+		Double driverCoefficient = insCom.getDriverCoefficient();
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
+		driverCoefficient = driverCoefficient == null ? 1.0:driverCoefficient;
+		List<FeeResult> feeResultList = new ArrayList<FeeResult>();
+		for (int i=0; i<size; i++) {
+			Integer curPrice = null;
+			Double curDays = null;
+			if (i == 0) {
+				curPrice = abatementConfig.getAbatementUnitPrice7();
+				curDays = abatementDay <= 7 ? abatementDay:7.0;
+			} else if (i == 1) {
+				curPrice = abatementConfig.getAbatementUnitPrice15();
+				curDays = abatementDay <= 15 ? abatementDay - 7:8.0;
+			} else if (i == 2) {
+				curPrice = abatementConfig.getAbatementUnitPrice25();
+				curDays = abatementDay <= 25 ? abatementDay - 15:10.0;
+			} else {
+				curPrice = abatementConfig.getAbatementUnitPriceOther();
+				curDays = abatementDay - 25;
+			}
+			Integer unitPrice = (int) Math.ceil(curPrice*coefficient*easyCoefficient*driverCoefficient);
+			Double unitCount = curDays;
+			Integer totalFee = (int) Math.ceil(unitPrice*unitCount);
+			FeeResult feeResult = new FeeResult(unitPrice, unitCount, totalFee);
+			feeResultList.add(feeResult);
+		}
+		return feeResultList;
+	}
+	
+	
+	/**
+	 * 计算轮胎/轮毂保障费
+	 * @param insCom 保费计算用对象
+	 * @param tyrePrice 轮胎保障费一天保费价格
+	 * @return FeeResult
+	 */
+	public static FeeResult calTyreInsurAmt(InsuranceCommonDTO insCom, Integer tyrePrice) {
+		if (insCom == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.PARAM_ERROR);
+		}
+		LocalDateTime rentTime = insCom.getRentTime();
+		LocalDateTime revertTime = insCom.getRevertTime();
+		Integer getCarBeforeTime = insCom.getGetCarBeforeTime();
+		Integer returnCarAfterTime = insCom.getReturnCarAfterTime();
+		Double coefficient = insCom.getCoefficient();
+		Double easyCoefficient = insCom.getEasyCoefficient();
+		Double driverCoefficient = insCom.getDriverCoefficient();
+		
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (tyrePrice == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_UNIT_PRICE_EXCEPTION);
+		}
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
+		driverCoefficient = driverCoefficient == null ? 1.0:driverCoefficient;
+		// 计算提前延后时间
+		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
+		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
+		// 计算租期
+		long totalDays = CommonUtils.getDaysUpCeil(rentTime, revertTime);
+		// 经过系数后的单价
+		tyrePrice = (int) Math.ceil(tyrePrice*coefficient*easyCoefficient*driverCoefficient);
+		// 总价
+		Integer totalInsurAmt = (int) Math.ceil(tyrePrice*totalDays);
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(totalInsurAmt);
+		feeResult.setUnitCount((double) totalDays);
+		feeResult.setUnitPrice(tyrePrice);
+		return feeResult;
+	}
+	
+	
+	/**
+	 * 计算驾乘无忧保障费
+	 * @param insCom 保费计算用对象
+	 * @param driverPrice 驾乘无忧保障费一天保费价格
+	 * @return FeeResult
+	 */
+	public static FeeResult calDriverInsurAmt(InsuranceCommonDTO insCom, Integer driverPrice) {
+		if (insCom == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.PARAM_ERROR);
+		}
+		LocalDateTime rentTime = insCom.getRentTime();
+		LocalDateTime revertTime = insCom.getRevertTime();
+		Integer getCarBeforeTime = insCom.getGetCarBeforeTime();
+		Integer returnCarAfterTime = insCom.getReturnCarAfterTime();
+		Double coefficient = insCom.getCoefficient();
+		Double easyCoefficient = insCom.getEasyCoefficient();
+		Double driverCoefficient = insCom.getDriverCoefficient();
+		
+		if (rentTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.RENT_TIME_IS_NULL);
+		}
+		if (revertTime == null) {
+			throw new RenterFeeCostException(ExceptionCodeEnum.REVERT_TIME_IS_NULL);
+		}
+		if (driverPrice == null) {
+			return null;
+		}
+		coefficient = coefficient == null ? 1.0:coefficient;
+		easyCoefficient = easyCoefficient == null ? 1.0:easyCoefficient;
+		driverCoefficient = driverCoefficient == null ? 1.0:driverCoefficient;
+		// 计算提前延后时间
+		rentTime = CommonUtils.calBeforeTime(rentTime, getCarBeforeTime);
+		revertTime = CommonUtils.calAfterTime(revertTime, returnCarAfterTime);
+		// 计算租期
+		long totalDays = CommonUtils.getDaysUpCeil(rentTime, revertTime);
+		// 经过系数后的单价
+		driverPrice = (int) Math.ceil(driverPrice*coefficient*easyCoefficient*driverCoefficient);
+		// 总价
+		Integer totalInsurAmt = (int) Math.ceil(driverPrice*totalDays);
+		FeeResult feeResult = new FeeResult();
+		feeResult.setTotalFee(totalInsurAmt);
+		feeResult.setUnitCount((double) totalDays);
+		feeResult.setUnitPrice(driverPrice);
+		return feeResult;
+	}
 }

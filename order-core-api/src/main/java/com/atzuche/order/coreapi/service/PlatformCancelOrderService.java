@@ -90,7 +90,7 @@ public class PlatformCancelOrderService {
                 CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo,
                         cancelOrderRes);
                 if (null != cancelOrderDeliveryVO) {
-                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO,1);
                 }
             }
 

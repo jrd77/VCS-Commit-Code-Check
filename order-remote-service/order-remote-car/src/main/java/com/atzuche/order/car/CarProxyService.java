@@ -63,6 +63,8 @@ public class CarProxyService {
         private Integer guidePrice;
         // 保费计算用购置价
         private Integer inmsrp;
+        //座位数
+        private Integer seatNum;
     }
 
     /**
@@ -93,6 +95,7 @@ public class CarProxyService {
             carPriceDetail.setOwnerNo(responseObject.getData().getCarBaseVO().getOwnerNo());
             carPriceDetail.setCarLevel(responseObject.getData().getCarBaseVO().getCarLevel());
             carPriceDetail.setGuidePrice(responseObject.getData().getCarBaseVO().getGuidePrice());
+            carPriceDetail.setSeatNum(responseObject.getData().getCarBaseVO().getSeatNum());
             if (responseObject.getData().getCarModelParam() != null) {
             	carPriceDetail.setInmsrp(responseObject.getData().getCarModelParam().getInmsrp());
             }

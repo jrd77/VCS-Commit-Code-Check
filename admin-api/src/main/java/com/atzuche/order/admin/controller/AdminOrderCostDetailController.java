@@ -11,7 +11,7 @@ import com.atzuche.order.admin.service.OwnerOrderDetailService;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.util.CompareBeanUtils;
-import com.atzuche.order.admin.vo.req.cost.*;
+import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.cost.AdditionalDriverInsuranceVO;
 import com.atzuche.order.admin.vo.resp.income.RenterToPlatformVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
@@ -19,14 +19,18 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidy
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
 import com.atzuche.order.commons.CostStatUtils;
-import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.OrderIngNotOperateException;
+import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
@@ -37,7 +41,6 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.XSlf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +82,18 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        RenterAndConsoleFineVO fineList = null;
+        try{
+            fineList = orderCostRemoteService.getRenterAndConsoleFineVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+        }catch (Exception e){
+            log.error("违约罚金-记录日志查询异常",e);
+        }
         try {
         	//无需返回值
         	orderCostDetailService.updatefineAmtListByOrderNo(renterCostReqVO);
             //记录日志
         	try{
-                RenterAndConsoleFineVO fineList = orderCostRemoteService.getRenterAndConsoleFineVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+
                 List<ConsoleRenterOrderFineDeatailEntity> list = fineList == null ? null : fineList.getConsoleFineList();
                 // 累计求和
                 int renterBeforeReturnCarFineAmount = 0;
@@ -97,8 +105,8 @@ public class AdminOrderCostDetailController {
                         renterDelayReturnCarFineAmount = consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
                     }
                 }
-                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+":原值 "+renterBeforeReturnCarFineAmount+" 修改为 " +renterCostReqVO.getRenterBeforeReturnCarFineAmt()+"\n"
-                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值 "+ renterDelayReturnCarFineAmount+ " 修改为 "+ renterCostReqVO.getRenterDelayReturnCarFineAmt();
+                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())+"\n"
+                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
                 adminLogService.insertLog(AdminOpTypeEnum.RENTER_UPDATE_FINE, renterCostReqVO.getOrderNo(), desc);
             }catch (Exception e){
         	    log.error("记录日志失败",e);
@@ -193,12 +201,44 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
+        orderDetailReqDTO.setOrderNo(renterCostReqVO.getOrderNo());
+        orderDetailReqDTO.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+        ResponseData<OrderStatusRespDTO> respDTOResponseData = remoteFeignService.getOrderStatusFromRemote(orderDetailReqDTO);
+        if(respDTOResponseData == null || respDTOResponseData.getData() == null || respDTOResponseData.getData().getOrderStatusDTO()==null){
+            log.error("订单状态查询为空 orderDetailReqDTO={}",JSON.toJSONString(orderDetailReqDTO));
+            throw new OrderStatusNotFoundException();
+        }
+        Integer status = respDTOResponseData.getData().getOrderStatusDTO().getStatus();
+        if(status >= OrderStatusEnum.TO_RETURN_CAR.getStatus() || status == OrderStatusEnum.CLOSED.getStatus()){
+            log.error("订单已经开始，不允许操作renterCostReqVO={}",JSON.toJSONString(renterCostReqVO));
+            throw new OrderIngNotOperateException(renterCostReqVO.getOrderNo());
+        }
+        List<RenterAdditionalDriverDTO> oldData = null;
+        try{
+            oldData = remoteFeignService.queryAdditionalDriverListFromRemot(renterCostReqVO.getRenterOrderNo());
+        }catch (Exception e){
+            log.error("查询附加驾驶人异常",e);
+        }
         try {
         	orderCostDetailService.insertAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
             //日志记录
             try{
-                adminLogService.insertLog(AdminOpTypeEnum.ADDITIONAL_DRIVER_ADD, renterCostReqVO.getOrderNo(), JSON.toJSONString(renterCostReqVO));
+                if(oldData != null){
+                    String desc = "附加驾驶人 由原来的 【";
+                    List<RenterAdditionalDriverDTO> newData = remoteFeignService.queryAdditionalDriverListFromRemot(renterCostReqVO.getRenterOrderNo());
+                    for (RenterAdditionalDriverDTO oldDatum : oldData) {
+                        desc += oldDatum.getRealName()+" ";
+                    }
+                    desc += "】 修改为 【";
+                    for (RenterAdditionalDriverDTO newDatum : newData) {
+                        desc += newDatum.getRealName()+" ";
+                    }
+                    desc += "】";
+
+                    adminLogService.insertLog(AdminOpTypeEnum.ADDITIONAL_DRIVER_ADD, renterCostReqVO.getOrderNo(), desc);
+                }
+
             }catch (Exception e){
                 log.error("记录日志失败",e);
             }
@@ -248,26 +288,31 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        PlatformToRenterSubsidyResVO oldData = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            oldData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
+        }catch (Exception e){
+            log.error("平台给租客的补贴-记录日志查询时异常",e);
+        }
         try {
         	orderCostDetailService.updatePlatFormToRenterListByOrderNo(renterCostReqVO);
         	try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                PlatformToRenterSubsidyResVO newData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
-                PlatformToRenterSubsidyResVO oldData = new PlatformToRenterSubsidyResVO();
-                oldData.setDispatchingSubsidy(renterCostReqVO.getDispatchingSubsidy());
-                oldData.setOilSubsidy(renterCostReqVO.getOilSubsidy());
-                oldData.setCleanCarSubsidy(renterCostReqVO.getCleanCarSubsidy());
-                oldData.setGetReturnDelaySubsidy(renterCostReqVO.getGetReturnDelaySubsidy());
-                oldData.setDelaySubsidy(renterCostReqVO.getDelaySubsidy());
-                oldData.setTrafficSubsidy(renterCostReqVO.getTrafficSubsidy());
-                oldData.setInsureSubsidy(renterCostReqVO.getInsureSubsidy());
-                oldData.setRentAmtSubsidy(renterCostReqVO.getRentAmtSubsidy());
-                oldData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
-                oldData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
-                oldData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
+
+                PlatformToRenterSubsidyResVO newData = new PlatformToRenterSubsidyResVO();
+                newData.setDispatchingSubsidy(renterCostReqVO.getDispatchingSubsidy());
+                newData.setOilSubsidy(renterCostReqVO.getOilSubsidy());
+                newData.setCleanCarSubsidy(renterCostReqVO.getCleanCarSubsidy());
+                newData.setGetReturnDelaySubsidy(renterCostReqVO.getGetReturnDelaySubsidy());
+                newData.setDelaySubsidy(renterCostReqVO.getDelaySubsidy());
+                newData.setTrafficSubsidy(renterCostReqVO.getTrafficSubsidy());
+                newData.setInsureSubsidy(renterCostReqVO.getInsureSubsidy());
+                newData.setRentAmtSubsidy(renterCostReqVO.getRentAmtSubsidy());
+                newData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
+                newData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
+                newData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
                 adminLogService.insertLog(AdminOpTypeEnum.PLATFORM_TO_RENTER,renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),null,CompareBeanUtils.newInstance(oldData,newData).compare());
             }catch (Exception e){
         	    log.error("平台给租客的补贴修改日志记录异常",e);
@@ -295,10 +340,15 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        ResponseData<PlatformToOwnerSubsidyDTO> responseData = null;
+        try{
+            responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        }catch (Exception e){
+		    log.error("平台给车主的补贴-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	try{
-                ResponseData<PlatformToOwnerSubsidyDTO> responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
                 PlatformToOwnerSubsidyDTO oldData = responseData.getData();
                 PlatformToOwnerSubsidyDTO newData = new PlatformToOwnerSubsidyDTO();
                 newData.setMileageAmt(Integer.valueOf(ownerCostReqVO.getMileageAmt()==null?"0":ownerCostReqVO.getMileageAmt()));
@@ -335,18 +385,22 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        RenterPriceAdjustmentResVO resp = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setOwnerOrderNo(renterCostReqVO.getOwnerOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(req);
+        }catch (Exception e){
+            log.error("租客车主互相调价-日志记录查询异常",e);
+        }
         try {
         	/**
         	 * 全局补贴
         	 */
         	orderCostDetailService.updateRenterPriceAdjustmentByOrderNo(renterCostReqVO);
             try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setOwnerOrderNo(renterCostReqVO.getOwnerOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                RenterPriceAdjustmentResVO resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(req);
                 if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())){
                     String oldData = resp.getOwnerToRenterAdjustAmt();
                     String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
@@ -354,7 +408,7 @@ public class AdminOrderCostDetailController {
                             renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
                 }
                 if(StringUtils.isNotBlank(renterCostReqVO.getRenterToOwnerAdjustAmt())){
-                    String oldData = resp.getOwnerToRenterAdjustAmt();
+                    String oldData = resp.getRenterToOwnerAdjustAmt();
                     String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
                     adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
                             renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
@@ -437,13 +491,18 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        RenterToPlatformVO oldData = null;
+        try{
+            RenterCostReqVO req = new RenterCostReqVO();
+            req.setOrderNo(renterCostReqVO.getOrderNo());
+            req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
+            oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
+        }catch (Exception e){
+            log.error("租客需支付给平台的费用-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
-                RenterCostReqVO req = new RenterCostReqVO();
-                req.setOrderNo(renterCostReqVO.getOrderNo());
-                req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
-                RenterToPlatformVO oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
                 RenterToPlatformVO newData = new RenterToPlatformVO();
                 newData.setOliAmt(renterCostReqVO.getOliAmt());
                 newData.setTimeOut(renterCostReqVO.getTimeOut());
@@ -523,16 +582,21 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
+        List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = null;
+		try{
+            ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());
+        }catch (Exception e){
+		 log.error("车主给租客的租金补贴-日志记录查询异常",e);
+        }
         try {
         	orderCostDetailService.ownerToRenterRentAmtSubsidy(ownerCostReqVO);
         	try{
-                List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());
                 OwnerOrderSubsidyDetailDTO ownerOrderSubsidyDetailDTO = CostStatUtils.ownerSubsidtyFilterByCashNo(RenterCashCodeEnum.SUBSIDY_OWNER_TORENTER_RENTAMT.getCashNo(), ownerOrderSubsidyDetailDTOS);
                 String desc = "租客租金补贴：";
                 if(ownerOrderSubsidyDetailDTO == null){
                     desc += "将 0 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
                 }else{
-                    desc += "将 "+ownerOrderSubsidyDetailDTO.getSubsidyAmount()+" 修改为 "+ ownerCostReqVO.getOwnerSubsidyRentAmt();
+                    desc += "将 "+ownerOrderSubsidyDetailDTO.getSubsidyAmount()+" 修改为 "+ -Integer.valueOf(ownerCostReqVO.getOwnerSubsidyRentAmt());
                 }
                 adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_RENTER,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),desc);
             }catch (Exception e){

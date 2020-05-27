@@ -18,7 +18,7 @@ public class BaseCostVO {
     private String basicGuaranteeFee;
     @AutoDocProperty("手续费")
     private String chargeFee;
-    @AutoDocProperty("全面保障服务费")
+    @AutoDocProperty("补充保障服务费")
     private String allGuaranteeFee;
     @AutoDocProperty("附加驾驶员险")
     private String driverInsurance;

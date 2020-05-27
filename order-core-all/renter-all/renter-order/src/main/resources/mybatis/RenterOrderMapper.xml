@@ -36,6 +36,8 @@
         <result property="changeSource" column="change_source"/>
         <result property="changeReason" column="change_reason"/>
         <result property="supplementAmt" column="supplement_amt"/>
+        <result property="tyreInsurFlag" column="tyre_insur_flag"/>
+        <result property="driverInsurFlag" column="driver_insur_flag"/>
     </resultMap>
 
 
@@ -71,7 +73,9 @@
 	`change_source`,
 	`change_reason`,
 	`req_accept_time`,
-	supplement_amt
+	supplement_amt,
+	tyre_insur_flag,
+	driver_insur_flag
 	</sql>
 
 
@@ -168,6 +172,8 @@
             <if test="changeSource != null">`change_source`, </if>
             <if test="changeReason != null">`change_reason`, </if>
             <if test="supplementAmt != null">`supplement_amt`, </if>
+            <if test="tyreInsurFlag != null">`tyre_insur_flag`, </if>
+            <if test="driverInsurFlag != null">`driver_insur_flag`, </if>
             <if test="isCancle != null">`is_cancle`, </if>
             <if test="seeFlag != null">`see_flag`, </if>
             <if test="reqAcceptTime != null">`req_accept_time`, </if>
@@ -198,6 +204,8 @@
             <if test="changeSource != null">#{changeSource},  </if>
             <if test="changeReason != null">#{changeReason},  </if>
             <if test="supplementAmt != null">#{supplementAmt},  </if>
+            <if test="tyreInsurFlag != null">#{tyreInsurFlag},  </if>
+            <if test="driverInsurFlag != null">#{driverInsurFlag},  </if>
             <if test="isCancle != null">#{isCancle},  </if>
             <if test="seeFlag != null">#{seeFlag},  </if>
             <if test="reqAcceptTime != null">#{reqAcceptTime},  </if>

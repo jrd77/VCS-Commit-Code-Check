@@ -46,6 +46,12 @@ public class CommonUtils {
     
 	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
 	
+	private static final double DRIVERCOEFFICIENT_INIT = 1.0;
+    
+	private static final double DRIVERCOEFFICIENT_NOVICE = 1.3;
+	
+	private static final double DRIVER_SCORE_MIN = 30.0; 
+	
 	private static final String[] CAR_EASY_TAG = {"370","371"};
 	
 	public static final float FINE_AMT_RATIO_BIG = 0.3F;
@@ -699,6 +705,23 @@ public class CommonUtils {
 		}
 		return INSURE_DISCOUNT_NORMAL;
 	}
+	
+	
+	public static Double getDriverCoefficient(String driverScore) {
+		if (StringUtils.isBlank(driverScore)) {
+			return DRIVERCOEFFICIENT_INIT;
+		}
+		try {
+			double driverScoreD = Double.valueOf(driverScore);
+			if (driverScoreD <= DRIVER_SCORE_MIN) {
+				return DRIVERCOEFFICIENT_NOVICE;
+			}
+		} catch (Exception e) {
+			log.error("getDriverCoefficient driverScore数据异常");
+		}
+		return DRIVERCOEFFICIENT_INIT;
+	}
+	
 	
 	public static void main(String[] args) {
 		LocalDateTime rentTime = LocalDateTime.of(2020, 1, 17, 21, 30, 0);

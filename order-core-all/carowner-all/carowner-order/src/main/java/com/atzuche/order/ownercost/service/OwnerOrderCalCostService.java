@@ -33,7 +33,7 @@ public class OwnerOrderCalCostService {
     private OwnerOrderCostCombineService ownerOrderCostCombineService;
     @Autowired
     private OwnerOrderIncrementDetailService ownerOrderIncrementDetailService;
-    
+
     /**
      * 下单-车主端租车费用+明细+补贴 落库
      *
@@ -81,15 +81,11 @@ public class OwnerOrderCalCostService {
         }
 
         //平台服务费
-        //OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
-        //int serviceExpense = null == serviceExpenseEntity ? OrderConstant.ZERO : serviceExpenseEntity.getTotalAmount();
+        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
+        int serviceExpense = null == serviceExpenseEntity ? OrderConstant.ZERO : serviceExpenseEntity.getTotalAmount();
         //代管车服务费
-        //OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
-        //int proxyServiceExpense = null == proxyServiceExpenseEntity ? OrderConstant.ZERO : proxyServiceExpenseEntity.getTotalAmount();
-
-        OwnerOrderIncrementDetailEntity ownerOrderIncrementDetailEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getUseServiceRate().intValue());
-        int useServiceRate = null == ownerOrderIncrementDetailEntity ? OrderConstant.ZERO : ownerOrderIncrementDetailEntity.getTotalAmount();
-
+        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
+        int proxyServiceExpense = null == proxyServiceExpenseEntity ? OrderConstant.ZERO : proxyServiceExpenseEntity.getTotalAmount();
         //GPS服务费
         List<Integer> lsGpsSerialNumber = ListUtil.parse(ownerOrderCostReqDTO.getGpsSerialNumber(),",");
         List<OwnerOrderIncrementDetailEntity> gpsServiceAmtIncrementEntity = ownerOrderCostCombineService.getGpsServiceAmtIncrementEntity(costBaseDTO,lsGpsSerialNumber);
@@ -98,9 +94,10 @@ public class OwnerOrderCalCostService {
         if(CollectionUtils.isNotEmpty(gpsServiceAmtIncrementEntity)) {
             gpsServiceExpense = gpsServiceAmtIncrementEntity.stream().mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
         }
-        int incrementAmt = getTotalAmt + returnAmt + useServiceRate /*serviceExpense + proxyServiceExpense*/ + gpsServiceExpense;
-        log.info("下单-车主端-准备保存费用，incrementAmt:[{}] = getTotalAmt:[{}] + returnAmt:[{}] + useServiceRate:[{}] + " + "gpsServiceExpense:[{}]",
-                incrementAmt, getTotalAmt, returnAmt, useServiceRate, gpsServiceExpense);
+        int incrementAmt = getTotalAmt + returnAmt + serviceExpense + proxyServiceExpense + gpsServiceExpense;
+        log.info("下单-车主端-准备保存费用，incrementAmt:[{}] = getTotalAmt:[{}] + returnAmt:[{}] + serviceExpense:[{}] + " +
+                        "proxyServiceExpense:[{}] + gpsServiceExpense:[{}]",
+                incrementAmt, getTotalAmt, returnAmt, serviceExpense, proxyServiceExpense, gpsServiceExpense);
         //车主端费用
         OwnerOrderCostEntity ownerOrderCostEntity = new OwnerOrderCostEntity();
         ownerOrderCostEntity.setOrderNo(orderNo);
@@ -115,16 +112,16 @@ public class OwnerOrderCalCostService {
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetailList = new ArrayList<>();
         ownerOrderIncrementDetailList.add(ownerSrvGetAmtEntity);
         ownerOrderIncrementDetailList.add(ownerSrvReturnAmtEntity);
-        /*if(null != serviceExpenseEntity) {
+        //if(null != serviceExpenseEntity) {
+        //    ownerOrderIncrementDetailList.add(serviceExpenseEntity);
+        //}
+
+        if(null != proxyServiceExpenseEntity) {//如果托管车有值就优先取脱管车服务费
+            ownerOrderIncrementDetailList.add(proxyServiceExpenseEntity);
+        }else if(null != serviceExpenseEntity){
             ownerOrderIncrementDetailList.add(serviceExpenseEntity);
         }
 
-        if(null != proxyServiceExpenseEntity) {
-            ownerOrderIncrementDetailList.add(proxyServiceExpenseEntity);
-        }*/
-        if(null != ownerOrderIncrementDetailEntity) {
-            ownerOrderIncrementDetailList.add(ownerOrderIncrementDetailEntity);
-        }
         if(CollectionUtils.isNotEmpty(gpsServiceAmtIncrementEntity)) {
             ownerOrderIncrementDetailList.addAll(gpsServiceAmtIncrementEntity);
         }

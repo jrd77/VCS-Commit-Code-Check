@@ -641,6 +641,12 @@ public class ModifyOrderService {
 		if (abatementFlag == null) {
 			modifyOrderDTO.setAbatementFlag(initRenterOrder.getIsAbatement());
 		} 
+		if (modifyOrderReq.getTyreInsurFlag() == null) {
+			modifyOrderDTO.setTyreInsurFlag(initRenterOrder.getTyreInsurFlag());
+		}
+		if (modifyOrderReq.getDriverInsurFlag() == null) {
+			modifyOrderDTO.setDriverInsurFlag(initRenterOrder.getDriverInsurFlag());
+		}
 		if (StringUtils.isBlank(modifyOrderReq.getRentTime())) {
 			modifyOrderDTO.setRentTime(initRenterOrder.getExpRentTime());
 		} else {
@@ -814,6 +820,8 @@ public class ModifyOrderService {
 		int addDriver = modifyOrderDTO.getDriverIds() == null ? 0:modifyOrderDTO.getDriverIds().size();
 		renterOrderNew.setAddDriver(addDriver);
 		renterOrderNew.setIsAbatement(modifyOrderDTO.getAbatementFlag());
+		renterOrderNew.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
+		renterOrderNew.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderNew.setIsEffective(0);
 		renterOrderNew.setAgreeFlag(0);
 		renterOrderNew.setCreateOp(modifyOrderDTO.getOperator());
@@ -1490,6 +1498,10 @@ public class ModifyOrderService {
 		if (renterGoodsDetailDTO.getCarNo() != null) {
 			renterOrderReqVO.setCarNo(String.valueOf(renterGoodsDetailDTO.getCarNo()));
 		}
+		renterOrderReqVO.setSeatNum(renterGoodsDetailDTO.getSeatNum());
+		renterOrderReqVO.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
+		renterOrderReqVO.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
+		renterOrderReqVO.setDriverScore(renterMemberDTO.getDriverScore());
 		return renterOrderReqVO;
 	}
 	
@@ -1598,6 +1610,7 @@ public class ModifyOrderService {
 		getDelivery.setType(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
 		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getGetMinutes() != null) {
 			getDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getGetMinutes());
+			getDelivery.setAheadOrDelayLocalDateTime(carRentTimeRangeResVO.getAdvanceStartDate());
 		}
 		if (modifyOrderDTO.getSrvGetFlag() != null && modifyOrderDTO.getSrvGetFlag() == 1) {
 			getDelivery.setIsNotifyRenyun(1);
@@ -1620,6 +1633,7 @@ public class ModifyOrderService {
 		returnDelivery.setType(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
 		if (carRentTimeRangeResVO != null && carRentTimeRangeResVO.getReturnMinutes() != null) {
 			returnDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getReturnMinutes());
+			returnDelivery.setAheadOrDelayLocalDateTime(carRentTimeRangeResVO.getDelayEndDate());
 		}
 		if (modifyOrderDTO.getSrvReturnFlag() != null && modifyOrderDTO.getSrvReturnFlag() == 1) {
 			returnDelivery.setIsNotifyRenyun(1);

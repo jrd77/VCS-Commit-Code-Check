@@ -188,6 +188,11 @@ public class NormalOrderReqVO extends BaseVO implements Serializable {
 
     @AutoDocProperty(value = "请求来源IP地址对应端口号", hidden = true)
     private Integer srcPort;
+    
+    @AutoDocProperty(value = "是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+    @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 
 
     public String getOrderCategory() {

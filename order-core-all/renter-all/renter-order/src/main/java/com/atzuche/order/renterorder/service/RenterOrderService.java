@@ -243,6 +243,8 @@ public class RenterOrderService {
         record.setRenterMemNo(renterOrderReqVO.getMemNo());
         record.setCreateOp(renterOrderReqVO.getOperator());
         record.setChangeSource(renterOrderReqVO.getChangeSource());
+        record.setTyreInsurFlag(renterOrderReqVO.getTyreInsurFlag());
+        record.setDriverInsurFlag(renterOrderReqVO.getDriverInsurFlag());
         renterOrderMapper.insertSelective(record);
         //保存租客订单费用、费用明细、补贴明细等
         renterOrderCostRespDTO.setRenterOrderSubsidyDetailDTOList(context.getOrderSubsidyDetailList());
@@ -325,6 +327,10 @@ public class RenterOrderService {
         insurAmtDTO.setReturnCarAfterTime(renterOrderReqVO.getReturnCarAfterTime());
         insurAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         insurAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
+        insurAmtDTO.setDriverScore(renterOrderReqVO.getDriverScore());
+        insurAmtDTO.setSeatNum(renterOrderReqVO.getSeatNum());
+        insurAmtDTO.setTyreInsurFlag(renterOrderReqVO.getTyreInsurFlag());
+        insurAmtDTO.setDriverInsurFlag(renterOrderReqVO.getDriverInsurFlag());
 
         //补充全险计算相关信息
         AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
@@ -336,6 +342,7 @@ public class RenterOrderService {
         abatementAmtDTO.setInmsrp(renterOrderReqVO.getInmsrp());
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
         abatementAmtDTO.setIsAbatement(null != renterOrderReqVO.getAbatement() && renterOrderReqVO.getAbatement() == 1 );
+        abatementAmtDTO.setDriverScore(renterOrderReqVO.getDriverScore());
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();

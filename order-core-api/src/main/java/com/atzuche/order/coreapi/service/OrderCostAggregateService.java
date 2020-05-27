@@ -221,6 +221,8 @@ public class OrderCostAggregateService {
 				? Integer.valueOf(renterCostReqVO.getAbatementSubsidy())
 				: 0;
 		int fee = renterCostReqVO.getFeeSubsidy() != null ? Integer.valueOf(renterCostReqVO.getFeeSubsidy()) : 0;
+        int tyreInsurSubsidy = renterCostReqVO.getTyreInsurSubsidy() != null ? Integer.valueOf(renterCostReqVO.getTyreInsurSubsidy()) : 0;
+        int driverInsurSubsidy = renterCostReqVO.getDriverInsurSubsidy() != null ? Integer.valueOf(renterCostReqVO.getDriverInsurSubsidy()) : 0;
 
 		// 封装订单号和会员号
 		costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
@@ -332,6 +334,22 @@ public class OrderCostAggregateService {
 			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
+        if (tyreInsurSubsidy != 0) {
+            OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, tyreInsurSubsidy,
+                    targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_TYRE_INSURE_TOTAL_PRICES);
+            record.setCreateOp(userName);
+            record.setUpdateOp(userName);
+            record.setOperatorId(userName);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+        }
+        if (driverInsurSubsidy != 0) {
+            OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, driverInsurSubsidy,
+                    targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_DRIVER_INSURE_TOTAL_PRICES);
+            record.setCreateOp(userName);
+            record.setUpdateOp(userName);
+            record.setOperatorId(userName);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+        }
 
 	}
 	

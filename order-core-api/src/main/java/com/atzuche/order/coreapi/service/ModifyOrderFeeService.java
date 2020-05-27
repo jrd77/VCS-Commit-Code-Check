@@ -174,6 +174,8 @@ public class ModifyOrderFeeService {
 			totalRentCarFee += (modifyOrderCostVO.getReturnCost() == null ? 0:modifyOrderCostVO.getReturnCost());
 			totalRentCarFee += (modifyOrderCostVO.getGetBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getGetBlockedRaiseAmt());
 			totalRentCarFee += (modifyOrderCostVO.getReturnBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getReturnBlockedRaiseAmt());
+			totalRentCarFee += (modifyOrderCostVO.getTyreInsurAmt() == null ? 0:modifyOrderCostVO.getTyreInsurAmt());
+			totalRentCarFee += (modifyOrderCostVO.getDriverInsurAmt() == null ? 0:modifyOrderCostVO.getDriverInsurAmt());
 		}
 		ModifyOrderDeductVO modifyOrderDeductVO = updateModifyOrderFeeVO.getModifyOrderDeductVO();
 		if (modifyOrderDeductVO != null) {
@@ -345,6 +347,10 @@ public class ModifyOrderFeeService {
 		Integer getBlockedRaiseAmt = getCostAmtByCode(costList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo());
 		// 还车运能加价
 		Integer returnBlockedRaiseAmt = getCostAmtByCode(costList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo());
+		// 轮胎保障服务费
+		Integer tyreInsurAmt = getCostAmtByCode(costList, RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo());
+		// 驾乘无忧保障费
+		Integer driverInsurAmt = getCostAmtByCode(costList, RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo());
 		// 封装费用对象
 		ModifyOrderCostVO modifyOrderCostVO = new ModifyOrderCostVO();
 		modifyOrderCostVO.setAbatementAmt(abatementAmt);
@@ -356,6 +362,8 @@ public class ModifyOrderFeeService {
 		modifyOrderCostVO.setReturnBlockedRaiseAmt(returnBlockedRaiseAmt);
 		modifyOrderCostVO.setReturnCost(returnCost);
 		modifyOrderCostVO.setTotalDriverFee(totalDriverFee);
+		modifyOrderCostVO.setTyreInsurAmt(tyreInsurAmt);
+		modifyOrderCostVO.setDriverInsurAmt(driverInsurAmt);
 		return modifyOrderCostVO;
 	}
 	

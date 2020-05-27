@@ -2,8 +2,11 @@ package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.coreapi.service.AdditionalDriverService;
+import com.atzuche.order.coreapi.service.RenterMemFacadeService;
+import com.atzuche.order.renterorder.entity.RenterAdditionalDriverEntity;
 import com.atzuche.order.renterorder.service.RenterAdditionalDriverService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,8 @@ public class AdditionalDriverController {
     private AdditionalDriverService additionalDriverService;
     @Autowired
     private RenterAdditionalDriverService renterAdditionalDriverService;
+    @Autowired
+    private RenterMemFacadeService renterMemFacadeService;
 
     /*
      * @Author ZhangBin
@@ -49,5 +54,16 @@ public class AdditionalDriverController {
         List<String> driverIds = renterAdditionalDriverService.listDriverIdByRenterOrderNo(renterOrderNo);
         return ResponseData.success(driverIds);
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/29 18:01
+     * @Description: 查询添加的附加驾驶人
+     *
+     **/
+    @PostMapping("/additionalDriver/queryAdditionalDriverList")
+    public ResponseData<List<RenterAdditionalDriverDTO>> queryAdditionalDriverList(@RequestParam("renterOrderNo") String renterOrderNo){
+        log.info("查询附加驾驶人和附加驾驶人险 renterOrderNo={}", renterOrderNo);
+        List<RenterAdditionalDriverDTO> renterOrderExtraDrivers = renterAdditionalDriverService.getRenterOrderExtraDrivers(renterOrderNo);
+        return ResponseData.success(renterOrderExtraDrivers);
+    }
 }

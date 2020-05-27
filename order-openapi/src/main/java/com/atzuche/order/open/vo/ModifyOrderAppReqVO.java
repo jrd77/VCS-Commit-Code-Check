@@ -50,4 +50,9 @@ public class ModifyOrderAppReqVO {
 	
 	@AutoDocProperty(value="【增加附加驾驶员】附加驾驶员ID列表")
 	private List<String> driverIds;
+	
+	@AutoDocProperty(value="是否购买轮胎保障服务 0-不购买，1-购买")
+	private Integer tyreInsurFlag;
+	@AutoDocProperty(value="是否购买驾乘无忧保障服务 0-不购买，1-购买")
+	private Integer driverInsurFlag;
 }

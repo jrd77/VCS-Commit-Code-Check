@@ -20,7 +20,9 @@ public enum OrderChangeItemEnum {
 	MODIFY_CAROWNERCOUPON("10", "修改车主券"),
 	MODIFY_GETRETURNCOUPON("11", "修改取还车券"),
 	MODIFY_PLATFORMCOUPON("12", "修改平台券"),
-	MODIFY_TRANSFER("13", "管理后台换车")
+	MODIFY_TRANSFER("13", "管理后台换车"),
+	MODIFY_TYREINSUR("14", "修改轮胎保费服务标志"),
+	MODIFY_DRIVERINSUR("15", "修改驾乘无忧保障服务标志"),
     ;
 
 
