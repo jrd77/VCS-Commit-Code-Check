@@ -100,7 +100,6 @@ public class AddIncomeExcelService {
 	 * @param addIncomeExcelOptDTO
 	 */
 	public void updateStatus(AddIncomeExcelOptDTO addIncomeExcelOptDTO) {
-		log.info("追加收益操作 addIncomeExcelOptDTO=[{}]",addIncomeExcelOptDTO);
 		if (addIncomeExcelOptDTO == null) {
 			return;
 		}

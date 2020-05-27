@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
+import com.atzuche.order.coreapi.service.AddIncomeService;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 public class AddIncomeController {
-	
+	@Autowired
 	private AddIncomeExcelService addIncomeExcelService;
+	@Autowired
+	private AddIncomeService addIncomeService;
 
 	/**
 	 * 获取追加收益文件列表
@@ -47,7 +51,7 @@ public class AddIncomeController {
 	public ResponseData<?> saveAddIncomeExcel(@Valid @RequestBody AddIncomeImportDTO req, BindingResult bindingResult) {
 		log.info("保存追加收益AddIncomeImportDTO=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
-		addIncomeExcelService.saveAddIncomeExcel(req);
+		addIncomeService.saveAddIncomeExcel(req);
         return ResponseData.success();
     }
 	
