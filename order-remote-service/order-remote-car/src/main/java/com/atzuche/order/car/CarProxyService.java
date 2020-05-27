@@ -219,7 +219,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setType(carBaseVO.getType());
             renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
             renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
-            renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+            renterGoodsDetailDto.setLicenseDay(carBaseVO.getLicenseDay()== null?null:LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
             renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
             renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpireDate()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpireDate()));
             renterGoodsDetailDto.setIsPlatformShow(carBaseVO.getIsPlatformShow());
@@ -301,7 +301,7 @@ public class CarProxyService {
         log.info("fixedServiceRate={},serviceRate={},serviceProxyRate={}",fixedServiceRate,serviceRate,serviceProxyRate);
 
         Integer currentRate = serviceRate;
-        switch (carOwnerTypeEnum.getServiceRateType()){
+        switch (carOwnerTypeEnum==null?-1:carOwnerTypeEnum.getServiceRateType()){
             case 1://平台服务费比例
                 currentRate = serviceRate;
                 renterGoodsDetailDTO.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));
@@ -321,6 +321,7 @@ public class CarProxyService {
         }
         return currentRate==null?0D: Double.valueOf(currentRate);
     }
+
 
     //获取车主商品信息
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) {
@@ -354,10 +355,6 @@ public class CarProxyService {
         return coverPic;
     }
 
-    public static void main(String[] args) {
-        LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
-        System.out.println(localDate);
-    }
 
     public static void  checkResponse(ResponseObject responseObject){
         if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
