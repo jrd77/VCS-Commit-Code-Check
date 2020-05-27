@@ -60,8 +60,8 @@ public enum ErrorCode {
     IS_GET_CAR_OVER_ERROR("700006","取车是否超运能接口异常"),
     IS_RETURN_CAR_OVER_FAIL("700007","还车是否超运能获取失败"),
     IS_RETURN_CAR_OVER_ERROR("700008","还车是否超运能接口异常"),
-    REMOTE_CALL_FAIL("700008","远程操作失败"),
-
+    REMOTE_CALL_FAIL("700009","远程操作失败"),
+    REMOTE_CALL_DATA_FAIL("700010","远程获取数据失败"),
 
     FEIGN_MEMBER_DRIVER_fAIL("700100","获取附加驾驶人信息失败"),
     FEIGN_MEMBER_DRIVER_ERROR("700101","获取附加驾驶人信息异常"),
@@ -129,7 +129,7 @@ public enum ErrorCode {
     NOT_ALLOWED_EDIT("500058","不允许编辑"),
     NOT_FOUNT_ORDER_STATUS_ERR("500059","订单状态查询失败"),
     NO_RANGE_POINT("600040","地址不在范围内"),
-
+    ORDER_ING_NOT_OPERATE_FAIL("600041","订单已经开始不允许操作"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
 
     ;

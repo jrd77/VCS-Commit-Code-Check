@@ -95,6 +95,7 @@ public class RemoteOldSysDebtService {
         ResponseData<DebtDetailVO> responseData = null;
         log.info("Feign 获取用户的欠款,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包服务");
+        DebtDetailVO debtDetailVO = null;
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"RemoteOldSysDebtService.getDebtDetailVO");
             String parameter = "memNo="+memNo;
@@ -102,14 +103,18 @@ public class RemoteOldSysDebtService {
             responseData = debtFeignService.getDebtDetailVO(memNo);
             ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
+            
+            debtDetailVO = responseData.getData();
+            
         }catch (Exception e){
             log.error("Feign 获取用户的欠款失败,ResponseData={},memNo={}",responseData,memNo,e);
             Cat.logError("Feign 获取用户的欠款失败",e);
             t.setStatus(e);
+            throw e;
         }finally {
             t.complete();
-        }
-        DebtDetailVO debtDetailVO = responseData.getData();
+        }   
+        
         return debtDetailVO;
     }
 }

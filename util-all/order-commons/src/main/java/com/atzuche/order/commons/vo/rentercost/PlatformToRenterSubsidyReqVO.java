@@ -51,10 +51,18 @@ public class PlatformToRenterSubsidyReqVO {
     String rentAmtSubsidy;
 	@AutoDocProperty(value="其他补贴")
     String otherSubsidy;
-	@AutoDocProperty(value="全面保障服务费补贴")
+	@AutoDocProperty(value="补充保障服务费补贴")
     String abatementSubsidy;
 	@AutoDocProperty(value="手续费补贴")
     String feeSubsidy;
 	// 操作人
     private String operatorName;
+
+    @AutoDocProperty(value = "轮胎保障服务费补贴")
+    private String tyreInsurSubsidy;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
+    private String driverInsurSubsidy;
+
+
+
 }

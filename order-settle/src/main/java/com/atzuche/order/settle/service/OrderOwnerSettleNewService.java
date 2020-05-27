@@ -18,8 +18,10 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
+import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
@@ -28,6 +30,7 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderPurchaseDetailEntity;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
@@ -49,7 +52,58 @@ public class OrderOwnerSettleNewService {
 	private CashierService cashierService;
 	@Autowired
 	private AccountDebtService accountDebtService;
+	@Autowired 
+	private CashierSettleService cashierSettleService;
 	
+	/**
+     * 车主费用结余 处理 （如果结算产生欠款，需要记录。200526）
+     * @param settleOrdersAccount
+     */
+    public void rentCostSettleOwner(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount,OrderPayCallBack callBack) {
+        //2如果 步骤1 结算 小于0  此订单产生历史欠款
+    	if(settleOrdersAccount.getOwnerCostSurplusAmt() < 0){
+    		int amt = settleOrdersAccount.getOwnerCostSurplusAmt();
+    		log.info("rentCostSettleOwner do create debt,params orderNo=[{}],ownerNo=[{}],amt=[{}]",settleOrders.getOrderNo(),settleOrders.getOwnerMemNo(),amt);
+    		
+            //2.1 记录历史欠款
+            AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
+            BeanUtils.copyProperties(settleOrders,accountInsertDebt);
+            accountInsertDebt.setMemNo(settleOrders.getOwnerMemNo());
+            accountInsertDebt.setType(DebtTypeEnum.SETTLE.getCode());
+            accountInsertDebt.setAmt(amt);
+            accountInsertDebt.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
+            accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
+            int debtDetailId = cashierService.createDebt(accountInsertDebt);
+            
+            log.info("rentCostSettleOwner create debt,params orderNo=[{}],accountInsertDebt=[{}],debtDetailId=[{}]",settleOrders.getOrderNo(),GsonUtils.toJson(accountInsertDebt),debtDetailId);
+        	
+            //2.2记录结算费用状态
+            AccountOwnerCostSettleDetailEntity entity = new AccountOwnerCostSettleDetailEntity();
+            BeanUtils.copyProperties(settleOrders,entity);
+            entity.setMemNo(settleOrders.getOwnerMemNo());
+            entity.setAmt(-amt);
+            entity.setSourceCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
+            entity.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
+            entity.setUniqueNo(String.valueOf(debtDetailId));
+            //数据封装
+            List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetails = new ArrayList<AccountOwnerCostSettleDetailEntity>();
+            accountOwnerCostSettleDetails.add(entity);
+            cashierSettleService.insertAccountOwnerCostSettleDetails(accountOwnerCostSettleDetails);
+            // 实付费用加上 历史欠款转移部分，存在欠款 1走历史欠款，2当前订单 账户拉平
+            log.info("rentCostSettleOwner create debt,params orderNo=[{}],accountOwnerCostSettleDetailEntity=[{}],debtDetailId=[{}]",settleOrders.getOrderNo(),GsonUtils.toJson(entity),debtDetailId);
+            
+            //转入欠款之后，按结算金额0处理。
+            settleOrdersAccount.setOwnerCostSurplusAmt(0);
+            //更新订单费用处数据
+            if(Objects.nonNull(callBack)){
+                callBack.callBackSettle(settleOrders.getOrderNo(),settleOrders.getRenterOrderNo());
+            }
+        }else {
+        	log.info("rentCostSettleOwner donot create debt,params orderNo=[{}],ownerNo=[{}],amt=[{}]",settleOrders.getOrderNo(),settleOrders.getOwnerMemNo(),settleOrdersAccount.getOwnerCostSurplusAmt());
+        }
+    }
+    
+    
 	/**
      * 车主收益 结余处理 历史欠款
      * @param settleOrdersAccount

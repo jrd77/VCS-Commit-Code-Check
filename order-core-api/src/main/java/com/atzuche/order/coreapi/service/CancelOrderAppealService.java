@@ -76,9 +76,9 @@ public class CancelOrderAppealService {
         //车辆类型校验
         if (null != carOwnerType) {
             logger.info("Car owner type is :[{}]", carOwnerType);
-            if (carOwnerType == CarOwnerTypeEnum.F.getCode()) {
+            if (carOwnerType == CarOwnerTypeEnum.DZTGC.getCode()) {
                 throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
-            } else if (carOwnerType == CarOwnerTypeEnum.G.getCode()) {
+            } else if (carOwnerType == CarOwnerTypeEnum.DGCL.getCode()) {
                 throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
             }
         } else {

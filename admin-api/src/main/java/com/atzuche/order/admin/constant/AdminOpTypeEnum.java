@@ -33,10 +33,10 @@ public enum AdminOpTypeEnum {
     CANCEL_ORDER_OWNER_PLAT(23,"取消订单-待车主取消操作"),
     PLATFORM_TO_OWNER(24,"平台给车主的补贴操作"),
     OWNER_TO_RENTER(25,"车主给租客的优惠操作"),
+    OWNER_RENTER_GET_RETURN_CAR(26,"车主租客取还车服务操作"),
     ABATEMENTFLAG(26,"补充保障服务费"),
-	TYREINSURFLAG(27,"轮胎/轮毂保障服务费"),
-	DRIVERINSURFLAG(28,"驾乘无忧保障费")
-
+    TYREINSURFLAG(27,"轮胎/轮毂保障服务费"),
+    DRIVERINSURFLAG(28,"驾乘无忧保障费")
     ;
     private int opCode;
     private String opType;

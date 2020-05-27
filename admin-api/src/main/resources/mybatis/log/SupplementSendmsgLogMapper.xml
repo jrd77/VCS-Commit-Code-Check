@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atzuche.order.admin.mapper.log.SupplementSendmsgLogMapper">
+    <resultMap type="com.atzuche.order.admin.entity.SupplementSendmsgLog" id="SupplementSendmsgLogMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="platform" column="platform" jdbcType="INTEGER"/>
+        <result property="messageType" column="message_type" jdbcType="VARCHAR"/>
+        <result property="memRole" column="mem_role" jdbcType="INTEGER"/>
+        <result property="memNo" column="mem_no" jdbcType="INTEGER"/>
+        <result property="orderNo" column="order_no" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="pageMode" column="page_mode" jdbcType="INTEGER"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="eventName" column="event_name" jdbcType="VARCHAR"/>
+        <result property="param" column="param" jdbcType="VARCHAR"/>
+        <result property="event" column="event" jdbcType="INTEGER"/>
+        <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+        <result property="createOp" column="create_op" jdbcType="VARCHAR"/>
+        <result property="orderSupplementDetailId" column="order_supplement_detail_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SupplementSendmsgLogMap">
+        select
+          id, platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id
+        from order_center.supplement_sendmsg_log
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="SupplementSendmsgLogMap">
+        select
+          id, platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id
+        from order_center.supplement_sendmsg_log
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SupplementSendmsgLogMap">
+        select
+          id, platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id
+        from order_center.supplement_sendmsg_log
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="platform != null">
+                and platform = #{platform}
+            </if>
+            <if test="messageType != null and messageType != ''">
+                and message_type = #{messageType}
+            </if>
+            <if test="memRole != null">
+                and mem_role = #{memRole}
+            </if>
+            <if test="memNo != null">
+                and mem_no = #{memNo}
+            </if>
+            <if test="orderNo != null">
+                and order_no = #{orderNo}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="pageMode != null">
+                and page_mode = #{pageMode}
+            </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
+            <if test="eventName != null and eventName != ''">
+                and event_name = #{eventName}
+            </if>
+            <if test="param != null and param != ''">
+                and param = #{param}
+            </if>
+            <if test="event != null">
+                and event = #{event}
+            </if>
+            <if test="sendTime != null">
+                and send_time = #{sendTime}
+            </if>
+            <if test="createOp != null and createOp != ''">
+                and create_op = #{createOp}
+            </if>
+            <if test="orderSupplementDetailId != null">
+                and order_supplement_detail_id = #{orderSupplementDetailId}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into order_center.supplement_sendmsg_log(platform, message_type, mem_role, mem_no, order_no, content, page_mode, url, event_name, param, event, send_time, create_op, order_supplement_detail_id)
+        values (#{platform}, #{messageType}, #{memRole}, #{memNo}, #{orderNo}, #{content}, #{pageMode}, #{url}, #{eventName}, #{param}, #{event}, #{sendTime}, #{createOp}, #{orderSupplementDetailId})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.atzuche.order.admin.entity.SupplementSendmsgLog" useGeneratedKeys="true">
+        insert into supplement_sendmsg_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="platform != null">
+                platform,
+            </if>
+            <if test="messageType != null">
+                message_type,
+            </if>
+            <if test="memRole != null">
+                mem_role,
+            </if>
+            <if test="memNo != null">
+                mem_no,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="pageMode != null">
+                page_mode,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="eventName != null">
+                event_name,
+            </if>
+            <if test="param != null">
+                param,
+            </if>
+            <if test="event != null">
+                event,
+            </if>
+            <if test="sendTime != null">
+                send_time,
+            </if>
+            <if test="createOp != null">
+                create_op,
+            </if>
+            <if test="orderSupplementDetailId != null">
+                order_supplement_detail_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="platform != null">
+                #{platform,jdbcType=INTEGER},
+            </if>
+            <if test="messageType != null">
+                #{messageType,jdbcType=VARCHAR},
+            </if>
+            <if test="memRole != null">
+                #{memRole,jdbcType=INTEGER},
+            </if>
+            <if test="memNo != null">
+                #{memNo,jdbcType=BIGINT},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo,jdbcType=BIGINT},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="pageMode != null">
+                #{pageMode,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="eventName != null">
+                #{eventName,jdbcType=VARCHAR},
+            </if>
+            <if test="param != null">
+                #{param,jdbcType=VARCHAR},
+            </if>
+            <if test="event != null">
+                #{event,jdbcType=INTEGER},
+            </if>
+            <if test="sendTime != null">
+                #{sendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createOp != null">
+                #{createOp,jdbcType=VARCHAR},
+            </if>
+            <if test="orderSupplementDetailId != null">
+                #{orderSupplementDetailId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <!--通过主键修改数据-->
+    <update id="update">
+        update order_center.supplement_sendmsg_log
+        <set>
+            <if test="platform != null">
+                platform = #{platform},
+            </if>
+            <if test="messageType != null and messageType != ''">
+                message_type = #{messageType},
+            </if>
+            <if test="memRole != null">
+                mem_role = #{memRole},
+            </if>
+            <if test="memNo != null">
+                mem_no = #{memNo},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="pageMode != null">
+                page_mode = #{pageMode},
+            </if>
+            <if test="url != null and url != ''">
+                url = #{url},
+            </if>
+            <if test="eventName != null and eventName != ''">
+                event_name = #{eventName},
+            </if>
+            <if test="param != null and param != ''">
+                param = #{param},
+            </if>
+            <if test="event != null">
+                event = #{event},
+            </if>
+            <if test="sendTime != null">
+                send_time = #{sendTime},
+            </if>
+            <if test="createOp != null and createOp != ''">
+                create_op = #{createOp},
+            </if>
+            <if test="orderSupplementDetailId != null">
+                order_supplement_detail_id = #{orderSupplementDetailId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from order_center.supplement_sendmsg_log where id = #{id}
+    </delete>
+
+    <select id="selectByPage" parameterType="com.atzuche.order.admin.vo.req.supplement.BufuMessagePushRecordListReqVO" resultType="com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO">
+        SELECT
+        id as id,
+        platform as platform,
+        message_type as messageType,
+        mem_role as memRole,
+        content as content,
+        page_mode as pageMode,
+        url as url,
+        event_name as eventName,
+        send_time as sendTime,
+        create_op as createOp,
+        order_supplement_detail_id as orderSupplementDetailId
+        FROM supplement_sendmsg_log
+        WHERE order_no = #{orderNo}
+        <if test="orderSupplementDetailId != null">
+            and order_supplement_detail_id  = #{orderSupplementDetailId}
+        </if>
+        <if test="idSort != null">
+            order by order_supplement_detail_id ${idSort}
+        </if>
+        <if test="sendTimeSort != null">
+            order by send_time ${sendTimeSort}
+        </if>
+    </select>
+</mapper>

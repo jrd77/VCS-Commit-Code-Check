@@ -58,7 +58,7 @@ public class OrderDispatchCancelService {
                 //通知收银台退款以及退还凹凸币和钱包
                 CancelOrderReqDTO reqDTO = new CancelOrderReqDTO();
                 reqDTO.setSettleRenterFlg(true);
-                reqDTO.setOrderNo(cancelOrderRes.getOrderNo());
+                reqDTO.setOrderNo(orderNo);
                 reqDTO.setRenterOrderNo(cancelOrderRes.getRenterOrderNo());
                 reqDTO.setOwnerOrderNo(cancelOrderRes.getOwnerOrderNo());
                 orderSettleService.orderCancelSettleCombination(reqDTO);
@@ -68,7 +68,7 @@ public class OrderDispatchCancelService {
                         orderCommonConver.buildCancelOrderDeliveryVO(orderNo,
                                 cancelOrderRes);
                 if (null != cancelOrderDeliveryVO) {
-                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO,1);
                 }
             }
         }

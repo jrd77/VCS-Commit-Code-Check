@@ -33,7 +33,7 @@ public class RenterSubsidyDetailVO {
     private Integer owner2RenterSubsidyAmt;
     @AutoDocProperty(value = "手续费补贴")
     private Integer feeSubsidyAmt;
-    @AutoDocProperty(value = "全面保障服务费补贴")
+    @AutoDocProperty(value = "补充保障服务费补贴")
     private Integer abatementSubsidyAmt;
     @AutoDocProperty(value = "其他补贴")
     private Integer otherSubsidyAmt;

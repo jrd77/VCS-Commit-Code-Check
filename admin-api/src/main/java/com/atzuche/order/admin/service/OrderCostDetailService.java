@@ -35,6 +35,7 @@ import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -315,6 +316,15 @@ public class OrderCostDetailService {
 	    int other=0;
 	    int abatement=0;
 	    int fee=0;
+        //轮胎保障服务费补贴
+        int tyreInsurSubsidy = 0;
+        //轮胎保障服务费补贴
+        int tyreInsurSubsidySystem = 0;
+        //驾乘无忧保障服务费补贴
+        int driverInsurSubsidy = 0;
+        //驾乘无忧保障服务费补贴(系统自动计算)
+        int driverInsurSubsidySystem = 0;
+
 	    // 远程调用获取租客补贴
 	    RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
 	    // 管理后台补贴
@@ -345,8 +355,12 @@ public class OrderCostDetailService {
 					abatement += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 				}else if(RenterCashCodeEnum.SUBSIDY_FEE.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
 					fee += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+				}else if(RenterCashCodeEnum.SUBSIDY_TYRE_INSURE_TOTAL_PRICES.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())){
+                    tyreInsurSubsidy += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+                }else if(RenterCashCodeEnum.SUBSIDY_DRIVER_INSURE_TOTAL_PRICES.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())){
+                    driverInsurSubsidy += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 				}
-			}
+            }
 		}
 
 
@@ -374,6 +388,10 @@ public class OrderCostDetailService {
         resVo.setAbatementSubsidySystem(String.valueOf(abatementInsureAmt));
 	 	resVo.setFeeSubsidy(String.valueOf(fee));
         resVo.setLongGetReturnCarCostSubsidy(String.valueOf(longGetReturnCarCostSubsidy));//长租特有字段(运营习惯看到正数，取正值展示)
+        resVo.setTyreInsurSubsidy(String.valueOf(tyreInsurSubsidy));
+        resVo.setTyreInsurSubsidySystem(String.valueOf(tyreInsurSubsidySystem));
+        resVo.setDriverInsurSubsidy(String.valueOf(driverInsurSubsidy));
+        resVo.setDriverInsurSubsidySystem(String.valueOf(driverInsurSubsidySystem));
 		return resVo;
 	}
 	

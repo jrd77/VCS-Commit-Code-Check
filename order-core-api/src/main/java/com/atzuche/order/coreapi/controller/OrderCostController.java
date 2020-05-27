@@ -283,6 +283,7 @@ public class OrderCostController {
         }
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
         if(renterOrderEntity==null){
+            log.error("订单找不到orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
         RenterCostDetailDTO renterCostDetailDTO = facadeService.renterCostDetail(orderNo,renterOrderEntity.getRenterOrderNo(),renterOrderEntity.getRenterMemNo());

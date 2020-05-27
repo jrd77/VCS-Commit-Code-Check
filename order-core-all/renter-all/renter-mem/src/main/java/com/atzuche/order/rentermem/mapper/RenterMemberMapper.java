@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 租客端会员概览表
- * 
+ *
  * @author ZhangBin
  * @date 2019-12-18 16:15:16
  */
@@ -17,11 +17,11 @@ public interface RenterMemberMapper{
     RenterMemberEntity selectByPrimaryKey(Integer id);
 
     int insert(RenterMemberEntity record);
-    
+
     int insertSelective(RenterMemberEntity record);
 
     int updateByPrimaryKey(RenterMemberEntity record);
-    
+
     int updateByPrimaryKeySelective(RenterMemberEntity record);
 
     RenterMemberEntity selectByRenterOrderNo(@Param("renterOrderNo")String renterOrderNo);
@@ -33,4 +33,6 @@ public interface RenterMemberMapper{
     RenterMemberEntity queryRenterInfoByOrderNoAndRenterNo(@Param("orderNo") String orderNo,@Param("renterNo") String renterNo);
     
     RenterMemberEntity getRenterMemberByOrderNo(@Param("orderNo") String orderNo);
+
+    String queryRenterPhoneByOrderNo(@Param("orderNo") String orderNo);
 }

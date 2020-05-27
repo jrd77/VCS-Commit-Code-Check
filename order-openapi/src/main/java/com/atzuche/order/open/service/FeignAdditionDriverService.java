@@ -1,5 +1,6 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -28,4 +29,13 @@ public interface FeignAdditionDriverService {
      **/
     @PostMapping("/additionalDriver/queryAdditionalDriver")
     ResponseData<List<String>> queryAdditionalDriver(@RequestParam("renterOrderNo") String renterOrderNo);
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/26 14:04
+     * @Description: 获取附加驾驶人列表
+     *
+     **/
+    @PostMapping("/additionalDriver/queryAdditionalDriverList")
+    public ResponseData<List<RenterAdditionalDriverDTO>> queryAdditionalDriverList(@RequestParam("renterOrderNo") String renterOrderNo);
 }

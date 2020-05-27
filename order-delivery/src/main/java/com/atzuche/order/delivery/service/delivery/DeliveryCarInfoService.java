@@ -339,14 +339,20 @@ public class DeliveryCarInfoService {
     public Integer getDeliveryCarOverMileageAmt(RenterOrderDeliveryEntity renterOrderDelivery,OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO,RenterGoodsDetailDTO renterGoodsDetailDTO) {
         try {
             MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
-            mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType());
-            mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage());
-            mileageAmtDTO.setGetmileage(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
-            mileageAmtDTO.setReturnMileage(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
-            mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice());
+            if(renterGoodsDetailDTO != null){
+                mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType()==null?null:renterGoodsDetailDTO.getCarOwnerType());
+                mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage()==null?null:renterGoodsDetailDTO.getCarDayMileage());
+                mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?null:renterGoodsDetailDTO.getCarDayMileage());
+            }
+            if(ownerGetAndReturnCarDTO != null){
+                mileageAmtDTO.setGetmileage(ownerGetAndReturnCarDTO.getGetKM()==null?null:Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
+                mileageAmtDTO.setReturnMileage(ownerGetAndReturnCarDTO.getReturnKM()==null?null:Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM()));
+            }
             CostBaseDTO costBaseDTO = new CostBaseDTO();
-            costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
-            costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+            if(renterOrderDelivery != null){
+                costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
+                costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+            }
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
         } catch (Exception e) {
