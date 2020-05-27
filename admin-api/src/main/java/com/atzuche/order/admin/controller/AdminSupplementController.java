@@ -37,8 +37,7 @@ public class AdminSupplementController {
 
 	@Autowired
 	private AdminSupplementService adminSupplementService;
-	@Value("${sms_send_platform_service}")
-    public String reqUrl;
+
     @Autowired
     private SupplementSendmsgLogService supplementSendmsgLogService;
 
