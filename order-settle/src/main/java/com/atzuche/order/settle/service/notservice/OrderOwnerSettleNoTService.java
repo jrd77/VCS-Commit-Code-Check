@@ -20,6 +20,7 @@ import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.OilAmtDTO;
@@ -27,6 +28,7 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
+import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
@@ -61,6 +63,7 @@ import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.OrderOwnerSettleNewService;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
@@ -173,7 +176,10 @@ public class OrderOwnerSettleNoTService {
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount one [{}]", GsonUtils.toJson(settleOrdersAccount));
         Cat.logEvent("settleOrdersAccount",GsonUtils.toJson(settleOrdersAccount));
         
-
+        ///
+        //9 车主费用 结余处理
+        orderOwnerSettleNewService.rentCostSettleOwner(settleOrders,settleOrdersAccount,callBack);
+        
         // 13.1车主收益 结余处理 历史欠款
         orderOwnerSettleNewService.repayHistoryDebtOwner(settleOrdersAccount);
         // 13.2车主收益 结余处理 历史欠款
@@ -184,7 +190,7 @@ public class OrderOwnerSettleNoTService {
     }
 	
 	//---------------------------------------------------------------------------------------------------------------------
-	
+
 	/**
      * 查询车主费用明细
      * @param settleOrders
