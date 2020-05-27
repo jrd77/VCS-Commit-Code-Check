@@ -219,7 +219,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setType(carBaseVO.getType());
             renterGoodsDetailDto.setYear(carBaseVO.getYear() == null ? "" : String.valueOf(carBaseVO.getYear()));
             renterGoodsDetailDto.setBrand(carBaseVO.getBrand()==null ? null:String.valueOf(carBaseVO.getBrand()));
-            renterGoodsDetailDto.setLicenseDay(LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
+            renterGoodsDetailDto.setLicenseDay(carBaseVO.getLicenseDay()== null?null:LocalDateTimeUtils.parseStringToLocalDate(carBaseVO.getLicenseDay()));
             renterGoodsDetailDto.setMoreLicenseFlag(carBaseVO.getMoreLicenseFlag());
             renterGoodsDetailDto.setLicenseExpire(carBaseVO.getLicenseExpireDate()==null?null:LocalDateTimeUtils.dateToLocalDateTime(carBaseVO.getLicenseExpireDate()));
             renterGoodsDetailDto.setIsPlatformShow(carBaseVO.getIsPlatformShow());
@@ -261,10 +261,8 @@ public class CarProxyService {
             renterGoodsDetailDto.setCarInmsrp(data.getCarModelParam().getInmsrp());
         }
         renterGoodsDetailDto.setStopCostRate(data.getStopCostRate()==null ? 0D:Double.valueOf(data.getStopCostRate()));
-        renterGoodsDetailDto.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));//平台服务费比例
-        renterGoodsDetailDto.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProxyProportion()));//代官车服务费比例
-        renterGoodsDetailDto.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//固定平台服务费比例
-        renterGoodsDetailDto.setUseServiceRate(getRateByCarOwnerType(data));
+        Double useServiceRate = getAndSetRateByCarOwnerType(renterGoodsDetailDto, data);//设置和获取服务费率
+        renterGoodsDetailDto.setUseServiceRate(useServiceRate);
         renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
         renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
         String serialNumbers = Optional.ofNullable(carGpsVOS)
@@ -290,7 +288,7 @@ public class CarProxyService {
         return renterGoodsDetailDto;
     }
 
-    private Double getRateByCarOwnerType(CarDetailVO data) {
+    private static Double getAndSetRateByCarOwnerType(RenterGoodsDetailDTO renterGoodsDetailDTO,CarDetailVO data) {
         if(data == null){
             throw new RuntimeException();
         }
@@ -301,15 +299,29 @@ public class CarProxyService {
         Integer serviceRate = data.getDeductibleRate();//平台服务费比例
         Integer serviceProxyRate = data.getServiceProxyProportion();//代管车服务费比例
         log.info("fixedServiceRate={},serviceRate={},serviceProxyRate={}",fixedServiceRate,serviceRate,serviceProxyRate);
+
         Integer currentRate = serviceRate;
-        switch (carOwnerTypeEnum.getServiceRateType()){
-            case 1: currentRate = serviceRate; break;
-            case 2: currentRate = fixedServiceRate;break;
-            case 3: currentRate = serviceProxyRate;break;
-            default: currentRate = serviceRate;
+        switch (carOwnerTypeEnum==null?-1:carOwnerTypeEnum.getServiceRateType()){
+            case 1://平台服务费比例
+                currentRate = serviceRate;
+                renterGoodsDetailDTO.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));
+                break;
+            case 2://固定平台服务费比例
+                currentRate = fixedServiceRate;
+                renterGoodsDetailDTO.setFixedServiceRate(data.getServiceProportion()==null?0D:Double.valueOf(data.getServiceProportion()));
+                renterGoodsDetailDTO.setServiceRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProportion()));//将固定平台服务费率存到平台服务费率字段上
+                break;
+            case 3://代官车服务费比例
+                currentRate = serviceProxyRate;
+                renterGoodsDetailDTO.setServiceProxyRate(data.getServiceProxyProportion()==null?0D:Double.valueOf(data.getServiceProxyProportion()));
+                break;
+            default:
+                currentRate = serviceRate;
+                renterGoodsDetailDTO.setServiceRate(data.getDeductibleRate()==null?0D:Double.valueOf(data.getDeductibleRate()));
         }
         return currentRate==null?0D: Double.valueOf(currentRate);
     }
+
 
     //获取车主商品信息
     public OwnerGoodsDetailDTO getOwnerGoodsDetail(RenterGoodsDetailDTO renterGoodsDetailDto) {
@@ -343,10 +355,6 @@ public class CarProxyService {
         return coverPic;
     }
 
-    public static void main(String[] args) {
-        LocalDate localDate = LocalDateTimeUtils.parseStringToLocalDate("2012-06-21");
-        System.out.println(localDate);
-    }
 
     public static void  checkResponse(ResponseObject responseObject){
         if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){

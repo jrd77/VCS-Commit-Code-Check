@@ -331,7 +331,7 @@ public class CancelOrderService {
                 //通知流程系统
                 CancelOrderDeliveryVO cancelOrderDeliveryVO = orderCommonConver.buildCancelOrderDeliveryVO(orderNo, res);
                 if (null != cancelOrderDeliveryVO) {
-                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO);
+                    deliveryCarService.cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO,1);
                 }
             }
 

@@ -361,7 +361,7 @@ public class ModifyOrderConfirmService {
 				}
 				if (srvGetFlag != null && srvGetFlag == 0) {
 					// 取消取车服务
-					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "take"));
+					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "take"),1);
 				}
 			}
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode())) {
@@ -381,7 +381,7 @@ public class ModifyOrderConfirmService {
 				}
 				if (srvReturnFlag != null && srvReturnFlag == 0) {
 					// 取消还车服务
-					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "back"));
+					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "back"),1);
 				}
 			}
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()) || 

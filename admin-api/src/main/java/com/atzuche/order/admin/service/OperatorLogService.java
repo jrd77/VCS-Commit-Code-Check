@@ -106,15 +106,19 @@ public class OperatorLogService {
     		String tex = modifyInsurFlagVO.getBuyValue() != null && modifyInsurFlagVO.getBuyValue() == 1 ? "购买":"未购买";
     		// 描述
     		String desc = "";
+    		AdminOpTypeEnum opType = AdminOpTypeEnum.ABATEMENTFLAG;
     		if (BuyInsurKeyEnum.ABATEMENTFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
     			desc = "将【"+AdminOpTypeEnum.ABATEMENTFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+    			opType = AdminOpTypeEnum.ABATEMENTFLAG;
             } else if (BuyInsurKeyEnum.TYREINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
             	desc = "将【"+AdminOpTypeEnum.TYREINSURFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+            	opType = AdminOpTypeEnum.TYREINSURFLAG;
             } else if (BuyInsurKeyEnum.DRIVERINSURFLAG.getKey().equals(modifyInsurFlagVO.getBuyKey())) {
             	desc = "将【"+AdminOpTypeEnum.DRIVERINSURFLAG.getOpType()+"】从'未购买'改成'"+tex+"';";
+            	opType = AdminOpTypeEnum.DRIVERINSURFLAG;
             }
 			// 保存
-			adminLogService.insertLog(AdminOpTypeEnum.UPDATE_RISK_STATUS, modifyInsurFlagVO.getOrderNo(), desc);
+			adminLogService.insertLog(opType, modifyInsurFlagVO.getOrderNo(), desc);
 		} catch (Exception e) {
 			log.error("购买保障服务记录日志异常  modifyInsurFlagVO=[{}]",modifyInsurFlagVO,e);
 		}

@@ -406,8 +406,8 @@ public class ModificationOrderService {
 		try {
 			// 修改项目描述
 			String desc = "";
-			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) || 
-					changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+			if (changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode()) ||
+                    changeCodeList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
 				// 修改租期
 				String strAfterRentTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRentTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
 				String strAfterRevertTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);

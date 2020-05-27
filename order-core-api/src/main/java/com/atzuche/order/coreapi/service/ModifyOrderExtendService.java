@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,6 +92,8 @@ public class ModifyOrderExtendService {
 		modifyOrderDTO.setSrvGetReturnCouponId(initGetReturnCouponId);
 		modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
 		modifyOrderDTO.setChangeItemList(ModifyOrderUtils.listOrderChangeItemDTO(null, initRenterOrder, modifyOrderReq, orderCouponList, deliveryMap));
+		log.info("ModifyOrderExtendService.getInitModifyOrderDTO modifyOrderDTO={},initRenterOrder={},modifyOrderReq={}",
+                JSON.toJSONString(modifyOrderDTO),JSON.toJSONString(initRenterOrder),JSON.toJSONString(modifyOrderReq));
 		return modifyOrderDTO;
 	}
 	

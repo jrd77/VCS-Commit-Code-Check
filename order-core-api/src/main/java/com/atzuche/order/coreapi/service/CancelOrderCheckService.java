@@ -123,9 +123,9 @@ public class CancelOrderCheckService {
             OwnerGoodsDetailDTO ownerGoodsDetailDTO = reqContext.getOwnerGoodsDetailDTO();
             if(null != ownerGoodsDetailDTO.getCarOwnerType()) {
                 logger.error("Car owner type is :[{}]", ownerGoodsDetailDTO.getCarOwnerType());
-                if(ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.F.getCode()) {
+                if(ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.DZTGC.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.MANAGED_CAR_CAN_NOT_OPT_TRANS);
-                } else if (ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.G.getCode()) {
+                } else if (ownerGoodsDetailDTO.getCarOwnerType() == CarOwnerTypeEnum.DGCL.getCode()) {
                     throw new RefuseOrderCheckException(ErrorCode.PROXY_CAR_CAN_NOT_OPT_TRANS);
                 }
             } else {
