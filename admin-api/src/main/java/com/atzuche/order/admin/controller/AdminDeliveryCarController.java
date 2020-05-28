@@ -4,6 +4,7 @@ import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import com.atzuche.order.admin.service.DeliveryRemoteService;
 import com.atzuche.order.admin.service.log.AdminLogService;
+import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarVO;
@@ -135,32 +136,32 @@ public class AdminDeliveryCarController extends BaseController {
                 String desc = "";
                 if(ownerGetAndReturnCarDTO!= null && deliveryCarVO.getOwnerGetAndReturnCarDTO()!= null){
                     desc += "车主处取还车 ：【";
-                    if(compareString(ownerGetAndReturnCarDTO.getKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM)){
+                    if(CompareBeanUtils.compareString(ownerGetAndReturnCarDTO.getKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM)){
                         desc += "取车里程数 " + ownerGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getKM;
                     }
-                    if(compareString(ownerGetAndReturnCarDTO.returnKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM)){
+                    if(CompareBeanUtils.compareString(ownerGetAndReturnCarDTO.returnKM,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM)){
                         desc += "还车里程数 " + ownerGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().returnKM;
                     }
-                    if(compareString(ownerGetAndReturnCarDTO.getCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil)){
+                    if(CompareBeanUtils.compareString(ownerGetAndReturnCarDTO.getCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil)){
                         desc += "取车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
                     }
-                    if(compareString(ownerGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnCarOil)){
+                    if(CompareBeanUtils.compareString(ownerGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getOwnerGetAndReturnCarDTO().returnCarOil)){
                         desc += "还车油表刻度 " + ownerGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getOwnerGetAndReturnCarDTO().getCarOil;
                     }
                     desc += "】";
                 }
                 if(renterGetAndReturnCarDTO != null  && deliveryCarVO.getRenterGetAndReturnCarDTO()!= null){
                     desc += "  租客处取还车 ：【";
-                    if(compareString(renterGetAndReturnCarDTO.getKM,deliveryCarVO.getRenterGetAndReturnCarDTO().getKM)){
+                    if(CompareBeanUtils.compareString(renterGetAndReturnCarDTO.getKM,deliveryCarVO.getRenterGetAndReturnCarDTO().getKM)){
                         desc += "交车里程数 " + renterGetAndReturnCarDTO.getKM +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getKM;
                     }
-                    if(compareString(renterGetAndReturnCarDTO.returnKM,deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM)){
+                    if(CompareBeanUtils.compareString(renterGetAndReturnCarDTO.returnKM,deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM)){
                         desc += "收车里程数 " + renterGetAndReturnCarDTO.returnKM +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().returnKM;
                     }
-                    if(compareString(renterGetAndReturnCarDTO.getCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil)){
+                    if(CompareBeanUtils.compareString(renterGetAndReturnCarDTO.getCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil)){
                         desc += "交车油表刻度 " + renterGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil;
                     }
-                    if(compareString(renterGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().returnCarOil)){
+                    if(CompareBeanUtils.compareString(renterGetAndReturnCarDTO.returnCarOil,deliveryCarVO.getRenterGetAndReturnCarDTO().returnCarOil)){
                         desc += "收车油表刻度 " + renterGetAndReturnCarDTO.getCarOil +" 修改为 " + deliveryCarVO.getRenterGetAndReturnCarDTO().getCarOil;
                     }
                     desc += "】";
@@ -174,20 +175,6 @@ public class AdminDeliveryCarController extends BaseController {
         return ResponseData.success();
     }
 
-    public static boolean compareString(String oldStr,String newStr){
-        if(oldStr == null && newStr == null){
-            return false;
-        }
-        if(oldStr == null && oldStr != newStr){
-            return true;
-        }
-        if(oldStr != null && oldStr.equals(newStr)){
-            return false;
-        }
-        if(oldStr != null && !oldStr.equals(newStr)){
-            return true;
-        }
-        return false;
-    }
+
 
 }

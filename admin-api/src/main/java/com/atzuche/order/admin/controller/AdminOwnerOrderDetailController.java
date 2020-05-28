@@ -1,6 +1,9 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.OwnerOrderDetailService;
+import com.atzuche.order.admin.service.log.AdminLogService;
+import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.admin.vo.req.FienAmtUpdateReqVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.ownerOrderDetail.*;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 public class AdminOwnerOrderDetailController {
     @Autowired
     private OwnerOrderDetailService ownerOrderDetailService;
+    @Autowired
+    private AdminLogService adminLogService;
 
 
     /**
@@ -196,11 +201,31 @@ public class AdminOwnerOrderDetailController {
     @PostMapping("/console/owner/updateFien")
     public ResponseData<?> updateFineAmt(@RequestBody FienAmtUpdateReqVO fienAmtUpdateReqDTO, BindingResult bindingResult){  //@Valid 
         BindingResultUtil.checkBindingResult(bindingResult);
+        ResponseData<FienAmtDetailDTO> oldDataResponse = null;
+        try{
+            oldDataResponse = ownerOrderDetailService.fienAmtDetail(fienAmtUpdateReqDTO.getOrderNo(),fienAmtUpdateReqDTO.getOwnerOrderNo());
+        }catch (Exception e){
+            log.error("查询违约罚金异常！");
+        }
         FienAmtUpdateReqDTO reqDTO = new FienAmtUpdateReqDTO();
         BeanUtils.copyProperties(fienAmtUpdateReqDTO,reqDTO);
         reqDTO.setOwnerGetReturnCarFienCashNo(FineTypeCashCodeEnum.GET_RETURN_CAR.getFineType());
         reqDTO.setOwnerModifyAddrAmtCashNo(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE.getFineType());
         ResponseData<?> responseData = ownerOrderDetailService.updateFineAmt(reqDTO);
+
+        try{
+            if(oldDataResponse != null && oldDataResponse.getData()!=null){
+                String oldData = oldDataResponse.getData().getOwnerGetReturnCarFienAmt()==null?null:String.valueOf(oldDataResponse.getData().getOwnerGetReturnCarFienAmt());
+                String newData = fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt()==null?null:String.valueOf(fienAmtUpdateReqDTO.getOwnerGetReturnCarFienAmt());
+                String desc = "";
+                if(CompareBeanUtils.compareString(oldData,newData)){
+                    desc += "车主罚金修改: 将原值 "+oldData+" 修改为 "+newData;
+                }
+                adminLogService.insertLog(AdminOpTypeEnum.OWNER_FINE,fienAmtUpdateReqDTO.getOrderNo(),null, fienAmtUpdateReqDTO.getOwnerOrderNo(), desc); ;
+            }
+        }catch (Exception e){
+            log.error("修改违约罚金记录日志异常",e);
+        }
         return responseData;
     }
 
