@@ -35,15 +35,6 @@ public class AccountOwnerIncomeService{
 
 
     /**
-     * 查询车主收益信息
-     * @param memNo
-     * @return
-     */
-    public int getOwnerIncomeAmt(String memNo){
-        return accountOwnerIncomeNoTService.getOwnerIncomeAmt(memNo);
-    }
-
-    /**
      * 结算后产生待审核收益 落库
      */
     public void insertOwnerIncomeExamine(AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamineReq){

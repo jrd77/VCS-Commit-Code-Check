@@ -350,6 +350,7 @@ public class AdminOrderCostDetailController {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	try{
                 PlatformToOwnerSubsidyDTO oldData = responseData.getData();
+                PlatformToOwnerSubsidyDTO.setDefaultValue(oldData);
                 PlatformToOwnerSubsidyDTO newData = new PlatformToOwnerSubsidyDTO();
                 newData.setMileageAmt(Integer.valueOf(ownerCostReqVO.getMileageAmt()==null?"0":ownerCostReqVO.getMileageAmt()));
                 newData.setOilSubsidyAmt(Integer.valueOf(ownerCostReqVO.getOilSubsidyAmt()==null?"0":ownerCostReqVO.getOilSubsidyAmt()));
@@ -497,6 +498,13 @@ public class AdminOrderCostDetailController {
             req.setOrderNo(renterCostReqVO.getOrderNo());
             req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
             oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
+            oldData.setOliAmt(oldData.getOliAmt()==null?"0":oldData.getOliAmt());
+            oldData.setTimeOut(oldData.getTimeOut()==null?"0":oldData.getTimeOut());
+            oldData.setModifyOrderTimeAndAddrAmt(oldData.getModifyOrderTimeAndAddrAmt()==null?"0":oldData.getModifyOrderTimeAndAddrAmt());
+            oldData.setCarWash(oldData.getCarWash()==null?"0":oldData.getCarWash());
+            oldData.setDlayWait(oldData.getDlayWait()==null?"0":oldData.getDlayWait());
+            oldData.setStopCar(oldData.getStopCar()==null?"0":oldData.getStopCar());
+            oldData.setExtraMileage(oldData.getExtraMileage()==null?"0":oldData.getExtraMileage());
         }catch (Exception e){
             log.error("租客需支付给平台的费用-日志记录查询异常",e);
         }
