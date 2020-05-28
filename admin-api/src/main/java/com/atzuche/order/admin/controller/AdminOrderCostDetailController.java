@@ -607,8 +607,14 @@ public class AdminOrderCostDetailController {
             if(responseData != null && responseData.getData()!= null){
                 PlatformToOwnerDTO oldData = responseData.getData();
                 PlatformToOwnerDTO.setDefaultValue(oldData);
-                PlatformToOwnerDTO newData = responseData.getData();
-                PlatformToOwnerDTO.setDefaultValue(newData);
+                PlatformToOwnerDTO newData = new PlatformToOwnerDTO();
+                newData.setOliAmt(ownerCostReqVO.getOliAmt()==null?"0":ownerCostReqVO.getOliAmt());
+                newData.setTimeOut(ownerCostReqVO.getTimeOut()==null?"0":ownerCostReqVO.getTimeOut());
+                newData.setModifyOrderTimeAndAddrAmt(ownerCostReqVO.getModifyOrderTimeAndAddrAmt()==null?"0":ownerCostReqVO.getModifyOrderTimeAndAddrAmt());
+                newData.setCarWash(ownerCostReqVO.getCarWash()==null?"0":ownerCostReqVO.getCarWash());
+                newData.setDlayWait(ownerCostReqVO.getDlayWait()==null?"0":ownerCostReqVO.getDlayWait());
+                newData.setStopCar(ownerCostReqVO.getStopCar()==null?"0":ownerCostReqVO.getStopCar());
+                newData.setExtraMileage(ownerCostReqVO.getExtraMileage()==null?"0":ownerCostReqVO.getExtraMileage());
                 adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_PLATFORM,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),CompareBeanUtils.newInstance(oldData,newData).compare());
             }
         }catch (Exception e){
