@@ -1,5 +1,6 @@
 package com.atzuche.order.open.service;
 
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
@@ -9,6 +10,8 @@ import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailR
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 查询车主收益信息
@@ -43,4 +46,7 @@ public interface FeignOwnerIncomeService {
     );
     @PostMapping("/owner/income/adjustmentOwnerIncomeExam")
     public ResponseData adjustmentOwnerIncomeExam(@RequestBody AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO);
+
+    @PostMapping("/owner/income/getIncomTotalListByMemNoList")
+    public ResponseData<List<AccountOwnerIncomeListDTO>> getIncomTotalListByMemNoList(@RequestParam(value = "memNoList") List<Integer> memNoList);
 }

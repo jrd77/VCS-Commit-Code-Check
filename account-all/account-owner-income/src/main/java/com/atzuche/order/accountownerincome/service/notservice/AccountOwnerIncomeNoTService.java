@@ -4,12 +4,16 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntit
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.autoyol.commons.web.ErrorCode;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -65,8 +69,8 @@ public class AccountOwnerIncomeNoTService {
             throw new AccountOwnerIncomeExamineException();
         }
     }
-    
-    
+
+
     /**
      * 更新车主收益(提现)
      * @param accountOwnerIncomeDetail
@@ -89,4 +93,17 @@ public class AccountOwnerIncomeNoTService {
         return accountOwnerIncome;
     }
 
+    public List<AccountOwnerIncomeListDTO> getIncomTotalListByMemNoList(List<Integer> memNoList) {
+        List<AccountOwnerIncomeEntity> accountOwnerIncomeEntities = accountOwnerIncomeMapper.selectByMemNoList(memNoList);
+        List<AccountOwnerIncomeListDTO> accountOwnerIncomeList=  new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accountOwnerIncomeEntities)){
+            for (AccountOwnerIncomeEntity accountOwnerIncomeEntity : accountOwnerIncomeEntities) {
+                AccountOwnerIncomeListDTO accountOwnerIncomeListDTO = new AccountOwnerIncomeListDTO();
+                accountOwnerIncomeListDTO.setIncomeAmt(accountOwnerIncomeEntity.getIncomeAmt());
+                accountOwnerIncomeListDTO.setMemNo(accountOwnerIncomeEntity.getMemNo());
+                accountOwnerIncomeList.add(accountOwnerIncomeListDTO);
+            }
+        }
+        return accountOwnerIncomeList;
+    }
 }
