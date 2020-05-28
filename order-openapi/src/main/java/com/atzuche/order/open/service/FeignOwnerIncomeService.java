@@ -47,6 +47,6 @@ public interface FeignOwnerIncomeService {
     @PostMapping("/owner/income/adjustmentOwnerIncomeExam")
     public ResponseData adjustmentOwnerIncomeExam(@RequestBody AdjustmentOwnerIncomeExamVO adjustmentOwnerIncomeExamVO);
 
-    @PostMapping("/owner/income/getIncomTotalListByMemNoList")
+    @GetMapping("/owner/income/getIncomTotalListByMemNoList")
     public ResponseData<List<AccountOwnerIncomeListDTO>> getIncomTotalListByMemNoList(@RequestParam(value = "memNoList") List<Integer> memNoList);
 }
