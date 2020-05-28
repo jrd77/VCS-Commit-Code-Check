@@ -179,7 +179,7 @@ public class OrderCommonConver {
         double insureDiscount = CommonUtils.getInsureDiscount(renterOrderReqVO.getRentTime(), renterOrderReqVO.getRevertTime(), inmsrpGuidePrice);
         // 平台保障费用项
         costItemList.add(getInsurCostItemVO(renterOrderCostRespDTO, insureDiscount));
-        // 全面保障费用项
+        // 补充保障服务费项
         costItemList.add(getAbatementCostItemVO(renterOrderCostRespDTO, insureDiscount));
         logger.info("Build costItem list A.result is,costItemList:[{}]", JSON.toJSONString(costItemList));
         return costItemList;
@@ -287,7 +287,7 @@ public class OrderCommonConver {
 
 
     /**
-     * 获取全面保障费费用项
+     * 获取补充保障服务费费用项
      *
      * @param renterOrderCostRespDTO XX
      * @param insureDiscount         XX
@@ -1017,7 +1017,7 @@ public class OrderCommonConver {
         respDTO.setRentAmount(OrderCostDetailCalculationUtil.getOrderRentAmt(costDetails, subsidyDetails));
         //基础保障费
         respDTO.setBasicEnsureAmount(OrderCostDetailCalculationUtil.getInsuranceAmt(costDetails, subsidyDetails));
-        //全面保障费
+        //补充保障服务费
         respDTO.setComprehensiveEnsureAmount(OrderCostDetailCalculationUtil.getAbatementAmt(costDetails, subsidyDetails));
         //手续费
         respDTO.setCommissionAmount(OrderCostDetailCalculationUtil.getFeeAmt(costDetails).getAmt());
@@ -1031,7 +1031,7 @@ public class OrderCommonConver {
         respDTO.setGetOverAmt(OrderCostDetailCalculationUtil.getGetBlockedRaiseAmt(costDetails, subsidyDetails));
         //还车超运能溢价
         respDTO.setReturnOverAmt(OrderCostDetailCalculationUtil.getReturnBlockedRaiseAmt(costDetails, subsidyDetails));
-        //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
+        //租车费用 = 租金+平台保障费+补充保障服务费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
         int rentCarAmount =
                 respDTO.getRentAmount() +
                         respDTO.getBasicEnsureAmount() +

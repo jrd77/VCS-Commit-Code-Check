@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,7 @@ public class AdminPaymentController {
 //	@GetMapping("payment/information")
 	@RequestMapping(value="payment/information",method = RequestMethod.POST)
 	public ResponseData platformPaymentList(@RequestBody @Validated PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	PaymentInformationResponseVO respVo = paymentService.platformPaymentList(paymentRequestVO);

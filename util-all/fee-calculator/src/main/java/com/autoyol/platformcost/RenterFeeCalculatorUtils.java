@@ -189,7 +189,7 @@ public class RenterFeeCalculatorUtils {
 	
 	
 	/**
-	 * 计算总的全面保障费
+	 * 计算总的补充保障服务费
 	 * @param rentTime 取车时间
 	 * @param revertTime 还车时间
 	 * @param getCarBeforeTime 提前时间（分钟数）
@@ -241,7 +241,7 @@ public class RenterFeeCalculatorUtils {
 	
 	
 	/**
-	 * 获取全面保障费阶梯价格
+	 * 获取补充保障服务费阶梯价格
 	 * @param abatementConfig 价格配置
 	 * @param abatementDay 租期
 	 * @param coefficient 会员系数
@@ -682,7 +682,7 @@ public class RenterFeeCalculatorUtils {
 	
 	
 	/**
-	 * 计算总的全面保障费
+	 * 计算总的补充保障服务费
 	 * @param insCom 保费计算用通用参数
 	 * @return List<FeeResult>
 	 */
@@ -734,7 +734,7 @@ public class RenterFeeCalculatorUtils {
 	
 	
 	/**
-	 * 获取全面保障费阶梯价格
+	 * 获取补充保障服务费阶梯价格
 	 * @param abatementConfig 价格配置
 	 * @param abatementDay 租期
 	 * @param insCom 保费计算用通用参数

@@ -524,7 +524,7 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
-        //4 全面保障费 费用收益方 平台   平台端记录冲账流水
+        //4 补充保障服务费 费用收益方 平台   平台端记录冲账流水
         if(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
             AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();

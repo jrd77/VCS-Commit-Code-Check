@@ -7,6 +7,7 @@ import com.atzuche.order.admin.service.AdminDeliveryCarService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atzuche.order.commons.BindingResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,7 @@ public class AdminOrderCostController {
 	@RequestMapping(value="/calculateRenterOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateRenterOrderCost(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCost controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	
@@ -101,9 +100,7 @@ public class AdminOrderCostController {
     @RequestMapping(value="/calculateRenterOrderCostLongRent",method = RequestMethod.POST)
     public ResponseData calculateRenterOrderCostLongRent(@RequestBody @Validated RenterCostReqVO renterCostReqVO,BindingResult bindingResult) {
         logger.info("calculateRenterOrderCostLongRent controller params={}",renterCostReqVO.toString());
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         try {
             OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCostLongRent(renterCostReqVO);
@@ -120,9 +117,7 @@ public class AdminOrderCostController {
 	@RequestMapping(value="/calculateOwnerOrderCost",method = RequestMethod.POST)
 	public ResponseData calculateOwnerOrderCost(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCost(ownerCostReqVO);
@@ -140,9 +135,7 @@ public class AdminOrderCostController {
     @RequestMapping(value="/calculateOwnerOrderCostLong",method = RequestMethod.POST)
     public ResponseData calculateOwnerOrderCostLong(@RequestBody @Validated OwnerCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateOwnerOrderCost controller params={}",ownerCostReqVO.toString());
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
 
         try {
             OrderOwnerCostResVO resp = orderCostService.calculateOwnerOrderCostLong(ownerCostReqVO);
