@@ -105,8 +105,14 @@ public class AdminOrderCostDetailController {
                         renterDelayReturnCarFineAmount = consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
                     }
                 }
-                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())+"\n"
-                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
+
+                String desc ="";
+                if(CompareBeanUtils.compareString(String.valueOf(renterBeforeReturnCarFineAmount),String.valueOf(-Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())))){
+                    desc += FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt());
+                }
+                if(CompareBeanUtils.compareString(String.valueOf(renterDelayReturnCarFineAmount),String.valueOf(-Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt())))){
+                    desc +=FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
+                }
                 adminLogService.insertLog(AdminOpTypeEnum.RENTER_UPDATE_FINE, renterCostReqVO.getOrderNo(), desc);
             }catch (Exception e){
         	    log.error("记录日志失败",e);
@@ -294,6 +300,7 @@ public class AdminOrderCostDetailController {
             req.setOrderNo(renterCostReqVO.getOrderNo());
             req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
             oldData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
+            PlatformToRenterSubsidyResVO.setDefaultValue(oldData);
         }catch (Exception e){
             log.error("平台给租客的补贴-记录日志查询时异常",e);
         }
@@ -404,15 +411,20 @@ public class AdminOrderCostDetailController {
             try{
                 if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())){
                     String oldData = resp.getOwnerToRenterAdjustAmt();
-                    String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
-                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                    if(CompareBeanUtils.compareString(oldData, renterCostReqVO.getOwnerToRenterAdjustAmt())){
+                        String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
+                        adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
+                                renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                    }
                 }
                 if(StringUtils.isNotBlank(renterCostReqVO.getRenterToOwnerAdjustAmt())){
                     String oldData = resp.getRenterToOwnerAdjustAmt();
-                    String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
-                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                    if(CompareBeanUtils.compareString(oldData, renterCostReqVO.getRenterToOwnerAdjustAmt())){
+                        String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
+                        adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
+                                renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                    }
+
                 }
             }catch (Exception e){
                 log.error("租客车主互相调价 车主租客互相调价操作 日志记录 异常",e);
@@ -511,16 +523,19 @@ public class AdminOrderCostDetailController {
         try {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
-                RenterToPlatformVO newData = new RenterToPlatformVO();
-                newData.setOliAmt(renterCostReqVO.getOliAmt());
-                newData.setTimeOut(renterCostReqVO.getTimeOut());
-                newData.setModifyOrderTimeAndAddrAmt(renterCostReqVO.getModifyOrderTimeAndAddrAmt());
-                newData.setCarWash(renterCostReqVO.getCarWash());
-                newData.setDlayWait(renterCostReqVO.getDlayWait());
-                newData.setStopCar(renterCostReqVO.getStopCar());
-                newData.setExtraMileage(renterCostReqVO.getExtraMileage());
-                adminLogService.insertLog(AdminOpTypeEnum.RENTER_TO_PLATFORM,renterCostReqVO.getOrderNo(),
-                        renterCostReqVO.getRenterOrderNo(),null, CompareBeanUtils.newInstance(oldData,newData).compare());
+        	    if(oldData != null){
+                    RenterToPlatformVO newData = new RenterToPlatformVO();
+                    newData.setOliAmt(renterCostReqVO.getOliAmt());
+                    newData.setTimeOut(renterCostReqVO.getTimeOut());
+                    newData.setModifyOrderTimeAndAddrAmt(renterCostReqVO.getModifyOrderTimeAndAddrAmt());
+                    newData.setCarWash(renterCostReqVO.getCarWash());
+                    newData.setDlayWait(renterCostReqVO.getDlayWait());
+                    newData.setStopCar(renterCostReqVO.getStopCar());
+                    newData.setExtraMileage(renterCostReqVO.getExtraMileage());
+                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_TO_PLATFORM,renterCostReqVO.getOrderNo(),
+                            renterCostReqVO.getRenterOrderNo(),null, CompareBeanUtils.newInstance(oldData,newData).compare());
+                }
+
             }catch (Exception e){
         	    log.error("租客需支付给平台的费用日志记录异常",e);
             }

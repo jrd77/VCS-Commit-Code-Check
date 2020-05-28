@@ -38,6 +38,9 @@ public class AdminLogService {
      * @param desc    操作内容
      */
     public void insertLog(AdminOpTypeEnum type, String orderNo, String desc) {
+        if(desc == null || desc.trim().length()<=0){
+            return;
+        }
         AdminOperateLogEntity entity = new AdminOperateLogEntity();
         entity.setOrderNo(orderNo);
         entity.setDesc(desc);
@@ -55,6 +58,9 @@ public class AdminLogService {
      * @param desc    操作内容
      */
     public void insertLog(AdminOpTypeEnum type, String orderNo,String renterOrderNo,String ownerOrderNo, String desc) {
+        if(desc == null || desc.trim().length()<=0){
+            return;
+        }
         AdminOperateLogEntity entity = new AdminOperateLogEntity();
         entity.setOrderNo(orderNo);
         entity.setRenterOrderNo(renterOrderNo);
