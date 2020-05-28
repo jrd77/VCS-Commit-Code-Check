@@ -1,19 +1,117 @@
-oldData.setDispatchingSubsidy();
-oldData.setDispatchingSubsidySystem();
-oldData.setOilSubsidy();
-oldData.setCleanCarSubsidy();
-oldData.setGetReturnDelaySubsidy();
-oldData.setDelaySubsidy();
-oldData.setTrafficSubsidy();
-oldData.setInsureSubsidy();
-oldData.setInsureSubsidySystem();
-oldData.setTyreInsurSubsidy();
-oldData.setTyreInsurSubsidySystem();
-oldData.setDriverInsurSubsidy();
-oldData.setDriverInsurSubsidySystem();
-oldData.setRentAmtSubsidy();
-oldData.setOtherSubsidy();
-oldData.setAbatementSubsidy();
-oldData.setAbatementSubsidySystem();
-oldData.setFeeSubsidy();
-oldData.setLongGetReturnCarCostSubsidy();
+if (dispatching != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO,
+					dispatching, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT,
+					RenterCashCodeEnum.SUBSIDY_DISPATCHING_AMT);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (oil != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, oil,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OIL);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (cleancar != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, cleancar,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_CLEANCAR);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (getReturnDelay != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO,
+					getReturnDelay, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT,
+					RenterCashCodeEnum.SUBSIDY_GETRETURNDELAY);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (delay != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, delay,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_DELAY);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (traffic != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, traffic,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_TRAFFIC);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (insure != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, insure,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_INSURE);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (rentamt != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, rentamt,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_RENTAMT);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (other != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, other,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OTHER);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (abatement != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, abatement,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_ABATEMENT);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+
+		if (fee != -9999) {
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, fee,
+					targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_FEE);
+			record.setCreateOp(userName);
+			record.setUpdateOp(userName);
+			record.setOperatorId(userName);
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+		}
+        if (tyreInsurSubsidy != -9999) {
+            OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, tyreInsurSubsidy,
+                    targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_TYRE_INSURE_TOTAL_PRICES);
+            record.setCreateOp(userName);
+            record.setUpdateOp(userName);
+            record.setOperatorId(userName);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+        }
+        if (driverInsurSubsidy != -9999) {
+            OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, driverInsurSubsidy,
+                    targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_DRIVER_INSURE_TOTAL_PRICES);
+            record.setCreateOp(userName);
+            record.setUpdateOp(userName);
+            record.setOperatorId(userName);
+            orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
+        }
