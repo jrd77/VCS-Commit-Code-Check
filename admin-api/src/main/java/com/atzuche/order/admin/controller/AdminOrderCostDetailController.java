@@ -23,6 +23,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDT
 import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
+import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
@@ -589,15 +590,31 @@ public class AdminOrderCostDetailController {
 		if (bindingResult.hasErrors()) {
             return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
         }
-        
+        ResponseData<PlatformToOwnerDTO> responseData = null;
+        try{
+            responseData = ownerOrderDetailService.platformToOwner(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        }catch (Exception e){
+            log.error("查询车主需支付给平台的费用异常",e);
+        }
         try {
         	orderCostDetailService.updateOwnerToPlatFormListByOrderNo(ownerCostReqVO);
-        	return ResponseData.success();
 		} catch (Exception e) {
 			Cat.logError("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
 			logger.error("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
 			return ResponseData.error();
 		}
+        try{
+            if(responseData != null && responseData.getData()!= null){
+                PlatformToOwnerDTO oldData = responseData.getData();
+                PlatformToOwnerDTO.setDefaultValue(oldData);
+                PlatformToOwnerDTO newData = responseData.getData();
+                PlatformToOwnerDTO.setDefaultValue(newData);
+                adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_PLATFORM,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),CompareBeanUtils.newInstance(oldData,newData).compare());
+            }
+        }catch (Exception e){
+            log.error("车主需支付给平台的费用日志记录异常",e);
+        }
+        return ResponseData.success();
     }
     
     @AutoDocMethod(description = "车主给租客的租金补贴 修改接口", value = "车主给租客的租金补贴 修改接口",response = ResponseData.class)
