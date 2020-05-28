@@ -320,6 +320,8 @@ public class AdminOrderCostDetailController {
                 newData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
                 newData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
                 newData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
+                newData.setTyreInsurSubsidy(renterCostReqVO.getTyreInsurSubsidy());
+                newData.setDriverInsurSubsidy(renterCostReqVO.getDriverInsurSubsidy());
                 adminLogService.insertLog(AdminOpTypeEnum.PLATFORM_TO_RENTER,renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),null,CompareBeanUtils.newInstance(oldData,newData).compare());
             }catch (Exception e){
         	    log.error("平台给租客的补贴修改日志记录异常",e);

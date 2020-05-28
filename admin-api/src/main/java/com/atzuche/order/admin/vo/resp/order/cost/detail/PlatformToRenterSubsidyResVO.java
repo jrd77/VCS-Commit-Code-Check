@@ -89,6 +89,6 @@ public class PlatformToRenterSubsidyResVO {
         oldData.setAbatementSubsidy(oldData.getAbatementSubsidy()==null?"0":oldData.getAbatementSubsidy());
         oldData.setAbatementSubsidySystem(oldData.getAbatementSubsidySystem()==null?"0":oldData.getAbatementSubsidySystem());
         oldData.setFeeSubsidy(oldData.getFeeSubsidy()==null?"0":oldData.getFeeSubsidy());
-        oldData.setLongGetReturnCarCostSubsidy(oldData.getLongGetReturnCarCostSubsidy()==null?"0":oldData.getLongGetReturnCarCostSubsidy());
+        //oldData.setLongGetReturnCarCostSubsidy(oldData.getLongGetReturnCarCostSubsidy()==null?"0":oldData.getLongGetReturnCarCostSubsidy());
     }
 }
