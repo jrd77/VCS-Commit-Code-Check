@@ -24,15 +24,7 @@ public class AccountOwnerIncomeNoTService {
     @Autowired
     private AccountOwnerIncomeMapper accountOwnerIncomeMapper;
 
-    /**
-     * 查询车主收益信息
-     * @param memNo
-     * @return
-     */
-    public int getOwnerIncomeAmt(String memNo) {
-        AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(memNo);
-        return accountOwnerIncome.getIncomeAmt();
-    }
+
 
     public AccountOwnerIncomeEntity getOwnerIncome(String memNo) {
         if(Objects.isNull(memNo)){
@@ -45,6 +37,18 @@ public class AccountOwnerIncomeNoTService {
             accountOwnerIncome.setVersion(NumberUtils.INTEGER_ONE);
             accountOwnerIncome.setIncomeAmt(NumberUtils.INTEGER_ZERO);
             accountOwnerIncomeMapper.insertSelective(accountOwnerIncome);
+        }
+        return accountOwnerIncome;
+    }
+
+    public AccountOwnerIncomeEntity getOwnerIncomeByMemNO(String memNo) {
+        if(Objects.isNull(memNo)){
+            Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
+        }
+        AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
+        if(Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())){
+            accountOwnerIncome = new AccountOwnerIncomeEntity();
+            accountOwnerIncome.setIncomeAmt(0);
         }
         return accountOwnerIncome;
     }

@@ -80,7 +80,7 @@ public class CashWithdrawalService {
 		// 调远程获取老系统可提现余额
 		MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
 		// 获取新订单系统的会员总收益
-		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
+		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncomeByMemNO(req.getMemNo());
 		int balance = 0;
 		if (memBalanceVO != null && memBalanceVO.getBalance() != null && memBalanceVO.getBalance() > 0) {
 			balance += memBalanceVO.getBalance();
