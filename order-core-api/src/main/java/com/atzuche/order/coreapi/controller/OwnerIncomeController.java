@@ -130,5 +130,13 @@ public class OwnerIncomeController {
         log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
         return ResponseData.success(ownerIncomeByMemNo.getIncomeAmt());
     }
+    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
+    @GetMapping("/getIncomTotalByOwnerMem")
+    public ResponseData<Integer> getIncomTotalByOwnerMemList(@RequestParam("ownerMemeNo") String ownerMemeNo){
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
+        AccountOwnerIncomeEntity ownerIncomeByMemNo = accountOwnerIncomeNoTService.getOwnerIncomeByMemNo(ownerMemeNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
+        return ResponseData.success(ownerIncomeByMemNo.getIncomeAmt());
+    }
 
 }
