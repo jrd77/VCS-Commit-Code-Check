@@ -136,6 +136,8 @@ public class OwnerIncomeController {
         log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
         AccountOwnerIncomeEntity ownerIncomeByMemNo = accountOwnerIncomeNoTService.getOwnerIncomeByMemNo(ownerMemeNo);
         log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
+
+
         return ResponseData.success(ownerIncomeByMemNo.getIncomeAmt());
     }
 
