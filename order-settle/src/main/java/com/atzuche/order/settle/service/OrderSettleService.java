@@ -586,7 +586,8 @@ public class OrderSettleService{
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
             OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
-            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {
+            
+//            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {  //去掉暂扣标识
                 OrderStatusEntity record = new OrderStatusEntity();
                 record.setId(entity.getId());
                 record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
@@ -596,7 +597,8 @@ public class OrderSettleService{
                 record.setCarDepositSettleTime(LocalDateTime.now());
                 
                 orderStatusService.updateByPrimaryKeySelective(record);
-            }
+//            }
+                
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
