@@ -30,6 +30,7 @@ import com.atzuche.order.admin.util.CarHwXls;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.ExcelUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
+import com.atzuche.order.admin.vo.resp.AddIncomeExamineLogVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExamineOptDTO;
@@ -186,12 +187,14 @@ public class AddIncomeController {
 	}
 	
 	
-	@AutoDocMethod(description = "获取追加收益审核日志", value = "获取追加收益审核日志", response = AddIncomeExamineLog.class)
+	@AutoDocMethod(description = "获取追加收益审核日志", value = "获取追加收益审核日志", response = AddIncomeExamineLogVO.class)
 	@RequestMapping(value = "console/income/examinelog/list", method = RequestMethod.GET)
-	public ResponseData<List<AddIncomeExamineLog>> listAddIncomeExamineLog(@RequestParam(value="id",required = true) Integer id) {
+	public ResponseData<AddIncomeExamineLogVO> listAddIncomeExamineLog(@RequestParam(value="id",required = true) Integer id) {
 		log.info("AddIncomeController.listAddIncomeExamineLog id=[{}]", id);
 		List<AddIncomeExamineLog> list = addIncomeRemoteService.listAddIncomeExamineLog(id);
-		return ResponseData.success(list);
+		AddIncomeExamineLogVO addIncomeExamineLogVO = new AddIncomeExamineLogVO();
+		addIncomeExamineLogVO.setList(list);
+		return ResponseData.success(addIncomeExamineLogVO);
 	}
 	
 	
