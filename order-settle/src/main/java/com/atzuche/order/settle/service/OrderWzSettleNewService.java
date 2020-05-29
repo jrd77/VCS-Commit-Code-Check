@@ -115,8 +115,11 @@ public class OrderWzSettleNewService {
             settleOrdersWz.setOwnerMemNo("0");
             settleOrdersWz.setOwnerOrderNo("0");
         }
+        
+        //外置
         // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-        this.check(renterOrder);
+//        this.check(renterOrder);
+        
         // 3 初始化数据
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
@@ -143,9 +146,13 @@ public class OrderWzSettleNewService {
 	 * 
 	 * @param renterOrder 租客订单信息
 	 */
-	public void check(RenterOrderEntity renterOrder) {
+	public boolean check(RenterOrderEntity renterOrder) {
 		// 1 先查询 发现 有结算数据停止结算 手动处理
-		this.checkIsSettle(renterOrder.getOrderNo());
+		boolean checkFlag = this.checkIsSettle(renterOrder.getOrderNo());
+		if(!checkFlag) {
+			return checkFlag;
+		}
+		
 		// 2 校验是否存在 理赔 存在不结算 这个跟违章是一起的。
 		boolean isClaim = cashierWzSettleService.getOrderClaim(renterOrder.getOrderNo());
 		if (isClaim) {
@@ -166,6 +173,8 @@ public class OrderWzSettleNewService {
 			// 无法结算
 			throw new RuntimeException("租客未找到违章记录信息不能结算");
 		}
+		
+		return true;
 	}
 
 	/**
@@ -173,11 +182,14 @@ public class OrderWzSettleNewService {
 	 * 
 	 * @param orderNo
 	 */
-	public void checkIsSettle(String orderNo) {
+	public boolean checkIsSettle(String orderNo) {
+		//总控开关
 		// 1 订单校验是否可以结算
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderNo);
 		if (OrderStatusEnum.TO_WZ_SETTLE.getStatus() != orderStatus.getStatus() || SettleStatusEnum.SETTLEING.getCode() != orderStatus.getWzSettleStatus()) {
-			throw new RuntimeException("租客订单状态不是待结算，不能结算");
+//			throw new RuntimeException("租客订单状态不是待结算，不能结算");
+			log.error("租客订单状态不是待结算，不能结算，orderNo=[{}]",orderNo);
+			return false;
 		}
 		
 		// 违章
@@ -194,6 +206,7 @@ public class OrderWzSettleNewService {
 			throw new RuntimeException("有违章结算数据停止结算");
 		}
 
+		return true;
 	}
 
 	/**
