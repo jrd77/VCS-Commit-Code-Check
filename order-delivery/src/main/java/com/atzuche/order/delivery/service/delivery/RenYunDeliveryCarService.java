@@ -117,11 +117,6 @@ public class RenYunDeliveryCarService {
         StringBuffer sb = new StringBuffer();
         if (params != null) {
             for (Map.Entry<String, Object> e : flowOrderMap.entrySet()) {
-                if (StringUtils.isBlank(String.valueOf(e.getValue()))) {
-                    e.setValue("");
-                } else if (String.valueOf(e.getValue()).equals("null")) {
-                    e.setValue("");
-                }
                 sb.append(e.getKey());
                 sb.append("=");
                 sb.append(e.getValue());
