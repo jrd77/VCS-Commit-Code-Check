@@ -138,6 +138,12 @@ public class HandoverCarInfoService {
                     }
                     handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
                     handoverCarService.addHandoverCarInfo(handoverCarVO, 1);
+                    //新增车主
+                    HandoverCarInfoDTO ownerHandoverCarInfoDTO = new HandoverCarInfoDTO();
+                    BeanUtils.copyProperties(handoverCarInfoDTO,ownerHandoverCarInfoDTO);
+                    HandoverCarVO ownerHandoverCarVO = new HandoverCarVO();
+                    ownerHandoverCarVO.setHandoverCarInfoDTO(ownerHandoverCarInfoDTO);
+                    handoverCarService.addHandoverCarInfo(handoverCarVO, 2);
                 }
             }else {
                 renterHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,renterHandoverCarInfoEntityList);
@@ -186,6 +192,13 @@ public class HandoverCarInfoService {
                     }
                     handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
                     handoverCarService.addHandoverCarInfo(handoverCarVO, 2);
+                    //新增租客
+                    HandoverCarInfoDTO ownerHandoverCarInfoDTO = new HandoverCarInfoDTO();
+                    BeanUtils.copyProperties(handoverCarInfoDTO,ownerHandoverCarInfoDTO);
+                    HandoverCarVO ownerHandoverCarVO = new HandoverCarVO();
+                    ownerHandoverCarVO.setHandoverCarInfoDTO(ownerHandoverCarInfoDTO);
+                    handoverCarService.addHandoverCarInfo(handoverCarVO, 1);
+
                 }
             }else {
                 ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,ownerHandoverCarInfoEntityList);

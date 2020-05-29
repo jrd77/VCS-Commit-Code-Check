@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.transport.service.GetReturnCarCostService;
@@ -264,7 +265,7 @@ public class DeliveryCarInfoService {
         try {
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
         } catch (Exception e) {
-            log.info("获取平台加邮费出错", e);
+            log.info("获取平台加邮费出错,ownerGetAndReturnCarDTO:[]", JSONObject.toJSONString(ownerGetAndReturnCarDTO));
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
         }
         renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
