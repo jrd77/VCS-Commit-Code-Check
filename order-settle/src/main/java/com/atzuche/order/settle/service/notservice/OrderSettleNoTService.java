@@ -242,7 +242,7 @@ public class OrderSettleNoTService {
         		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
         		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
 //            throw new RuntimeException("租客订单状态不是待结算，不能结算");
-        	log.error("租客订单状态不是待结算，不能结算");
+        	log.error("租客订单状态不是待结算，不能结算，orderNo=[{}]",renterOrder.getOrderNo());
         	return false;
         }
         
