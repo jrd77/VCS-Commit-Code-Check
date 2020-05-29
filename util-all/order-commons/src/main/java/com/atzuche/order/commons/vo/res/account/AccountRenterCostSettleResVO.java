@@ -41,7 +41,7 @@ public class AccountRenterCostSettleResVO implements Serializable {
 	 */
 	private Integer basicEnsureAmount;
 	/**
-	 * 全面保障费用
+	 * 补充保障服务费
 	 */
 	private Integer comprehensiveEnsureAmount;
 	/**

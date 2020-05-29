@@ -18,12 +18,12 @@ import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetai
 import com.atzuche.order.admin.vo.resp.order.cost.detail.PlatformToRenterSubsidyResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.ReductionDetailResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.RenterPriceAdjustmentResVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterAdditionalDriverDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusRespDTO;
-import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.PlatformToOwnerSubsidyDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
@@ -80,9 +80,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("fineAmt/update")
     public ResponseData<?> updatefineAmtListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterFineCostReqVO renterCostReqVO, BindingResult bindingResult) {
     	logger.info("updatefineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         RenterAndConsoleFineVO fineList = null;
         try{
             fineList = orderCostRemoteService.getRenterAndConsoleFineVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
@@ -106,14 +104,8 @@ public class AdminOrderCostDetailController {
                         renterDelayReturnCarFineAmount = consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
                     }
                 }
-
-                String desc ="";
-                if(CompareBeanUtils.compareString(String.valueOf(renterBeforeReturnCarFineAmount),String.valueOf(-Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())))){
-                    desc += FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt());
-                }
-                if(CompareBeanUtils.compareString(String.valueOf(renterDelayReturnCarFineAmount),String.valueOf(-Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt())))){
-                    desc +=FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
-                }
+                String desc = FineTypeCashCodeEnum.MODIFY_ADVANCE.getFineTypeDesc()+": 原值: "+renterBeforeReturnCarFineAmount+" 修改为: " + -Integer.valueOf(renterCostReqVO.getRenterBeforeReturnCarFineAmt())+"\n"
+                                + FineTypeCashCodeEnum.DELAY_FINE.getFineTypeDesc() + ": 原值: "+ renterDelayReturnCarFineAmount+ " 修改为: "+ -Integer.valueOf(renterCostReqVO.getRenterDelayReturnCarFineAmt());
                 adminLogService.insertLog(AdminOpTypeEnum.RENTER_UPDATE_FINE, renterCostReqVO.getOrderNo(), desc);
             }catch (Exception e){
         	    log.error("记录日志失败",e);
@@ -135,9 +127,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("fineAmt/list")
     public ResponseData<OrderRenterFineAmtDetailResVO> findfineAmtListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findfineAmtListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	OrderRenterFineAmtDetailResVO resp = orderCostDetailService.findfineAmtListByOrderNo(renterCostReqVO);
@@ -159,9 +149,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("reductionDetails/list")
     public ResponseData<ReductionDetailResVO> findReductionDetailsListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findReductionDetailsListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	ReductionDetailResVO resp = orderCostDetailService.findReductionDetailsListByOrderNo(renterCostReqVO);
@@ -182,9 +170,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("additionalDriverInsurance/list")
     public ResponseData<?> findAdditionalDriverInsuranceByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	AdditionalDriverInsuranceVO resp = orderCostDetailService.findAdditionalDriverInsuranceByOrderNo(renterCostReqVO);
@@ -205,9 +191,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("additionalDriverInsurance/add")
     public ResponseData<?> insertAdditionalDriverInsuranceByOrderNo(@RequestBody @Validated AdditionalDriverInsuranceIdsReqVO renterCostReqVO,BindingResult bindingResult) {
     	logger.info("insertAdditionalDriverInsuranceByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         OrderDetailReqDTO orderDetailReqDTO = new OrderDetailReqDTO();
         orderDetailReqDTO.setOrderNo(renterCostReqVO.getOrderNo());
         orderDetailReqDTO.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
@@ -266,9 +250,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToRenter/list")
     public ResponseData<PlatformToRenterSubsidyResVO> findPlatFormToRenterListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findPlatFormToRenterListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	PlatformToRenterSubsidyResVO resp = orderCostDetailService.findPlatFormToRenterListByOrderNo(renterCostReqVO);
@@ -292,16 +274,13 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToRenter/update")
     public ResponseData<?> updatePlatFormToRenterListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.PlatformToRenterSubsidyReqVO renterCostReqVO,BindingResult bindingResult) {
     	logger.info("updatePlatFormToRenterListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         PlatformToRenterSubsidyResVO oldData = null;
         try{
             RenterCostReqVO req = new RenterCostReqVO();
             req.setOrderNo(renterCostReqVO.getOrderNo());
             req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
             oldData = orderCostDetailService.findPlatFormToRenterListByOrderNo(req);
-            PlatformToRenterSubsidyResVO.setDefaultValue(oldData);
         }catch (Exception e){
             log.error("平台给租客的补贴-记录日志查询时异常",e);
         }
@@ -321,8 +300,6 @@ public class AdminOrderCostDetailController {
                 newData.setOtherSubsidy(renterCostReqVO.getOtherSubsidy());
                 newData.setAbatementSubsidy(renterCostReqVO.getAbatementSubsidy());
                 newData.setFeeSubsidy(renterCostReqVO.getFeeSubsidy());
-                newData.setTyreInsurSubsidy(renterCostReqVO.getTyreInsurSubsidy());
-                newData.setDriverInsurSubsidy(renterCostReqVO.getDriverInsurSubsidy());
                 adminLogService.insertLog(AdminOpTypeEnum.PLATFORM_TO_RENTER,renterCostReqVO.getOrderNo(),renterCostReqVO.getRenterOrderNo(),null,CompareBeanUtils.newInstance(oldData,newData).compare());
             }catch (Exception e){
         	    log.error("平台给租客的补贴修改日志记录异常",e);
@@ -347,9 +324,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("platFormToOwner/update")
     public ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.PlatformToOwnerSubsidyReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updatePlatFormToOwnerListByOrderNo controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         ResponseData<PlatformToOwnerSubsidyDTO> responseData = null;
         try{
             responseData = ownerOrderDetailService.platformToOwnerSubsidy(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
@@ -360,7 +335,6 @@ public class AdminOrderCostDetailController {
         	orderCostDetailService.updatePlatFormToOwnerListByOrderNo(ownerCostReqVO);
         	try{
                 PlatformToOwnerSubsidyDTO oldData = responseData.getData();
-                PlatformToOwnerSubsidyDTO.setDefaultValue(oldData);
                 PlatformToOwnerSubsidyDTO newData = new PlatformToOwnerSubsidyDTO();
                 newData.setMileageAmt(Integer.valueOf(ownerCostReqVO.getMileageAmt()==null?"0":ownerCostReqVO.getMileageAmt()));
                 newData.setOilSubsidyAmt(Integer.valueOf(ownerCostReqVO.getOilSubsidyAmt()==null?"0":ownerCostReqVO.getOilSubsidyAmt()));
@@ -393,9 +367,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterPriceAdjustment/update")
     public ResponseData<?> updateRenterPriceAdjustmentByOrderNo(@RequestBody RenterAdjustCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response, BindingResult bindingResult) {
     	logger.info("updateRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         RenterPriceAdjustmentResVO resp = null;
         try{
             RenterCostReqVO req = new RenterCostReqVO();
@@ -414,20 +386,15 @@ public class AdminOrderCostDetailController {
             try{
                 if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())){
                     String oldData = resp.getOwnerToRenterAdjustAmt();
-                    if(CompareBeanUtils.compareString(oldData, renterCostReqVO.getOwnerToRenterAdjustAmt())){
-                        String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
-                        adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                                renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
-                    }
+                    String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
+                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
+                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
                 }
                 if(StringUtils.isNotBlank(renterCostReqVO.getRenterToOwnerAdjustAmt())){
                     String oldData = resp.getRenterToOwnerAdjustAmt();
-                    if(CompareBeanUtils.compareString(oldData, renterCostReqVO.getRenterToOwnerAdjustAmt())){
-                        String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
-                        adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                                renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
-                    }
-
+                    String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
+                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
+                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
                 }
             }catch (Exception e){
                 log.error("租客车主互相调价 车主租客互相调价操作 日志记录 异常",e);
@@ -451,9 +418,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterPriceAdjustment/list")
     public ResponseData<RenterPriceAdjustmentResVO> findRenterPriceAdjustmentByOrderNo(@RequestBody  RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterPriceAdjustmentByOrderNo controller params={}",renterCostReqVO.toString());  //@Validated
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	RenterPriceAdjustmentResVO resp = orderCostDetailService.findRenterPriceAdjustmentByOrderNo(renterCostReqVO);
@@ -477,9 +442,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterToPlatForm/list")
     public ResponseData<RenterToPlatformVO> findRenterToPlatFormListByOrderNo(@RequestBody @Validated RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	/**
@@ -504,41 +467,29 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterToPlatForm/update")
     public ResponseData<?> updateRenterToPlatFormListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterToPlatformCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateRenterToPlatFormListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         RenterToPlatformVO oldData = null;
         try{
             RenterCostReqVO req = new RenterCostReqVO();
             req.setOrderNo(renterCostReqVO.getOrderNo());
             req.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
             oldData = orderCostDetailService.findRenterToPlatFormListByOrderNo(req);
-            oldData.setOliAmt(oldData.getOliAmt()==null?"0":oldData.getOliAmt());
-            oldData.setTimeOut(oldData.getTimeOut()==null?"0":oldData.getTimeOut());
-            oldData.setModifyOrderTimeAndAddrAmt(oldData.getModifyOrderTimeAndAddrAmt()==null?"0":oldData.getModifyOrderTimeAndAddrAmt());
-            oldData.setCarWash(oldData.getCarWash()==null?"0":oldData.getCarWash());
-            oldData.setDlayWait(oldData.getDlayWait()==null?"0":oldData.getDlayWait());
-            oldData.setStopCar(oldData.getStopCar()==null?"0":oldData.getStopCar());
-            oldData.setExtraMileage(oldData.getExtraMileage()==null?"0":oldData.getExtraMileage());
         }catch (Exception e){
             log.error("租客需支付给平台的费用-日志记录查询异常",e);
         }
         try {
         	orderCostDetailService.updateRenterToPlatFormListByOrderNo(renterCostReqVO);
         	try{
-        	    if(oldData != null){
-                    RenterToPlatformVO newData = new RenterToPlatformVO();
-                    newData.setOliAmt(renterCostReqVO.getOliAmt());
-                    newData.setTimeOut(renterCostReqVO.getTimeOut());
-                    newData.setModifyOrderTimeAndAddrAmt(renterCostReqVO.getModifyOrderTimeAndAddrAmt());
-                    newData.setCarWash(renterCostReqVO.getCarWash());
-                    newData.setDlayWait(renterCostReqVO.getDlayWait());
-                    newData.setStopCar(renterCostReqVO.getStopCar());
-                    newData.setExtraMileage(renterCostReqVO.getExtraMileage());
-                    adminLogService.insertLog(AdminOpTypeEnum.RENTER_TO_PLATFORM,renterCostReqVO.getOrderNo(),
-                            renterCostReqVO.getRenterOrderNo(),null, CompareBeanUtils.newInstance(oldData,newData).compare());
-                }
-
+                RenterToPlatformVO newData = new RenterToPlatformVO();
+                newData.setOliAmt(renterCostReqVO.getOliAmt());
+                newData.setTimeOut(renterCostReqVO.getTimeOut());
+                newData.setModifyOrderTimeAndAddrAmt(renterCostReqVO.getModifyOrderTimeAndAddrAmt());
+                newData.setCarWash(renterCostReqVO.getCarWash());
+                newData.setDlayWait(renterCostReqVO.getDlayWait());
+                newData.setStopCar(renterCostReqVO.getStopCar());
+                newData.setExtraMileage(renterCostReqVO.getExtraMileage());
+                adminLogService.insertLog(AdminOpTypeEnum.RENTER_TO_PLATFORM,renterCostReqVO.getOrderNo(),
+                        renterCostReqVO.getRenterOrderNo(),null, CompareBeanUtils.newInstance(oldData,newData).compare());
             }catch (Exception e){
         	    log.error("租客需支付给平台的费用日志记录异常",e);
             }
@@ -561,9 +512,7 @@ public class AdminOrderCostDetailController {
     @PostMapping("renterRentAmt/list")
     public ResponseData<RenterRentDetailDTO> findRenterRentAmtListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.RenterCostReqVO renterCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("findTenantRentListByOrderNo controller params={}",renterCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
         	RenterRentDetailDTO resp = orderCostDetailService.findRenterRentAmtListByOrderNo(renterCostReqVO);
@@ -587,49 +536,23 @@ public class AdminOrderCostDetailController {
     @PostMapping("ownerToPlatForm/update")
     public ResponseData<?> updateOwnerToPlatFormListByOrderNo(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("updateOwnerToPlatFormListByOrderNo controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
-        ResponseData<PlatformToOwnerDTO> responseData = null;
-        try{
-            responseData = ownerOrderDetailService.platformToOwner(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
-        }catch (Exception e){
-            log.error("查询车主需支付给平台的费用异常",e);
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
+        
         try {
         	orderCostDetailService.updateOwnerToPlatFormListByOrderNo(ownerCostReqVO);
+        	return ResponseData.success();
 		} catch (Exception e) {
 			Cat.logError("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
 			logger.error("updateOwnerToPlatFormListByOrderNo exception params="+ownerCostReqVO.toString(),e);
 			return ResponseData.error();
 		}
-        try{
-            if(responseData != null && responseData.getData()!= null){
-                PlatformToOwnerDTO oldData = responseData.getData();
-                PlatformToOwnerDTO.setDefaultValue(oldData);
-                PlatformToOwnerDTO newData = new PlatformToOwnerDTO();
-                newData.setOliAmt(ownerCostReqVO.getOliAmt()==null?"0":ownerCostReqVO.getOliAmt());
-                newData.setTimeOut(ownerCostReqVO.getTimeOut()==null?"0":ownerCostReqVO.getTimeOut());
-                newData.setModifyOrderTimeAndAddrAmt(ownerCostReqVO.getModifyOrderTimeAndAddrAmt()==null?"0":ownerCostReqVO.getModifyOrderTimeAndAddrAmt());
-                newData.setCarWash(ownerCostReqVO.getCarWash()==null?"0":ownerCostReqVO.getCarWash());
-                newData.setDlayWait(ownerCostReqVO.getDlayWait()==null?"0":ownerCostReqVO.getDlayWait());
-                newData.setStopCar(ownerCostReqVO.getStopCar()==null?"0":ownerCostReqVO.getStopCar());
-                newData.setExtraMileage(ownerCostReqVO.getExtraMileage()==null?"0":ownerCostReqVO.getExtraMileage());
-                adminLogService.insertLog(AdminOpTypeEnum.OWNER_TO_PLATFORM,ownerCostReqVO.getOrderNo(),null,ownerCostReqVO.getOwnerOrderNo(),CompareBeanUtils.newInstance(oldData,newData).compare());
-            }
-        }catch (Exception e){
-            log.error("车主需支付给平台的费用日志记录异常",e);
-        }
-        return ResponseData.success();
     }
     
     @AutoDocMethod(description = "车主给租客的租金补贴 修改接口", value = "车主给租客的租金补贴 修改接口",response = ResponseData.class)
     @PostMapping("ownerToRenterRentAmtSubsidy/update")
     public ResponseData<?> ownerToRenterRentAmtSubsidy(@RequestBody @Validated com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO ownerCostReqVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
     	logger.info("ownerToRenterRentAmtSubsidy controller params={}",ownerCostReqVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOS = null;
 		try{
             ownerOrderSubsidyDetailDTOS = remoteFeignService.queryOwnerSubsidyByownerOrderNo(ownerCostReqVO.getOrderNo(), ownerCostReqVO.getOwnerOrderNo());

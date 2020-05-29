@@ -21,7 +21,7 @@ public class PlatformSubsidyDTO {
     public Integer carFeeSubsidy = 0;
     @AutoDocProperty("基础保障费补贴")
     public Integer premiumSubsidy = 0;
-    @AutoDocProperty("全面保障费补贴")
+    @AutoDocProperty("补充保障服务费补贴")
     public Integer comprehensiveEnsureSubsidy = 0;
     @AutoDocProperty("租金补贴")
     public Integer rentSubsidy = 0;
