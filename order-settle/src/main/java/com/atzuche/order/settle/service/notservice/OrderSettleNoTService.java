@@ -232,22 +232,26 @@ public class OrderSettleNoTService {
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param settleOrders
      */
-    public void check(SettleOrders settleOrders) {
+    public boolean check(SettleOrders settleOrders) {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
     	
+    	//总开关
+        // 1 订单校验是否可以结算
+        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
+        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() 
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
+        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
+//            throw new RuntimeException("租客订单状态不是待结算，不能结算");
+        	log.error("租客订单状态不是待结算，不能结算，orderNo=[{}]",renterOrder.getOrderNo());
+        	return false;
+        }
+        
     	//判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
     	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getRenterOrderNo());
     	if(flagMileage == false) {
     		throw new RuntimeException("租客取车或还车里程数不完整不能结算");
     	}
     	
-        // 1 订单校验是否可以结算
-        OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(renterOrder.getOrderNo());
-        if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus() 
-        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
-        		|| SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
-            throw new RuntimeException("租客订单状态不是待结算，不能结算");
-        }
 //        //2校验租客是否还车
 //        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
 //            boolean isReturn = handoverCarService.isReturnCar(renterOrder.getOrderNo());
@@ -267,6 +271,8 @@ public class OrderSettleNoTService {
         }
         //4 先查询  发现 有结算数据停止结算 手动处理
         orderSettleNewService.checkIsSettle(renterOrder.getOrderNo(),settleOrders);
+        
+        return true;
     }
     
     /**

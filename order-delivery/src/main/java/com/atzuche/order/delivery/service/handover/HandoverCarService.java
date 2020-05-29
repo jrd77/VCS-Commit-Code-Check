@@ -253,7 +253,6 @@ public class HandoverCarService {
      * @param handoverCarInfoDTO
      * @param handoverCarRemarkDTO
      */
-    @Transactional(rollbackFor = Exception.class)
     public void insertOrUpdateOwnerHandoverCarInfo(HandoverCarInfoDTO handoverCarInfoDTO, HandoverCarRemarkDTO handoverCarRemarkDTO) {
         OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity = null;
         OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = null;
