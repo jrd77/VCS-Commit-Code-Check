@@ -1,15 +1,27 @@
 package com.atzuche.order.coreapi.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
+import com.atzuche.order.accountownerincome.service.AddIncomeExamineService;
 import com.atzuche.order.accountownerincome.service.AddIncomeExcelService;
+import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelContextEntity;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.enums.ExamineStatusEnum;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.AddImportExamineException;
 import com.atzuche.order.commons.exceptions.ImportAddIncomeExcelException;
 import com.atzuche.order.coreapi.entity.dto.MemberSimpleDTO;
 import com.atzuche.order.mem.MemProxyService;
@@ -18,9 +30,18 @@ import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
+import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.service.RemoteOldSysDebtService;
+import com.atzuche.order.settle.vo.req.AccountDeductDebtReqVO;
+import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
+import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.autoyol.member.detail.vo.res.MemberCoreInfo;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AddIncomeService {
 
 	@Autowired
@@ -33,6 +54,14 @@ public class AddIncomeService {
 	private OwnerMemberService ownerMemberService;
 	@Autowired
 	private MemProxyService memProxyService;
+	@Autowired
+	private AddIncomeExamineService addIncomeExamineService;
+	@Autowired
+	private AccountDebtService accountDebtService;
+	@Autowired
+	private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
+	@Autowired
+	private RemoteOldSysDebtService remoteOldSysDebtService;
 	
 	private static final Integer RENTER_MEM_TYPE = 0;
 	
@@ -123,4 +152,130 @@ public class AddIncomeService {
 		}
 		return getMemberSimpleDTOByMemNo(memNo, index);
 	}
+	
+	
+	/**
+	 * 追加收益审核操作
+	 * @param req
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void examineOpt(AddIncomeExamineOptDTO req) {
+		if (req == null) {
+			return;
+		}
+		int flag = req.getFlag() == null ? 0:req.getFlag().intValue();
+		if (flag == ExamineStatusEnum.UNDER_REVIEW_EXCEPTION.getCode()) {
+			// 审核中
+			req.setFlag(req.getWaitFlag());
+		}
+		// 更新状态
+		int updateFlag = addIncomeExamineService.updateExamine(req);
+		if (updateFlag <= 0) {
+			throw new AddImportExamineException("请勿重复操作。");
+		}
+		// 记录审核日志
+		addIncomeExamineService.saveAddIncomeExamineLog(req);
+		// 审核通过
+		passExamine(req);
+	}
+	
+	/**
+	 * 审核通过
+	 * @param req
+	 */
+	public void passExamine(AddIncomeExamineOptDTO req) {
+		if (req == null || req.getFlag() == null || req.getFlag().intValue() != ExamineStatusEnum.APPROVED.getCode()) {
+			return;
+		}
+		// 根据id获取追加的收益
+		AddIncomeExamine addIncomeExamine = addIncomeExamineService.getAddIncomeExamine(req.getId());
+		if (addIncomeExamine == null) {
+			log.info("审核通过 passExamine AddIncomeExamine获取为空，req=[{}]",req);
+			throw new AddImportExamineException("审核记录不存在");
+		}
+		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
+		if (amt == 0) {
+			log.info("审核通过 passExamine 该条记录收益为0，req=[{}]",req);
+			return;
+		}
+		if (addIncomeExamine.getMemNo() == null) {
+			log.info("审核通过 passExamine 该条记录会员号为空，req=[{}]",req);
+			throw new AddImportExamineException("该条记录会员号为空");
+		}
+		if (amt > 0) {
+			greaterThanZero(addIncomeExamine, req.getOperator());
+		} else if (amt < 0) {
+			lessThanZero(addIncomeExamine);
+		}
+	}
+	
+	
+	/**
+	 * 追加的收益大于零处理逻辑
+	 * @param addIncomeExamine
+	 * @param operator
+	 */
+	public void greaterThanZero(AddIncomeExamine addIncomeExamine, String operator) {
+		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
+		if (amt <= 0) {
+			return;
+		}
+		// 抵扣新欠款
+		AccountDeductDebtReqVO debtReq = new AccountDeductDebtReqVO(addIncomeExamine.getMemNo().toString(), amt, RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getCashNo(), RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getTxt(), operator);
+		debtReq.setUniqueNo(String.valueOf(addIncomeExamine.getId()));
+		int realDebtAmt = accountDebtService.deductDebt(debtReq);
+		amt = amt - realDebtAmt;
+		int oldRealDebtAmt = 0;
+		if (amt > 0) {
+			// 继续抵扣老欠款
+			List<AccountOldDebtReqVO> oldDebtList = new ArrayList<AccountOldDebtReqVO>();
+    		AccountOldDebtReqVO accountOldDebtReqVO = new AccountOldDebtReqVO();
+    		accountOldDebtReqVO.setMemNo(addIncomeExamine.getMemNo().toString());
+    		accountOldDebtReqVO.setSurplusAmt(amt);
+    		accountOldDebtReqVO.setCahsCodeEnum(RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_OLD_HISTORY_AMT);
+    		oldDebtList.add(accountOldDebtReqVO);
+    		List<AccountOldDebtResVO> debtResList = accountDebtService.deductOldDebt(oldDebtList);
+			oldRealDebtAmt = (debtResList == null || debtResList.isEmpty() || debtResList.get(0).getRealDebtAmt() == null) ? 0:debtResList.get(0).getRealDebtAmt();
+			amt = amt - oldRealDebtAmt;
+		}
+		if (amt > 0) {
+			// 更新会员收益
+			AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = new AccountOwnerIncomeDetailEntity();
+			accountOwnerIncomeDetail.setMemNo(addIncomeExamine.getMemNo().toString());
+			accountOwnerIncomeDetail.setAmt(amt);
+			accountOwnerIncomeDetail.setDetail("追加收益审核通过");
+	        accountOwnerIncomeDetail.setOrderNo(addIncomeExamine.getOrderNo());
+	        accountOwnerIncomeDetail.setTime(LocalDateTime.now());
+	        accountOwnerIncomeDetail.setType(AccountOwnerIncomeDetailType.INCOME.getType());
+			accountOwnerIncomeDetail.setIncomeExamineId(addIncomeExamine.getId());
+			accountOwnerIncomeDetail.setCostCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getCashNo());
+			accountOwnerIncomeDetail.setCostDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getTxt());
+			accountOwnerIncomeNoTService.updateTotalIncomeAndSaveDetail(accountOwnerIncomeDetail);
+		}
+		if (oldRealDebtAmt > 0) {
+			// 调远程抵扣
+			remoteOldSysDebtService.deductBalance(addIncomeExamine.getMemNo().toString(), oldRealDebtAmt);
+		}
+	}
+	
+	
+	/**
+	 * 小于零逻辑，产生欠款
+	 * @param addIncomeExamine
+	 */
+	public void lessThanZero(AddIncomeExamine addIncomeExamine) {
+		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
+		if (amt >= 0) {
+			return;
+		}
+		AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
+		accountInsertDebt.setAmt(amt);
+		accountInsertDebt.setMemNo(addIncomeExamine.getMemNo().toString());
+		accountInsertDebt.setOrderNo(addIncomeExamine.getOrderNo());
+		accountInsertDebt.setSourceCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getCashNo());
+		accountInsertDebt.setSourceDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getTxt());
+		accountInsertDebt.setType(2);
+		accountDebtService.insertDebt(accountInsertDebt);
+	}
+	
 }

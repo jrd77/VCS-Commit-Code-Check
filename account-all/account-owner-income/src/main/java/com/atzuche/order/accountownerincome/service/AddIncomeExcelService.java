@@ -40,6 +40,7 @@ public class AddIncomeExcelService {
 	
 	private static final int ADD_INCOME_PASS = 1;
 	private static final int ADD_INCOME_WITHDRAW = 3;
+	private static final int ADD_INCOME_DELL = 4;
 	
 	/**
 	 * 获取追加收益文件列表
@@ -101,6 +102,7 @@ public class AddIncomeExcelService {
 	 * 追加收益操作
 	 * @param addIncomeExcelOptDTO
 	 */
+	@Transactional(rollbackFor=Exception.class)
 	public void updateStatus(AddIncomeExcelOptDTO addIncomeExcelOptDTO) {
 		if (addIncomeExcelOptDTO == null) {
 			return;
@@ -116,13 +118,17 @@ public class AddIncomeExcelService {
 		} else if (flag == ADD_INCOME_WITHDRAW) {
 			// 撤回
 			withdrawAddIncome(addId);
+		} else if (flag == ADD_INCOME_DELL) {
+			addIncomeExcelEntityMapper.delAddIncomeExcel(addIncomeExcelOptDTO);
 		}
-		AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
-		addIncomeExcelEntity.setId(addId);
-		addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
-		addIncomeExcelEntity.setOperateTime(new Date());
-		addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
-		addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+		if (flag != ADD_INCOME_DELL) {
+			AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
+			addIncomeExcelEntity.setId(addId);
+			addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
+			addIncomeExcelEntity.setOperateTime(new Date());
+			addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
+			addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+		}
 	}
 	
 	/**
@@ -162,4 +168,5 @@ public class AddIncomeExcelService {
 		// 删除该批次的追加收益
 		addIncomeExamineMapper.delAddIncomeExamineByAddId(addId);
 	}
+	
 }

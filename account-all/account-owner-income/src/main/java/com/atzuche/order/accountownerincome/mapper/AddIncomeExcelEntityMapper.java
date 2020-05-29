@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelEntity;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
+import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelQueryDTO;
 @Mapper
 public interface AddIncomeExcelEntityMapper {
@@ -24,4 +25,6 @@ public interface AddIncomeExcelEntityMapper {
     int queryListCount(AddIncomeExcelConsoleDTO addIncomeExcelConsoleDTO);
     
     List<AddIncomeExcelEntity> queryList(AddIncomeExcelQueryDTO addIncomeExcelQueryDTO);
+    
+    int delAddIncomeExcel(AddIncomeExcelOptDTO addIncomeExcelOptDTO);
 }

@@ -1,12 +1,16 @@
 package com.atzuche.order.admin.controller;
 
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -21,11 +25,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.AddIncomeRemoteService;
+import com.atzuche.order.admin.service.AddIncomeService;
 import com.atzuche.order.admin.util.CarHwXls;
 import com.atzuche.order.admin.util.CommonUtils;
 import com.atzuche.order.admin.util.ExcelUtils;
 import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelContextEntity;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelEntity;
@@ -33,6 +40,9 @@ import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelVO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
 import com.atzuche.order.commons.exceptions.ImportAddIncomeExcelException;
+import com.atzuche.order.commons.vo.AddIncomeExamine;
+import com.atzuche.order.commons.vo.AddIncomeExamineLog;
+import com.atzuche.order.commons.vo.AddIncomeExamineVO;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -47,6 +57,8 @@ public class AddIncomeController {
 
 	@Autowired
 	private AddIncomeRemoteService addIncomeRemoteService;
+	@Autowired
+	private AddIncomeService addIncomeService;
 
 	@AutoDocMethod(description = "追加收益文件列表", value = "追加收益文件列表", response = AddIncomeExcelVO.class)
 	@RequestMapping(value = "console/income/excel/list", method = RequestMethod.GET)
@@ -90,7 +102,9 @@ public class AddIncomeController {
                 String amt=CarHwXls.getValue(hssfRow.getCell(5));
                 String describe=CarHwXls.getValue(hssfRow.getCell(6));
                 String department=CarHwXls.getValue(hssfRow.getCell(7));
-                String applyTime=CarHwXls.getValue(hssfRow.getCell(8));
+                String applyTime=CarHwXls.convertCellToString(hssfRow.getCell(8));
+                applyTime = convertDate(applyTime);
+                
                 String memType=CarHwXls.getValue(hssfRow.getCell(9))==null?"":CarHwXls.getValue(hssfRow.getCell(9));
                 Integer intMemType = null;
                 if("车主".equals(memType)){
@@ -143,6 +157,54 @@ public class AddIncomeController {
 		return ResponseData.success();
 	}
 	
+	
+	@AutoDocMethod(description = "获取追加收益审核列表(分页)", value = "获取追加收益审核列表(分页)", response = AddIncomeExamineVO.class)
+	@RequestMapping(value = "console/income/examine/list", method = RequestMethod.GET)
+	public ResponseData<AddIncomeExamineVO> getAddIncomeExamineVO(AddIncomeExamineDTO req) {
+		log.info("AddIncomeController.getAddIncomeExamineVO req=[{}]", req);
+		AddIncomeExamineVO addIncomeExamineVO = addIncomeRemoteService.getAddIncomeExamineVO(req);
+		return ResponseData.success(addIncomeExamineVO);
+	}
+	
+	
+	@AutoDocMethod(description = "导出追加收益审核列表", value = "导出获取追加收益审核列表")
+	@RequestMapping(value = "console/income/examine/export")
+	public void exportExamine(AddIncomeExamineDTO req, HttpServletResponse response) {
+		log.info("AddIncomeController.exportExamine req=[{}]", req);
+		List<AddIncomeExamine> list = addIncomeRemoteService.listAllAddIncomeExamine(req);
+		try {
+            HSSFWorkbook wb = addIncomeService.export(list);
+            response.setContentType("application/vnd.ms-excel");  
+            response.setHeader("Content-disposition", "attachment;filename=settleList.xls");  
+            OutputStream ouputStream = response.getOutputStream();  
+            wb.write(ouputStream);  
+            ouputStream.flush();  
+            ouputStream.close(); 
+        } catch (Exception e) {    
+        	log.error("导出追加收益审核列表错误:", e);
+        }  
+	}
+	
+	
+	@AutoDocMethod(description = "获取追加收益审核日志", value = "获取追加收益审核日志")
+	@RequestMapping(value = "console/income/examinelog/list", method = RequestMethod.GET)
+	public ResponseData<List<AddIncomeExamineLog>> listAddIncomeExamineLog(@RequestParam(value="id",required = true) Integer id) {
+		log.info("AddIncomeController.listAddIncomeExamineLog id=[{}]", id);
+		List<AddIncomeExamineLog> list = addIncomeRemoteService.listAddIncomeExamineLog(id);
+		return ResponseData.success(list);
+	}
+	
+	
+	@AutoDocMethod(description = "追加收益审核操作", value = "追加收益审核操作", response = ResponseData.class)
+	@RequestMapping(value = "console/income/examineopt/update", method = RequestMethod.POST)
+	public ResponseData<?> examineOpt(@Valid @RequestBody AddIncomeExamineOptDTO req, BindingResult bindingResult) {
+		log.info("AddIncomeController.examineOpt req=[{}]", req);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		addIncomeRemoteService.examineOpt(req);
+		return ResponseData.success();
+	}
+	
+	
 	/**
 	 * 校验
 	 * @param list
@@ -162,5 +224,20 @@ public class AddIncomeController {
 				throw new ImportAddIncomeExcelException("第"+(i+1)+"行数据,用户类型为空或者格式不对！");
 			}
 		}
+	}
+	
+	
+	/**
+	 * 格式化日期
+	 * @param appdate
+	 * @return String
+	 */
+	public String convertDate(String appdate) {
+		if (StringUtils.isBlank(appdate)) {
+			return null;
+		}
+		Date applyDate = com.atzuche.order.commons.DateUtils.parseDate(appdate, com.atzuche.order.commons.DateUtils.fmt_next_yyyyMMdd);
+		appdate = com.atzuche.order.commons.DateUtils.formate(applyDate, com.atzuche.order.commons.DateUtils.fmt_yyyyMMdd);
+		return appdate;
 	}
 }

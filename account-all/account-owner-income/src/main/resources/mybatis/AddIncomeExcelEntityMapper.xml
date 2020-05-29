@@ -159,4 +159,8 @@
       del_flag = #{delFlag,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  
+  <update id ="delAddIncomeExcel" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO">
+    UPDATE add_income_excel SET del_flag=1,operate=#{operator},operate_time=now() where id=#{id} and status=0
+  </update >
 </mapper>

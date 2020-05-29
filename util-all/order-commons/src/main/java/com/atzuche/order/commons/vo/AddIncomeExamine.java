@@ -6,6 +6,7 @@ import com.atzuche.order.commons.DateUtils;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
 public class AddIncomeExamine {
+	@AutoDocProperty(value = "收益审核记录id")
     private Integer id;
     @AutoDocProperty(value = "订单号")
     private String orderNo;
