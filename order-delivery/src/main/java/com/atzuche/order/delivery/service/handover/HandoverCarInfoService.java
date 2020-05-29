@@ -130,11 +130,11 @@ public class HandoverCarInfoService {
                     handoverCarInfoDTO.setRealReturnAddrLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
                     handoverCarInfoDTO.setRealReturnAddrLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
                     if(renterOrderDeliveryEntity.getType().intValue() == 1) {
-                        handoverCarInfoDTO.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-                        handoverCarInfoDTO.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+                        handoverCarInfoDTO.setOilNum(StringUtils.isBlank(handoverCarInfoReqDTO.getOwnReturnOil()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+                        handoverCarInfoDTO.setMileageNum(StringUtils.isBlank(handoverCarInfoReqDTO.getOwnReturnKM()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
                     }else{
-                        handoverCarInfoDTO.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-                        handoverCarInfoDTO.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+                        handoverCarInfoDTO.setOilNum(StringUtils.isBlank(handoverCarInfoReqDTO.getRenterReturnOil()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+                        handoverCarInfoDTO.setMileageNum(StringUtils.isBlank(handoverCarInfoReqDTO.getRenterRetrunKM()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
                     }
                     handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
                     handoverCarService.addHandoverCarInfo(handoverCarVO, 1);
@@ -178,11 +178,11 @@ public class HandoverCarInfoService {
                     handoverCarInfoDTO.setRealReturnAddrLat(renterOrderDeliveryEntity.getRenterGetReturnAddrLat());
                     handoverCarInfoDTO.setRealReturnAddrLon(renterOrderDeliveryEntity.getRenterGetReturnAddrLon());
                     if(renterOrderDeliveryEntity.getType().intValue() == 1) {
-                        handoverCarInfoDTO.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
-                        handoverCarInfoDTO.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
+                        handoverCarInfoDTO.setOilNum(StringUtils.isBlank(handoverCarInfoReqDTO.getRenterReturnOil()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
+                        handoverCarInfoDTO.setMileageNum(StringUtils.isBlank(handoverCarInfoReqDTO.getRenterRetrunKM()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
                     }else{
-                        handoverCarInfoDTO.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
-                        handoverCarInfoDTO.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()) == null ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
+                        handoverCarInfoDTO.setOilNum(StringUtils.isBlank(handoverCarInfoReqDTO.getOwnReturnOil()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
+                        handoverCarInfoDTO.setMileageNum(StringUtils.isBlank(handoverCarInfoReqDTO.getOwnReturnKM()) == true ? 0:Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
                     }
                     handoverCarVO.setHandoverCarInfoDTO(handoverCarInfoDTO);
                     handoverCarService.addHandoverCarInfo(handoverCarVO, 2);
