@@ -82,6 +82,14 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
         return ownerHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
     }
 
+    public OwnerHandoverCarInfoEntity selectOwnerObjectByOrderNo(String orderNo) {
+        return ownerHandoverCarInfoMapper.selectOwnerObjectByOrderNo(orderNo);
+    }
+
+    public OwnerHandoverCarInfoEntity selectOwnerReturnObjectByOrderNo(String orderNo) {
+        return ownerHandoverCarInfoMapper.selectOwnerReturnObjectByOrderNo(orderNo);
+    }
+
     /**
      * 根据子订单号获取车主交接车数据
      *
@@ -155,9 +163,14 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo, String type) {
-        return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
+    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo) {
+        return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo);
     }
+
+    public OwnerHandoverCarRemarkEntity selectObjectReturnByOrderNoType(String orderNo) {
+        return ownerHandoverCarRemarkMapper.selectObjectReturnByOrderNoType(orderNo);
+    }
+
 
     public OwnerHandoverCarInfoEntity selectByRenterOrderNoAndType(String renterOrderNo, Integer type) {
         return ownerHandoverCarInfoMapper.selectByOwnerOrderNoAndType(renterOrderNo, type);

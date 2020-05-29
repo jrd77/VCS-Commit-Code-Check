@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * 全面保障费折扣信息
+ * 补充保障服务费折扣信息
  *
  * @author pengcheng.fu
  * @date 2020/3/31 15:26

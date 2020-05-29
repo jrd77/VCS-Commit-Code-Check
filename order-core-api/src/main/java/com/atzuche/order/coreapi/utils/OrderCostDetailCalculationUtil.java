@@ -118,7 +118,7 @@ public class OrderCostDetailCalculationUtil {
     }
 
     /**
-     * 从费用列表中获得全面保障费服务信息
+     * 从费用列表中获得补充保障服务费服务信息
      *
      * @param list 费用列表
      * @return OrderCostDTO

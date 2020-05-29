@@ -10,7 +10,7 @@ import com.autoyol.doc.annotation.AutoDocProperty;
  */
 public class CostItemVO {
 
-    @AutoDocProperty(value = "费用项编码,如:11110001(租金),11110002(平台保障费),11110003(全面保障费),11110004(平台手续费),11110005(取车费用)," +
+    @AutoDocProperty(value = "费用项编码,如:11110001(租金),11110002(平台保障费),11110003(补充保障服务费),11110004(平台手续费),11110005(取车费用)," +
             "11110006(还车费用),11110012(取车运能加价),11110013(还车运能加价),11110010(附加驾驶保险金额) 等")
     private String costCode;
 
@@ -26,7 +26,7 @@ public class CostItemVO {
     @AutoDocProperty(value = "费用项总金额")
     private Integer totalAmount;
     
-    @AutoDocProperty(value = "平台保障费和全面保障费的折扣,例如：0.7")
+    @AutoDocProperty(value = "平台保障费和补充保障服务费的折扣,例如：0.7")
     private Double discount;
 
     public String getCostCode() {
