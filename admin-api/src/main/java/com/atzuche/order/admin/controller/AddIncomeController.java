@@ -186,7 +186,7 @@ public class AddIncomeController {
 	}
 	
 	
-	@AutoDocMethod(description = "获取追加收益审核日志", value = "获取追加收益审核日志")
+	@AutoDocMethod(description = "获取追加收益审核日志", value = "获取追加收益审核日志", response = AddIncomeExamineLog.class)
 	@RequestMapping(value = "console/income/examinelog/list", method = RequestMethod.GET)
 	public ResponseData<List<AddIncomeExamineLog>> listAddIncomeExamineLog(@RequestParam(value="id",required = true) Integer id) {
 		log.info("AddIncomeController.listAddIncomeExamineLog id=[{}]", id);
