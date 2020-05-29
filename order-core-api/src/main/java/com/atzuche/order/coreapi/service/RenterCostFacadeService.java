@@ -146,7 +146,8 @@ public class RenterCostFacadeService {
         basicCostDetailVO.setFee(-RenterOrderCostDetailUtils.getFeeAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setAbatementInsuranceAmt(-RenterOrderCostDetailUtils.getAbatementInsuranceAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setExtraDriverInsuranceAmt(-RenterOrderCostDetailUtils.getExtraDriverInsureAmt(renterOrderCostDetailEntityList));
-
+        basicCostDetailVO.setTyreInsurAmt(-RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setDriverInsurAmt(-RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         //取送车费用
         RenterDeliveryFeeDetailVO deliveryFeeDetailVO = getRenterDeliveryFeeDetail(renterOrderCostDetailEntityList);
         basicCostDetailVO.setDeliveryFeeDetail(deliveryFeeDetailVO);
@@ -228,6 +229,9 @@ public class RenterCostFacadeService {
 
         detail.setSrvGetCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_GET_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT)));
         detail.setSrvReturnCostAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SRV_RETURN_COST)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT)));
+        detail.setTyreInsurAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_TYRE_INSURE_TOTAL_PRICES)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_TYRE_INSURE_TOTAL_PRICES)));
+        detail.setDriverInsurAmt(-(OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_DRIVER_INSURE_TOTAL_PRICES)+OrderSubsidyDetailUtils.getRenterSubsidyAmt(renterOrderSubsidyDetailEntityList, RenterCashCodeEnum.SUBSIDY_DRIVER_INSURE_TOTAL_PRICES)));
+
         return detail;
     }
 

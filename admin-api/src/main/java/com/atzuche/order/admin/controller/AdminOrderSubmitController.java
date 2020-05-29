@@ -5,6 +5,7 @@ import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.OrderSubmitService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.orderSubmit.AdminTransReqVO;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.res.OrderResVO;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -39,9 +40,7 @@ public class AdminOrderSubmitController {
     @AutoDocMethod(description = "下单", value = "下单", response = OrderResVO.class)
     @PostMapping("/submit")
     public ResponseData<OrderResVO> submit(@Valid @RequestBody AdminTransReqVO adminOrderReqVO, BindingResult bindingResult, HttpServletRequest request) throws Exception {
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         OrderResVO orderResVO = orderSubmitService.submit(adminOrderReqVO,request);
         try{
             adminLogService.insertLog(AdminOpTypeEnum.SUBMIT_ORDER,orderResVO.getOrderNo(), JSON.toJSONString(adminOrderReqVO));

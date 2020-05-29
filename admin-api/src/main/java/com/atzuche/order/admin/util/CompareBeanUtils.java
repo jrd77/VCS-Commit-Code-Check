@@ -46,7 +46,7 @@ public class CompareBeanUtils<T> {
 
     public static List<String> excludeColumnList = Arrays.asList("dispatchingSubsidySystem","abatementSubsidySystem",
             "insureSubsidySystem","dispatchingSubsidySystem","insureSubsidySystem","abatementSubsidySystem",
-            "driverInsurSubsidySystem","tyreInsurSubsidySystem","total","longGetReturnCarCostSubsidy");
+            "driverInsurSubsidySystem","tyreInsurSubsidySystem");
 
     /**
      * 需要对比字段描述
@@ -356,7 +356,6 @@ public class CompareBeanUtils<T> {
         }
     }
 
-
     public static boolean compareString(String oldStr,String newStr){
         if(oldStr == null && newStr == null){
             return false;
@@ -375,4 +374,5 @@ public class CompareBeanUtils<T> {
         }
         return true;
     }
+
 }

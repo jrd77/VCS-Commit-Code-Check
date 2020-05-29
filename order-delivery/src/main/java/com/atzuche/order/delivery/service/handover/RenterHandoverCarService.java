@@ -80,8 +80,12 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, String type) {
-        return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
+    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo) {
+        return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo);
+    }
+
+    public RenterHandoverCarInfoEntity selectObjectReturnByOrderNo(String orderNo) {
+        return renterHandoverCarInfoMapper.selectObjectReturnByOrderNo(orderNo);
     }
 
     /**
@@ -110,8 +114,12 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo, String type) {
-        return renterHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
+    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo) {
+        return renterHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo);
+    }
+
+    public RenterHandoverCarRemarkEntity selectObjectReturnByOrderNoType(String orderNo) {
+        return renterHandoverCarRemarkMapper.selectObjectReturnByOrderNoType(orderNo);
     }
 
     /**

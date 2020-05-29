@@ -172,7 +172,7 @@ public class RenterOrderService {
         RenterOrderResVO renterOrderResVO = new RenterOrderResVO();
         //1. 租车费用计算
         RenterOrderCostReqDTO renterOrderCostReqDTO = buildRenterOrderCostReqDTO(renterOrderReqVO);
-        // 获取平台保障费和全面保障费折扣补贴
+        // 获取平台保障费和补充保障服务费折扣补贴
   		List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, null);
   		renterOrderCostReqDTO.setSubsidyOutList(insurDiscountSubsidyList);
 

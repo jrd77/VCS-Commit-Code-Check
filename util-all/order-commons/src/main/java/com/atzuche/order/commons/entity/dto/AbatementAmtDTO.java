@@ -38,7 +38,7 @@ public class AbatementAmtDTO {
 	 */
 	private List<String> carLabelIds;
     /**
-     * 是否计算全面保障费
+     * 是否计算补充保障服务费
      */
 	private Boolean isAbatement;
 	/**

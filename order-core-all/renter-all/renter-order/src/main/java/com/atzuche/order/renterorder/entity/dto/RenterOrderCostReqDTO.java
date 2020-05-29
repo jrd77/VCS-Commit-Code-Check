@@ -28,7 +28,7 @@ public class RenterOrderCostReqDTO implements Serializable{
     private InsurAmtDTO insurAmtDTO;
 
     /**
-     * 全面保障费参数
+     * 补充保障服务费参数
      */
     private AbatementAmtDTO abatementAmtDTO;
 

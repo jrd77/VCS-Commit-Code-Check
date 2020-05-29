@@ -119,7 +119,7 @@ public class ModifyOrderFeeService {
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
 		RenterOrderReqVO renterOrderReqVO = modifyOrderService.convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
-		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
+		// 基础费用计算包含租金，手续费，基础保障费用，补充保障服务费，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = modifyOrderService.getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 获取修改订单违约金
 		List<RenterOrderFineDeatailEntity> renterFineList = modifyOrderService.getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
@@ -241,7 +241,7 @@ public class ModifyOrderFeeService {
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
 		RenterOrderReqVO renterOrderReqVO = modifyOrderService.convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
-		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
+		// 基础费用计算包含租金，手续费，基础保障费用，补充保障服务费，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = modifyOrderService.getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 获取修改订单违约金
 		List<RenterOrderFineDeatailEntity> renterFineList = modifyOrderService.getRenterFineList(modifyOrderDTO, initRenterOrder, deliveryList, renterOrderCostRespDTO);
@@ -335,7 +335,7 @@ public class ModifyOrderFeeService {
 		Integer poundageAmt = getCostAmtByCode(costList, RenterCashCodeEnum.FEE.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.FEE.getCashNo());
 		// 平台保障费
 		Integer insuranceAmt = getCostAmtByCode(costList, RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo());
-		// 全面保障费
+		// 补充保障服务费
 		Integer abatementAmt = getCostAmtByCode(costList, RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
 		// 附加驾驶人保险费
 		Integer totalDriverFee = getCostAmtByCode(costList, RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo()); 

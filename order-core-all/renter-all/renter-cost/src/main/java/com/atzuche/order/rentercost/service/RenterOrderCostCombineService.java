@@ -311,25 +311,25 @@ public class RenterOrderCostCombineService {
 	
 	
 	/**
-	 * 获取全面保障费返回结果
+	 * 获取补充保障服务费返回结果
 	 * @param abatementAmtDTO
 	 * @return List<RenterOrderCostDetailEntity>
 	 */
 	public List<RenterOrderCostDetailEntity> listAbatementAmtEntity(AbatementAmtDTO abatementAmtDTO) {
 		log.info("listAbatementAmtEntity abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
 		if (abatementAmtDTO == null) {
-			log.error("listAbatementAmtEntity 获取全面保障费abatementAmtDTO对象为空");
-			Cat.logError("获取全面保障费abatementAmtDTO对象为空", new RenterCostParameterException());
+			log.error("listAbatementAmtEntity 获取补充保障服务费abatementAmtDTO对象为空");
+			Cat.logError("获取补充保障服务费abatementAmtDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
 		if(abatementAmtDTO.getIsAbatement() == null || !abatementAmtDTO.getIsAbatement()){
-		    log.info("不需要计算全面保障费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
+		    log.info("不需要计算补充保障服务费！abatementAmtDTO=[{}]",JSON.toJSONString(abatementAmtDTO));
             return new ArrayList<>();
         }
 		CostBaseDTO costBaseDTO = abatementAmtDTO.getCostBaseDTO();
 		if (costBaseDTO == null) {
-			log.error("listAbatementAmtEntity 获取全面保障费abatementAmtDTO.costBaseDTO对象为空");
-			Cat.logError("获取全面保障费abatementAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
+			log.error("listAbatementAmtEntity 获取补充保障服务费abatementAmtDTO.costBaseDTO对象为空");
+			Cat.logError("获取补充保障服务费abatementAmtDTO.costBaseDTO对象为空", new RenterCostParameterException());
 			throw new RenterCostParameterException();
 		}
 		// 指导价
@@ -1023,7 +1023,7 @@ public class RenterOrderCostCombineService {
         }
         // 租金+保险+不计免赔+手续费
         Integer sumJudgeFreeFee = getReturnCarCostReqDto.getSumJudgeFreeFee();
-        // 订单的租金，平台保障费，全面保障费，平台手续费总和小于300，则取还车服务不享受免费
+        // 订单的租金，平台保障费，补充保障服务费，平台手续费总和小于300，则取还车服务不享受免费
         sumJudgeFreeFee = sumJudgeFreeFee == null ? 0:sumJudgeFreeFee;
         String sumJudgeFreeFeeStr = String.valueOf(sumJudgeFreeFee);
         log.info("取还车费用计算，租金+保险+不计免赔+手续费 sumJudgeFreeFee=[{}]", sumJudgeFreeFee);

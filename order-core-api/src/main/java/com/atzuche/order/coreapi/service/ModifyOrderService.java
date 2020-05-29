@@ -191,7 +191,7 @@ public class ModifyOrderService {
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
 		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
-		// 基础费用计算包含租金，手续费，基础保障费用，全面保障费用，附加驾驶人保障费用，取还车费用计算和超运能费用计算
+		// 基础费用计算包含租金，手续费，基础保障费用，补充保障服务费，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 调用风控审核
 		modifyOrderRiskService.checkModifyRisk(modifyOrderDTO, renterOrderCostRespDTO);
@@ -869,7 +869,7 @@ public class ModifyOrderService {
 				subsidyList.addAll(modifyOrderDTO.getRenterSubsidyList());
 			}
 		} else {
-			// 获取平台保障费和全面保障费折扣补贴
+			// 获取平台保障费和补充保障服务费折扣补贴
 			List<RenterOrderSubsidyDetailDTO> insurDiscountSubsidyList = insurAbamentDiscountService.getInsureDiscountSubsidy(renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList());
 			// 获取费用补贴列表
 			subsidyList = getRenterSubsidyList(modifyOrderDTO, renterOrderCostReqDTO, modifyOrderDTO.getRenterSubsidyList(), initCostList, initSubsidyList, insurDiscountSubsidyList);
@@ -943,13 +943,13 @@ public class ModifyOrderService {
 	        }
 		}
 		if (subMap == null || subMap.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo()) == null) {
-			//获取全面保障费
+			//获取补充保障服务费
 	        List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
 	        Integer comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
 	        if (insurDiscountSubsidyList != null) {
 	        	comprehensiveEnsureAmount += insurDiscountSubsidyList.stream().filter(cost -> {return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getSubsidyCostCode());}).mapToInt(RenterOrderSubsidyDetailDTO::getSubsidyAmount).sum();
 	        }
-	        // 修改前全面保障费
+	        // 修改前补充保障服务费
 	        Integer initAbatementAmt = 0;
 	        if (initCostList != null && !initCostList.isEmpty()) {
 	        	initAbatementAmt += initCostList.stream().filter(cost -> {return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode());}).mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();
@@ -961,7 +961,7 @@ public class ModifyOrderService {
 	        	Integer subsidyAmount = Math.abs(comprehensiveEnsureAmount) - Math.abs(initAbatementAmt);
 	        	// 产生补贴
 	        	RenterOrderSubsidyDetailDTO subsidyDetail = insurAbamentDiscountService.convertToRenterOrderSubsidyDetailDTO(renterOrderCostReqDTO.getCostBaseDTO(), subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE, 
-	        			SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, RenterCashCodeEnum.ABATEMENT_INSURE, "修改订单全面保障费不退还");
+	        			SubsidySourceCodeEnum.RENTER, SubsidySourceCodeEnum.PLATFORM, RenterCashCodeEnum.ABATEMENT_INSURE, "修改订单补充保障服务费不退还");
 	        	renterSubsidyList.add(subsidyDetail);
 	        }
 		}
@@ -1014,10 +1014,10 @@ public class ModifyOrderService {
         	renterSubsidyList.add(subsidyDetail);
         }
         
-        // 获取全面保障费
+        // 获取补充保障服务费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
         Integer comprehensiveEnsureAmount = comprehensiveEnsureList.stream().collect(Collectors.summingInt(RenterOrderCostDetailEntity::getTotalAmount));
-        // 修改前全面保障费
+        // 修改前补充保障服务费
         Integer initAbatementAmt = 0;
         if (initCostList != null && !initCostList.isEmpty()) {
         	initAbatementAmt += initCostList.stream().filter(cost -> {return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(cost.getCostCode());}).mapToInt(RenterOrderCostDetailEntity::getTotalAmount).sum();

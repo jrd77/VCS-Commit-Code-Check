@@ -65,6 +65,12 @@ public class RenterSubsidyDetailVO {
     @AutoDocProperty(value = "还车服务费补贴")
     private Integer srvReturnCostAmt=0;
 
+    @AutoDocProperty(value = "轮胎保障服务费补贴")
+    public Integer tyreInsurAmt=0;
+    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
+    public Integer driverInsurAmt=0;
+
+
     public Integer getTotalSubsidy(){
         int total=0;
         if(platformCouponSubsidyAmt!=null){
@@ -133,6 +139,12 @@ public class RenterSubsidyDetailVO {
         }
         if(longRentDecutAmt != null){
             total=total+longRentDecutAmt;
+        }
+        if(tyreInsurAmt != null){
+            total=total+tyreInsurAmt;
+        }
+        if(driverInsurAmt != null){
+            total=total+driverInsurAmt;
         }
         return total;
     }
