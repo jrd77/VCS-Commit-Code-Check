@@ -154,6 +154,7 @@ public class AddIncomeController {
 	public ResponseData<?> updateStatus(@Valid @RequestBody AddIncomeExcelOptDTO req, BindingResult bindingResult) {
 		log.info("AddIncomeController.updateStatus req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
+		req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
 		addIncomeRemoteService.updateStatus(req);
 		return ResponseData.success();
 	}
@@ -203,6 +204,7 @@ public class AddIncomeController {
 	public ResponseData<?> examineOpt(@Valid @RequestBody AddIncomeExamineOptDTO req, BindingResult bindingResult) {
 		log.info("AddIncomeController.examineOpt req=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
+		req.setOperator(AdminUserUtil.getAdminUser().getAuthName());
 		addIncomeRemoteService.examineOpt(req);
 		return ResponseData.success();
 	}

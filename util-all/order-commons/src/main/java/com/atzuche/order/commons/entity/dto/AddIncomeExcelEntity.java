@@ -116,6 +116,10 @@ public class AddIncomeExcelEntity {
 	}
 
 	public String getStatusStr() {
+		if (delFlag != null && delFlag.intValue() == 1) {
+			statusStr = "已删除";
+			return statusStr;
+		}
 		if (status != null) {
 			if (status.intValue() == 0) {
 				statusStr = "未审核";

@@ -24,6 +24,7 @@ import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelQueryDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
+import com.atzuche.order.commons.exceptions.ImportAddIncomeExcelException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,7 +95,15 @@ public class AddIncomeExcelService {
 			nowContent.setAddId(nowAddIncomeExcelEntity.getId());
 			nowContentList.add(nowContent);
 		}
-		addIncomeExcelContextEntityMapper.saveAddIncomeExcelContextBatch(nowContentList);
+		try {
+			addIncomeExcelContextEntityMapper.saveAddIncomeExcelContextBatch(nowContentList);
+		} catch (Exception e) {
+			String resultMsg = exceptionProcess(e);
+			if (StringUtils.isNotBlank(resultMsg)) {
+				throw new ImportAddIncomeExcelException(resultMsg);
+			}
+			throw e;
+		}
 	}
 	
 	
@@ -122,12 +131,18 @@ public class AddIncomeExcelService {
 			addIncomeExcelEntityMapper.delAddIncomeExcel(addIncomeExcelOptDTO);
 		}
 		if (flag != ADD_INCOME_DELL) {
+			// 查询该批次下已经操作过的追加收益数量
+			int count = addIncomeExamineMapper.getCountByAddIdAndStatus(addId);
+			if (count > 0) {
+				throw new AddIncomeCanNotWithdrawException();
+			}
 			AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
 			addIncomeExcelEntity.setId(addId);
 			addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
 			addIncomeExcelEntity.setOperateTime(new Date());
 			addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
 			addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+			addIncomeExcelContextEntityMapper.updateDelete(addId);
 		}
 	}
 	
@@ -167,6 +182,33 @@ public class AddIncomeExcelService {
 		}
 		// 删除该批次的追加收益
 		addIncomeExamineMapper.delAddIncomeExamineByAddId(addId);
+	}
+	
+	
+	public String exceptionProcess(Exception e){
+		String keyStart="Duplicate entry";
+		String keyEnd="for key 'order_detail_type_amt_unique'";
+		String result = null;
+		if(e==null){
+			return result;
+		}
+		Throwable t = e.getCause();
+		if (t == null) {
+			return result;
+		}
+		String msg = t.getMessage();
+		int index=0;
+		if (StringUtils.isNotBlank(msg)){
+			if (msg.matches(keyStart+" .+ "+keyEnd)) {
+				String uiniqueContent=msg.replace(keyStart, "").replace(keyEnd, "");
+				index=uiniqueContent.indexOf("-");
+				if(index!=-1){
+					String [] uiniqueContents = uiniqueContent.split("-");
+ 					result="订单号:"+uiniqueContents[1]+"已追加收益！";
+				} 
+			}
+		}
+		return result;
 	}
 	
 }

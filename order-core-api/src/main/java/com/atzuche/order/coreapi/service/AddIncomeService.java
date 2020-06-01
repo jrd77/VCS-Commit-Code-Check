@@ -221,10 +221,14 @@ public class AddIncomeService {
 			return;
 		}
 		// 抵扣新欠款
-		AccountDeductDebtReqVO debtReq = new AccountDeductDebtReqVO(addIncomeExamine.getMemNo().toString(), amt, RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getCashNo(), RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getTxt(), operator);
-		debtReq.setUniqueNo(String.valueOf(addIncomeExamine.getId()));
-		int realDebtAmt = accountDebtService.deductDebt(debtReq);
-		amt = amt - realDebtAmt;
+		// 查询历史总欠款
+        int historyDebtAmt = accountDebtService.getAccountDebtNumByMemNo(addIncomeExamine.getMemNo().toString());
+        if(historyDebtAmt < 0){
+        	AccountDeductDebtReqVO debtReq = new AccountDeductDebtReqVO(addIncomeExamine.getMemNo().toString(), amt, RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getCashNo(), RenterCashCodeEnum.ADD_INCOME_OWNER_INCOME_TO_HISTORY_AMT.getTxt(), operator);
+    		debtReq.setUniqueNo(String.valueOf(addIncomeExamine.getId()));
+    		int realDebtAmt = accountDebtService.deductDebt(debtReq);
+    		amt = amt - realDebtAmt;
+        }
 		int oldRealDebtAmt = 0;
 		if (amt > 0) {
 			// 继续抵扣老欠款
