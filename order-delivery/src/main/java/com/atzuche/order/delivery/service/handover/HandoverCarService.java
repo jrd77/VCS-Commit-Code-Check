@@ -258,10 +258,8 @@ public class HandoverCarService {
         OwnerHandoverCarRemarkEntity ownerHandoverCarRemarkEntity = null;
         if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
             ownerHandoverCarInfoEntity = ownerHandoverCarService.selectOwnerObjectByOrderNo(handoverCarInfoDTO.getOrderNo());
-            ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo());
         } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
             ownerHandoverCarInfoEntity = ownerHandoverCarService.selectOwnerReturnObjectByOrderNo(handoverCarInfoDTO.getOrderNo());
-            ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectObjectReturnByOrderNoType(handoverCarInfoDTO.getOrderNo());
         }
          log.info("更新车主交接车和备注信息，handoverCarInfoDTO：[]", JSONObject.toJSONString(handoverCarInfoDTO));
         if (Objects.nonNull(ownerHandoverCarInfoEntity)) {
@@ -273,7 +271,12 @@ public class HandoverCarService {
             ownerHandoverCarInfo.setIsDelete(0);
             ownerHandoverCarService.insertOwnerHandoverCarInfo(ownerHandoverCarInfo);
         }
-        if (Objects.nonNull(handoverCarRemarkDTO)) {
+        if (Objects.nonNull(handoverCarRemarkDTO) && StringUtils.isNotBlank(handoverCarRemarkDTO.getOrderNo())) {
+            if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
+                ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectOwnerHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo());
+            } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
+                ownerHandoverCarRemarkEntity = ownerHandoverCarService.selectObjectReturnByOrderNoType(handoverCarInfoDTO.getOrderNo());
+            }
             if (null == ownerHandoverCarRemarkEntity) {
                 OwnerHandoverCarRemarkEntity ownerRemarkEntity = new OwnerHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, ownerRemarkEntity);
