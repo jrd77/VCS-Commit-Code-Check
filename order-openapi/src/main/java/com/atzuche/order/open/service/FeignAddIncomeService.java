@@ -21,8 +21,8 @@ import com.atzuche.order.commons.vo.AddIncomeExamineLog;
 import com.atzuche.order.commons.vo.AddIncomeExamineVO;
 import com.autoyol.commons.web.ResponseData;
 
-//@FeignClient(name="order-center-api")
-@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
+@FeignClient(name="order-center-api")
+//@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
 public interface FeignAddIncomeService {
 
 	/**
