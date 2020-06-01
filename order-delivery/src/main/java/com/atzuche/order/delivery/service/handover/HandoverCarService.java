@@ -43,7 +43,6 @@ public class HandoverCarService {
      * 新增交接车数据
      * @param handoverCarVO
      */
-    //@Transactional(rollbackFor = Exception.class)
     public void addHandoverCarInfo(HandoverCarVO handoverCarVO, int userType) {
         if (Objects.isNull(handoverCarVO) || handoverCarVO.getHandoverCarInfoDTO().getType() == null) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
@@ -216,11 +215,8 @@ public class HandoverCarService {
         RenterHandoverCarRemarkEntity renterHandoverCarRemarkEntity = null;
         if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
             handoverCarInfoEntity = renterHandoverCarService.selectObjectByOrderNo(handoverCarInfoDTO.getOrderNo());
-            renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo());
         } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
             handoverCarInfoEntity = renterHandoverCarService.selectObjectReturnByOrderNo(handoverCarInfoDTO.getOrderNo());
-            renterHandoverCarRemarkEntity = renterHandoverCarService.selectObjectReturnByOrderNoType(handoverCarInfoDTO.getOrderNo());
-
         }
         log.info("更新租客交接车和备注信息，handoverCarInfoDTO：[]", JSONObject.toJSONString(handoverCarInfoDTO));
         if (Objects.nonNull(handoverCarInfoEntity)) {
@@ -232,7 +228,12 @@ public class HandoverCarService {
             BeanUtils.copyProperties(handoverCarInfoDTO, renterHandoverCarInfoEntity);
             renterHandoverCarService.insertRenterHandoverCar(renterHandoverCarInfoEntity);
         }
-        if (Objects.nonNull(handoverCarRemarkDTO)) {
+        if (Objects.nonNull(handoverCarRemarkDTO) && StringUtils.isNotBlank(handoverCarRemarkDTO.getOrderNo())) {
+            if (handoverCarInfoDTO.getType() == 1 || handoverCarInfoDTO.getType() == 3) {
+                renterHandoverCarRemarkEntity = renterHandoverCarService.selectRenterHandoverRemarkByOrderNoType(handoverCarInfoDTO.getOrderNo());
+            } else if (handoverCarInfoDTO.getType() == 2 || handoverCarInfoDTO.getType() == 4) {
+                renterHandoverCarRemarkEntity = renterHandoverCarService.selectObjectReturnByOrderNoType(handoverCarInfoDTO.getOrderNo());
+            }
             if (null == renterHandoverCarRemarkEntity) {
                 RenterHandoverCarRemarkEntity renterRemarkEntity = new RenterHandoverCarRemarkEntity();
                 BeanUtils.copyProperties(handoverCarRemarkDTO, renterRemarkEntity);
