@@ -319,7 +319,7 @@
 			<if test="memNo != null and memNo != ''">AND mem_no=#{memNo}</if>
 			<if test="name != null and name != ''">AND name=#{name}</if>
 			<if test="department != null and department != ''">AND department=#{department}</if>
-			<if test="status != null and status != ''">AND status=#{status}</if>
+			<if test="status != null">AND status=#{status}</if>
 			<if test="createTimeBegin != null and createTimeBegin != ''">AND create_time &gt;= STR_TO_DATE('${createTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
 			<if test="createTimeEnd != null and createTimeEnd != ''">AND create_time &lt;= STR_TO_DATE('${createTimeEnd}', '%Y-%m-%d %k:%i:%s')</if>
 			<if test="examineTimeBegin != null and examineTimeBegin != ''">AND update_time &gt;= STR_TO_DATE('${examineTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
