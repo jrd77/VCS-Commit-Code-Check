@@ -63,4 +63,32 @@ public class PlatformToRenterSubsidyResVO {
     String feeSubsidy;
     @AutoDocProperty(value = "长租-取还车费用补贴")
     String longGetReturnCarCostSubsidy;
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/5/28 13:40
+     * @Description: adminlog记录日志用
+     *
+     **/
+    public static void setDefaultValue(PlatformToRenterSubsidyResVO oldData){
+        oldData.setDispatchingSubsidy(oldData.getDispatchingSubsidy()==null?"0":oldData.getDispatchingSubsidy());
+        oldData.setDispatchingSubsidySystem(oldData.getDispatchingSubsidySystem()==null?"0":oldData.getDispatchingSubsidySystem());
+        oldData.setOilSubsidy(oldData.getOilSubsidy()==null?"0":oldData.getOilSubsidy());
+        oldData.setCleanCarSubsidy(oldData.getCleanCarSubsidy()==null?"0":oldData.getCleanCarSubsidy());
+        oldData.setGetReturnDelaySubsidy(oldData.getGetReturnDelaySubsidy()==null?"0":oldData.getGetReturnDelaySubsidy());
+        oldData.setDelaySubsidy(oldData.getDelaySubsidy()==null?"0":oldData.getDelaySubsidy());
+        oldData.setTrafficSubsidy(oldData.getTrafficSubsidy()==null?"0":oldData.getTrafficSubsidy());
+        oldData.setInsureSubsidy(oldData.getInsureSubsidy()==null?"0":oldData.getInsureSubsidy());
+        oldData.setInsureSubsidySystem(oldData.getInsureSubsidySystem()==null?"0":oldData.getInsureSubsidySystem());
+        oldData.setTyreInsurSubsidy(oldData.getTyreInsurSubsidy()==null?"0":oldData.getTyreInsurSubsidy());
+        oldData.setTyreInsurSubsidySystem(oldData.getTyreInsurSubsidySystem()==null?"0":oldData.getTyreInsurSubsidySystem());
+        oldData.setDriverInsurSubsidy(oldData.getDriverInsurSubsidy()==null?"0":oldData.getDriverInsurSubsidy());
+        oldData.setDriverInsurSubsidySystem(oldData.getDriverInsurSubsidySystem()==null?"0":oldData.getDriverInsurSubsidySystem());
+        oldData.setRentAmtSubsidy(oldData.getRentAmtSubsidy()==null?"0":oldData.getRentAmtSubsidy());
+        oldData.setOtherSubsidy(oldData.getOtherSubsidy()==null?"0":oldData.getOtherSubsidy());
+        oldData.setAbatementSubsidy(oldData.getAbatementSubsidy()==null?"0":oldData.getAbatementSubsidy());
+        oldData.setAbatementSubsidySystem(oldData.getAbatementSubsidySystem()==null?"0":oldData.getAbatementSubsidySystem());
+        oldData.setFeeSubsidy(oldData.getFeeSubsidy()==null?"0":oldData.getFeeSubsidy());
+        //oldData.setLongGetReturnCarCostSubsidy(oldData.getLongGetReturnCarCostSubsidy()==null?"0":oldData.getLongGetReturnCarCostSubsidy());
+    }
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.Objects;
  */
 @Service
 @Slf4j
-public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
+public class RenterHandoverCarService{
 
     @Resource
     RenterHandoverCarInfoMapper renterHandoverCarInfoMapper;
@@ -37,10 +38,10 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param handoverCarInfoReqDTO
      */
     @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
-
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntityList = selectRenterByOrderNo(handoverCarInfoReqDTO.getOrderNo());
+    public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO,List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntityList) {
+        if(CollectionUtils.isEmpty(renterHandoverCarInfoEntityList)){
+            return;
+        }
         renterHandoverCarInfoEntityList.stream().forEach(r -> {
             if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
                 if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil()) && !handoverCarInfoReqDTO.getRenterReturnOil().equals("0")) {
@@ -80,8 +81,12 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, String type) {
-        return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
+    public RenterHandoverCarInfoEntity selectObjectByOrderNo(String orderNo) {
+        return renterHandoverCarInfoMapper.selectObjectByOrderNo(orderNo);
+    }
+
+    public RenterHandoverCarInfoEntity selectObjectReturnByOrderNo(String orderNo) {
+        return renterHandoverCarInfoMapper.selectObjectReturnByOrderNo(orderNo);
     }
 
     /**
@@ -110,8 +115,12 @@ public class RenterHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo, String type) {
-        return renterHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
+    public RenterHandoverCarRemarkEntity selectRenterHandoverRemarkByOrderNoType(String orderNo) {
+        return renterHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo);
+    }
+
+    public RenterHandoverCarRemarkEntity selectObjectReturnByOrderNoType(String orderNo) {
+        return renterHandoverCarRemarkMapper.selectObjectReturnByOrderNoType(orderNo);
     }
 
     /**

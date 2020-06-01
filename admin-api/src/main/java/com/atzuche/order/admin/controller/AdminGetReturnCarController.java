@@ -49,9 +49,7 @@ public class AdminGetReturnCarController {
 	@RequestMapping(value="calculateGetOrReturnCost",method = RequestMethod.POST)
 	public ResponseData calculateGetOrReturnCost(@RequestBody @Validated GetReturnRequestVO getReturnRequestVO, HttpServletRequest request, HttpServletResponse response,BindingResult bindingResult) {
         logger.info("calculateGetOrReturnCost controller params={}",getReturnRequestVO.toString());
-		if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+		BindingResultUtil.checkBindingResult(bindingResult);
 //        BindingResultUtil.checkBindingResult(bindingResult);
         
         try {

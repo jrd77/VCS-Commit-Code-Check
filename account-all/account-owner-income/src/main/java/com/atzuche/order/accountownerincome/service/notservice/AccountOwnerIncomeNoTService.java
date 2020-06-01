@@ -7,13 +7,17 @@ import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMappe
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.autoyol.commons.web.ErrorCode;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -30,15 +34,7 @@ public class AccountOwnerIncomeNoTService {
     @Autowired
     private AccountOwnerIncomeDetailMapper accountOwnerIncomeDetailMapper;
 
-    /**
-     * 查询车主收益信息
-     * @param memNo
-     * @return
-     */
-    public int getOwnerIncomeAmt(String memNo) {
-        AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(memNo);
-        return accountOwnerIncome.getIncomeAmt();
-    }
+
 
     public AccountOwnerIncomeEntity getOwnerIncome(String memNo) {
         if(Objects.isNull(memNo)){
@@ -51,6 +47,18 @@ public class AccountOwnerIncomeNoTService {
             accountOwnerIncome.setVersion(NumberUtils.INTEGER_ONE);
             accountOwnerIncome.setIncomeAmt(NumberUtils.INTEGER_ZERO);
             accountOwnerIncomeMapper.insertSelective(accountOwnerIncome);
+        }
+        return accountOwnerIncome;
+    }
+
+    public AccountOwnerIncomeEntity getOwnerIncomeByMemNO(String memNo) {
+        if(Objects.isNull(memNo)){
+            Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
+        }
+        AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
+        if(Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())){
+            accountOwnerIncome = new AccountOwnerIncomeEntity();
+            accountOwnerIncome.setIncomeAmt(0);
         }
         return accountOwnerIncome;
     }
@@ -71,8 +79,8 @@ public class AccountOwnerIncomeNoTService {
             throw new AccountOwnerIncomeExamineException();
         }
     }
-    
-    
+
+
     /**
      * 更新车主收益(提现)
      * @param accountOwnerIncomeDetail
@@ -107,4 +115,17 @@ public class AccountOwnerIncomeNoTService {
         accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
     }
 
+    public List<AccountOwnerIncomeListDTO> getIncomTotalListByMemNoList(List<Integer> memNoList) {
+        List<AccountOwnerIncomeEntity> accountOwnerIncomeEntities = accountOwnerIncomeMapper.selectByMemNoList(memNoList);
+        List<AccountOwnerIncomeListDTO> accountOwnerIncomeList=  new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(accountOwnerIncomeEntities)){
+            for (AccountOwnerIncomeEntity accountOwnerIncomeEntity : accountOwnerIncomeEntities) {
+                AccountOwnerIncomeListDTO accountOwnerIncomeListDTO = new AccountOwnerIncomeListDTO();
+                accountOwnerIncomeListDTO.setIncomeAmt(accountOwnerIncomeEntity.getIncomeAmt());
+                accountOwnerIncomeListDTO.setMemNo(accountOwnerIncomeEntity.getMemNo());
+                accountOwnerIncomeList.add(accountOwnerIncomeListDTO);
+            }
+        }
+        return accountOwnerIncomeList;
+    }
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
+public class OwnerHandoverCarService {
 
     @Resource
     OwnerHandoverCarInfoMapper ownerHandoverCarInfoMapper;
@@ -36,10 +37,10 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      * @param handoverCarInfoReqDTO
      */
     @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO) {
-
-        List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntityList = selectOwnerByOrderNo(handoverCarInfoReqDTO.getOrderNo());
+    public void updateHandoverCarOilMileageNum(HandoverCarInfoReqDTO handoverCarInfoReqDTO,List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntityList ) {
+        if (CollectionUtils.isEmpty(ownerHandoverCarInfoEntityList)) {
+            return;
+        }
         ownerHandoverCarInfoEntityList.stream().forEach(r -> {
             if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
                 if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil())) {
@@ -56,7 +57,7 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
                     r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
                 }
             }
-            log.info("车主更新油耗里程--->>>>:handoverCarInfoReqDTO:[{}],r-->>[{}]",handoverCarInfoReqDTO.toString(), JSONObject.toJSONString(r));
+            log.info("车主更新油耗里程--->>>>:handoverCarInfoReqDTO:[{}],r-->>[{}]", handoverCarInfoReqDTO.toString(), JSONObject.toJSONString(r));
             updateOwnerHandoverInfoByPrimaryKey(r);
         });
     }
@@ -80,6 +81,14 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      */
     public OwnerHandoverCarInfoEntity selectObjectByOrderNo(String orderNo, String type) {
         return ownerHandoverCarInfoMapper.selectObjectByOrderNo(orderNo, type);
+    }
+
+    public OwnerHandoverCarInfoEntity selectOwnerObjectByOrderNo(String orderNo) {
+        return ownerHandoverCarInfoMapper.selectOwnerObjectByOrderNo(orderNo);
+    }
+
+    public OwnerHandoverCarInfoEntity selectOwnerReturnObjectByOrderNo(String orderNo) {
+        return ownerHandoverCarInfoMapper.selectOwnerReturnObjectByOrderNo(orderNo);
     }
 
     /**
@@ -155,9 +164,14 @@ public class OwnerHandoverCarService implements IUpdateHandoverCarInfo {
      * @param orderNo
      * @return
      */
-    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo, String type) {
-        return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo, type);
+    public OwnerHandoverCarRemarkEntity selectOwnerHandoverRemarkByOrderNoType(String orderNo) {
+        return ownerHandoverCarRemarkMapper.selectObjectByOrderNoType(orderNo);
     }
+
+    public OwnerHandoverCarRemarkEntity selectObjectReturnByOrderNoType(String orderNo) {
+        return ownerHandoverCarRemarkMapper.selectObjectReturnByOrderNoType(orderNo);
+    }
+
 
     public OwnerHandoverCarInfoEntity selectByRenterOrderNoAndType(String renterOrderNo, Integer type) {
         return ownerHandoverCarInfoMapper.selectByOwnerOrderNoAndType(renterOrderNo, type);

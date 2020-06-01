@@ -64,7 +64,7 @@ public class HandoverCarOilMileageService {
         handoverCarInfoReqVO.setRenterHandoverCarDTO(renterHandoverCarInfoReqDTO);
         handoverCarInfoReqVO.setOwnerHandoverCarDTO(ownerHandoverCarInfoReqDTO);
         try {
-            handoverCarInfoService.updateHandoverCarInfo(handoverCarInfoReqVO);
+            handoverCarInfoService.updateNewHandoverCarInfo(handoverCarInfoReqVO);
         } catch (Exception e) {
             log.info("更新仁云取还车油耗数据发生异常,具体原因:{}", e.getMessage());
             Cat.logError("更新仁云取还车油耗数据发生异常", e);
@@ -95,7 +95,7 @@ public class HandoverCarOilMileageService {
         ownerHandoverCarInfoDTO.setOrderNo(mileageOilVO.getOrderNo());
         handoverCarInfoVO.setOwnerHandoverCarDTO(ownerHandoverCarInfoDTO);
         try {
-            handoverCarInfoService.updateHandoverCarInfo(handoverCarInfoVO);
+            handoverCarInfoService.updateNewHandoverCarInfo(handoverCarInfoVO);
         } catch (Exception e) {
             log.info("更新车主取还车油耗数据发生异常,具体原因:{}", e.getMessage());
             Cat.logError("更新车主取还车油耗数据发生异常", e);

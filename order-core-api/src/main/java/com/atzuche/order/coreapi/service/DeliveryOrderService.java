@@ -99,7 +99,7 @@ public class DeliveryOrderService {
      */
     public void updateHandoverCarInfo(DeliveryCarVO deliveryCarVO) throws Exception {
         log.info("入参handoverCarReqVO：[{}]", deliveryCarVO.toString());
-        handoverCarInfoService.updateHandoverCarInfo(createHandoverCarInfoParams(deliveryCarVO));
+        handoverCarInfoService.updateNewHandoverCarInfo(createHandoverCarInfoParams(deliveryCarVO));
     }
     
     

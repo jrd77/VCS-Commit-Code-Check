@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderSettleServiceTest {
 	@Autowired
 	OrderSettleService orderSettleService;
+	@Autowired 
+    PayCallbackService payCallbackService;
 	
 	@Test
 	public void testGetRenterCostByOrderNo() {
@@ -50,7 +52,7 @@ public class OrderSettleServiceTest {
 
 	@Test
 	public void testSettleOrder() {
-		fail("Not yet implemented");
+		orderSettleService.settleOrder("29933292500299", payCallbackService);
 	}
 
 	@Test

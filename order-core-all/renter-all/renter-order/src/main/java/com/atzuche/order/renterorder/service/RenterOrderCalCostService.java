@@ -120,7 +120,7 @@ public class RenterOrderCalCostService {
         }
         LOGGER.info("租客费用-获取平台保障费-insurAmt=[{}]", insurAmt);
 
-        //获取全面保障费
+        //获取补充保障服务费
         List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
         List<RenterOrderSubsidyDetailDTO> comprehensiveEnsureSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo());
         int comprehensiveEnsureSubsidyAmount = comprehensiveEnsureSubsidy == null ? 0 :
@@ -133,7 +133,7 @@ public class RenterOrderCalCostService {
         if (comprehensiveEnsureSubsidy != null) {
             subsidyList.addAll(comprehensiveEnsureSubsidy);
         }
-        LOGGER.info("租客费用-获取全面保障费-comprehensiveEnsureAmount=[{}]", comprehensiveEnsureAmount);
+        LOGGER.info("租客费用-获取补充保障服务费-comprehensiveEnsureAmount=[{}]", comprehensiveEnsureAmount);
         
         //获取轮胎/轮毂保障费
         RenterOrderCostDetailEntity tyreInsurAmtEntity = renterOrderCostCombineService.getTyreInsurAmtEntity(renterOrderCostReqDTO.getInsurAmtDTO());
@@ -229,7 +229,7 @@ public class RenterOrderCalCostService {
         }
         LOGGER.info("租客费用-获取取还车超运能费用getReturnOverCostAmount=[{}]", getReturnOverCostAmount);
 
-        //租车费用 = 租金+平台保障费+全面保障费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
+        //租车费用 = 租金+平台保障费+补充保障服务费+取还车费用+取还车超运能费用+附加驾驶员费用+手续费；
         int rentCarAmount = rentAmt + insurAmt + comprehensiveEnsureAmount + getReturnAmt + getReturnOverCostAmount + extraDriverAmount + serviceAmount;
         LOGGER.info("租客费用-租车费用rentCarAmount=[{}]", rentCarAmount);
 

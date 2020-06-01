@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import com.atzuche.order.admin.service.RemoteFeignService;
+import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.autoyol.commons.web.ErrorCode;
@@ -42,9 +43,7 @@ public class AdminOrderCouponController {
     @PostMapping("queryDisCouponByOrderNo")
     public ResponseData<AdminGetDisCouponListResVO> queryDisCouponByOrderNo(@Valid @RequestBody AdminGetDisCouponListReqVO req, BindingResult bindingResult) {
         logger.info("AdminOrderCouponController queryDisCouponByOrderNo start. param [{}]", req);
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         ResponseData<AdminGetDisCouponListResVO> result = remoteFeignService.queryDisCouponByOrderNoFromRemote(req);
         //ResponseData<AdminGetDisCouponListResVO>  result = feignOrderCouponService.getDisCouponListByOrderNo(req);
         logger.info("AdminOrderCouponController queryDisCouponByOrderNo end. result [{}]",result);

@@ -40,6 +40,13 @@ public class OrderWzSettleService {
             log.info("OrderSettleService settleOrders init data settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
+            // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
+            boolean checkFlag = orderWzSettleNewService.check(settleOrders.getRenterOrder());
+            if(!checkFlag) {
+            	log.info("提前终止结算，当前违章结算状态不符合。orderNo [{}]",orderNo);
+    			return;
+    		}
+            
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             log.info("OrderSettleService settleOrderFirst start [{}]",GsonUtils.toJson(settleOrders));
             orderWzSettleNewService.settleOrderFirst(settleOrders);

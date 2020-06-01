@@ -21,4 +21,14 @@ public class PlatformToOwnerDTO {
     private String stopCar;
     @AutoDocProperty("超里程费用")
     private String extraMileage;
+
+    public static void setDefaultValue(PlatformToOwnerDTO oldData){
+        oldData.setOliAmt(oldData.getOliAmt()==null?"0":oldData.getOliAmt());
+        oldData.setTimeOut(oldData.getTimeOut()==null?"0":oldData.getTimeOut());
+        oldData.setModifyOrderTimeAndAddrAmt(oldData.getModifyOrderTimeAndAddrAmt()==null?"0":oldData.getModifyOrderTimeAndAddrAmt());
+        oldData.setCarWash(oldData.getCarWash()==null?"0":oldData.getCarWash());
+        oldData.setDlayWait(oldData.getDlayWait()==null?"0":oldData.getDlayWait());
+        oldData.setStopCar(oldData.getStopCar()==null?"0":oldData.getStopCar());
+        oldData.setExtraMileage(oldData.getExtraMileage()==null?"0":oldData.getExtraMileage());
+    }
 }

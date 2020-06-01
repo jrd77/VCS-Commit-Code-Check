@@ -9,7 +9,7 @@ public enum ExceptionCodeEnum {
 	PARAM_ERROR("400002","参数错误"),
 	RENT_COST_ERROR("400400","租金计算错误"),
 	INSUR_COST_ERROR("400401","平台保障费计算错误"),
-	ABATEMENT_COST_ERROR("400402","全面保障费计算错误"),
+	ABATEMENT_COST_ERROR("400402","补充保障服务费计算错误"),
 	SRV_GET_RETURN_COST_ERROR("400403","取还车费用计算错误"),
 	SRV_GET_RETURN_OVER_COST_ERROR("400404","取还车超运能附加费计算错误"),
 	EXTRA_DRIVER_INSURE_COST_ERROR("400405","附加驾驶人费用计算错误"),
