@@ -44,18 +44,18 @@ public class RenterHandoverCarService{
         }
         renterHandoverCarInfoEntityList.stream().forEach(r -> {
             if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
-                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil()) && !handoverCarInfoReqDTO.getRenterReturnOil().equals("0")) {
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil())) {
                     r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));
                 }
-                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterRetrunKM()) && !handoverCarInfoReqDTO.getRenterRetrunKM().equals("0")) {
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterRetrunKM())) {
                     r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterRetrunKM()));
                 }
             }
             else if (r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue()) {
-                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnOil()) && !handoverCarInfoReqDTO.getOwnReturnOil().equals("0")) {
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnOil())) {
                     r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnOil()));
                 }
-                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnKM()) && !handoverCarInfoReqDTO.getOwnReturnKM().equals("0")) {
+                if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getOwnReturnKM())) {
                     r.setMileageNum(Integer.valueOf(handoverCarInfoReqDTO.getOwnReturnKM()));
                 }
             }
