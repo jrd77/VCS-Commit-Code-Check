@@ -113,6 +113,7 @@ public class AddIncomeController {
                 String describe=CarHwXls.getValue(hssfRow.getCell(6));
                 String department=CarHwXls.getValue(hssfRow.getCell(7));
                 String applyTime=CarHwXls.convertCellToString(hssfRow.getCell(8));
+                log.info("追加收益导入applyTime={}",applyTime);
                 applyTime = convertDate(applyTime);
                 
                 String memType=CarHwXls.getValue(hssfRow.getCell(9))==null?"":CarHwXls.getValue(hssfRow.getCell(9));
@@ -129,7 +130,7 @@ public class AddIncomeController {
 				context.setAmt(StringUtils.isBlank(amt)?null:Integer.valueOf(amt));
 				context.setDescribe(StringUtils.isBlank(describe)?null:describe);
 				context.setDepartment(StringUtils.isBlank(department)?null:department);
-				context.setApplyTime(StringUtils.isBlank(applyTime)?null:applyTime);
+				context.setApplyTime(applyTime);
 				context.setDetailType(StringUtils.isBlank(detailType)?null:detailType);
 				context.setMemType(intMemType);
 				list.add(context);
