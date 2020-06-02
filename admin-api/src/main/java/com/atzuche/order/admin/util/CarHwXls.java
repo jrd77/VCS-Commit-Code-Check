@@ -235,7 +235,7 @@ public class CarHwXls {
 		if (cell == null)
 			return "";
 		// POI对单元格日期处理很弱，没有针对的类型，日期类型取出来的也是一个double值，所以同样作为数值类型
-		// 解决日期2006/11/02格式读入后出错的问题，POI读取后变成“02-十一月-2006”格式
+		// 解决日期xxxx/xx/xx格式读入后出错的问题，POI读取后变成“xx-xx月-xxxx”格式
 		if (cell.toString().contains("-")) {
 			String ans = "";
 			try {
@@ -251,7 +251,7 @@ public class CarHwXls {
 	}
 
 	/**
-	 * 判断是否是“02-十一月-2006”格式的日期类型
+	 * 判断是否是“xx-xx月-xxx”格式的日期类型
 	 */
 	private static boolean checkDate(String str) {
 		String[] dataArr = str.split("-");
