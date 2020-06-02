@@ -128,21 +128,18 @@ public class AddIncomeExcelService {
 			// 撤回
 			withdrawAddIncome(addId);
 		} else if (flag == ADD_INCOME_DELL) {
-			addIncomeExcelEntityMapper.delAddIncomeExcel(addIncomeExcelOptDTO);
+			int delFlag = addIncomeExcelEntityMapper.delAddIncomeExcel(addIncomeExcelOptDTO);
+			if (delFlag > 0) {
+				addIncomeExcelContextEntityMapper.delAddIncomeExcelContext(addId);
+			}
 		}
 		if (flag != ADD_INCOME_DELL) {
-			// 查询该批次下已经操作过的追加收益数量
-			int count = addIncomeExamineMapper.getCountByAddIdAndStatus(addId);
-			if (count > 0) {
-				throw new AddIncomeCanNotWithdrawException();
-			}
 			AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
 			addIncomeExcelEntity.setId(addId);
 			addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
 			addIncomeExcelEntity.setOperateTime(new Date());
 			addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
 			addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
-			addIncomeExcelContextEntityMapper.updateDelete(addId);
 		}
 	}
 	
@@ -182,6 +179,8 @@ public class AddIncomeExcelService {
 		}
 		// 删除该批次的追加收益
 		addIncomeExamineMapper.delAddIncomeExamineByAddId(addId);
+		// 删除明细
+		addIncomeExcelContextEntityMapper.delAddIncomeExcelContext(addId);
 	}
 	
 	

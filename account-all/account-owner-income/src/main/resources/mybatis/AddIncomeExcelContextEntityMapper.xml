@@ -237,10 +237,9 @@
     where add_id = #{addId}
   </select>
   
-  <update id="updateDelete" parameterType="Long" >
-    update add_income_excel_context
-    set is_delete = 1
+  <delete id="delAddIncomeExcelContext" parameterType="Long" >
+    delete from add_income_excel_context
     where add_id = #{addId}
-  </update>
+  </delete>
   
 </mapper>

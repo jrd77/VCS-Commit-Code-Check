@@ -1,6 +1,7 @@
 package com.atzuche.order.admin.controller;
 
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +50,7 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 import com.autoyol.platformcost.DateUtils;
 
+import feign.Logger;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -77,7 +79,12 @@ public class AddIncomeController {
 			return ResponseData.createErrorCodeResponse("111001", "请选择上传文件！");
 		}
 		String fileType = addExcelFile.getContentType();
-		String fileName = addExcelFile.getOriginalFilename();
+		String fileName = "addImcomeTemplate.xlsx";
+		try {
+			fileName = new String(addExcelFile.getOriginalFilename().getBytes("ISO-8859-1"), "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			log.error("追加收益导入获取文件名出错 e:", e1);
+		}
 		if (!fileType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 				&& !fileType.equals("application/vnd.ms-excel")
 				&& !fileType.equals("application/x-excel")) {
@@ -86,10 +93,10 @@ public class AddIncomeController {
 		}
 		try {
 			List<AddIncomeExcelContextEntity> list = new ArrayList<AddIncomeExcelContextEntity>();
-			Workbook workbook =ExcelUtils.getWorkBook(addExcelFile.getOriginalFilename(),addExcelFile.getInputStream());
+			Workbook workbook =ExcelUtils.getWorkBook(fileName,addExcelFile.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			String str = DateUtils.formate(LocalDateTime.now(), DateUtils.DATE_DEFAUTE);
-			String suffixes = addExcelFile.getOriginalFilename().substring(addExcelFile.getOriginalFilename().lastIndexOf("."), addExcelFile.getOriginalFilename().length());
+			String suffixes = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 			String key = "account_log/add/"+str.substring(0, 8)+"/"+CommonUtils.getRandomNumUpChar(8)+suffixes;
 			for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
 				AddIncomeExcelContextEntity context = new AddIncomeExcelContextEntity();
