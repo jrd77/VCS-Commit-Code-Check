@@ -284,4 +284,14 @@ public class CashierRefundApplyNoTService {
     	}
     	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
+
+    public CashierRefundApplyEntity selectByQn(String orderNo, String paySerialNumber) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByQn(orderNo,paySerialNumber);
+        return cashierRefundApplyEntity;
+    }
+
+    public CashierRefundApplyEntity selectByOrerNoAndPayTransNo(String orderNo, String payTransNo) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(orderNo,payTransNo);
+        return cashierRefundApplyEntity;
+    }
 }

@@ -40,4 +40,6 @@ public interface CashierRefundApplyMapper{
     
     List<CashierRefundApplyEntity> getRefundApplyByOrderNo(@Param("orderNo")String orderNo);
     List<CashierRefundApplyEntity> getRefundApplyByOrderNoPayKind(@Param("orderNo")String orderNo,@Param("payKind")String payKind);
+
+    CashierRefundApplyEntity selectByOrerNoAndPayTransNo(@Param("orderNo")String orderNo, @Param("payTransNo")String payTransNo);
 }

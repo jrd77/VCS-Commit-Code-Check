@@ -193,5 +193,9 @@
 		select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo} AND pay_kind = #{payKind}
 	</select>
+	<select id="selectByOrerNoAndPayTransNo" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo}
+    </select>
 
 </mapper>
