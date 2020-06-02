@@ -29,7 +29,7 @@ public class InsurAbamentDiscountService {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 
 	/**
-	 * 获取平台保障费和全面保障费折扣补贴
+	 * 获取平台保障费和补充保障服务费折扣补贴
 	 * @param renterOrderCostReqDTO
 	 * @param updSubsidyList
 	 * @return List<RenterOrderSubsidyDetailDTO>
@@ -41,7 +41,7 @@ public class InsurAbamentDiscountService {
 		}
 		CostBaseDTO costBaseDTO = renterOrderCostReqDTO.getCostBaseDTO();
 		if (costBaseDTO == null) {
-			log.error("获取平台保障费和全面保障费折扣补贴getInsureDiscountSubsidy costBaseDTO is null");
+			log.error("获取平台保障费和补充保障服务费折扣补贴getInsureDiscountSubsidy costBaseDTO is null");
 			return renterSubsidyList;
 		}
 		Integer inmsrpGuidePrice = null;
@@ -51,7 +51,7 @@ public class InsurAbamentDiscountService {
 		}
 		// 获取保险和不计免赔的折扣
 		double insureDiscount = CommonUtils.getInsureDiscount(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), inmsrpGuidePrice);
-		log.info("获取平台保障费和全面保障费折扣补贴getInsureDiscountSubsidy orderNo=[{}],insureDiscount=[{}]",costBaseDTO.getOrderNo(), insureDiscount);
+		log.info("获取平台保障费和补充保障服务费折扣补贴getInsureDiscountSubsidy orderNo=[{}],insureDiscount=[{}]",costBaseDTO.getOrderNo(), insureDiscount);
 		if (insureDiscount >= 1.0) {
 			return renterSubsidyList;
 		}
@@ -73,12 +73,12 @@ public class InsurAbamentDiscountService {
 	        }
 		}
 		if (subMap == null || subMap.get(RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo()) == null) {
-			//获取全面保障费
+			//获取补充保障服务费
 	        List<RenterOrderCostDetailEntity> comprehensiveEnsureList = renterOrderCostCombineService.listAbatementAmtEntity(renterOrderCostReqDTO.getAbatementAmtDTO());
 	        if (comprehensiveEnsureList != null && !comprehensiveEnsureList.isEmpty()) {
 	        	List<RenterOrderSubsidyDetailDTO> abatementSubsidyList =
                         comprehensiveEnsureList.stream().map(fr -> getAbatementSubsidy(costBaseDTO, fr,
-                                insureDiscount,"修改订单全面保障费打折补贴")).collect(Collectors.toList());
+                                insureDiscount,"修改订单补充保障服务费打折补贴")).collect(Collectors.toList());
 	        	renterSubsidyList.addAll(abatementSubsidyList);
 	        }
 		}
@@ -87,7 +87,7 @@ public class InsurAbamentDiscountService {
 	
 	
 	/**
-	 * 获取全面保障费打折补贴
+	 * 获取补充保障服务费打折补贴
 	 * @param costBaseDTO
 	 * @param abatementSubsidyEntity
 	 * @param insureDiscount
@@ -107,7 +107,7 @@ public class InsurAbamentDiscountService {
         	return convertToRenterOrderSubsidyDetailDTO(costBaseDTO, subsidyAmount, SubsidyTypeCodeEnum.ABATEMENT_INSURE,
                     SubsidySourceCodeEnum.PLATFORM, SubsidySourceCodeEnum.RENTER, RenterCashCodeEnum.ABATEMENT_INSURE, subsidyDesc);
         }
-        log.info("获取全面保障费打折补贴.insurAmt:[{}],afterDiscountInsurAmt:[{}]", insurAmt, afterDiscountInsurAmt);
+        log.info("获取补充保障服务费打折补贴.insurAmt:[{}],afterDiscountInsurAmt:[{}]", insurAmt, afterDiscountInsurAmt);
         return null;
 	}
 	

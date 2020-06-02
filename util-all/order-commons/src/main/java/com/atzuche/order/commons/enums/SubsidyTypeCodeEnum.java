@@ -27,7 +27,7 @@ public enum SubsidyTypeCodeEnum {
      */
     RENT_AMT("3", "租金"),
     INSURE_AMT("4", "平台保障费"),
-    ABATEMENT_INSURE("5", "全面保障费"),
+    ABATEMENT_INSURE("5", "补充保障服务费"),
     RENT_COST_AMT("6", "租车费用"),
     ADJUST_AMT("7", "调价费用"),
     CONSOLE_AMT("8", "管理后台操作费用"),

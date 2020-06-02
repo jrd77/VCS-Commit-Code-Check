@@ -274,7 +274,19 @@
 
 	<select id="selectObjectByOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List"/> from owner_handover_car_info where
-		order_no = #{orderNo} and type = ${type} and is_delete = 0
+		order_no = #{orderNo} and `type` = #{type} and is_delete = 0
+		order by id desc limit 1
+	</select>
+
+	<select id="selectOwnerObjectByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/> from owner_handover_car_info where
+		order_no = #{orderNo} and `type` in (1,3) and is_delete = 0
+		order by id desc limit 1
+	</select>
+
+	<select id="selectOwnerReturnObjectByOrderNo" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/> from owner_handover_car_info where
+		order_no = #{orderNo} and `type` in (2,4) and is_delete = 0
 		order by id desc limit 1
 	</select>
 

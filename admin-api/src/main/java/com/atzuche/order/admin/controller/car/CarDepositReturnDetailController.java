@@ -56,9 +56,7 @@ public class CarDepositReturnDetailController {
     @PostMapping(value = "/console/deposit/getCarDepositReturnDetail")
     public ResponseData<CarDepositRespVo> getCarDepositReturnDetail(@Valid @RequestBody CarDepositReqVO reqVo, BindingResult bindingResult) {
         log.info("车辆押金信息-reqVo={}", JSON.toJSONString(reqVo));
-        if (bindingResult.hasErrors()) {
-            return new ResponseData<>(ErrorCode.INPUT_ERROR.getCode(), ErrorCode.INPUT_ERROR.getText());
-        }
+        BindingResultUtil.checkBindingResult(bindingResult);
         return carDepositReturnDetailService.getCarDepositReturnDetail(reqVo);
     }
 

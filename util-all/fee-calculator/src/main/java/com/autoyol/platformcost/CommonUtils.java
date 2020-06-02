@@ -82,7 +82,7 @@ public class CommonUtils {
 	private static final int CARPURCHASEPRICE_300000 = 300000;
 	
     /**
-               * 初始化全面保障费单价配置
+               * 初始化补充保障服务费单价配置
      */
     public static final List<AbatementConfig> ABATEMENTCONFIG_List = new ArrayList<AbatementConfig>() {
     	/**
@@ -673,7 +673,7 @@ public class CommonUtils {
 	}
 	
 	/**
-	 * 获取平台保证费和全面保障费折扣
+	 * 获取平台保证费和补充保障服务费折扣
 	 * @param rentTime 取车时间
 	 * @param revertTime 还车时间
 	 * @return double
@@ -686,7 +686,7 @@ public class CommonUtils {
 			Duration duration = Duration.between(rentTime,revertTime);
 			// 获取相差的分钟数
 			long minutes = duration.toMinutes();
-			// 如果24h制租期大于7天，平台保障费和全面保障费打7折
+			// 如果24h制租期大于7天，平台保障费和补充保障服务费打7折
 			if (minutes >= HOURS_PER_DAY*7*60) {
 				// 计算保费指导价
 				int guidePrice = inmsrpGuidePrice == null ? 0:inmsrpGuidePrice;

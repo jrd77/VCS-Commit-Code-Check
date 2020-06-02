@@ -32,7 +32,7 @@ public class AccountRenterCostReqVO {
      */
     private int basicEnsureAmount;
     /**
-     * 全面保障费用
+     * 补充保障服务费
      */
     private int comprehensiveEnsureAmount;
     /**
