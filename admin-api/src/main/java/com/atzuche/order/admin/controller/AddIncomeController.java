@@ -113,7 +113,6 @@ public class AddIncomeController {
                 String describe=CarHwXls.getValue(hssfRow.getCell(6));
                 String department=CarHwXls.getValue(hssfRow.getCell(7));
                 String applyTime=CarHwXls.convertCellToString(hssfRow.getCell(8));
-                log.info("追加收益导入applyTime={}",applyTime);
                 applyTime = convertDate(applyTime);
                 
                 String memType=CarHwXls.getValue(hssfRow.getCell(9))==null?"":CarHwXls.getValue(hssfRow.getCell(9));
