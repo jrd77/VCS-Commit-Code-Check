@@ -83,12 +83,15 @@ public class DeliveryOrderService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
         ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(OilCostTypeEnum.getOilCostType(renterGoodsDetailDTO.getCarEngineType())));
-        String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" :String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
+        String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
         ownerGetAndReturnCarDTO.setDayKM(daykM);
-        ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume())+"L");
+        ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()) + "L");
         boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
         int carType = renterGoodsDetailDTO.getCarType();
-        return deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(),deliveryCarDTO,ownerGetAndReturnCarDTO,isEscrowCar,renterGoodsDetailDTO.getCarEngineType(),carType,renterGoodsDetailDTO);
+        int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
+        DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, isEscrowCar, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
+        deliveryCarVO.setMaxOilNumber(String.valueOf(oilTotalCalibration));
+        return deliveryCarVO;
     }
     
     
