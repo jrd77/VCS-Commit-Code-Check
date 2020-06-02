@@ -137,21 +137,21 @@ public class HandoverCarInfoService {
         if (handoverCarReqVO.getRenterHandoverCarDTO() != null){
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getRenterHandoverCarDTO();
             renterHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,renterHandoverCarInfoEntityList);
+            HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
+            HandoverCarInfoReqDTO renterHandoverCarInfo = new HandoverCarInfoReqDTO();
+            BeanUtils.copyProperties(renterHandoverCarInfoReqDTO,renterHandoverCarInfo);
             //车主端是否需要更新
             for(RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList){
                 if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
                     //还车 自取自还
-                    HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
-                    HandoverCarInfoReqDTO renterHandoverCarInfo = new HandoverCarInfoReqDTO();
-                    BeanUtils.copyProperties(renterHandoverCarInfoReqDTO,renterHandoverCarInfo);
                     if(renterOrderDeliveryEntity.getType() == 2){
-                        renterHandoverCarInfoReqDTO.setRenterRetrunKM(null);
-                        renterHandoverCarInfoReqDTO.setRenterReturnOil(null);
+                        renterHandoverCarInfo.setOwnReturnOil(null);
+                        renterHandoverCarInfo.setOwnReturnKM(null);
                         ownerHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfoReqDTO,ownerHandoverCarInfoEntityList);
                     }
                     if(renterOrderDeliveryEntity.getType() == 1){
-                        renterHandoverCarInfo.setOwnReturnOil(null);
-                        renterHandoverCarInfo.setOwnReturnKM(null);
+                        renterHandoverCarInfoReqDTO.setRenterRetrunKM(null);
+                        renterHandoverCarInfoReqDTO.setRenterReturnOil(null);
                         ownerHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfo,ownerHandoverCarInfoEntityList);
                     }
                 }
@@ -161,21 +161,21 @@ public class HandoverCarInfoService {
         if (handoverCarReqVO.getOwnerHandoverCarDTO() != null){
             HandoverCarInfoReqDTO handoverCarInfoReqDTO = handoverCarReqVO.getOwnerHandoverCarDTO();
             //更新车主交接车相关信息
-                ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,ownerHandoverCarInfoEntityList);
+            ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,ownerHandoverCarInfoEntityList);
+            HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
+            HandoverCarInfoReqDTO renterHandoverCarInfo = new HandoverCarInfoReqDTO();
+            BeanUtils.copyProperties(renterHandoverCarInfoReqDTO,renterHandoverCarInfo);
             for(RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList){
                 if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
                     //还车 自取自还(租客)
-                    HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
-                    HandoverCarInfoReqDTO renterHandoverCarInfo = new HandoverCarInfoReqDTO();
-                    BeanUtils.copyProperties(renterHandoverCarInfoReqDTO,renterHandoverCarInfo);
                     if(renterOrderDeliveryEntity.getType() == 2){
-                        renterHandoverCarInfoReqDTO.setOwnReturnKM(null);
-                        renterHandoverCarInfoReqDTO.setOwnReturnOil(null);
+                        renterHandoverCarInfo.setRenterReturnOil(null);
+                        renterHandoverCarInfo.setRenterRetrunKM(null);
                         renterHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfoReqDTO,renterHandoverCarInfoEntityList);
                     }
                     if(renterOrderDeliveryEntity.getType() == 1){
-                        renterHandoverCarInfo.setRenterReturnOil(null);
-                        renterHandoverCarInfo.setRenterRetrunKM(null);
+                        renterHandoverCarInfoReqDTO.setOwnReturnKM(null);
+                        renterHandoverCarInfoReqDTO.setOwnReturnOil(null);
                         renterHandoverCarService.updateHandoverCarOilMileageNum(renterHandoverCarInfo,renterHandoverCarInfoEntityList);
                     }
                 }
