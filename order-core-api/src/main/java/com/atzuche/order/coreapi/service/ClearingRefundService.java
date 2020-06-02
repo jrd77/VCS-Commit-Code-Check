@@ -23,8 +23,8 @@ public class ClearingRefundService {
 
 
     public ResponseData<?> clearingRefundSubmitToRefund(ClearingRefundReqVO clearingRefundReqVO) {
-        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyNoTService.selectByOrerNoAndPayTransNo(clearingRefundReqVO.getOrderNo(),clearingRefundReqVO.getPayTransNo());
-        cashierPayService.refundOrderPay(cashierRefundApplyEntity);
+
+
         return null;
     }
 }
