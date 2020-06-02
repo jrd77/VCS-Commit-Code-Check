@@ -164,7 +164,7 @@ public class HandoverCarInfoService {
                 ownerHandoverCarService.updateHandoverCarOilMileageNum(handoverCarInfoReqDTO,ownerHandoverCarInfoEntityList);
             for(RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntityList){
                 if (Objects.nonNull(renterOrderDeliveryEntity) && renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 0) {
-                    //还车 自取自还
+                    //还车 自取自还(租客)
                     HandoverCarInfoReqDTO renterHandoverCarInfoReqDTO = handoverCarInfoReqDTO;
                     HandoverCarInfoReqDTO renterHandoverCarInfo = new HandoverCarInfoReqDTO();
                     BeanUtils.copyProperties(renterHandoverCarInfoReqDTO,renterHandoverCarInfo);
