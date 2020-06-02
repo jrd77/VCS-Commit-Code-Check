@@ -61,5 +61,8 @@ public class OwnerMemberDTO implements Serializable {
 		 * 身份证号码
 		 */
 		private String idNo;
-    					
+        /**
+         * 车辆登记
+         */
+        private String carChargeLevel;
 }

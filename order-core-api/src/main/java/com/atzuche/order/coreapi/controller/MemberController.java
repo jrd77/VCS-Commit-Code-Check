@@ -1,8 +1,10 @@
 package com.atzuche.order.coreapi.controller;
 
 
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
+import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -26,6 +28,8 @@ public class MemberController {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private RenterMemberService renterMemberService;
+    @Autowired
+    private OwnerGoodsService ownerGoodsService;
     /*
      * @Author ZhangBin
      * @Date 2020/4/28 11:21
@@ -40,6 +44,9 @@ public class MemberController {
             ownerMemberDTO = new OwnerMemberDTO();
             BeanUtils.copyProperties(ownerMemberEntity,ownerMemberDTO);
         }
+        String ownerOrderNo = ownerMemberEntity.getOwnerOrderNo();
+        OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
+        ownerMemberDTO.setCarChargeLevel(ownerGoodsDetail==null?null:ownerGoodsDetail.getCarChargeLevel()==null?null:String.valueOf(ownerGoodsDetail.getCarChargeLevel()));
         return ResponseData.success(ownerMemberDTO);
     }
 
