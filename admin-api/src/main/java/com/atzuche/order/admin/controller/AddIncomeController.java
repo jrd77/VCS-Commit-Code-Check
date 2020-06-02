@@ -74,12 +74,12 @@ public class AddIncomeController {
 	
 	@AutoDocMethod(description = "追加收益导入", value = "追加收益导入", response = ResponseData.class)
 	@RequestMapping("console/income/excel/import")
-	public ResponseData<?> importAddIncomeExcel(@RequestParam("addExcelFile") MultipartFile addExcelFile) {
+	public ResponseData<?> importAddIncomeExcel(@RequestParam("addExcelFile") MultipartFile addExcelFile,String filename) {
 		if(addExcelFile == null || addExcelFile.isEmpty()) {
 			return ResponseData.createErrorCodeResponse("111001", "请选择上传文件！");
 		}
 		String fileType = addExcelFile.getContentType();
-		String fileName = addExcelFile.getOriginalFilename();//"addImcomeTemplate.xlsx";
+		String fileName = StringUtils.isBlank(filename) ? addExcelFile.getOriginalFilename():filename;//"addImcomeTemplate.xlsx";
 		log.info("追加收益导入fileName=[{}],fileType=[{}]",fileName,fileType);
 		/*
 		 * try { fileName = new
@@ -122,15 +122,15 @@ public class AddIncomeController {
     			}else if("租客".equals(memType)){
     				intMemType = 0;
     			}
-                context.setOrderNo(orderNo);
+                context.setOrderNo(StringUtils.isBlank(orderNo)?null:orderNo);
 				context.setMemNo(StringUtils.isBlank(memNo)?null:Integer.valueOf(memNo));
 				context.setMobile(StringUtils.isBlank(mobile)?null:Long.valueOf(mobile));
-				context.setType(type);
+				context.setType(StringUtils.isBlank(type)?null:type);
 				context.setAmt(StringUtils.isBlank(amt)?null:Integer.valueOf(amt));
-				context.setDescribe(describe);
-				context.setDepartment(department);
-				context.setApplyTime(applyTime);
-				context.setDetailType(detailType);
+				context.setDescribe(StringUtils.isBlank(describe)?null:describe);
+				context.setDepartment(StringUtils.isBlank(department)?null:department);
+				context.setApplyTime(StringUtils.isBlank(applyTime)?null:applyTime);
+				context.setDetailType(StringUtils.isBlank(detailType)?null:detailType);
 				context.setMemType(intMemType);
 				list.add(context);
 			}
