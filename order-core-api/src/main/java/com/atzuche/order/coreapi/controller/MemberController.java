@@ -46,7 +46,7 @@ public class MemberController {
         }
         String ownerOrderNo = ownerMemberEntity.getOwnerOrderNo();
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(ownerOrderNo, false);
-        ownerMemberDTO.setCarChargeLevel(ownerGoodsDetail==null?null:ownerGoodsDetail.getCarChargeLevel()==null?null:String.valueOf(ownerGoodsDetail.getCarChargeLevel()));
+        ownerMemberDTO.setCarChargeLevel(ownerGoodsDetail==null?null:ownerGoodsDetail.getCarChargeLevel()==null?null:ownerGoodsDetail.getCarChargeLevel());
         return ResponseData.success(ownerMemberDTO);
     }
 

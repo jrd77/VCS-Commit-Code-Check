@@ -37,7 +37,7 @@ public class AdminCarOwnerInfoService {
         //    respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberDTO.getMemType()).getRightName());
         //}
         if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getCarChargeLevel())){
-            respVO.setMemLevel(ownerMemberDTO.getCarChargeLevel());
+            respVO.setMemLevel(String.valueOf(ownerMemberDTO.getCarChargeLevel()));
         }
         if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getPhone())){
             respVO.setOwnerPhone(ownerMemberDTO.getPhone());
