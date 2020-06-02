@@ -56,6 +56,9 @@ public class AddIncomeExamine {
     private String updateOp;
 
     private Integer isDelete;
+    
+    @AutoDocProperty(value = "内部分类 1:普通,2:套餐,3:长租")
+    private String category;
 
     public Integer getId() {
         return id;
@@ -294,6 +297,14 @@ public class AddIncomeExamine {
 
 	public void setExamineTime(String examineTime) {
 		this.examineTime = examineTime;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
     
 }

@@ -46,6 +46,8 @@ public class AddIncomeExamine {
     private String updateOp;
 
     private Integer isDelete;
+    
+    private String category;
 
     public Integer getId() {
         return id;
@@ -222,4 +224,13 @@ public class AddIncomeExamine {
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
     }
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+    
 }

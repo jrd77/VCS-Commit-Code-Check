@@ -1,9 +1,11 @@
 package com.atzuche.order.coreapi.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,8 @@ import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
 import com.atzuche.order.coreapi.service.AddIncomeService;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import com.autoyol.commons.web.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,8 @@ public class AddIncomeController {
 	private AddIncomeService addIncomeService;
 	@Autowired
 	private AddIncomeExamineService addIncomeExamineService;
+	@Autowired
+	private OrderSourceStatService orderSourceStatService;
 
 	/**
 	 * 获取追加收益文件列表
@@ -90,6 +96,10 @@ public class AddIncomeController {
     public ResponseData<AddIncomeExamineVO> getAddIncomeExamineVO(@RequestBody AddIncomeExamineDTO req) {
 		log.info("获取追加收益审核列表(分页) AddIncomeExamineDTO=[{}]", req);
 		AddIncomeExamineVO addIncomeExamineVO = addIncomeExamineService.getAddIncomeExamineVO(req);
+		if (addIncomeExamineVO != null) {
+			List<AddIncomeExamine> list = convertAddIncomeExamineList(addIncomeExamineVO.getList());
+			addIncomeExamineVO.setList(list);
+		}
     	return ResponseData.success(addIncomeExamineVO);
     }
 	
@@ -133,4 +143,29 @@ public class AddIncomeController {
 		addIncomeService.examineOpt(req);
         return ResponseData.success();
     }
+	
+	
+	public List<AddIncomeExamine> convertAddIncomeExamineList(List<AddIncomeExamine> list) {
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
+		List<String> orderNos = new ArrayList<String>();
+		for (AddIncomeExamine addi:list) {
+			if (StringUtils.isNotBlank(addi.getOrderNo())) {
+				orderNos.add(addi.getOrderNo());
+			}
+		}
+		List<OrderSourceStatEntity> sourceStatList = orderSourceStatService.queryOrderSourceStatByOrderNos(orderNos);
+		if (sourceStatList == null || sourceStatList.isEmpty()) {
+			return null;
+		}
+		for (OrderSourceStatEntity sorsta:sourceStatList) {
+			for (AddIncomeExamine addi:list) {
+				if (sorsta.getOrderNo().equals(addi.getOrderNo())) {
+					addi.setCategory(sorsta.getCategory());
+				}
+			}
+		}
+		return list;
+	}
 }

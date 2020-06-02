@@ -79,12 +79,14 @@ public class AddIncomeController {
 			return ResponseData.createErrorCodeResponse("111001", "请选择上传文件！");
 		}
 		String fileType = addExcelFile.getContentType();
-		String fileName = "addImcomeTemplate.xlsx";
-		try {
-			fileName = new String(addExcelFile.getOriginalFilename().getBytes("ISO-8859-1"), "UTF-8");
-		} catch (UnsupportedEncodingException e1) {
-			log.error("追加收益导入获取文件名出错 e:", e1);
-		}
+		String fileName = addExcelFile.getOriginalFilename();//"addImcomeTemplate.xlsx";
+		log.info("追加收益导入fileName=[{}],fileType=[{}]",fileName,fileType);
+		/*
+		 * try { fileName = new
+		 * String(addExcelFile.getOriginalFilename().getBytes("ISO-8859-1"), "UTF-8"); }
+		 * catch (UnsupportedEncodingException e1) { log.error("追加收益导入获取文件名出错 e:", e1);
+		 * }
+		 */
 		if (!fileType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 				&& !fileType.equals("application/vnd.ms-excel")
 				&& !fileType.equals("application/x-excel")) {
