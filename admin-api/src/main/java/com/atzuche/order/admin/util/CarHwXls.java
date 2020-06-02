@@ -230,10 +230,11 @@ public class CarHwXls {
     
     
 	public static String convertCellToString(Cell cell) {
+		
 		// 如果为null会抛出异常，应当返回空字符串
 		if (cell == null)
 			return "";
-
+		logger.info("convertCellToString cell={}",cell.toString());
 		// POI对单元格日期处理很弱，没有针对的类型，日期类型取出来的也是一个double值，所以同样作为数值类型
 		// 解决日期2006/11/02格式读入后出错的问题，POI读取后变成“02-十一月-2006”格式
 		if (cell.toString().contains("-") && checkDate(cell.toString())) {
