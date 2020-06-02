@@ -18,7 +18,7 @@ public class AddIncomeExcelEntity {
 	private String uploadTimeStr;
 	@AutoDocProperty(value = "上传人")
     private String uploder;
-	@AutoDocProperty(value = "状态，0:未审核 1:审核通过 2：驳回 3：撤回")
+	@AutoDocProperty(value = "状态，0:未审核 1:审核通过 2：驳回 3：撤回,4:已删除")
     private Integer status;
     @AutoDocProperty(value = "审核状态中文描述")
     private String statusStr;
@@ -73,6 +73,9 @@ public class AddIncomeExcelEntity {
     }
 
     public Integer getStatus() {
+    	if (delFlag != null && delFlag.intValue() == 1) {
+    		status = 4;
+		}
         return status;
     }
 
@@ -116,6 +119,10 @@ public class AddIncomeExcelEntity {
 	}
 
 	public String getStatusStr() {
+		if (delFlag != null && delFlag.intValue() == 1) {
+			statusStr = "已删除";
+			return statusStr;
+		}
 		if (status != null) {
 			if (status.intValue() == 0) {
 				statusStr = "未审核";

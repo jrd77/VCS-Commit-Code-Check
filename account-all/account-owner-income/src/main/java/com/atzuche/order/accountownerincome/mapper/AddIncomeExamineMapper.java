@@ -27,5 +27,9 @@ public interface AddIncomeExamineMapper {
     
     List<AddIncomeExamine> queryAddIncomeExamine(AddIncomeExamineQueryDTO addIncomeExamineQueryDTO);
     
+    List<AddIncomeExamine> listAllAddIncomeExamine(AddIncomeExamineDTO addIncomeExamineDTO);
+    
     int queryCount(AddIncomeExamineDTO addIncomeExamineDTO);
+    
+    int updateAddIncomeExaminePass(AddIncomeExamine record);
 }

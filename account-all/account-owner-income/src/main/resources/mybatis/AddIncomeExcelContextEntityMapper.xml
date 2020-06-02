@@ -20,7 +20,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, add_id, order_no, mem_no, name, mobile, type, amt, department, apply_time, detail_type, 
-    order_date, settle_mon, mem_type, describe
+    order_date, settle_mon, mem_type, `describe`
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -37,7 +37,7 @@
       mem_no, mobile, type, 
       amt, department, apply_time, 
       detail_type, order_date, settle_mon, 
-      mem_type, describe)
+      mem_type, `describe`)
     values (#{id,jdbcType=BIGINT}, #{addId,jdbcType=BIGINT}, #{orderNo,jdbcType=VARCHAR}, 
       #{memNo,jdbcType=INTEGER}, #{mobile,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, 
       #{amt,jdbcType=INTEGER}, #{department,jdbcType=VARCHAR}, #{applyTime,jdbcType=VARCHAR}, 
@@ -87,7 +87,7 @@
         mem_type,
       </if>
       <if test="describe != null" >
-        describe,
+        `describe`,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -194,7 +194,7 @@
       order_date = #{orderDate,jdbcType=VARCHAR},
       settle_mon = #{settleMon,jdbcType=VARCHAR},
       mem_type = #{memType,jdbcType=INTEGER},
-      describe = #{describe,jdbcType=LONGVARCHAR}
+      `describe` = #{describe,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExcelContextEntity" >
@@ -219,7 +219,7 @@
       mem_no, name, mobile, type, 
       amt, department, apply_time, 
       detail_type, order_date, settle_mon, 
-      mem_type, describe)
+      mem_type, `describe`)
     values 
     <foreach collection ="list" item="aiec" index= "index" separator =",">
     (#{aiec.addId}, #{aiec.orderNo}, 
@@ -236,5 +236,10 @@
     from add_income_excel_context
     where add_id = #{addId}
   </select>
+  
+  <delete id="delAddIncomeExcelContext" parameterType="Long" >
+    delete from add_income_excel_context
+    where add_id = #{addId}
+  </delete>
   
 </mapper>

@@ -26,7 +26,7 @@
     <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, order_no, mem_no, mobile, name, mem_type, type, detail_type, amt, describe, department, 
+    id, order_no, mem_no, mobile, name, mem_type, type, detail_type, amt, `describe`, department, 
     apply_time, orig_debt, now_debt, status, remark, add_id, create_time, create_op, update_time, 
     update_op, is_delete
   </sql>
@@ -44,7 +44,7 @@
     insert into add_income_examine (id, order_no, mem_no, 
       mobile, name, mem_type, 
       type, detail_type, amt, 
-      describe, department, apply_time, 
+      `describe`, department, apply_time, 
       orig_debt, now_debt, status, 
       remark, create_time, create_op, 
       update_time, update_op, is_delete
@@ -89,7 +89,7 @@
         amt,
       </if>
       <if test="describe != null" >
-        describe,
+        `describe`,
       </if>
       <if test="department != null" >
         department,
@@ -267,7 +267,7 @@
       type = #{type,jdbcType=VARCHAR},
       detail_type = #{detailType,jdbcType=VARCHAR},
       amt = #{amt,jdbcType=INTEGER},
-      describe = #{describe,jdbcType=VARCHAR},
+      `describe` = #{describe,jdbcType=VARCHAR},
       department = #{department,jdbcType=VARCHAR},
       apply_time = #{applyTime,jdbcType=DATE},
       orig_debt = #{origDebt,jdbcType=INTEGER},
@@ -286,7 +286,7 @@
   	insert into add_income_examine (order_no, mem_no, 
       mobile, name, mem_type, 
       type, detail_type, amt, 
-      describe, department, apply_time, 
+      `describe`, department, apply_time, 
       orig_debt, now_debt, add_id
       )
     values 
@@ -319,7 +319,7 @@
 			<if test="memNo != null and memNo != ''">AND mem_no=#{memNo}</if>
 			<if test="name != null and name != ''">AND name=#{name}</if>
 			<if test="department != null and department != ''">AND department=#{department}</if>
-			<if test="status != null and status != ''">AND status=#{status}</if>
+			<if test="status != null">AND status=#{status}</if>
 			<if test="createTimeBegin != null and createTimeBegin != ''">AND create_time &gt;= STR_TO_DATE('${createTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
 			<if test="createTimeEnd != null and createTimeEnd != ''">AND create_time &lt;= STR_TO_DATE('${createTimeEnd}', '%Y-%m-%d %k:%i:%s')</if>
 			<if test="examineTimeBegin != null and examineTimeBegin != ''">AND update_time &gt;= STR_TO_DATE('${examineTimeBegin}', '%Y-%m-%d %k:%i:%s')</if>
@@ -338,11 +338,30 @@
 	LIMIT #{startIndex}, #{pageSize} 
   </select>
   
+  <select id="listAllAddIncomeExamine" resultMap="BaseResultMap" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO" >
+    select 
+    <include refid="Base_Column_List" />
+    from add_income_examine
+    <include refid="whereCondition"/> 
+	ORDER BY id DESC 
+  </select>
+  
   <select id="queryCount" resultType="Integer" parameterType="com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO" >
     select 
     count(*)
     from add_income_examine
     <include refid="whereCondition"/> 
   </select>
+  
+  <update id="updateAddIncomeExaminePass" parameterType="com.atzuche.order.accountownerincome.entity.AddIncomeExamine" >
+    update add_income_examine
+    set 
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_op = #{createOp,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+    and status != #{status,jdbcType=INTEGER}
+  </update>
   
 </mapper>

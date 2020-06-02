@@ -1,5 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +9,18 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamineLog;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExamineVO;
 import com.atzuche.order.accountownerincome.entity.AddIncomeExcelVO;
 import com.atzuche.order.accountownerincome.service.AddIncomeExamineService;
 import com.atzuche.order.accountownerincome.service.AddIncomeExcelService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.AddIncomeExamineDTO;
+import com.atzuche.order.commons.entity.dto.AddIncomeExamineOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
@@ -38,8 +44,8 @@ public class AddIncomeController {
 	 * @param req
 	 * @return ResponseData<AddIncomeExcelVO>
 	 */
-	@GetMapping("/income/excel/list")
-    public ResponseData<AddIncomeExcelVO> getAddIncomeExcelVO(@Valid AddIncomeExcelConsoleDTO req) {
+	@PostMapping("/income/excel/list")
+    public ResponseData<AddIncomeExcelVO> getAddIncomeExcelVO(@RequestBody AddIncomeExcelConsoleDTO req) {
 		log.info("获取追加收益文件列表 AddIncomeExcelConsoleDTO=[{}]", req);
 		AddIncomeExcelVO addIncomeExcelVO = addIncomeExcelService.getAddIncomeExcelVO(req);
     	return ResponseData.success(addIncomeExcelVO);
@@ -76,14 +82,55 @@ public class AddIncomeController {
 	
 	
 	/**
-	 * 获取追加收益审核列表
+	 * 获取追加收益审核列表(分页)
 	 * @param req
 	 * @return ResponseData<AddIncomeExamineVO>
 	 */
-	@GetMapping("/income/examine/list")
-    public ResponseData<AddIncomeExamineVO> getAddIncomeExcelVO(@Valid AddIncomeExamineDTO req) {
-		log.info("获取追加收益审核列表 AddIncomeExamineDTO=[{}]", req);
+	@PostMapping("/income/examine/list")
+    public ResponseData<AddIncomeExamineVO> getAddIncomeExamineVO(@RequestBody AddIncomeExamineDTO req) {
+		log.info("获取追加收益审核列表(分页) AddIncomeExamineDTO=[{}]", req);
 		AddIncomeExamineVO addIncomeExamineVO = addIncomeExamineService.getAddIncomeExamineVO(req);
     	return ResponseData.success(addIncomeExamineVO);
+    }
+	
+	
+	/**
+	 * 获取追加收益审核列表(非分页)
+	 * @param req
+	 * @return ResponseData<AddIncomeExamineVO>
+	 */
+	@PostMapping("/income/examine/listall")
+    public ResponseData<List<AddIncomeExamine>> listAllAddIncomeExamine(@RequestBody AddIncomeExamineDTO req) {
+		log.info("获取追加收益审核列表(非分页) AddIncomeExamineDTO=[{}]", req);
+		List<AddIncomeExamine> list = addIncomeExamineService.listAllAddIncomeExamine(req);
+    	return ResponseData.success(list);
+    }
+	
+	
+	/**
+	 * 获取追加收益审核日志
+	 * @param req
+	 * @return ResponseData<List<AddIncomeExamineLog>>
+	 */
+	@GetMapping("/income/examinelog/list")
+    public ResponseData<List<AddIncomeExamineLog>> listAddIncomeExamineLog(@RequestParam(value="id",required = true) Integer id) {
+		log.info("获取追加收益审核日志 addIncomeExamineId=[{}]", id);
+		List<AddIncomeExamineLog> list = addIncomeExamineService.listAddIncomeExamineLog(id);
+    	return ResponseData.success(list);
+    }
+	
+	
+	/**
+	 * 追加收益审核操作
+	 * @param req
+	 * @param bindingResult
+	 * @return ResponseData<?>
+	 */
+	@PostMapping("/income/examineopt/update")
+	public ResponseData<?> examineOpt(@Valid @RequestBody AddIncomeExamineOptDTO req, BindingResult bindingResult) {
+		log.info("追加收益审核操作AddIncomeExamineOptDTO=[{}]", req);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		addIncomeService.examineOpt(req);
+        return ResponseData.success();
     }
 }

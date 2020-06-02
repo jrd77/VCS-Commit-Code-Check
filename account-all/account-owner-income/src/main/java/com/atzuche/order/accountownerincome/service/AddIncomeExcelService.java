@@ -24,6 +24,7 @@ import com.atzuche.order.commons.entity.dto.AddIncomeExcelConsoleDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelOptDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeExcelQueryDTO;
 import com.atzuche.order.commons.entity.dto.AddIncomeImportDTO;
+import com.atzuche.order.commons.exceptions.ImportAddIncomeExcelException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +41,7 @@ public class AddIncomeExcelService {
 	
 	private static final int ADD_INCOME_PASS = 1;
 	private static final int ADD_INCOME_WITHDRAW = 3;
+	private static final int ADD_INCOME_DELL = 4;
 	
 	/**
 	 * 获取追加收益文件列表
@@ -93,7 +95,15 @@ public class AddIncomeExcelService {
 			nowContent.setAddId(nowAddIncomeExcelEntity.getId());
 			nowContentList.add(nowContent);
 		}
-		addIncomeExcelContextEntityMapper.saveAddIncomeExcelContextBatch(nowContentList);
+		try {
+			addIncomeExcelContextEntityMapper.saveAddIncomeExcelContextBatch(nowContentList);
+		} catch (Exception e) {
+			String resultMsg = exceptionProcess(e);
+			if (StringUtils.isNotBlank(resultMsg)) {
+				throw new ImportAddIncomeExcelException(resultMsg);
+			}
+			throw e;
+		}
 	}
 	
 	
@@ -101,6 +111,7 @@ public class AddIncomeExcelService {
 	 * 追加收益操作
 	 * @param addIncomeExcelOptDTO
 	 */
+	@Transactional(rollbackFor=Exception.class)
 	public void updateStatus(AddIncomeExcelOptDTO addIncomeExcelOptDTO) {
 		if (addIncomeExcelOptDTO == null) {
 			return;
@@ -116,13 +127,20 @@ public class AddIncomeExcelService {
 		} else if (flag == ADD_INCOME_WITHDRAW) {
 			// 撤回
 			withdrawAddIncome(addId);
+		} else if (flag == ADD_INCOME_DELL) {
+			int delFlag = addIncomeExcelEntityMapper.delAddIncomeExcel(addIncomeExcelOptDTO);
+			if (delFlag > 0) {
+				addIncomeExcelContextEntityMapper.delAddIncomeExcelContext(addId);
+			}
 		}
-		AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
-		addIncomeExcelEntity.setId(addId);
-		addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
-		addIncomeExcelEntity.setOperateTime(new Date());
-		addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
-		addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+		if (flag != ADD_INCOME_DELL) {
+			AddIncomeExcelEntity addIncomeExcelEntity = new AddIncomeExcelEntity();
+			addIncomeExcelEntity.setId(addId);
+			addIncomeExcelEntity.setOperate(addIncomeExcelOptDTO.getOperator());
+			addIncomeExcelEntity.setOperateTime(new Date());
+			addIncomeExcelEntity.setStatus(addIncomeExcelOptDTO.getFlag());
+			addIncomeExcelEntityMapper.updateByPrimaryKeySelective(addIncomeExcelEntity);
+		}
 	}
 	
 	/**
@@ -161,5 +179,35 @@ public class AddIncomeExcelService {
 		}
 		// 删除该批次的追加收益
 		addIncomeExamineMapper.delAddIncomeExamineByAddId(addId);
+		// 删除明细
+		addIncomeExcelContextEntityMapper.delAddIncomeExcelContext(addId);
 	}
+	
+	
+	public String exceptionProcess(Exception e){
+		String keyStart="Duplicate entry";
+		String keyEnd="for key 'order_detail_type_amt_unique'";
+		String result = null;
+		if(e==null){
+			return result;
+		}
+		Throwable t = e.getCause();
+		if (t == null) {
+			return result;
+		}
+		String msg = t.getMessage();
+		int index=0;
+		if (StringUtils.isNotBlank(msg)){
+			if (msg.matches(keyStart+" .+ "+keyEnd)) {
+				String uiniqueContent=msg.replace(keyStart, "").replace(keyEnd, "");
+				index=uiniqueContent.indexOf("-");
+				if(index!=-1){
+					String [] uiniqueContents = uiniqueContent.split("-");
+ 					result="订单号:"+uiniqueContents[1]+"已追加收益！";
+				} 
+			}
+		}
+		return result;
+	}
+	
 }

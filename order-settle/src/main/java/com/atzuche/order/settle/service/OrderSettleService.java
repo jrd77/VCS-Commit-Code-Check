@@ -535,7 +535,11 @@ public class OrderSettleService{
             log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
             //检查是否可以结算。 外置。
-            orderSettleNoTService.check(settleOrders);
+            boolean checkFlag = orderSettleNoTService.check(settleOrders);
+            if(!checkFlag) {
+            	log.info("提前终止结算，当前结算状态不符合。orderNo [{}]",orderNo);
+            	return;
+            }
             
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
@@ -582,7 +586,8 @@ public class OrderSettleService{
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
             OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
-            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {
+            
+//            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {  //去掉暂扣标识
                 OrderStatusEntity record = new OrderStatusEntity();
                 record.setId(entity.getId());
                 record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
@@ -592,7 +597,8 @@ public class OrderSettleService{
                 record.setCarDepositSettleTime(LocalDateTime.now());
                 
                 orderStatusService.updateByPrimaryKeySelective(record);
-            }
+//            }
+                
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
