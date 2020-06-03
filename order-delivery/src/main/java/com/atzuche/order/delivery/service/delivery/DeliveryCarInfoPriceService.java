@@ -112,11 +112,12 @@ public class DeliveryCarInfoPriceService {
                 throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "没有找到cityCode");
             }
             RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderDelivery.getRenterOrderNo(), false);
+            int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
             OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
             ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()));
             RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = RenterGetAndReturnCarDTO.builder().build();
             //车主取送信息
-            ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities, carEngineType, cityCode,2);
+            ownerGetAndReturnCarDTO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities, carEngineType, cityCode,2,oilTotalCalibration);
             OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
             BeanUtils.copyProperties(ownerGetAndReturnCarDTO, ownerGetAndReturnCarDO);
             //租客取送信息
@@ -126,7 +127,7 @@ public class DeliveryCarInfoPriceService {
                 BeanUtils.copyProperties(renterGetAndReturnCar, ownerGetAndReturnCar);
                 ownerHandoverCarInfoList.add(ownerGetAndReturnCar);
             }
-            ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode,1);
+            ownerGetAndReturnCarDO = createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDO, ownerHandoverCarInfoList, carEngineType, cityCode,1,oilTotalCalibration);
             BeanUtils.copyProperties(ownerGetAndReturnCarDO, renterGetAndReturnCarDTO);
             ownerGetAndReturnCarDTO.setOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
             return DeliveryOilCostVO.builder().ownerGetAndReturnCarDTO(ownerGetAndReturnCarDTO).renterGetAndReturnCarDTO(renterGetAndReturnCarDTO).build();
@@ -164,7 +165,7 @@ public class DeliveryCarInfoPriceService {
      * @param HandoverCarInfoEntities
      * @return
      */
-    public OwnerGetAndReturnCarDTO createOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, List<OwnerHandoverCarInfoEntity> HandoverCarInfoEntities,Integer carEngineType,String cityCode,Integer type) {
+    public OwnerGetAndReturnCarDTO createOwnerGetAndReturnCarDTO(OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO, List<OwnerHandoverCarInfoEntity> HandoverCarInfoEntities,Integer carEngineType,String cityCode,Integer type,Integer oilTotalCalibration) {
         for (OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : HandoverCarInfoEntities) {
             if (Objects.isNull(ownerHandoverCarInfoEntity.getType())) {
                 continue;
@@ -194,9 +195,9 @@ public class DeliveryCarInfoPriceService {
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
-            double lastOilDifference = MathUtil.mulByDouble(MathUtil.div(Integer.valueOf(oilContainer), 16.0),oilDifference);
+            double lastOilDifference = MathUtil.mulByDouble(MathUtil.div(Integer.valueOf(oilContainer), oilTotalCalibration),oilDifference);
             ownerGetAndReturnCarDTO.setOilDifference(String.valueOf(lastOilDifference) + "L");
-            double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, 16.0), Double.valueOf(oilContainer));
+            double oilMiddleDataFee = MathUtil.mulByDouble(MathUtil.div(oilDifference, oilTotalCalibration), Double.valueOf(oilContainer));
             double oilDifferenceCrash = MathUtil.mulByDouble(oilMiddleDataFee, getOilPriceByCityCodeAndType(Integer.valueOf(cityCode), carEngineType));
             log.info("油费数据----->>>>oilDifferenceCrash:[{}]",oilDifferenceCrash);
             oilDifferenceCrash = oilDifferenceCrash > 0D
@@ -296,13 +297,14 @@ public class DeliveryCarInfoPriceService {
      * 车主平台加油服务费
      * @return
      */
-    public int getOwnerPlatFormOilServiceCharge(Integer ownerReturnOil,Integer renterGetOil){
+    public int getOwnerPlatFormOilServiceCharge(RenterGoodsDetailDTO renterGoodsDetailDTO,Integer ownerReturnOil,Integer renterGetOil){
         try {
-            if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
                 return 25;
             }
         } catch (Exception e) {
-            log.info("获取平台加油服务费失败");
+            log.info("获取平台加油服务费失败,确认该订单是否是配送订单");
         }
         return 0;
     }
@@ -313,7 +315,7 @@ public class DeliveryCarInfoPriceService {
      *
      * @return
      */
-    public int getOwnerPlatFormOilServiceChargeByOrderNo(String orderNo) {
+    public int getOwnerPlatFormOilServiceChargeByOrderNo(Integer oilTotalCalibration,String orderNo) {
         try {
             List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
             List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
@@ -324,7 +326,7 @@ public class DeliveryCarInfoPriceService {
             }
             int ownerReturnOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 4).findFirst().get().getOilNum();
             int renterGetOil = renterHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
-            if (MathUtil.sub((ownerReturnOil / 16), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
                 return 25;
             }
         } catch (Exception e) {

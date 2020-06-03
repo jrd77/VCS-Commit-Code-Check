@@ -27,6 +27,8 @@ public class DeliveryCarVO {
     private Integer isReturnCar;
     @AutoDocProperty("orderNo订单号")
     private String orderNo;
+    @AutoDocProperty("油耗总刻度")
+    private String maxOilNumber;
 
 
 

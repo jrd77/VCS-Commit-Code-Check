@@ -111,6 +111,10 @@ public class RenterGoodsEntity implements Serializable {
 	 * 车主类型:5个人车主、10租赁公司、15其他 、20托管车辆-交易用、25托管车辆-工作用、30短期托管车、35代管车辆
 	 */
 	private Integer carOwnerType;
+    /**
+     * 车主等级
+     */
+    private Integer carChargeLevel;
 	/**
 	 * 功能类型 1:MPV，2：SUV,3:中型车，4：中大型车，5：其它，6：客车，7：小型车，8：微型车，9：房车，10：皮卡，11：紧凑型车，12：豪华车，13：跑车，14：面包车 
 	 */
