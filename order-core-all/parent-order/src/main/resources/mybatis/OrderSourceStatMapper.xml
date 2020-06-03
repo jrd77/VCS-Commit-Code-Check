@@ -407,5 +407,14 @@
     <select id="queryCtripOrderByOrderNo" parameterType="java.lang.String" resultType="java.lang.Integer">
         select count(*) from order_source_stat where order_no = #{orderNo} and category = 2 and business_parent_type = 1 and business_child_type = 1
     </select>
+    
+    
+    <select id="queryOrderSourceStatByOrderNos" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from order_source_stat where  
+        order_no in
+        <foreach collection="orderNos" item="orderNo" separator="," close=")" open="(">
+            #{orderNo}
+        </foreach>
+    </select>
   	
 </mapper>

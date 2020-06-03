@@ -362,7 +362,7 @@ public class OrderCostService {
 		platformSubsidyAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
 		platformSubsidyRealAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
 		///车主给租客的租金补贴
-		ownerSubsidyTotalAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentTotalAmount));
+		ownerSubsidyTotalAmt = String.valueOf(-ownerSubsidyRentTotalAmount);
 		//文本框中填入负数，保存负数，暂不处理
 //		ownerSubsidyRentAmt = String.valueOf( ownerSubsidyRentAmount);  //NumberUtils.convertNumberToFushu()
 		ownerSubsidyRentAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentAmount));
@@ -1106,7 +1106,6 @@ public class OrderCostService {
     public OrderRenterCostResVO calculateRenterOrderCostLongRent(RenterCostReqVO renterCostReqVO) throws Exception {
         OrderRenterCostResVO realVo = new OrderRenterCostResVO();
         //主订单
-        //OrderEntity orderEntity = orderService.getOrderEntity(renterCostReqVO.getOrderNo());
         OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
         if(orderDTO == null){
             logger.error("获取订单数据为空orderNo={}",renterCostReqVO.getOrderNo());
