@@ -89,7 +89,8 @@ public enum RenterCashCodeEnum {
     CANCEL_RENT_COST_TO_RETURN_AMT("11130017","取消租车费用退还"),
     ACCOUNT_RENTER_DETAIN_CAR_AMT("11130018","暂扣租车费用"),
     PAY_DEBT_COST_TO_HISTORY_AMT("11130019","支付欠款抵扣订单欠款"),
-    
+
+
     ///// 暂扣的考虑以下的费用编码。
     ACCOUNT_RENTER_RENT_COST("11130019","租车费用"),
     ACCOUNT_RENTER_WZ_DEPOSIT("11130020","违章押金"),
@@ -129,6 +130,10 @@ public enum RenterCashCodeEnum {
 
     TYRE_INSURE_TOTAL_PRICES("11110015","轮胎/轮毂保障费"),
     DRIVER_INSURE_TOTAL_PRICES("11110016","驾乘无忧保障费"),
+
+    CLEAR_REFOUND_DEPOSIT("11110017","清算退款-车辆押金"),
+    CLEAR_REFOUND_WZ_DEPOSIT("11110018","清算退款-违章押金"),
+    CLEAR_REFOUND_RENT("11110019","清算退款-租车费用")
     ;
 	
 	/**
