@@ -63,7 +63,7 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from cashier_refund_apply where id = #{value}
+		select <include refid="Base_Column_List" /> from cashier_refund_apply where id = #{value} and is_delete = 0
 	</select>
 
     <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity" useGeneratedKeys="true" keyProperty="id">
@@ -118,6 +118,61 @@
         </trim>
     </insert>
 
+	<insert id="insertAgain">
+		INSERT INTO cashier_refund_apply(`mem_no`,
+		  `order_no`,
+		  `source_code`,
+		  `source_detail`,
+		  `atapp_id`,
+		  `pay_kind`,
+		  `pay_type`,
+		  `pay_source`,
+		  `amt`,
+		  `status`,
+		  `qn`,
+		  `unique_no`,
+		  `refund_time`,
+		  `flag`,
+		  `type`,
+		  `num`,
+		  `pay_md5`,
+		  `remake`,
+		  `dept_name`,
+		  `create_time`,
+		  `create_op`,
+		  `update_time`,
+		  `update_op`,
+		  `version`,
+		  `is_delete` )
+		SELECT 
+		  `mem_no`,
+		  `order_no`,
+		  `source_code`,
+		  `source_detail`,
+		  `atapp_id`,
+		  `pay_kind`,
+		  `pay_type`,
+		  `pay_source`,
+		  `amt`,
+		  `status`,
+		  `qn`,
+		  `unique_no`,
+		  `refund_time`,
+		  `flag`,
+		  `type`,
+		  0,
+		  `pay_md5`,
+		  `remake`,
+		  `dept_name`,
+		  `create_time`,
+		  `create_op`,
+		  `update_time`,
+		  `update_op`,
+		  `version`,
+		  `is_delete` 
+		FROM
+		  `cashier_refund_apply`  WHERE id = #{id}
+	</insert>
 	 
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
 		update cashier_refund_apply 
@@ -150,48 +205,50 @@
 		where id = #{id} and version = #{version}
 	</update>
     <select id="selectRefundByQn" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} limit 1
+        select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} and is_delete = 0 limit 1
     </select>
     <select id="selectRefundByMd5" resultMap="BaseResultMap">
 
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where mem_no = #{memNo} and order_no = #{orderNo} and pay_md5 = #{payMd5} limit 1
+        where mem_no = #{memNo} and order_no = #{orderNo} and pay_md5 = #{payMd5} and is_delete = 0 limit 1
 
     </select>
     <select id="selectRefundByType" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where order_no = #{orderNo} and pay_kind = #{payKind} AND `status`='01' limit 1
+        where order_no = #{orderNo} and pay_kind = #{payKind} AND `status`='01' and is_delete = 0 limit 1
     </select>
 
     <select id="queryRefundTimeByOrderNo" resultType="java.util.Date">
         select refund_time from cashier_refund_apply
-        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
+        where order_no = #{orderNo} and pay_kind = #{payKind} and is_delete = 0 limit 1
     </select>
     <select id="getCashierRefundApplyByTime" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        <![CDATA[ where status ='01' and create_time < #{date} and num<3 limit 100 ]]>
+        <![CDATA[ where status ='01' and create_time < #{date} and num<3 and is_delete = 0 limit 100 ]]>
     </select>
     
     <!-- 去掉  limit 100  -->
     <select id="getCashierRefundApplyByTimeForPreAuth" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        <![CDATA[ where status ='01' and create_time < #{date} and num >= 3 and pay_type = '03' ]]>
+        <![CDATA[ where status ='01' and create_time < #{date} and num >= 3 and pay_type = '03' and is_delete = 0 ]]>
     </select>
     
     <!-- 去掉 and create_time < #{date} -->
     <select id="getCashierRefundApplyByTimeForPreAuthSum" resultType="java.lang.Integer">
         select SUM(amt) from cashier_refund_apply
-        <![CDATA[ where mem_no= #{memNo} and status ='01' and num >= 3 and pay_type = '03' ]]>
+        <![CDATA[ where mem_no= #{memNo} and status ='01' and num >= 3 and pay_type = '03' and is_delete = 0 ]]>
     </select>
     
     <select id="getRefundApplyByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo}
+        where  order_no = #{orderNo} and is_delete = 0
     </select>
 	
 	<select id="getRefundApplyByOrderNoPayKind" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo} AND pay_kind = #{payKind}
+        where  order_no = #{orderNo} AND pay_kind = #{payKind} and is_delete = 0
 	</select>
+	
+	
 
 </mapper>

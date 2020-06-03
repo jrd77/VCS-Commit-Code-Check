@@ -21,6 +21,9 @@ public interface CashierRefundApplyMapper{
 
     int insertSelective(CashierRefundApplyEntity record);
     
+    //初始化
+    int insertAgain(Integer id);
+    
     int updateByPrimaryKeySelective(CashierRefundApplyEntity record);
 
     CashierRefundApplyEntity selectRefundByQn(@Param("memNo") String menNo, @Param("orderNo")String orderNo, @Param("qn")String qn);

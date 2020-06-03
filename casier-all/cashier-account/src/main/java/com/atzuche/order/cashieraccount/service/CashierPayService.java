@@ -1340,20 +1340,74 @@ public class CashierPayService{
             //3退款
             AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
             if(Objects.nonNull(vo)){
-            	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+	        	log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+	        	
+	            NotifyDataVo notifyDataVo = new NotifyDataVo();
+	            BeanUtils.copyProperties(vo,notifyDataVo);
+	            notifyDataVo.setSettleAmount(vo.getRefundAmt());
+	            //退款调用成功操作
+	            cashierService.refundCallBackSuccess(vo);
+	            log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
+	            
+	            //更新收银台
+	            List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
+	            lstNotifyDataVo.add(notifyDataVo);
+	            OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
+	            log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
+            }else {
+            	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));
+            }
+		} catch (Exception e) {
+			log.error("refundOrderPay exception: params=[{}]",GsonUtils.toJson(cashierRefundApply),e);
+		}
+    }
+    
+    public void refundOrderPayPreAuth(CashierRefundApplyEntity cashierRefundApply){
+        try {
+        	if(Objects.isNull(cashierRefundApply) || Objects.isNull(cashierRefundApply.getId())){
+                return;
+            }
+            //更新退款次数，最多允许退3次。 num<3 LIMIT 100
+            cashierRefundApplyNoTService.updateCashierRefundApplyEntity(cashierRefundApply);
+            //2 构造退款参数
+            RefundVo refundVo = cashierNoTService.getRefundVo(cashierRefundApply);
+            //3退款
+            AutoPayResultVo vo = refundRemoteService.refundOrderPay(refundVo);
+            //超出15天的，需要重新添加收银台记录，重新发起扣款流程。
+            
+            if(Objects.nonNull(vo)){
+            	//根据错误码来重新生成。
+            	if(vo.getResResult()!=null) {
+            		log.info("退款返回的结果vo=[{}],params=[{}]，resResult=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo),vo.getResResult());
+            	} else {
+            		log.info("退款返回的结果vo=[{}],params=[{}]",GsonUtils.toJson(vo),GsonUtils.toJson(refundVo));
+            	}
+            	boolean flagCreate = false;
             	
-                NotifyDataVo notifyDataVo = new NotifyDataVo();
-                BeanUtils.copyProperties(vo,notifyDataVo);
-                notifyDataVo.setSettleAmount(vo.getRefundAmt());
-                //退款调用成功操作
-                cashierService.refundCallBackSuccess(vo);
-                log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
-                
-                //更新收银台
-                List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
-                lstNotifyDataVo.add(notifyDataVo);
-                OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
-                log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
+            	String subCode = vo.getResResult()!=null?(String) vo.getResResult().get("subCode"):"";
+                log.info("subCode="+ subCode);
+                ////ACQ.BUYER_BALANCE_NOT_ENOUGH 测试流程!!     || "ACQ.BUYER_BALANCE_NOT_ENOUGH".equals(subCode)
+                if("ACQ.TRADE_HAS_CLOSE".equals(subCode) || "ACQ.CONTEXT_INCONSISTENT".equals(subCode) || "UNIQUE_VIOLATION".equals(subCode) ){ 
+                	flagCreate = true;
+                }
+            	if(flagCreate) {		
+            		cashierRefundApplyNoTService.deleteOrInitNewCashierRefundApplyEntity(cashierRefundApply);
+            		log.info("(重新生成退款记录)params:[{}]", GsonUtils.toJson(cashierRefundApply));
+            	}else {
+            		
+	                NotifyDataVo notifyDataVo = new NotifyDataVo();
+	                BeanUtils.copyProperties(vo,notifyDataVo);
+	                notifyDataVo.setSettleAmount(vo.getRefundAmt());
+	                //退款调用成功操作
+	                cashierService.refundCallBackSuccess(vo);
+	                log.info("(退款同步处理退款申请表)refundCallBackSuccess:[{}]", GsonUtils.toJson(vo));
+	                
+	                //更新收银台
+	                List<NotifyDataVo> lstNotifyDataVo = new ArrayList<NotifyDataVo>();
+	                lstNotifyDataVo.add(notifyDataVo);
+	                OrderPayCallBackSuccessVO orderPayCallBackSuccessVO = cashierService.callBackSuccess(lstNotifyDataVo);
+	                log.info("(退款同步处理收银台)callBackSuccess:[{}]", GsonUtils.toJson(orderPayCallBackSuccessVO));
+            	}
                 
             }else {
             	log.error("退款返回的结果vo为null异常,params=[{}]",GsonUtils.toJson(refundVo));

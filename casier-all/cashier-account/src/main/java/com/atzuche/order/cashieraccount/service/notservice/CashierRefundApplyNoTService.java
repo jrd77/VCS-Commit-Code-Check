@@ -125,6 +125,10 @@ public class CashierRefundApplyNoTService {
             cashierRefundApplyUpdate.setVersion(cashierRefundApplyEntity.getVersion());
             cashierRefundApplyUpdate.setId(cashierRefundApplyEntity.getId());
             cashierRefundApplyUpdate.setRefundTime(LocalDateTime.now());
+            ///更新qn和pay_trans_no
+            cashierRefundApplyUpdate.setQn(notifyDataVo.getQn());
+            cashierRefundApplyUpdate.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //退款的ID
+            
             int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
             if(result==0){
 //                throw new OrderPayRefundCallBackAsnyException();
@@ -166,6 +170,20 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
         cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
     }
+    
+    public void deleteOrInitNewCashierRefundApplyEntity(CashierRefundApplyEntity cashierRefundApply) {
+    	//初始化
+    	cashierRefundApplyMapper.insertAgain(cashierRefundApply.getId());
+    	
+    	//逻辑删除
+        CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
+        cashierRefundApplyEntity.setId(cashierRefundApply.getId());
+        cashierRefundApplyEntity.setIsDelete(1);
+        cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
+        cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
+    }
+    
+    
 
     /**
      *

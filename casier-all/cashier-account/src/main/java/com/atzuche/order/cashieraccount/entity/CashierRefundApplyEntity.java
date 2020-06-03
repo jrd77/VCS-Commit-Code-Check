@@ -66,6 +66,7 @@ public class CashierRefundApplyEntity implements Serializable {
 	 * 支付流水号
 	 */
 	private String qn;
+	private String payTransNo;
 	/**
 	 * 退款外部凭证
 	 */

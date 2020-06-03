@@ -350,7 +350,9 @@ public class CashierNoTService {
 	            cashier.setPaySn(cashierEntity.getPaySn()+1);
 	            cashier.setPayEvn(notifyDataVo.getPayEnv());
 	            cashier.setOs(notifyDataVo.getReqOs());
-	            cashier.setPayTransNo(notifyDataVo.getQn());
+//	            cashier.setPayTransNo(notifyDataVo.getQn());
+	            cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
+	            
 	            cashier.setPayTime(notifyDataVo.getOrderTime());
 	            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
 	            cashier.setPayChannel(notifyDataVo.getPayChannel());
@@ -373,7 +375,9 @@ public class CashierNoTService {
                 BeanUtils.copyProperties(notifyDataVo,cashier);
                 cashier.setPayEvn(notifyDataVo.getPayEnv());
                 cashier.setOs(notifyDataVo.getReqOs());
-                cashier.setPayTransNo(notifyDataVo.getQn());
+//                cashier.setPayTransNo(notifyDataVo.getQn());
+                cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
+                
                 cashier.setPayTime(notifyDataVo.getOrderTime());
                 cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
                 String amtStr = notifyDataVo.getSettleAmount();
