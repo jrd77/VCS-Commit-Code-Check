@@ -300,7 +300,7 @@ public class OrderOwnerSettleNoTService {
         	ownerIncomeAmt += orderConsoleCostDetailEntity.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
         }
         //12 平台加油服务费
-        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(settleOrders.getOrderNo());
+        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(ownerGoodsDetail.getOilTotalCalibration() == null ? 16 : ownerGoodsDetail.getOilTotalCalibration(),settleOrders.getOrderNo());
         ownerIncomeAmt += -ownerPlatFormOilService;
         //13 补充 租客端的超里程，计算给车主。 add 200306 huangjing
         //跟租客有关联的地方（徐开心，之前是根据该方法上部的车主的参数来计算。目前不支持）

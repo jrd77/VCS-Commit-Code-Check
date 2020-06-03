@@ -33,8 +33,11 @@ public class AdminCarOwnerInfoService {
         respVO.setProvince(orderRenterInfoDTO.getProvince());
 
         OwnerMemberDTO ownerMemberDTO = remoteFeignService.remoteGetOwnerMember(orderNo, memNo);
-        if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getMemType())){
-            respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberDTO.getMemType()).getRightName());
+        //if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getMemType())){
+        //    respVO.setMemLevel(MemberFlagEnum.getRightByIndex(ownerMemberDTO.getMemType()).getRightName());
+        //}
+        if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getCarChargeLevel())){
+            respVO.setMemLevel(String.valueOf(ownerMemberDTO.getCarChargeLevel()));
         }
         if(Objects.nonNull(ownerMemberDTO) && Objects.nonNull(ownerMemberDTO.getPhone())){
             respVO.setOwnerPhone(ownerMemberDTO.getPhone());
