@@ -302,4 +302,9 @@ public class CashierRefundApplyNoTService {
     	}
     	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
     }
+
+    public CashierRefundApplyEntity selectByOrerNoAndPayTransNo(String orderNo, String payTransNo) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(orderNo,payTransNo);
+        return cashierRefundApplyEntity;
+    }
 }

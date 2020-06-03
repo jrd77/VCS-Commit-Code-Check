@@ -1023,4 +1023,15 @@ public class CashierNoTService {
         orderMessage.setMessage(orderSettlementMq);
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.routingKey,orderMessage);
     }
+    
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/3 15:27 
+     * @Description: 根据订单号和交易流水好查询
+     * 
+     **/
+    public CashierEntity getCashierBypayTransNo(String orderNo,String payTransNo){
+        CashierEntity cashierEntity = cashierMapper.getCashierBypayTransNo(orderNo, payTransNo);
+        return cashierEntity;
+    }
 }

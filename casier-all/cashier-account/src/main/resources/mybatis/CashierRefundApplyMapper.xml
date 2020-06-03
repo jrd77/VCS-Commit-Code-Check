@@ -144,7 +144,7 @@
 		  `update_op`,
 		  `version`,
 		  `is_delete` )
-		SELECT 
+		SELECT
 		  `mem_no`,
 		  `order_no`,
 		  `source_code`,
@@ -169,11 +169,11 @@
 		  `update_time`,
 		  `update_op`,
 		  `version`,
-		  `is_delete` 
+		  `is_delete`
 		FROM
 		  `cashier_refund_apply`  WHERE id = #{id}
 	</insert>
-	 
+
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
 		update cashier_refund_apply 
 		<set>
@@ -248,7 +248,11 @@
 		select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo} AND pay_kind = #{payKind} and is_delete = 0
 	</select>
-	
-	
+	<select id="selectByOrerNoAndPayTransNo" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo}
+    </select>
+
+
 
 </mapper>
