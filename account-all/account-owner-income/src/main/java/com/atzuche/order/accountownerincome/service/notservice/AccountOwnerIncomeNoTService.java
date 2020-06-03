@@ -3,7 +3,10 @@ package com.atzuche.order.accountownerincome.service.notservice;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeDetailEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
+import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper;
+import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.autoyol.commons.web.ErrorCode;
 import org.apache.commons.collections.CollectionUtils;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +31,8 @@ import java.util.Objects;
 public class AccountOwnerIncomeNoTService {
     @Autowired
     private AccountOwnerIncomeMapper accountOwnerIncomeMapper;
+    @Autowired
+    private AccountOwnerIncomeDetailMapper accountOwnerIncomeDetailMapper;
 
 
 
@@ -95,6 +101,18 @@ public class AccountOwnerIncomeNoTService {
         }
         AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
         return accountOwnerIncome;
+    }
+    
+    
+    /**
+     * 更新收益并保存明细
+     * @param accountOwnerIncomeDetail
+     */
+    public void updateTotalIncomeAndSaveDetail(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail) {
+    	// 更新收益
+    	updateOwnerIncomeAmt(accountOwnerIncomeDetail);
+    	// 保存收益详情
+        accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
     }
 
     public List<AccountOwnerIncomeListDTO> getIncomTotalListByMemNoList(List<Integer> memNoList) {

@@ -138,7 +138,7 @@ public class AccountDebtService{
     	if (oldDebtList == null || oldDebtList.isEmpty()) {
     		return null;
     	}
-    	// TODO 查询老系统欠款
+    	// 查询老系统欠款
     	String memNo = oldDebtList.get(0).getMemNo();
     	Integer oldDebtAmt = remoteOldSysDebtService.getMemBalance(memNo);
     	log.info("老系统欠款 oldDebtAmt=[{}]", oldDebtAmt);

@@ -27,6 +27,7 @@
         <result property="carStatus" column="car_status"/>
         <result property="carImageUrl" column="car_image_url"/>
         <result property="carOwnerType" column="car_owner_type"/>
+        <result property="carChargeLevel" column="car_charge_level"/>
         <result property="carUseType" column="car_use_type"/>
         <result property="carOilVolume" column="car_oil_volume"/>
         <result property="carEngineType" column="car_engine_type"/>
@@ -86,6 +87,7 @@
 	`car_status`,
 	`car_image_url`,
 	`car_owner_type`,
+	`car_charge_level`,
 	`car_use_type`,
 	`car_oil_volume`,
 	`car_engine_type`,
@@ -151,6 +153,7 @@
         `car_status`,
         `car_image_url`,
         `car_owner_type`,
+        `car_charge_level`,
         `car_use_type`,
         `car_oil_volume`,
         `car_engine_type`,
@@ -205,6 +208,7 @@
         #{carStatus},
         #{carImageUrl},
         #{carOwnerType},
+        #{carChargeLevel},
         #{carUseType},
         #{carOilVolume},
         #{carEngineType},
@@ -262,6 +266,7 @@
             <if test="carStatus != null">`car_status`, </if>
             <if test="carImageUrl != null">`car_image_url`, </if>
             <if test="carOwnerType != null">`car_owner_type`, </if>
+            <if test="carChargeLevel != null">`car_charge_level`, </if>
             <if test="carUseType != null">`car_use_type`, </if>
             <if test="carOilVolume != null">`car_oil_volume`, </if>
             <if test="carEngineType != null">`car_engine_type`, </if>
@@ -315,6 +320,7 @@
             <if test="carStatus != null">#{carStatus},  </if>
             <if test="carImageUrl != null">#{carImageUrl},  </if>
             <if test="carOwnerType != null">#{carOwnerType},  </if>
+            <if test="carChargeLevel != null">#{carChargeLevel},  </if>
             <if test="carUseType != null">#{carUseType},  </if>
             <if test="carOilVolume != null">#{carOilVolume},  </if>
             <if test="carEngineType != null">#{carEngineType},  </if>
@@ -373,6 +379,7 @@
             <if test="carStatus != null">`car_status` = #{carStatus}, </if>
             <if test="carImageUrl != null">`car_image_url` = #{carImageUrl}, </if>
             <if test="carOwnerType != null">`car_owner_type` = #{carOwnerType}, </if>
+            <if test="carChargeLevel != null">`car_charge_level` = #{carChargeLevel}, </if>
             <if test="carUseType != null">`car_use_type` = #{carUseType}, </if>
             <if test="carOilVolume != null">`car_oil_volume` = #{carOilVolume}, </if>
             <if test="carEngineType != null">`car_engine_type` = #{carEngineType}, </if>
@@ -429,6 +436,7 @@
             `car_status` = #{carStatus},
             `car_image_url` = #{carImageUrl},
             `car_owner_type` = #{carOwnerType},
+            `car_charge_level` = #{carChargeLevel},
             `car_use_type` = #{carUseType},
             `car_oil_volume` = #{carOilVolume},
             `car_engine_type` = #{carEngineType},
