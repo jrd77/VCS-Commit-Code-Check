@@ -1,5 +1,7 @@
 package com.atzuche.order.admin.service;
 
+import java.io.FileNotFoundException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.atzuche.order.admin.AdminSpringBoot;
+import com.atzuche.order.admin.util.oss.OSSUtils;
 import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
@@ -58,6 +61,17 @@ public class OrderCostServiceTest {
 			e.printStackTrace();
 		}
 		System.err.println("res toString="+res.toString());
+	}
+	
+	@Test
+	public void uploadExcel() {
+		try {
+			OSSUtils.upload("account_log/add/addImcomeTemplate.xlsx", "E:\\addImcomeTemplate.xlsx");
+			System.out.println("success");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

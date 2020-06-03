@@ -74,6 +74,9 @@ dependencies {
     compile project(":order-coin")
     compile project(":order-remote-service:order-remote-mem")
     compile project(":order-remote-service:order-remote-car")
-    compile project(":order-mq")
-
+	
+	compile("org.apache.poi:poi:3.9")
+	compile("org.apache.poi:poi-ooxml:3.9")
+	compile project(":order-mq")
 }
+
