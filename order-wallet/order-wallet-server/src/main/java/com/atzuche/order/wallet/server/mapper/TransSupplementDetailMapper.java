@@ -1,5 +1,7 @@
 package com.atzuche.order.wallet.server.mapper;
 
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.wallet.api.MemDebtVO;
 import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +30,6 @@ public interface TransSupplementDetailMapper {
     List<DepositDebtVO> listRentDepositDebt(@Param("memNo") String memNo);
     
     List<DepositDebtVO> listIllegalDepositDebt(@Param("memNo") String memNo);
+
+    List<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req);
 }

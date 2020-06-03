@@ -1,9 +1,19 @@
 package com.atzuche.order.coreapi.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.MemberDebtListResDTO;
+import com.atzuche.order.settle.service.RemoteOldSysDebtService;
+import com.atzuche.order.wallet.api.DebtFeignService;
+import com.dianping.cat.message.Transaction;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +49,9 @@ public class CashWithdrawalController {
     private OrderSupplementDetailService orderSupplementDetailService;
 	@Autowired
     private CashierRefundApplyNoTService cashierRefundApplyNoTService;
+
+	@Autowired
+	private RemoteOldSysDebtService remoteOldSysDebtService;
 
 	/**
 	 * 提现
@@ -102,9 +115,39 @@ public class CashWithdrawalController {
 		}
 
     	return ResponseData.success(debtDetailVO);
-    } 
-	
-	
+    }
+	@GetMapping("/debt/queryList")
+	public ResponseData<Page> queryList(@Valid MemberDebtListReqDTO req, BindingResult bindingResult) {
+		log.info("查询会员欠款入参[{}]",req);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		Page page = remoteOldSysDebtService.queryList(req);
+		List<MemberDebtListReqDTO> list = page.getList();
+		if(CollectionUtils.isNotEmpty(list)){
+			List<MemberDebtListResDTO> memberDebtListResDTOList = new ArrayList<>();
+			for (MemberDebtListReqDTO memberDebtListReqDTO : list) {
+				MemberDebtListResDTO memberDebtListResDTO = new MemberDebtListResDTO();
+				DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(memberDebtListReqDTO.getMemNo());
+				if(debtDetailVO != null) {
+					debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(memberDebtListReqDTO.getMemNo()));
+					//4小时
+					Integer sum = cashierRefundApplyNoTService.getCashierRefundApplyByTimeForPreAuthSum(memberDebtListReqDTO.getMemNo());
+					debtDetailVO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt().intValue() + Math.abs(sum));
+				}
+				memberDebtListResDTO.setMemNo(memberDebtListReqDTO.getMemNo());
+				memberDebtListResDTO.setMobile(memberDebtListReqDTO.getMobile());
+				memberDebtListResDTO.setRealName(memberDebtListReqDTO.getRealName());
+				memberDebtListResDTO.setHistoryDebtAmt(debtDetailVO.getOrderDebtAmt());
+				memberDebtListResDTO.setNoPaySupplementAmt(debtDetailVO.getNoPaySupplementAmt());
+				memberDebtListResDTO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt());
+				memberDebtListResDTOList.add(memberDebtListResDTO);
+			}
+			page.setList(memberDebtListResDTOList);
+		}
+		log.info("查询会员欠款出参[{}]",GsonUtils.toJson(page));
+		return ResponseData.success(page);
+	}
+
+
 	/**
 	 * 车主车载押金抵扣记录
 	 * @param memNo

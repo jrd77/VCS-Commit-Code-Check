@@ -4,7 +4,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,4 +35,11 @@ public interface FeignCashWithdrawalService {
 	 */
 	@GetMapping("/debt/get")
     public ResponseData<DebtDetailVO> getDebtAmt(@RequestParam(value="memNo",required = true) String memNo);
+	/**
+	 * 获取用户总欠款列表
+	 * @param req
+	 * @return ResponseData<?>
+	 */
+	@GetMapping("/debt/queryList")
+	public ResponseData<Page> queryList(MemberDebtListReqDTO req);
 }

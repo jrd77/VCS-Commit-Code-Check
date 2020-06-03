@@ -400,5 +400,28 @@
 	 AND tp.`trans_type`='03'
 	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
   </select>
-  
+  <select id="findDebtByMemberNoList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
+    SELECT
+        m.reg_no as memNo,
+        m.mobile as mobile,
+        m.real_name as realName
+    FROM
+        trans_supplement_detail as tsd
+        left join member as m on tsd.mem_no=m.reg_no
+    WHERE
+        cash_type = 3
+        AND pay_flag IN ( 1, 4, 5 )
+          <if test="memNo != null">
+           and m.reg_no = #{memNo}
+          </if>
+          <if test="mobile != null">
+            and m.mobile = #{mobile}
+          </if>
+          <if test="realName != null">
+            and m.real_name like concat('%',#{realName},'%')
+          </if>
+    ORDER BY
+        mem_no desc
+  </select>
+
 </mapper>

@@ -1,5 +1,8 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.autoyol.commons.utils.GsonUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,4 +120,29 @@ public class RemoteOldSysDebtService {
         
         return debtDetailVO;
     }
+
+
+    public Page queryList(MemberDebtListReqDTO req) {
+        ResponseData<Page> responseData = null;
+        log.info("Feign 获取欠款用户,MemberDebtListReqDTO={}",req);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包服务");
+        Page data;
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"RemoteOldSysDebtService.queryList");
+            Cat.logEvent(CatConstants.FEIGN_PARAM, GsonUtils.toJson(req));
+            responseData = debtFeignService.queryList(req);
+            ResponseCheckUtil.checkResponse(responseData);
+            t.setStatus(Transaction.SUCCESS);
+            data = responseData.getData();
+        }catch (Exception e){
+            log.error("Feign 获取用户的欠款失败,ResponseData={},MemberDebtListReqDTO={}",GsonUtils.toJson(responseData),GsonUtils.toJson(req),e);
+            Cat.logError("Feign 获取用户的欠款失败",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+        return data;
+    }
+
 }

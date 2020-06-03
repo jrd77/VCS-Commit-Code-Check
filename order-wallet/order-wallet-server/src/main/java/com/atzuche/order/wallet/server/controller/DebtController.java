@@ -1,6 +1,8 @@
 package com.atzuche.order.wallet.server.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.api.DeductBalanceVO;
@@ -16,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -63,5 +66,16 @@ public class DebtController {
     public ResponseData<DebtDetailVO> getDebtDetailVO(@RequestParam("memNo")String memNo){
     	DebtDetailVO debtDetailVO = debtService.getDebtDetailVO(memNo);
         return ResponseData.success(debtDetailVO);
+    }
+
+    /**
+     * 返回有欠款的用户
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.GET)
+    public ResponseData<Page> queryList(MemberDebtListReqDTO req){
+        Page<MemberDebtListReqDTO> debtByMemberNoList = debtService.findDebtByMemberNoList(req);
+        return ResponseData.success(debtByMemberNoList);
     }
 }

@@ -1,11 +1,14 @@
 package com.atzuche.order.wallet.server.service;
 
+import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
 import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import com.atzuche.order.wallet.server.mapper.MemberMapper;
 import com.atzuche.order.wallet.server.mapper.TransSupplementDetailMapper;
+import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,5 +159,12 @@ public class DebtService {
         debtDetailVO.setHistoryDebtAmt(historyDebtAmt);
         debtDetailVO.setOrderDebtAmt(orderDebtAmt);
         return debtDetailVO;
+    }
+
+    public Page<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req) {
+        PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        List<MemberDebtListReqDTO> debtByMemberNoList = transSupplementDetailMapper.findDebtByMemberNoList(req);
+        return new Page<>(debtByMemberNoList);
+
     }
 }
