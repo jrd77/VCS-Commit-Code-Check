@@ -32,6 +32,9 @@ public class DeliveryCarVO {
     // 车主会员号
     private String ownerMemNo;
 
+    @AutoDocProperty("油耗总刻度")
+    private String maxOilNumber;
+
 
 
 }
