@@ -2,8 +2,7 @@ package com.atzuche.order.commons.entity.orderDetailDto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 
-import java.io.Serializable;
-public class AccountOwnerIncomeListDTO implements Serializable {
+public class AccountOwnerIncomeListDTO{
     @AutoDocProperty(value="会员号")
     private String memNo;
     @AutoDocProperty(value="收益总金额")
