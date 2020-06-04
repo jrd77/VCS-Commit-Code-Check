@@ -50,12 +50,16 @@ public class AdminPaymentController {
 		
 	}
     @AutoDocMethod(description = "清算退款", value = "清算退款", response = ClearingRefundReqVO.class)
-    @RequestMapping(value="payment/information",method = RequestMethod.POST)
-    public Response<?> platformPaymentList(@RequestBody @Validated ClearingRefundReqVO clearingRefundReqVO, BindingResult bindingResult) {
+    @RequestMapping(value="/clearingRefund/clearingRefundSubmit",method = RequestMethod.POST)
+    public Response<?> clearingRefundSubmitToRefund(@RequestBody @Validated ClearingRefundReqVO clearingRefundReqVO, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
         Response<?> response = remoteFeignService.clearingRefundFromRemote(clearingRefundReqVO);
         return response;
     }
-
+    @AutoDocMethod(description = "清算退款权限", value = "清算退款权限", response = ClearingRefundReqVO.class)
+    @RequestMapping(value="/clearingRefund/clearingRefundSubmitpower",method = RequestMethod.POST)
+    public ResponseData<Boolean> clearingRefundSubmitToRefundPower(){
+        return ResponseData.success(true);
+    }
 
 }

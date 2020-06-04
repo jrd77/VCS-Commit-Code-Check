@@ -16,6 +16,7 @@
         <result property="amt" column="amt"/>
         <result property="status" column="status"/>
         <result property="qn" column="qn"/>
+        <result property="payTransNo" column="pay_trans_no"/>
         <result property="uniqueNo" column="unique_no"/>
         <result property="flag" column="flag"/>
         <result property="type" column="type"/>
@@ -44,7 +45,8 @@
 	`pay_source`, 	
 	`amt`, 	
 	`status`, 	
-	`qn`, 	
+	`qn`,
+	`pay_trans_no`,
 	`unique_no`, 	
 	`flag`, 	
 	`type`, 	
@@ -80,6 +82,7 @@
             <if test="amt != null">`amt`, </if>
             <if test="status != null">`status`, </if>
             <if test="qn != null">`qn`, </if>
+            <if test="payTransNo != null">`pay_trans_no`, </if>
             <if test="uniqueNo != null">`unique_no`, </if>
             <if test="flag != null">`flag`, </if>
             <if test="type != null">`type`, </if>
@@ -104,6 +107,7 @@
             <if test="amt != null">#{amt},  </if>
             <if test="status != null">#{status},  </if>
             <if test="qn != null">#{qn},  </if>
+            <if test="payTransNo != null">#{payTransNo},  </if>
             <if test="uniqueNo != null">#{uniqueNo},  </if>
             <if test="flag != null">#{flag},  </if>
             <if test="type != null">#{type},  </if>
@@ -130,6 +134,7 @@
 		  `amt`,
 		  `status`,
 		  `qn`,
+		  `pay_trans_no`,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -156,6 +161,7 @@
 		  `amt`,
 		  `status`,
 		  `qn`,
+		  `pay_trans_no`,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -188,6 +194,7 @@
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="status != null">`status` = #{status}, </if>
 				<if test="qn != null">`qn` = #{qn}, </if>
+				<if test="payTransNo != null">`pay_trans_no` = #{payTransNo}, </if>
 				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
 				<if test="flag != null">`flag` = #{flag}, </if>
 				<if test="type != null">`type` = #{type}, </if>

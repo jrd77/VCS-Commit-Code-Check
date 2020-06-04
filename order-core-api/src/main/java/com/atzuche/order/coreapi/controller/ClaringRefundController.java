@@ -37,7 +37,7 @@ public class ClaringRefundController {
      * @Description: 清算退款提交-退款
      *
 //     **/
-    @PostMapping("/clearingRefundSubmitToQuery")
+    @PostMapping("/clearingRefundSubmit")
     public Response<?> clearingRefundSubmitToRefund(@RequestBody @Valid ClearingRefundReqVO  clearingRefundReqVO){
         log.info("清算退款提交-退款-入参-clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO));
         String orderNo = clearingRefundReqVO.getOrderNo();

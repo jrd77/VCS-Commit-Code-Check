@@ -17,6 +17,6 @@ public interface FeignClearingRefundService {
      * @Description: 清算退款
      *
      **/
-    @PostMapping("/clearingRefundSubmitToQuery")
+    @PostMapping("/clearingRefund/clearingRefundSubmit")
     public Response<?> clearingRefundSubmitToRefund(@RequestBody ClearingRefundReqVO clearingRefundReqVO);
 }
