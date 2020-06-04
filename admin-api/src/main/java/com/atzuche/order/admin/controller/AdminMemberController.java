@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/console")
 @RestController
-@AutoDocVersion(version = "钱包接口文档")
+@AutoDocVersion(version = "会员欠款文档")
 public class AdminMemberController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminMemberController.class);
@@ -23,7 +23,7 @@ public class AdminMemberController {
     private FeignCashWithdrawalService feignCashWithdrawalService;
 
 
-	@AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletBalanceVO.class)
+	@AutoDocMethod(description = "会员欠款查看", value = "会员欠款查看", response = WalletBalanceVO.class)
 	@PostMapping("/member/mmeberDebt")
 	public ResponseData walletBalance(@RequestBody MemberDebtListReqDTO req) {
         ResponseData<Page> pageResponseData = feignCashWithdrawalService.queryList(req);
