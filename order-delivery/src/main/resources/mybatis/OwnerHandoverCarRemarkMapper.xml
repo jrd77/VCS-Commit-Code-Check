@@ -193,7 +193,7 @@
 	</select>
 
     <select id="selectProIdByOrderNo" resultMap="BaseResultMap">
-        select description as remark,DATE_FORMAT(max(update_time),'%Y-%m-%d %H:%i:%s') as updateTime from owner_handover_car_remark
+        select remark, DATE_FORMAT(max(update_time),'%Y-%m-%d %H:%i:%s') as updateTime from owner_handover_car_remark
         where order_no = #{orderNo} and is_delete = 0
         group by pro_id order by id desc
     </select>
