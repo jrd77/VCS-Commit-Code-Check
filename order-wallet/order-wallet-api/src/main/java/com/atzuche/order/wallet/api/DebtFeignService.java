@@ -47,6 +47,6 @@ public interface DebtFeignService {
      * @param req
      * @return
      */
-    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.GET)
-    public ResponseData<Page> queryList(MemberDebtListReqDTO req);
+    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
+    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req);
 }

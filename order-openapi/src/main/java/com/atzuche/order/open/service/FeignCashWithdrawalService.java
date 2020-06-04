@@ -37,6 +37,6 @@ public interface FeignCashWithdrawalService {
 	 * @param req
 	 * @return ResponseData<?>
 	 */
-	@GetMapping("/debt/queryList")
-	public ResponseData<Page> queryList(MemberDebtListReqDTO req);
+	@PostMapping("/debt/queryList")
+	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req);
 }

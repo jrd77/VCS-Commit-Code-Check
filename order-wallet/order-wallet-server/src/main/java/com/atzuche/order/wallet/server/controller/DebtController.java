@@ -70,8 +70,8 @@ public class DebtController {
      * @param req
      * @return
      */
-    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.GET)
-    public ResponseData<Page> queryList(MemberDebtListReqDTO req){
+    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
+    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req){
         Page<MemberDebtListReqDTO> debtByMemberNoList = debtService.findDebtByMemberNoList(req);
         return ResponseData.success(debtByMemberNoList);
     }

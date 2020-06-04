@@ -105,8 +105,8 @@ public class CashWithdrawalController {
 
     	return ResponseData.success(debtDetailVO);
     }
-	@GetMapping("/debt/queryList")
-	public ResponseData<Page> queryList(@Valid MemberDebtListReqDTO req, BindingResult bindingResult) {
+	@PostMapping("/debt/queryList")
+	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req, BindingResult bindingResult) {
 		log.info("查询会员欠款入参[{}]",req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		Page page = remoteOldSysDebtService.queryList(req);
