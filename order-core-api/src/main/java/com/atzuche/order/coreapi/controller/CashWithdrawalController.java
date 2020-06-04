@@ -1,5 +1,7 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.BindingResultUtil;
@@ -112,10 +114,12 @@ public class CashWithdrawalController {
 		Page page = remoteOldSysDebtService.queryList(req);
 		log.info("获取欠款用户出参page=[{}]",page);
 		List<MemberDebtListReqDTO> list = page.getList();
+		String jsonString = JSON.toJSONString(list);
+		List<MemberDebtListReqDTO> memberDebtListReqDTOS = JSONArray.parseArray(jsonString, MemberDebtListReqDTO.class);
 		log.info("获取欠款用户出参list=[{}]",list);
 		if(CollectionUtils.isNotEmpty(list)){
 			List<MemberDebtListResDTO> memberDebtListResDTOList = new ArrayList<>();
-			for (MemberDebtListReqDTO memberDebtListReqDTO : list) {
+			for (MemberDebtListReqDTO memberDebtListReqDTO : memberDebtListReqDTOS) {
 				MemberDebtListResDTO memberDebtListResDTO = new MemberDebtListResDTO();
 				DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(memberDebtListReqDTO.getMemNo());
 				if(debtDetailVO != null) {
