@@ -16,6 +16,7 @@ import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.open.service.*;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
+import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -56,6 +57,34 @@ public class RemoteFeignService {
     FeignOrderModifyService feignOrderModifyService;
     @Autowired
     FeignModifyOwnerAddrService feignModifyOwnerAddrService;
+    @Autowired
+    FeignClearingRefundService feignClearingRefundService;
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/4 13:42
+     * @Description: 清算退款
+     *
+     **/
+    public Response<?> clearingRefundFromRemote(ClearingRefundReqVO clearingRefundReqVO ){
+        Response<?> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "清算退款");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderService.queryOrderStatusByOrderNo");
+            log.info("Feign 清算退款,clearingRefundReqVO={}", JSON.toJSONString(clearingRefundReqVO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(clearingRefundReqVO));
+            responseObject= feignClearingRefundService.clearingRefundSubmitToRefund(clearingRefundReqVO);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(clearingRefundReqVO));
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject;
+        }catch (Exception e){
+            log.error("Feign 清算退款异常,responseObject={},clearingRefundReqVO={}", JSON.toJSONString(responseObject),JSON.toJSONString(clearingRefundReqVO),e);
+            Cat.logError("Feign 清算退款异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 
     public OrderStatusDTO queryOrderStatusByOrderNo(String orderNo){
         ResponseData<OrderStatusDTO> responseObject = null;

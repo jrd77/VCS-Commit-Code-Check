@@ -5,15 +5,16 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.commons.exceptions.CleanRefoundException;
 import com.atzuche.order.commons.exceptions.NotFoundCashierException;
-import com.atzuche.order.coreapi.entity.request.ClearingRefundReqVO;
+import com.atzuche.order.commons.vo.req.ClearingRefundReqVO;
 import com.atzuche.order.coreapi.service.ClearingRefundService;
+import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 
 /*
  * @Author ZhangBin
@@ -37,7 +38,7 @@ public class ClaringRefundController {
      *
 //     **/
     @PostMapping("/clearingRefundSubmitToQuery")
-    public ResponseData<?> clearingRefundSubmitToRefund(@RequestBody @Valid ClearingRefundReqVO  clearingRefundReqVO){
+    public Response<?> clearingRefundSubmitToRefund(@RequestBody @Valid ClearingRefundReqVO  clearingRefundReqVO){
         log.info("清算退款提交-退款-入参-clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO));
         String orderNo = clearingRefundReqVO.getOrderNo();
         String payTransNo = clearingRefundReqVO.getPayTransNo();
@@ -48,16 +49,16 @@ public class ClaringRefundController {
             throw e;
         }
         String payType = clearingRefundReqVO.getPayType();
-        if(){//退款、预授权解冻、预授权查询
+        if(Arrays.asList("04","03","32").contains(payType)){//退款、预授权解冻、预授权查询
             Integer response = clearingRefundService.clearingRefundSubmitToRefund(clearingRefundReqVO,cashierEntity);
             log.info("清算退款提交-退款-结果{}-入参-clearingRefundReqVO={}",JSON.toJSONString(response),JSON.toJSONString(clearingRefundReqVO));
-            return ResponseData.success(response);
-        }else if(true){//查询操作
-            String response = clearingRefundService.clearingRefundToQuery(cashierEntity);
-            return ResponseData.success(response);
-        }else if(true){//支付宝同步履约
-            String response = clearingRefundService.clearingRefundToPerformance(cashierEntity);
-            return ResponseData.success(response);
+            return Response.success(response);
+        }else if(Arrays.asList("01","02").contains(payType)){//查询操作
+            Response<AutoPayResultVo> response = clearingRefundService.clearingRefundToQuery(cashierEntity);
+            return response;
+        }else if(Arrays.asList("100").contains(payType)){//支付宝同步履约
+            Response<AutoPayResultVo> response = clearingRefundService.clearingRefundToPerformance(cashierEntity);
+            return response;
         }else{
             CleanRefoundException e = new CleanRefoundException("无法匹配的操作类型");
             log.error("清算退款-流水号找不到对应的操作类型");

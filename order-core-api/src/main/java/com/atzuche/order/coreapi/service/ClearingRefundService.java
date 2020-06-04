@@ -5,30 +5,27 @@ import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.mapper.CashierRefundApplyMapper;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
-import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
-import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.exceptions.CleanRefoundException;
-import com.atzuche.order.commons.exceptions.NotFoundCashierException;
-import com.atzuche.order.coreapi.entity.request.ClearingRefundReqVO;
+import com.atzuche.order.commons.vo.req.ClearingRefundReqVO;
 import com.autoyol.autopay.gateway.api.AutoPayGatewaySecondaryService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.autopay.gateway.vo.req.PreRoutingPayRequest;
 import com.autoyol.autopay.gateway.vo.req.QueryVo;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
-import com.autoyol.commons.utils.GsonUtils;
-import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -43,7 +40,7 @@ public class ClearingRefundService {
     @Autowired
     private CashierPayService cashierPayService;
 
-    public String clearingRefundToPerformance(CashierEntity cashierEntity) {
+    public Response<AutoPayResultVo> clearingRefundToPerformance(CashierEntity cashierEntity) {
         PreRoutingPayRequest preRoutingPayRequest = new PreRoutingPayRequest();
         preRoutingPayRequest.setPayTransId(cashierEntity.getPayTransNo());
         preRoutingPayRequest.setSourceOs("PC");
@@ -52,9 +49,9 @@ public class ClearingRefundService {
         preRoutingPayRequest.setEnv(cashierEntity.getPayEvn());
         preRoutingPayRequest.setPayAmt(cashierEntity.getPayAmt()==null?"0":String.valueOf(cashierEntity.getPayAmt())); //跟金额无关。
         Response<AutoPayResultVo> autoPayResultVoResponse = routingRulesQuery(preRoutingPayRequest);
-        return JSON.toJSONString(autoPayResultVoResponse);
+        return autoPayResultVoResponse;
     }
-    public String clearingRefundToQuery(CashierEntity cashierEntity){
+    public Response<AutoPayResultVo> clearingRefundToQuery(CashierEntity cashierEntity){
         QueryVo queryVo = new QueryVo();
         queryVo.setAtappId(cashierEntity.getAtappId());
         queryVo.setPayEnv(cashierEntity.getPayEvn());
@@ -69,7 +66,7 @@ public class ClearingRefundService {
         queryVo.setPayTime(cashierEntity.getPayTime());
         queryVo.setAtpayNewTransId(cashierEntity.getPayTransNo());
         Response<AutoPayResultVo> autoPayResultVoResponse = routingRulesQuery(queryVo);
-        return JSON.toJSONString(autoPayResultVoResponse);
+        return autoPayResultVoResponse;
     }
 
 
@@ -77,19 +74,19 @@ public class ClearingRefundService {
     public Integer clearingRefundSubmitToRefund(ClearingRefundReqVO clearingRefundReqVO,CashierEntity cashierEntity) {
         String payType = cashierEntity.getPayType();
         String payTypeReq = clearingRefundReqVO.getPayType();
-        if(payTypeReq==null || !payTypeReq.equals(payType)){
+        if(payTypeReq==null
+                || (DataPayTypeConstant.PAY_PRE.equals(payType) && !Arrays.asList("03","32").contains(payTypeReq))
+                || DataPayTypeConstant.PAY_PUR.equals(payType) && !Arrays.asList("04").contains(payTypeReq)){
             CleanRefoundException e = new CleanRefoundException("操作类型与流水记录不匹配");
             log.error("清算退款-操作类型与流水记录不匹配clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-        String paySource = cashierEntity.getPaySource();
-        String paySourcereq = clearingRefundReqVO.getPaySource();
-        if(paySourcereq==null || !paySourcereq.equals(paySource)){
-            CleanRefoundException e = new CleanRefoundException("支付来源与流水记录不匹配");
-            log.error("清算退款-操作类型与流水记录不匹配clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
+        if(clearingRefundReqVO.getAmt()==null || clearingRefundReqVO.getAmt()<=0){
+            CleanRefoundException e = new CleanRefoundException("退款金额不能小于等于0");
+            log.error("清算退款-退款金额不能小于等于0clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-        if(cashierEntity.getPayAmt() < clearingRefundReqVO.getAmt()){
+        if(cashierEntity.getPayAmt()==null || cashierEntity.getPayAmt() < clearingRefundReqVO.getAmt()){
             CleanRefoundException e = new CleanRefoundException("退款金额大于流水金额，不予退款");
             log.error("清算退款-退款金额大于流水金额clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
@@ -102,11 +99,11 @@ public class ClearingRefundService {
         cashierRefundApplyEntity.setAtappId(cashierEntity.getAtappId());
         cashierRefundApplyEntity.setPayKind(cashierEntity.getPayKind());
         cashierRefundApplyEntity.setPayType(clearingRefundReqVO.getPayType());
-        cashierRefundApplyEntity.setPaySource(paySourcereq);
+        cashierRefundApplyEntity.setPaySource(cashierEntity.getPaySource());
         cashierRefundApplyEntity.setQn(cashierEntity.getQn());
         cashierRefundApplyEntity.setUniqueNo(null);
         cashierRefundApplyEntity.setType(0);
-        cashierRefundApplyEntity.setNum(0);
+        cashierRefundApplyEntity.setNum(1);
         cashierRefundApplyEntity.setPayMd5(cashierEntity.getPayMd5());
         cashierRefundApplyEntity.setSourceCode(renterCashCodeEnum.getCashNo());
         cashierRefundApplyEntity.setSourceDetail(renterCashCodeEnum.getTxt());
@@ -116,7 +113,7 @@ public class ClearingRefundService {
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         log.info("清算退款-记录保存result={},参数cashierRefundApplyEntity={}",result,JSON.toJSONString(cashierRefundApplyEntity));
 
-        //退款操作
+        //立即退款操作
         CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(cashierEntity.getOrderNo(),cashierEntity.getPayKind());
         cashierPayService.refundOrderPay(cashierRefundApply);
 
