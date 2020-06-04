@@ -110,7 +110,9 @@ public class CashWithdrawalController {
 		log.info("查询会员欠款入参[{}]",req);
 		BindingResultUtil.checkBindingResult(bindingResult);
 		Page page = remoteOldSysDebtService.queryList(req);
+		log.info("获取欠款用户出参page=[{}]",page);
 		List<MemberDebtListReqDTO> list = page.getList();
+		log.info("获取欠款用户出参list=[{}]",list);
 		if(CollectionUtils.isNotEmpty(list)){
 			List<MemberDebtListResDTO> memberDebtListResDTOList = new ArrayList<>();
 			for (MemberDebtListReqDTO memberDebtListReqDTO : list) {
