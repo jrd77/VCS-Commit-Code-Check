@@ -1,23 +1,20 @@
 package com.atzuche.order.open.service;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import com.atzuche.order.commons.Page;
+import com.atzuche.order.commons.entity.dto.AccountOwnerCashExamineDTO;
 import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
+import com.atzuche.order.commons.vo.DebtDetailVO;
+import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.autoyol.commons.utils.Page;
+import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.atzuche.order.commons.entity.dto.AccountOwnerCashExamineDTO;
-import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
-import com.atzuche.order.commons.vo.DebtDetailVO;
-import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
-import com.autoyol.commons.web.ResponseData;
+import javax.validation.Valid;
+import java.util.List;
 
 @FeignClient(name="order-center-api")
 public interface FeignCashWithdrawalService {

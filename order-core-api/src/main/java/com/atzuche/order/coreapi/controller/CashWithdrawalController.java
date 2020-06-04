@@ -1,41 +1,30 @@
 package com.atzuche.order.coreapi.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import com.atzuche.order.commons.Page;
-import com.atzuche.order.commons.ResponseCheckUtil;
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
-import com.atzuche.order.commons.entity.dto.MemberDebtListResDTO;
-import com.atzuche.order.settle.service.RemoteOldSysDebtService;
-import com.atzuche.order.wallet.api.DebtFeignService;
-import com.dianping.cat.message.Transaction;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.MemberDebtListResDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.coreapi.entity.vo.OwnerGpsDeductVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.service.RemoteOldSysDebtService;
 import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @Slf4j

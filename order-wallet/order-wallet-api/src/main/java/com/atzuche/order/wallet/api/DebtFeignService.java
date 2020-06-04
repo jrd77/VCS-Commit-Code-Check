@@ -1,7 +1,7 @@
 package com.atzuche.order.wallet.api;
 
-import com.atzuche.order.commons.Page;
 import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;

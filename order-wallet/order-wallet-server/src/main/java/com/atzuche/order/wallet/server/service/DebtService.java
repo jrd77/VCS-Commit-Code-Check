@@ -1,6 +1,5 @@
 package com.atzuche.order.wallet.server.service;
 
-import com.atzuche.order.commons.Page;
 import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
@@ -8,6 +7,7 @@ import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import com.atzuche.order.wallet.server.mapper.MemberMapper;
 import com.atzuche.order.wallet.server.mapper.TransSupplementDetailMapper;
+import com.autoyol.commons.utils.Page;
 import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
