@@ -130,9 +130,9 @@ public class RemoteOldSysDebtService {
             Cat.logEvent(CatConstants.FEIGN_PARAM, GsonUtils.toJson(req));
             String s = GsonUtils.toJson(req);
             MemberDebtListReqDTO memberDebtListReqDTO = GsonUtils.convertObj(s, MemberDebtListReqDTO.class);
-            log.info("111111111111111"+GsonUtils.toJson(memberDebtListReqDTO));
+            log.info("远程调用欠款用户入参"+GsonUtils.toJson(memberDebtListReqDTO));
             responseData = debtFeignService.queryList(memberDebtListReqDTO);
-            log.info("22222222222222"+GsonUtils.toJson(responseData));
+            log.info("远程调用欠款用户出参"+GsonUtils.toJson(responseData));
             ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
             data = responseData.getData();

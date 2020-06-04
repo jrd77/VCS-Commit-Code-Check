@@ -401,7 +401,7 @@
 	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
   </select>
   <select id="findDebtByMemberNoList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
-    SELECT
+    SELECT DISTINCT
         m.reg_no as memNo,
         m.mobile as mobile,
         m.real_name as realName
