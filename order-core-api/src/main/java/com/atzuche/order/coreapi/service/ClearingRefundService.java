@@ -100,8 +100,9 @@ public class ClearingRefundService {
         int refoundAmt = Optional.ofNullable(refundApplyByOrderNoPayKind).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
         int diffAmt = cashierEntity.getPayAmt() - refoundAmt- clearingRefundReqVO.getAmt();
         if(diffAmt < 0){
-            CleanRefoundException e = new CleanRefoundException("当前退款金额【"+clearingRefundReqVO.getAmt()+"】，已退款或正在退款金额【"+refoundAmt+"】，剩余退款金额【"+diffAmt+"】超过退款总金额，不予退款");
-            log.error("清算退款-退款金额大于流水金额clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
+            String msg = "总金额【"+cashierEntity.getPayAmt()+"】，已退款或正在退款金额【"+refoundAmt+"】，剩余退款金额【"+ (cashierEntity.getPayAmt() - refoundAmt)+"】超过可退款总金额，不予退款";
+            CleanRefoundException e = new CleanRefoundException(msg);
+            log.error("清算退款-{}，clearingRefundReqVO={}",msg,JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
         //保存记录
