@@ -970,6 +970,11 @@ public class CashierNoTService {
         refundVo.setInternalNo("1");
         refundVo.setReqOs("IOS");
         refundVo.setRefundAmt(String.valueOf(Math.abs(cashierRefundApply.getAmt())));
+        ///重新赋值
+        if("04".equals(cashierRefundApply.getPayType())) {
+        	refundVo.setQn(cashierRefundApply.getPayTransNo());
+        }
+        
         String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
         String reqContent = FasterJsonUtil.toJson(refundVo);
