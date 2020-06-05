@@ -352,6 +352,8 @@ public class CashierNoTService {
 	            cashier.setOs(notifyDataVo.getReqOs());
 //	            cashier.setPayTransNo(notifyDataVo.getQn());
 	            cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
+	            //重新赋值
+	            cashier.setQn(notifyDataVo.getQn());
 	            
 	            cashier.setPayTime(notifyDataVo.getOrderTime());
 	            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
@@ -377,7 +379,9 @@ public class CashierNoTService {
                 cashier.setOs(notifyDataVo.getReqOs());
 //                cashier.setPayTransNo(notifyDataVo.getQn());
                 cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
-                
+                //重新赋值
+	            cashier.setQn(notifyDataVo.getQn());
+	            
                 cashier.setPayTime(notifyDataVo.getOrderTime());
                 cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
                 String amtStr = notifyDataVo.getSettleAmount();
@@ -970,10 +974,10 @@ public class CashierNoTService {
         refundVo.setInternalNo("1");
         refundVo.setReqOs("IOS");
         refundVo.setRefundAmt(String.valueOf(Math.abs(cashierRefundApply.getAmt())));
-        ///重新赋值
-        if("04".equals(cashierRefundApply.getPayType())) {
-        	refundVo.setQn(cashierRefundApply.getPayTransNo());
-        }
+//        ///重新赋值
+//        if("04".equals(cashierRefundApply.getPayType())) {
+//        	refundVo.setQn(cashierRefundApply.getPayTransNo());
+//        }
         
         String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
