@@ -40,8 +40,6 @@ public class ClearingRefundService {
     @Autowired
     private AutoPayGatewaySecondaryService autoPayGatewaySecondaryService;
     @Autowired
-    private CashierRefundApplyNoTService cashierRefundApplyNoTService;
-    @Autowired
     private CashierPayService cashierPayService;
 
     public Response<AutoPayResultVo> clearingRefundToPerformance(CashierEntity cashierEntity) {
