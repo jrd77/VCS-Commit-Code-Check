@@ -25,7 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -81,13 +85,22 @@ public class ClearingRefundService {
             log.error("清算退款-操作类型与流水记录不匹配clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-        if(clearingRefundReqVO.getAmt()==null || clearingRefundReqVO.getAmt()<=0){
+        if(clearingRefundReqVO.getAmt()==null || clearingRefundReqVO.getAmt()<=0 ){
             CleanRefoundException e = new CleanRefoundException("退款金额不能小于等于0");
-            log.error("清算退款-退款金额不能小于等于0clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
+            log.error("清算退款-退款金额不能小于等于0，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-        if(cashierEntity.getPayAmt()==null || cashierEntity.getPayAmt() < clearingRefundReqVO.getAmt()){
-            CleanRefoundException e = new CleanRefoundException("退款金额大于流水金额，不予退款");
+        if(cashierEntity.getPayAmt()==null){
+            CleanRefoundException e = new CleanRefoundException("收银台金额为空，退款失败！");
+            log.error("收银台金额为空，退款失败，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
+            throw e;
+        }
+
+        List<CashierRefundApplyEntity> refundApplyByOrderNoPayKind = cashierRefundApplyMapper.getRefundApplyByOrderNoPayKind(cashierEntity.getOrderNo(), cashierEntity.getPayKind());
+        int refoundAmt = Optional.ofNullable(refundApplyByOrderNoPayKind).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
+        int diffAmt = cashierEntity.getPayAmt() - refoundAmt- clearingRefundReqVO.getAmt();
+        if(diffAmt < 0){
+            CleanRefoundException e = new CleanRefoundException("当前退款金额【"+clearingRefundReqVO.getAmt()+"】，已退款或正在退款金额【"+refoundAmt+"】，剩余退款金额【"+diffAmt+"】超过退款总金额，不予退款");
             log.error("清算退款-退款金额大于流水金额clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
