@@ -423,5 +423,25 @@
     ORDER BY
         mem_no desc
   </select>
+  <select id="findMemberList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
+    SELECT DISTINCT
+    m.reg_no as memNo,
+    m.mobile as mobile,
+    m.real_name as realName
+    FROM
+     member as m
+    WHERE
+    <if test="memNo != null">
+      and m.reg_no = #{memNo}
+    </if>
+    <if test="mobile != null">
+      and m.mobile = #{mobile}
+    </if>
+    <if test="realName != null">
+      and m.real_name like concat('%',#{realName},'%')
+    </if>
+    ORDER BY
+    mem_no desc
+  </select>
 
 </mapper>

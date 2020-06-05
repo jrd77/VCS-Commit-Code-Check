@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -164,6 +165,9 @@ public class DebtService {
     public Page<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req) {
         PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<MemberDebtListReqDTO> debtByMemberNoList = transSupplementDetailMapper.findDebtByMemberNoList(req);
+        if(CollectionUtils.isEmpty(debtByMemberNoList)){
+            debtByMemberNoList = transSupplementDetailMapper.findMemberList(req);
+        }
         return new Page<>(debtByMemberNoList);
 
     }
