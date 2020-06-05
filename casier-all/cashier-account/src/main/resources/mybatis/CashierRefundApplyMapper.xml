@@ -15,6 +15,8 @@
         <result property="paySource" column="pay_source"/>
         <result property="amt" column="amt"/>
         <result property="status" column="status"/>
+        <result property="payTransNoParent" column="pay_trans_no_parent"/>
+        <result property="adminFlag" column="admin_flag"/>
         <result property="qn" column="qn"/>
         <result property="payTransNo" column="pay_trans_no"/>
         <result property="uniqueNo" column="unique_no"/>
@@ -44,7 +46,9 @@
 	`pay_type`, 	
 	`pay_source`, 	
 	`amt`, 	
-	`status`, 	
+	`status`,
+	`pay_trans_no_parent`,
+	`admin_flag`,
 	`qn`,
 	`pay_trans_no`,
 	`unique_no`, 	
@@ -81,6 +85,8 @@
             <if test="paySource != null">`pay_source`, </if>
             <if test="amt != null">`amt`, </if>
             <if test="status != null">`status`, </if>
+            <if test="payTransNoParent != null">`pay_trans_no_parent`, </if>
+            <if test="adminFlag != null">`admin_flag`, </if>
             <if test="qn != null">`qn`, </if>
             <if test="payTransNo != null">`pay_trans_no`, </if>
             <if test="uniqueNo != null">`unique_no`, </if>
@@ -106,6 +112,8 @@
             <if test="paySource != null">#{paySource},  </if>
             <if test="amt != null">#{amt},  </if>
             <if test="status != null">#{status},  </if>
+            <if test="payTransNoParent != null">#{payTransNoParent},  </if>
+            <if test="adminFlag != null">#{adminFlag},  </if>
             <if test="qn != null">#{qn},  </if>
             <if test="payTransNo != null">#{payTransNo},  </if>
             <if test="uniqueNo != null">#{uniqueNo},  </if>
@@ -133,8 +141,10 @@
 		  `pay_source`,
 		  `amt`,
 		  `status`,
+		  `admin_flag`,
 		  `qn`,
 		  `pay_trans_no`,
+		  `pay_trans_no_parent`,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -160,8 +170,10 @@
 		  `pay_source`,
 		  `amt`,
 		  `status`,
+		  0,
 		  `qn`,
 		  `pay_trans_no`,
+		  `pay_trans_no_parent`,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -193,6 +205,8 @@
 				<if test="paySource != null">`pay_source` = #{paySource}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="status != null">`status` = #{status}, </if>
+				<if test="payTransNoParent != null">`pay_trans_no_parent` = #{payTransNoParent}, </if>
+				<if test="adminFlag != null">`admin_flag` = #{adminFlag}, </if>
 				<if test="qn != null">`qn` = #{qn}, </if>
 				<if test="payTransNo != null">`pay_trans_no` = #{payTransNo}, </if>
 				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
@@ -259,7 +273,9 @@
       select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo} and pay_trans_no = #{payTransNo}
     </select>
-
-
+    <select id="getRefundApplyByPayTransNoParent" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} and pay_trans_no_parent = #{payTransNoParent}
+    </select>
 
 </mapper>

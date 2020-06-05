@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.vo.req.ClearingRefundReqVO;
@@ -53,6 +54,7 @@ public class AdminPaymentController {
     @RequestMapping(value="/clearingRefund/clearingRefundSubmit",method = RequestMethod.POST)
     public Response<?> clearingRefundSubmitToRefund(@RequestBody @Validated ClearingRefundReqVO clearingRefundReqVO, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
+        clearingRefundReqVO.setOperateName(AdminUserUtil.getAdminUser().getAuthName());
         Response<?> response = remoteFeignService.clearingRefundFromRemote(clearingRefundReqVO);
         return response;
     }

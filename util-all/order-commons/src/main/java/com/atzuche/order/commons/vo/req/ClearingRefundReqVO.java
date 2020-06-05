@@ -23,4 +23,7 @@ public class ClearingRefundReqVO {
     private String paySource;
     @AutoDocProperty("金额")
     private Integer amt;
+
+    @AutoDocProperty("操作人")
+    private String operateName;
 }

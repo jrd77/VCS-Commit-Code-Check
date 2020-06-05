@@ -97,6 +97,7 @@ public class CashierRefundApplyNoTService {
         if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){
             return entity.getId();
         }
+
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();

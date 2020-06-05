@@ -95,9 +95,8 @@ public class ClearingRefundService {
             log.error("收银台金额为空，退款失败，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-
-        List<CashierRefundApplyEntity> refundApplyByOrderNoPayKind = cashierRefundApplyMapper.getRefundApplyByOrderNoPayKind(cashierEntity.getOrderNo(), cashierEntity.getPayKind());
-        int refoundAmt = Optional.ofNullable(refundApplyByOrderNoPayKind).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
+        List<CashierRefundApplyEntity>  refundApply = cashierRefundApplyMapper.getRefundApplyByPayTransNoParent(cashierEntity.getOrderNo(),clearingRefundReqVO.getPayTransNo());
+        int refoundAmt = Optional.ofNullable(refundApply).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
         int diffAmt = cashierEntity.getPayAmt() - refoundAmt- clearingRefundReqVO.getAmt();
         if(diffAmt < 0){
             String msg = "总金额【"+cashierEntity.getPayAmt()+"】，已退款或正在退款金额【"+refoundAmt+"】，剩余退款金额【"+ (cashierEntity.getPayAmt() - refoundAmt)+"】超过可退款总金额，不予退款";
@@ -124,11 +123,14 @@ public class ClearingRefundService {
         cashierRefundApplyEntity.setAmt(clearingRefundReqVO.getAmt());
         cashierRefundApplyEntity.setStatus(CashierRefundApplyStatus.WAITING_FOR_REFUND.getCode());
         cashierRefundApplyEntity.setFlag(null);
+        cashierRefundApplyEntity.setAdminFlag(1);
+        cashierRefundApplyEntity.setCreateOp(clearingRefundReqVO.getOperateName());
+        cashierRefundApplyEntity.setUpdateOp(clearingRefundReqVO.getOperateName());
+        cashierRefundApplyEntity.setPayTransNoParent(clearingRefundReqVO.getPayTransNo());
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         log.info("清算退款-记录保存result={},参数cashierRefundApplyEntity={}",result,JSON.toJSONString(cashierRefundApplyEntity));
-
+        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyMapper.selectByPrimaryKey(cashierRefundApplyEntity.getId());
         //立即退款操作
-        CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(cashierEntity.getOrderNo(),cashierEntity.getPayKind());
         cashierPayService.refundOrderPay(cashierRefundApply);
 
         return result;
