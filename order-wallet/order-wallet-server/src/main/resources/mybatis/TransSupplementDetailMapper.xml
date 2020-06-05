@@ -441,7 +441,7 @@
       and m.real_name like concat('%',#{realName},'%')
     </if>
     ORDER BY
-    mem_no desc
+    reg_no desc
   </select>
 
 </mapper>
