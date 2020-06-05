@@ -95,7 +95,16 @@ public class ClearingRefundService {
             log.error("收银台金额为空，退款失败，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
-        List<CashierRefundApplyEntity>  refundApply = cashierRefundApplyMapper.getRefundApplyByPayTransNoParent(cashierEntity.getOrderNo(),clearingRefundReqVO.getPayTransNo());
+        List<CashierRefundApplyEntity>  refundApply = null;
+        if("03".equals(cashierEntity.getPayType()) && "04".equals(payTypeReq)){
+            CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(cashierEntity.getOrderNo(), clearingRefundReqVO.getPayTransNo());
+            if(cashierRefundApplyEntity != null){
+                refundApply = Arrays.asList(cashierRefundApplyEntity);
+            }
+        }else{
+            refundApply = cashierRefundApplyMapper.getRefundApplyByPayTransNoParent(cashierEntity.getOrderNo(),clearingRefundReqVO.getPayTransNo());
+        }
+
         int refoundAmt = Optional.ofNullable(refundApply).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
         int diffAmt = cashierEntity.getPayAmt() - refoundAmt- clearingRefundReqVO.getAmt();
         if(diffAmt < 0){
