@@ -337,6 +337,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      */
     public Boolean updataCashier(NotifyDataDTO notifyDataVo) {
+    	log.info("updataCashier notifyDataVo = [{}]",GsonUtils.toJson(notifyDataVo));
         CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
         int result =0;
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
@@ -363,6 +364,7 @@ public class CashierNoTService {
 	            String amtStr = notifyDataVo.getSettleAmount();
 	            amtStr = Objects.isNull(amtStr)?"0":amtStr;
 	            cashier.setPayAmt(Integer.valueOf(amtStr));
+	            log.info("updateByPrimaryKeySelective cashier=[{}]",GsonUtils.toJson(cashier));
 	            result = cashierMapper.updateByPrimaryKeySelective(cashier);
 	            if(result == 0){
 	                throw new OrderPayCallBackAsnyException();
@@ -387,6 +389,7 @@ public class CashierNoTService {
                 String amtStr = notifyDataVo.getSettleAmount();
                 amtStr = Objects.isNull(amtStr)?"0":amtStr;
                 cashier.setPayAmt(Integer.valueOf(amtStr));
+                log.info("insertSelective cashier=[{}]",GsonUtils.toJson(cashier));
                 result = cashierMapper.insertSelective(cashier);
                 if(result == 0){
                     throw new OrderPayCallBackAsnyException();

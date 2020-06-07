@@ -110,6 +110,8 @@ public class CashierRefundApplyNoTService {
      * 退款回调信息
      */
     public CashierRefundApplyEntity updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
+    	log.info("updateRefundDepositSuccess notifyDataVo=[{}]",GsonUtils.toJson(notifyDataVo));
+    	
         //1 校验
         String refundIdStr = notifyDataVo.getRefundId();
         int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
