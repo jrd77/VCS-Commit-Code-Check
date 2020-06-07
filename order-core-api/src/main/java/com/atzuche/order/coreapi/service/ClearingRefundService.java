@@ -94,6 +94,7 @@ public class ClearingRefundService {
             throw e;
         }
         List<CashierRefundApplyEntity>  refundApply = null;
+        //预授权完成之后的退款的情况。只有04
         if("03".equals(cashierEntity.getPayType()) && "04".equals(payTypeReq)){
             CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(cashierEntity.getOrderNo(), clearingRefundReqVO.getPayTransNo());
             if(cashierRefundApplyEntity != null){
@@ -111,6 +112,7 @@ public class ClearingRefundService {
             log.error("清算退款-{}，clearingRefundReqVO={}",msg,JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
+        
         //保存记录
         RenterCashCodeEnum renterCashCodeEnum = getCashCodeByPayKind(cashierEntity.getPayKind());
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
