@@ -76,6 +76,11 @@ public class ClearingRefundService {
     public Integer clearingRefundSubmitToRefund(ClearingRefundReqVO clearingRefundReqVO,CashierEntity cashierEntity) {
         String payType = cashierEntity.getPayType();
         String payTypeReq = clearingRefundReqVO.getPayType();
+        if("04".equals(payType) || "32".equals(payType)){
+            CleanRefoundException e = new CleanRefoundException("已退款或撤销，无法操作！");
+            log.error("已退款或撤销，无法操作，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
+            throw e;
+        }
         if(payTypeReq==null
                 || (DataPayTypeConstant.PAY_PRE.equals(payType) && !Arrays.asList("03","32").contains(payTypeReq))
                 || DataPayTypeConstant.PAY_PUR.equals(payType) && !Arrays.asList("04").contains(payTypeReq)){
@@ -93,6 +98,7 @@ public class ClearingRefundService {
             log.error("收银台金额为空，退款失败，clearingRefundReqVO={}",JSON.toJSONString(clearingRefundReqVO),e);
             throw e;
         }
+
         List<CashierRefundApplyEntity>  refundApply = null;
         /*if("03".equals(cashierEntity.getPayType()) && "04".equals(payTypeReq)){
             CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(cashierEntity.getOrderNo(), clearingRefundReqVO.getPayTransNo());
