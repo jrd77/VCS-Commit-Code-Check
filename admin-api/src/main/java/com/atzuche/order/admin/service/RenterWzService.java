@@ -523,6 +523,7 @@ public class RenterWzService {
         pushParamMap.put("messageType",reqVO.getMessageType());
         pushParamMap.put("event",reqVO.getEvent());
         pushParamMap.put("orderNo",reqVO.getOrderNo());
+        pushParamMap.put("url",reqVO.getUrl());
         // app推送
         orderMessage.setPushMap(pushParamMap);
         baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.routingKey, orderMessage);
