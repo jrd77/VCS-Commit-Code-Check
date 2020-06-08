@@ -109,20 +109,18 @@ public class HandoverCarService {
         HandoverCarRespVO handoverCarRepVO = new HandoverCarRespVO();
         if (CollectionUtils.isNotEmpty(renterHandoverCarInfoEntities)) {
             List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = Lists.newArrayList();
-            for(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities)
-            {
+            for (RenterHandoverCarInfoEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities) {
                 RenterHandoverCarInfoVO renterHandoverCarInfoVO = new RenterHandoverCarInfoVO();
-                BeanUtils.copyProperties(renterHandoverCarInfoEntity,renterHandoverCarInfoVO);
+                BeanUtils.copyProperties(renterHandoverCarInfoEntity, renterHandoverCarInfoVO);
                 renterHandoverCarInfoVOS.add(renterHandoverCarInfoVO);
             }
             handoverCarRepVO.setRenterHandoverCarInfoVOS(renterHandoverCarInfoVOS);
         }
         if (CollectionUtils.isNotEmpty(ownerHandoverCarInfoEntities)) {
             List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = Lists.newArrayList();
-            for(OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : ownerHandoverCarInfoEntities)
-            {
+            for (OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : ownerHandoverCarInfoEntities) {
                 OwnerHandoverCarInfoVO ownerHandoverCarInfoVO = new OwnerHandoverCarInfoVO();
-                BeanUtils.copyProperties(ownerHandoverCarInfoEntity,ownerHandoverCarInfoVO);
+                BeanUtils.copyProperties(ownerHandoverCarInfoEntity, ownerHandoverCarInfoVO);
                 ownerHandoverCarInfoVOS.add(ownerHandoverCarInfoVO);
             }
             handoverCarRepVO.setOwnerHandoverCarInfoVOS(ownerHandoverCarInfoVOS);
