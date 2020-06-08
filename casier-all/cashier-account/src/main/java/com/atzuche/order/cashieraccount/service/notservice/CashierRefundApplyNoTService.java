@@ -176,14 +176,17 @@ public class CashierRefundApplyNoTService {
     
     public void deleteOrInitNewCashierRefundApplyEntity(CashierRefundApplyEntity cashierRefundApply) {
     	//初始化
-    	cashierRefundApplyMapper.insertAgain(cashierRefundApply.getId());
+    	int i = cashierRefundApplyMapper.insertAgain(cashierRefundApply.getId());
+    	log.info("insertAgain num=[{}],params cashierRefundApply=[{}]",i,GsonUtils.toJson(cashierRefundApply));
     	
     	//逻辑删除
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
         cashierRefundApplyEntity.setId(cashierRefundApply.getId());
+        cashierRefundApplyEntity.setStatus("99"); //作废
         cashierRefundApplyEntity.setIsDelete(1);
         cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
-        cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
+        int j = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
+        log.info("updateByPrimaryKeySelective num=[{}],params cashierRefundApplyEntity=[{}]",j,GsonUtils.toJson(cashierRefundApplyEntity));
     }
     
     

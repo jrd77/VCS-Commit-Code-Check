@@ -1386,8 +1386,9 @@ public class CashierPayService{
             	
             	String subCode = vo.getResResult()!=null?(String) vo.getResResult().get("subCode"):"";
                 log.info("subCode="+ subCode);
+     ////"subCode":"ACQ.BUYER_BALANCE_NOT_ENOUGH",
                 ////ACQ.BUYER_BALANCE_NOT_ENOUGH 测试流程!!     || "ACQ.BUYER_BALANCE_NOT_ENOUGH".equals(subCode)
-                if("ACQ.TRADE_HAS_CLOSE".equals(subCode) || "ACQ.CONTEXT_INCONSISTENT".equals(subCode) || "UNIQUE_VIOLATION".equals(subCode) ){ 
+                if("ACQ.TRADE_HAS_CLOSE".equals(subCode) || "ACQ.CONTEXT_INCONSISTENT".equals(subCode) || "UNIQUE_VIOLATION".equals(subCode)){   //|| "ACQ.BUYER_BALANCE_NOT_ENOUGH".equals(subCode)
                 	flagCreate = true;
                 }
             	if(flagCreate) {		

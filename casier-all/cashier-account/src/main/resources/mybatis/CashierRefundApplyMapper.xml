@@ -141,10 +141,10 @@
 		  `pay_source`,
 		  `amt`,
 		  `status`,
-		  `admin_flag`,
 		  `qn`,
 		  `pay_trans_no`,
 		  `pay_trans_no_parent`,
+		   admin_flag,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -170,10 +170,10 @@
 		  `pay_source`,
 		  `amt`,
 		  `status`,
-		  0,
 		  `qn`,
 		  `pay_trans_no`,
 		  `pay_trans_no_parent`,
+		   admin_Flag,
 		  `unique_no`,
 		  `refund_time`,
 		  `flag`,
@@ -192,6 +192,7 @@
 		  `cashier_refund_apply`  WHERE id = #{id}
 	</insert>
 
+	<!-- where and version = #{version}  去掉 -->
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
 		update cashier_refund_apply 
 		<set>
@@ -223,7 +224,7 @@
 				version = version +1 ,
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id} and version = #{version}
+		where id = #{id} 
 	</update>
     <select id="selectRefundByQn" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} and is_delete = 0 limit 1
@@ -271,11 +272,11 @@
 	</select>
 	<select id="selectByOrerNoAndPayTransNo" resultMap="BaseResultMap">
       select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo} AND pay_type = '04'
+        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo} AND pay_type = '04' and is_delete = 0
     </select>
     <select id="getRefundApplyByPayTransNoParent" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo} and pay_trans_no_parent = #{payTransNoParent}
+        where  order_no = #{orderNo} and pay_trans_no_parent = #{payTransNoParent} and is_delete = 0
     </select>
     
 </mapper>
