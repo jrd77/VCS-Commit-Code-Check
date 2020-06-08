@@ -199,6 +199,9 @@
         select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc
 
     </select>
+    <select id="getCashierBypayTransNo" resultMap="BaseResultMap">
+         select <include refid="Base_Column_List" /> from cashier where pay_trans_no = #{payTransNo} and order_no = #{orderNo}
+    </select>
 
 
 </mapper>

@@ -276,7 +276,7 @@ public class PaymentService {
         vo.setItem(convertItem(cashierRefundApplyDTO.getPayKind()));
         vo.setPaymentType(convertType(cashierRefundApplyDTO.getPayType()));
         vo.setAmount(String.valueOf(cashierRefundApplyDTO.getAmt()));
-        vo.setSerialNumber(cashierRefundApplyDTO.getQn());
+        vo.setSerialNumber(cashierRefundApplyDTO.getPayTransNo());
         vo.setOrderType(convertOperate(cashierRefundApplyDTO.getPayType()));
         vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(cashierRefundApplyDTO.getCreateTime()));
         vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(cashierRefundApplyDTO.getUpdateTime()));
@@ -321,7 +321,7 @@ public class PaymentService {
 		vo.setItem(convertItem(cashierEntity.getPayKind()));
 		vo.setPaymentType(convertType(cashierEntity.getPayType()));
 		vo.setAmount(String.valueOf(cashierEntity.getPayAmt()));
-		vo.setSerialNumber(cashierEntity.getQn());
+		vo.setSerialNumber(cashierEntity.getPayTransNo());
 		vo.setOrderType(convertOperate(cashierEntity.getPayType()));
 		vo.setOperatorTime(LocalDateTimeUtils.formatDateTime(cashierEntity.getCreateTime()));
 		vo.setRecentlyOperatorTime(LocalDateTimeUtils.formatDateTime(cashierEntity.getUpdateTime()));

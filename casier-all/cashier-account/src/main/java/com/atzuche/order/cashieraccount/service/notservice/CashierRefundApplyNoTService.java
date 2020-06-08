@@ -97,6 +97,7 @@ public class CashierRefundApplyNoTService {
         if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){
             return entity.getId();
         }
+
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();
@@ -109,6 +110,8 @@ public class CashierRefundApplyNoTService {
      * 退款回调信息
      */
     public CashierRefundApplyEntity updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
+    	log.info("updateRefundDepositSuccess notifyDataVo=[{}]",GsonUtils.toJson(notifyDataVo));
+    	
         //1 校验
         String refundIdStr = notifyDataVo.getRefundId();
         int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
@@ -301,5 +304,10 @@ public class CashierRefundApplyNoTService {
     		return;
     	}
     	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+    }
+
+    public CashierRefundApplyEntity selectByOrerNoAndPayTransNo(String orderNo, String payTransNo) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(orderNo,payTransNo);
+        return cashierRefundApplyEntity;
     }
 }

@@ -67,6 +67,13 @@ public class CashierRefundApplyEntity implements Serializable {
 	 */
 	private String qn;
 	private String payTransNo;
+    //是否后台管理系统退款 0:默认，1：是
+	private Integer adminFlag;
+    /**
+     * 父退款pay_trans_no
+     */
+    private String payTransNoParent;
+
 	/**
 	 * 退款外部凭证
 	 */
