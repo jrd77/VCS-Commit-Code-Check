@@ -14,6 +14,7 @@ import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.utils.CommonUtil;
 import com.atzuche.order.delivery.vo.delivery.HandoverProVO;
 import com.atzuche.order.delivery.vo.handover.*;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,11 +108,23 @@ public class HandoverCarService {
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
         HandoverCarRespVO handoverCarRepVO = new HandoverCarRespVO();
         if (CollectionUtils.isNotEmpty(renterHandoverCarInfoEntities)) {
-            List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = CommonUtil.copyList(renterHandoverCarInfoEntities);
+            List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = Lists.newArrayList();
+            for(RenterHandoverCarInfoEntity renterHandoverCarInfoEntity : renterHandoverCarInfoEntities)
+            {
+                RenterHandoverCarInfoVO renterHandoverCarInfoVO = new RenterHandoverCarInfoVO();
+                BeanUtils.copyProperties(renterHandoverCarInfoEntity,renterHandoverCarInfoVO);
+                renterHandoverCarInfoVOS.add(renterHandoverCarInfoVO);
+            }
             handoverCarRepVO.setRenterHandoverCarInfoVOS(renterHandoverCarInfoVOS);
         }
         if (CollectionUtils.isNotEmpty(ownerHandoverCarInfoEntities)) {
-            List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = CommonUtil.copyList(ownerHandoverCarInfoEntities);
+            List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = Lists.newArrayList();
+            for(OwnerHandoverCarInfoEntity ownerHandoverCarInfoEntity : ownerHandoverCarInfoEntities)
+            {
+                OwnerHandoverCarInfoVO ownerHandoverCarInfoVO = new OwnerHandoverCarInfoVO();
+                BeanUtils.copyProperties(ownerHandoverCarInfoEntity,ownerHandoverCarInfoVO);
+                ownerHandoverCarInfoVOS.add(ownerHandoverCarInfoVO);
+            }
             handoverCarRepVO.setOwnerHandoverCarInfoVOS(ownerHandoverCarInfoVOS);
         }
         return handoverCarRepVO;
