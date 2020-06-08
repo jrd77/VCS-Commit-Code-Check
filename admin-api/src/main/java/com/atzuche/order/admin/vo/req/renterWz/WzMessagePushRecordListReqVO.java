@@ -18,7 +18,6 @@ import java.io.Serializable;
 public class WzMessagePushRecordListReqVO implements Serializable {
     private static final long serialVersionUID = 6277947143171115766L;
     @AutoDocProperty("订单号")
-    @NotNull(message = "订单号不能为空")
     private Long orderNo;
     @AutoDocProperty(value = "页码")
     @NotNull(message="页码不允许为空")
