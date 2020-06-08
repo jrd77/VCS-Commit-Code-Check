@@ -271,11 +271,11 @@
 	</select>
 	<select id="selectByOrerNoAndPayTransNo" resultMap="BaseResultMap">
       select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo}
+        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo} AND pay_type = '04'
     </select>
     <select id="getRefundApplyByPayTransNoParent" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
         where  order_no = #{orderNo} and pay_trans_no_parent = #{payTransNoParent}
     </select>
-
+    
 </mapper>

@@ -337,6 +337,7 @@ public class CashierNoTService {
      * @param notifyDataVo
      */
     public Boolean updataCashier(NotifyDataDTO notifyDataVo) {
+    	log.info("updataCashier notifyDataVo = [{}]",GsonUtils.toJson(notifyDataVo));
         CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
         int result =0;
         if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId())){
@@ -352,6 +353,8 @@ public class CashierNoTService {
 	            cashier.setOs(notifyDataVo.getReqOs());
 //	            cashier.setPayTransNo(notifyDataVo.getQn());
 	            cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
+	            //重新赋值
+	            cashier.setQn(notifyDataVo.getQn());
 	            
 	            cashier.setPayTime(notifyDataVo.getOrderTime());
 	            cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
@@ -361,6 +364,7 @@ public class CashierNoTService {
 	            String amtStr = notifyDataVo.getSettleAmount();
 	            amtStr = Objects.isNull(amtStr)?"0":amtStr;
 	            cashier.setPayAmt(Integer.valueOf(amtStr));
+	            log.info("updateByPrimaryKeySelective cashier=[{}]",GsonUtils.toJson(cashier));
 	            result = cashierMapper.updateByPrimaryKeySelective(cashier);
 	            if(result == 0){
 	                throw new OrderPayCallBackAsnyException();
@@ -377,12 +381,15 @@ public class CashierNoTService {
                 cashier.setOs(notifyDataVo.getReqOs());
 //                cashier.setPayTransNo(notifyDataVo.getQn());
                 cashier.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //支付交易号。20200601
-                
+                //重新赋值
+	            cashier.setQn(notifyDataVo.getQn());
+	            
                 cashier.setPayTime(notifyDataVo.getOrderTime());
                 cashier.setPayTitle(getPayTitle(notifyDataVo.getOrderNo(),notifyDataVo.getPayKind()));
                 String amtStr = notifyDataVo.getSettleAmount();
                 amtStr = Objects.isNull(amtStr)?"0":amtStr;
                 cashier.setPayAmt(Integer.valueOf(amtStr));
+                log.info("insertSelective cashier=[{}]",GsonUtils.toJson(cashier));
                 result = cashierMapper.insertSelective(cashier);
                 if(result == 0){
                     throw new OrderPayCallBackAsnyException();
@@ -970,6 +977,11 @@ public class CashierNoTService {
         refundVo.setInternalNo("1");
         refundVo.setReqOs("IOS");
         refundVo.setRefundAmt(String.valueOf(Math.abs(cashierRefundApply.getAmt())));
+//        ///重新赋值
+//        if("04".equals(cashierRefundApply.getPayType())) {
+//        	refundVo.setQn(cashierRefundApply.getPayTransNo());
+//        }
+        
         String payMd5 =  MD5.MD5Encode(FasterJsonUtil.toJson(refundVo));
         refundVo.setPayMd5(payMd5);
         String reqContent = FasterJsonUtil.toJson(refundVo);
