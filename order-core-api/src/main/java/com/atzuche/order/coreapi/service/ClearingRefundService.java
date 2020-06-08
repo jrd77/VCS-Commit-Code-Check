@@ -94,14 +94,14 @@ public class ClearingRefundService {
             throw e;
         }
         List<CashierRefundApplyEntity>  refundApply = null;
-        if("03".equals(cashierEntity.getPayType()) && "04".equals(payTypeReq)){
+        /*if("03".equals(cashierEntity.getPayType()) && "04".equals(payTypeReq)){
             CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(cashierEntity.getOrderNo(), clearingRefundReqVO.getPayTransNo());
             if(cashierRefundApplyEntity != null){
                 refundApply = Arrays.asList(cashierRefundApplyEntity);
             }
-        }else{
+        }else{*/
             refundApply = cashierRefundApplyMapper.getRefundApplyByPayTransNoParent(cashierEntity.getOrderNo(),clearingRefundReqVO.getPayTransNo());
-        }
+       /* }*/
 
         int refoundAmt = Optional.ofNullable(refundApply).orElseGet(ArrayList::new).stream().collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
         int diffAmt = cashierEntity.getPayAmt() - refoundAmt- clearingRefundReqVO.getAmt();
