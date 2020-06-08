@@ -106,10 +106,14 @@ public class HandoverCarService {
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntities = renterHandoverCarService.selectRenterByOrderNo(orderNo);
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntities = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
         HandoverCarRespVO handoverCarRepVO = new HandoverCarRespVO();
-        List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = CommonUtil.copyList(ownerHandoverCarInfoEntities);
-        List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = CommonUtil.copyList(renterHandoverCarInfoEntities);
-        handoverCarRepVO.setOwnerHandoverCarInfoVOS(ownerHandoverCarInfoVOS);
-        handoverCarRepVO.setRenterHandoverCarInfoVOS(renterHandoverCarInfoVOS);
+        if (CollectionUtils.isNotEmpty(renterHandoverCarInfoEntities)) {
+            List<RenterHandoverCarInfoVO> renterHandoverCarInfoVOS = CommonUtil.copyList(renterHandoverCarInfoEntities);
+            handoverCarRepVO.setRenterHandoverCarInfoVOS(renterHandoverCarInfoVOS);
+        }
+        if (CollectionUtils.isNotEmpty(ownerHandoverCarInfoEntities)) {
+            List<OwnerHandoverCarInfoVO> ownerHandoverCarInfoVOS = CommonUtil.copyList(ownerHandoverCarInfoEntities);
+            handoverCarRepVO.setOwnerHandoverCarInfoVOS(ownerHandoverCarInfoVOS);
+        }
         return handoverCarRepVO;
     }
 
