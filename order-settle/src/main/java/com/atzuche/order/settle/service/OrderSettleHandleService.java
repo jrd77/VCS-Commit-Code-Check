@@ -288,7 +288,8 @@ public class OrderSettleHandleService {
             }else {
             	//车辆押金
 	            // 新增account_renter_wz_deposit_detail
-	            accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterDepositDetailEntity(reqVO, uniqueNo));// .insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
+	            accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterDepositDetailEntity(reqVO, uniqueNo));
+	            // .insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
 	            // 更新account_renter_wz_deposit.shishou_deposit
 	            accountRenterDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),reqVO.getRealDeductAmt());
             }

@@ -138,6 +138,8 @@ public class OrderWzSettleNewService {
                 }
             }
         }
+        //订单是否使用钱包
+        settleOrdersWz.setUseWallet(Objects.nonNull(renterOrder.getIsUseWallet()) && renterOrder.getIsUseWallet() == OrderConstant.YES);
         return settleOrdersWz;
     }
 
