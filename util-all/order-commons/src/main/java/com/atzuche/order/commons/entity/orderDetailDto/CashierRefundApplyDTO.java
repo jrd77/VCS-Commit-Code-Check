@@ -124,5 +124,9 @@ public class CashierRefundApplyDTO implements Serializable {
      *退款成功时间
      */
     private LocalDateTime refundTime;
+    /*
+    * 支付流水号
+    * */
+    private String payTransNo;
 
 }

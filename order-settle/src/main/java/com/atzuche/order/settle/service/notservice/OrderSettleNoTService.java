@@ -53,6 +53,7 @@ import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
@@ -247,9 +248,9 @@ public class OrderSettleNoTService {
         }
         
     	//判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
-    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getRenterOrderNo());
+    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getOrderNo());
     	if(flagMileage == false) {
-    		throw new RuntimeException("租客取车或还车里程数不完整不能结算");
+    		throw new RuntimeException("租客取车或还车里程数或油表刻度不完整不能结算");
     	}
     	
 //        //2校验租客是否还车
@@ -319,9 +320,12 @@ public class OrderSettleNoTService {
     	RentCosts rentCosts = new RentCosts();
     	//1  初始化
     	//1.1 油费、超里程费用 配送模块需要的参数
-    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
-    	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
-        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+//    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
+//    	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
+//        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+    	//更新：按主订单号查询。
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(settleOrders.getOrderNo());
+        
         // 1.2 油费、超里程费用 订单商品需要的参数
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
 

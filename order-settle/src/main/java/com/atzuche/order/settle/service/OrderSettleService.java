@@ -595,6 +595,8 @@ public class OrderSettleService{
                 //车辆押金状态
                 record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
                 record.setCarDepositSettleTime(LocalDateTime.now());
+                //记录结算消息，错误码
+                record.setSettleMsg(e.getMessage());
                 
                 orderStatusService.updateByPrimaryKeySelective(record);
 //            }
