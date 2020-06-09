@@ -106,7 +106,16 @@ public class HandoverCarInfoService {
         if (Objects.isNull(handoverCarReqVO)) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误");
         }
-        String orderNo = handoverCarReqVO.getRenterHandoverCarDTO().getOrderNo() == null ? handoverCarReqVO.getOwnerHandoverCarDTO().getOrderNo() : handoverCarReqVO.getRenterHandoverCarDTO().getOrderNo();
+        String orderNo = null;
+        if (handoverCarReqVO.getRenterHandoverCarDTO() != null) {
+            orderNo = handoverCarReqVO.getRenterHandoverCarDTO().getOrderNo();
+        }
+        if (handoverCarReqVO.getOwnerHandoverCarDTO() != null) {
+            orderNo = handoverCarReqVO.getOwnerHandoverCarDTO().getOrderNo();
+        }
+        if (StringUtils.isBlank(orderNo)) {
+            throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误,没有订单号");
+        }
         if (StringUtils.isBlank(orderNo)) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误,没有订单号");
         }

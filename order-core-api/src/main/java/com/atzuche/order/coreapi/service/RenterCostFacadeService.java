@@ -23,13 +23,13 @@ import com.atzuche.order.commons.exceptions.RenterOrderEffectiveNotFoundExceptio
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.coreapi.entity.dto.OilAndMileageDTO;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -51,7 +51,6 @@ import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.autoyol.platformcost.model.FeeResult;
-import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,7 +241,7 @@ public class RenterCostFacadeService {
 
         HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
         handoverCarReq.setRenterOrderNo(renterOrderNo);
-        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(renterOrderEntity.getOrderNo());
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo,Boolean.TRUE);
         DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(orderNo,renterGoodsDetail.getCarEngineType());
         RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostVO.getRenterGetAndReturnCarDTO();
