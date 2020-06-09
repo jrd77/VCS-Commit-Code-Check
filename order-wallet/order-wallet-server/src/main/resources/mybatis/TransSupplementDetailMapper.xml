@@ -431,6 +431,7 @@
     FROM
      member as m
     WHERE
+    1=1
     <if test="memNo != null">
       and m.reg_no = #{memNo}
     </if>
