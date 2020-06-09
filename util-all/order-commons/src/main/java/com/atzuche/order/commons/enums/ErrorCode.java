@@ -130,7 +130,9 @@ public enum ErrorCode {
     NOT_FOUNT_ORDER_STATUS_ERR("500059","订单状态查询失败"),
     NO_RANGE_POINT("600040","地址不在范围内"),
     ORDER_ING_NOT_OPERATE_FAIL("600041","订单已经开始不允许操作"),
+    OIL_MILEAGE_ERR("600042","获取超里程或油费失败"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
+
 
     ;
 

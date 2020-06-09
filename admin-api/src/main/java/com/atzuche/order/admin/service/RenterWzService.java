@@ -1,11 +1,14 @@
 package com.atzuche.order.admin.service;
 
+
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.AdminUser;
 import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.common.Page;
+import com.atzuche.order.admin.entity.WeizhangSendmsgLog;
 import com.atzuche.order.admin.exception.ConsoleBusinessException;
-import com.atzuche.order.admin.vo.req.renterWz.CarDepositTemporaryRefundReqVO;
-import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostDetailReqVO;
-import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
+import com.atzuche.order.admin.mapper.log.WeizhangSendmsgLogMapper;
+import com.atzuche.order.admin.vo.req.renterWz.*;
 import com.atzuche.order.admin.vo.resp.renterWz.*;
 import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -19,10 +22,16 @@ import com.atzuche.order.commons.enums.wz.WzCostEnums;
 import com.atzuche.order.commons.vo.detain.CarDepositDetainReqVO;
 import com.atzuche.order.commons.vo.detain.IllegalDepositDetainReqVO;
 import com.atzuche.order.commons.vo.res.console.ConsoleOrderWzDetailQueryResVO;
+import com.atzuche.order.mq.common.base.BaseProducer;
+import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.open.service.FeignOrderDepositService;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.event.rabbit.neworder.NewOrderMQOtherEventEnum;
+import com.autoyol.event.rabbit.neworder.OrderSupplementPayMq;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,14 +49,19 @@ import java.util.stream.Collectors;
  * @author shisong
  * @date 2020/1/6
  */
-@Service
 @Slf4j
+@Service
 public class RenterWzService {
     @Autowired
     private FeignOrderDepositService feignOrderDepositService;
 
     @Autowired
     private RemoteFeignService remoteFeignService;
+    @Autowired
+    private WeizhangSendmsgLogMapper weizhangSendmsgLogMapper;
+    @Autowired
+    private BaseProducer baseProducer;
+
 
     private static final String WZ_OTHER_FINE_REMARK = "其他扣款备注";
     private static final String WZ_OTHER_FINE = "其他扣款";
@@ -474,5 +487,63 @@ public class RenterWzService {
             costDetails.add(vo);
         }
         return costDetails;
+    }
+
+    public Integer insertMassage(WzMessagePushReqVO reqVO) {
+        WeizhangSendmsgLog weizhangSendmsgLog = new WeizhangSendmsgLog();
+        BeanUtils.copyProperties(reqVO,weizhangSendmsgLog);
+        AdminUser adminUser = AdminUserUtil.getAdminUser();
+        weizhangSendmsgLog.setCreateOp(adminUser.getAuthName());
+        if(reqVO.getEvent()!=null && reqVO.getEvent()==310){
+            weizhangSendmsgLog.setUrl("违章详情页");
+        }
+        Integer platform = reqVO.getPlatform();
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        OrderSupplementPayMq orderSupplementPayMq = new OrderSupplementPayMq();
+        orderSupplementPayMq.setOrderNo(reqVO.getOrderNo()+"");
+        orderSupplementPayMq.setType(reqVO.getMessageType());
+        orderSupplementPayMq.setRenterMemNo(reqVO.getMemNo().intValue());
+        orderMessage.setMessage(orderSupplementPayMq);
+        switch(platform){
+            case 0 ://系统
+                sendPlatformMessage(reqVO,orderMessage);
+                break;
+            case 1 :// 短信
+                sendShortMessage(reqVO,orderMessage);
+                break;
+        }
+        log.info("插入消息记录数据库入参"+ JSON.toJSONString(weizhangSendmsgLog));
+        int insert = this.weizhangSendmsgLogMapper.insertSelective(weizhangSendmsgLog);
+        return insert;
+    }
+    private void sendPlatformMessage(WzMessagePushReqVO reqVO, OrderMessage orderMessage) {
+        Map pushParamMap = Maps.newHashMap();
+        pushParamMap.put("consoleDynamicContent", reqVO.getContent());
+        pushParamMap.put("renterFlag",reqVO.getEvent());
+        pushParamMap.put("messageType",reqVO.getMessageType());
+        pushParamMap.put("event",reqVO.getEvent());
+        pushParamMap.put("orderNo",reqVO.getOrderNo());
+        pushParamMap.put("url",reqVO.getUrl());
+        // app推送
+        orderMessage.setPushMap(pushParamMap);
+        baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.routingKey, orderMessage);
+    }
+    private void sendShortMessage(WzMessagePushReqVO reqVO,OrderMessage orderMessage) {
+        Map map = Maps.newHashMap();
+        map.put("textCode", "PlatformWzMassage2Renter");
+        map.put("message",reqVO.getContent() );
+        map.put("sender", 3);
+        map.put("type", 3);
+        map.put("orderNo",reqVO.getOrderNo());
+        map.put("url",reqVO.getUrl());
+        orderMessage.setMap(map);
+        baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_WZ.routingKey, orderMessage);
+    }
+
+    public Page<WzMessagePushRecordListResVO> selectByPage(WzMessagePushRecordListReqVO reqVO) {
+        //开启分页插件
+        PageHelper.startPage(reqVO.getPageNum(), reqVO.getPageSize());
+        List<WzMessagePushRecordListResVO> bufuRecordListByPage = weizhangSendmsgLogMapper.selectByPage(reqVO);
+        return new Page<>(bufuRecordListByPage);
     }
 }
