@@ -35,7 +35,7 @@ public class WzMessagePushReqVO {
     @AutoDocProperty("跳转链接，如果跳转页面方式为H5需要该字段")
     private String url;
 
-    @AutoDocProperty("274:订单详情 286：补付详情")
+    @AutoDocProperty("310 违章列表页")
     private Integer event;
 
     @AutoDocProperty("操作人")
