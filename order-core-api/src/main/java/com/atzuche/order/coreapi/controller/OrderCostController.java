@@ -9,6 +9,7 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.dto.OtherSubsidyRenyunDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
@@ -450,6 +451,19 @@ public class OrderCostController {
     @PostMapping("/order/renter/cost/updatePlatFormToOwnerListByOrderNo")
 	public ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req){
     	orderCostAggregateService.updatePlatFormToOwnerListByOrderNo(req);
+		return ResponseData.success();
+	}
+    
+    
+    /**
+     * 仁云给租客车主追加的其他补贴
+     * @param req
+     */
+    @PostMapping("/order/renyun/console/subsidy")
+	public ResponseData<?> updateOtherSubsidyByOrderNo(@Valid @RequestBody OtherSubsidyRenyunDTO req, BindingResult bindingResult){
+    	log.info("仁云给租客车主追加的其他补贴OtherSubsidyRenyunDTO=[{}]", req);
+    	BindingResultUtil.checkBindingResult(bindingResult);
+    	orderCostAggregateService.updateOtherSubsidyRenyunByOrderNo(req);
 		return ResponseData.success();
 	}
     
