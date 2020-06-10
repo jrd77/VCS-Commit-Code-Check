@@ -140,5 +140,23 @@ public class RenterOrderCostDetailUtils {
         return getReturnBlockedRaiseAmt(costDetailEntityList) + getGetBlockedRaiseAmt(costDetailEntityList)
                 + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList);
     }
+    
+    /**
+     * 精准取车服务费(负值）
+     * @param costDetailEntityList
+     * @return int
+     */
+    public static int getAccurateGetSrvAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.ACCURATE_GET_SRV_AMT);
+    }
+    
+    /**
+     * 精准还车服务费(负值）
+     * @param costDetailEntityList
+     * @return int
+     */
+    public static int getAccurateReturnSrvAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT);
+    }
 
 }

@@ -39,6 +39,7 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
 import com.atzuche.order.commons.exceptions.NoEffectiveErrException;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
@@ -403,9 +404,12 @@ public class OrderDetailService {
             renterOrderDTO = new RenterOrderDTO();
             BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
         }
+        // 获取有效的租客子订单
         RenterOrderEntity effective = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
-        RenterOrderDeliveryMode renterOrderDeliveryMode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(effective.getRenterOrderNo());
+        // 获取区间配送信息
+        SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getOwnerSectionDeliveryVO(effective.getRenterOrderNo(), effective.getExpRentTime(), effective.getExpRevertTime());
         OrderDetailRespDTO  orderDetailRespDTO = new OrderDetailRespDTO();
+        orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.ownerOrder = ownerOrderDTO;
         orderDetailRespDTO.renterOrder = renterOrderDTO;
@@ -1026,7 +1030,14 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,renterOrderSubsidyDetailDTO);
             renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
         });
+        // 获取区间配送信息
+        SectionDeliveryVO sectionDeliveryVO = null;
+        if (renterOrderEntity != null) {
+        	sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+        }
+        
         RenterOrderDetailRespDTO renterOrderDetailRespDTO = new RenterOrderDetailRespDTO();
+        renterOrderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
         renterOrderDetailRespDTO.order = orderDTO;
         renterOrderDetailRespDTO.renterOrder = renterOrderDTO;
         renterOrderDetailRespDTO.renterGoods = renterGoodsDTO;

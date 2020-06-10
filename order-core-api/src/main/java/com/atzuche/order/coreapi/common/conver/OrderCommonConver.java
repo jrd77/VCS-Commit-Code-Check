@@ -714,6 +714,7 @@ public class OrderCommonConver {
         orderCostGetReturnCarCostReqDTO.setIsPackageOrder(StringUtils.equals("2", context.getOrderReqVO().getOrderCategory()));
         orderCostGetReturnCarCostReqDTO.setIsGetCarCost(null != context.getOrderReqVO().getSrvGetFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvGetFlag());
         orderCostGetReturnCarCostReqDTO.setIsReturnCarCost(null != context.getOrderReqVO().getSrvReturnFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvReturnFlag());
+        orderCostGetReturnCarCostReqDTO.setDistributionMode(context.getOrderReqVO().getDistributionMode());
         logger.info("Init OrderCostGetReturnCarCostReqDTO.result is,orderCostGetReturnCarCostReqDTO:[{}]", JSON.toJSONString(orderCostGetReturnCarCostReqDTO));
         return orderCostGetReturnCarCostReqDTO;
     }

@@ -34,6 +34,8 @@ public class DeliveryCarVO {
 
     @AutoDocProperty("油耗总刻度")
     private String maxOilNumber;
+    @AutoDocProperty(value = "配送模式：0-区间配送，1-精准配送")
+    private Integer distributionMode;
 
 
 

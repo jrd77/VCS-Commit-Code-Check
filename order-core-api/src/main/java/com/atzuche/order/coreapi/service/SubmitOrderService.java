@@ -2,21 +2,30 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.CarChargeLevelConfigSDK;
+import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.SysConfigSDK;
 import com.atzuche.config.common.entity.CarChargeLevelConfigEntity;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
@@ -26,6 +35,8 @@ import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.submit.filter.cost.LongOrderCostFilterChain;
 import com.atzuche.order.coreapi.utils.BizAreaUtil;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.mem.MemProxyService;
@@ -43,6 +54,7 @@ import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
 import com.atzuche.order.parentorder.service.ParentOrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -54,9 +66,12 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
+import com.autoyol.platformcost.model.FeeResult;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
@@ -67,6 +82,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 订单业务处理类
@@ -125,6 +142,12 @@ public class SubmitOrderService {
     private LongOrderCostFilterChain longOrderCostFilterChain;
     @Autowired
     private SubmitOrderHandleService submitOrderHandleService;
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
+    @Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 
 
 
@@ -278,6 +301,8 @@ public class SubmitOrderService {
         
         // 保存车辆停运费信息
         submitOrderHandleService.saveOrderStopFreightInfo(orderNo, ownerGoodsDetailDTO);
+        // 保存区间配送信息
+        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo);
         
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
@@ -309,6 +334,8 @@ public class SubmitOrderService {
         longOrderCostFilterChain.calculate(orderCostContext);
         // 数据落库(主订单、租客订单、车主订单、押金(违章押金、车辆押金)、违章信息初始化、还车记录初始化等)
         int status = submitOrderHandleService.save(context, orderCostContext);
+        // 保存区间配送信息
+        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo);
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
@@ -530,6 +557,53 @@ public class SubmitOrderService {
         autoCoinDeductReqVO.setRemarkExtend("租车消费");
         LOGGER.info("Build AutoCoinDeductReqVO result is:[{}]", autoCoinDeductReqVO);
         return autoCoinDeductReqVO;
+    }
+    
+    
+    /**
+     * 保存区间配送信息
+     * @param orderReqVO
+     * @param orderNo
+     * @param renterOrderNo
+     */
+    public void saveSectionDelivery(OrderReqVO orderReqVO, String orderNo, String renterOrderNo) {
+    	if (orderReqVO == null) {
+    		return;
+    	}
+    	// 是否使用取车服务:0.否 1.是
+    	Integer srvGetFlag = orderReqVO.getSrvGetFlag() == null ? 0:orderReqVO.getSrvGetFlag();
+    	// 是否使用还车服务:0.否 1.是
+    	Integer srvReturnFlag = orderReqVO.getSrvReturnFlag() == null ? 0:orderReqVO.getSrvReturnFlag();
+    	if (srvGetFlag.intValue() == 0 && srvReturnFlag.intValue() == 0) {
+    		// 未使用取还车服务不需要计算
+    		return;
+    	}
+    	// 配送模式：0-区间配送，1-精准配送
+        Integer distributionMode = orderReqVO.getDistributionMode() == null ? 0:orderReqVO.getDistributionMode();
+    	LOGGER.info("config-从城市配置中获取区间配置,cityCode=[{}]", orderReqVO.getCityCode());
+        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(),Integer.valueOf(orderReqVO.getCityCode()));
+        LOGGER.info("config-从城市配置中获取区间配置,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
+        RenterOrderDeliveryMode mode = new RenterOrderDeliveryMode();
+        BeanUtils.copyProperties(configByCityCode, mode);
+        List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+    	LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? null : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+    	LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        mode.setId(null);
+        mode.setOrderNo(orderNo);
+        mode.setRenterOrderNo(renterOrderNo);
+        mode.setAccurateGetSrvUnit(getAccurateCost);
+        mode.setAccurateReturnSrvUnit(returnAccurateCost);
+        mode.setDistributionMode(distributionMode);
+        renterOrderDeliveryModeService.saveRenterOrderDeliveryMode(mode);
     }
 
 }

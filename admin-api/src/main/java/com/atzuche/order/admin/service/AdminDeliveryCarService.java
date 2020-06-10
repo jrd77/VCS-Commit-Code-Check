@@ -138,6 +138,7 @@ public class AdminDeliveryCarService {
         }
         modifyOrderReqVO.setSrvGetFlag(deliveryCarVO.getIsGetCar());
         modifyOrderReqVO.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
+        modifyOrderReqVO.setDistributionMode(deliveryCarVO.getDistributionMode());
         return modifyOrderReqVO;
     }
 
