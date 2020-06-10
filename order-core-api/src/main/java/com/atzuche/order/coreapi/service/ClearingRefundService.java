@@ -129,7 +129,7 @@ public class ClearingRefundService {
         cashierRefundApplyEntity.setQn(cashierEntity.getQn());
         cashierRefundApplyEntity.setUniqueNo(null);
         cashierRefundApplyEntity.setType(0);
-        cashierRefundApplyEntity.setNum(3);
+        cashierRefundApplyEntity.setNum(0);
         cashierRefundApplyEntity.setPayMd5(cashierEntity.getPayMd5());
         cashierRefundApplyEntity.setSourceCode(renterCashCodeEnum.getCashNo());
         cashierRefundApplyEntity.setSourceDetail(renterCashCodeEnum.getTxt());
