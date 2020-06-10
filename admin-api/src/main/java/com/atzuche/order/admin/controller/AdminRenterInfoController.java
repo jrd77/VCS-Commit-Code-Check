@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @RequestMapping("/console/renter")
 @RestController
@@ -79,7 +80,7 @@ public class AdminRenterInfoController {
             CommUseDriverInfo commUseDriverInfo = new CommUseDriverInfo();
             BeanUtils.copyProperties(dto,commUseDriverInfo);
             if(Objects.nonNull(dto.getPhone())){
-                commUseDriverInfo.setMobile(Long.valueOf(dto.getPhone()));
+                commUseDriverInfo.setMobile(Pattern.matches("^[-\\+]?\\d+$", dto.getPhone())?Long.valueOf(dto.getPhone()):null);
             }
             commUseDriverInfos.add(commUseDriverInfo);
         }
@@ -91,5 +92,9 @@ public class AdminRenterInfoController {
         public RenterNotFoundException(String mesg) {
             super(com.atzuche.order.commons.enums.ErrorCode.ORDER_QUERY_FAIL.getCode(), com.atzuche.order.commons.enums.ErrorCode.ORDER_QUERY_FAIL.getText()+":"+mesg);
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Pattern.matches("^[-\\+]?\\d+$", "-1sd"));
     }
 }
