@@ -368,6 +368,7 @@ public class RenterOrderService {
                 renterOrderReqVO.getSrvGetFlag().toString()));
         getReturnCarCostReqDto.setIsReturnCarCost(null != renterOrderReqVO.getSrvReturnFlag() && StringUtils.equals("1",
                 renterOrderReqVO.getSrvReturnFlag().toString()));
+        getReturnCarCostReqDto.setDistributionMode(renterOrderReqVO.getDistributionMode());
 
         //超运能溢价计算相关信息
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();

@@ -288,5 +288,9 @@ public class RenterOrderReqVO implements Serializable {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	/**
+	 * 配送模式：0-区间配送，1-精准配送
+	 */
+    private Integer distributionMode;
 
 }

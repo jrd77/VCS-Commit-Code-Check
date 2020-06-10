@@ -42,7 +42,9 @@ import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
@@ -187,6 +189,8 @@ public class OrderDetailService {
     private OrderSettleService orderSettleService;
     @Autowired
     private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 
     private static final String UNIT_HOUR = "小时";
 
@@ -399,7 +403,8 @@ public class OrderDetailService {
             renterOrderDTO = new RenterOrderDTO();
             BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
         }
-
+        RenterOrderEntity effective = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        RenterOrderDeliveryMode renterOrderDeliveryMode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(effective.getRenterOrderNo());
         OrderDetailRespDTO  orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.ownerOrder = ownerOrderDTO;

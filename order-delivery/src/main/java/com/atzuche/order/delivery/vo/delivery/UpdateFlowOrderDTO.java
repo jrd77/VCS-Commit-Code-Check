@@ -146,5 +146,41 @@ public class UpdateFlowOrderDTO implements Serializable{
      * 签名
      **/
     private String sign;
+    /**
+     * 配送模式：0-区间配送，1-精准配送
+     */
+    private String distributionMode="";
+    /**
+     * 租客处最早送达时间
+     */
+    private String renterRentTimeStart="";
+    /**
+     * 租客处最晚送达时间
+     */
+    private String renterRentTimeEnd="";
+    /**
+     * 租客处最早取车时间
+     */
+    private String renterRevertTimeStart="";
+    /**
+     * 租客处最晚取车时间
+     */
+    private String renterRevertTimeEnd="";
+    /**
+     * 车主处最早取车时间
+     */
+    private String ownerRentTimeStart="";
+    /**
+     * 车主处最晚取车时间
+     */
+    private String ownerRentTimeEnd="";
+    /**
+     * 车主处最早送达时间
+     */
+    private String ownerRevertTimeStart="";
+    /**
+     * 车主处最晚送达时间
+     */
+    private String ownerRevertTimeEnd=""; 
 
 }

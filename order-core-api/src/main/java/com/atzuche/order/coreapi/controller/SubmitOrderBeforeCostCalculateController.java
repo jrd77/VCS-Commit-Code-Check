@@ -8,6 +8,7 @@ import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.coreapi.service.SubmitOrderBeforeCostCalService;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -72,6 +73,9 @@ public class SubmitOrderBeforeCostCalculateController {
         } else {
             resVO = submitOrderBeforeCostCalService.costCalculate(orderReqVO);
         }
+        // 设置区间配送信息
+        SectionDeliveryVO sectionDeliveryVO = submitOrderBeforeCostCalService.getSectionDelivery(orderReqVO);
+        resVO.setSectionDelivery(sectionDeliveryVO);
         LOGGER.info("Submit order before cost calculate.result is,resVO:[{}]", JSON.toJSONString(resVO));
         return ResponseData.success(resVO);
     }

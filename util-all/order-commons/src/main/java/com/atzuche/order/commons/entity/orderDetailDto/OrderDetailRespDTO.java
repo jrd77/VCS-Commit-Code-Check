@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 import com.atzuche.order.commons.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.vo.OrderStopFreightInfo;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 
 import lombok.Data;
 import lombok.ToString;
@@ -60,5 +61,7 @@ public class OrderDetailRespDTO {
     public Integer ownerPreIncom;
     // 停运费信息
     public OrderStopFreightDTO orderStopFreightDTO;
+    // 区间配送信息
+    public SectionDeliveryVO sectionDelivery;
 
 }
