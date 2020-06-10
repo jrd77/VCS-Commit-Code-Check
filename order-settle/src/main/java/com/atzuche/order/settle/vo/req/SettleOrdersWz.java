@@ -71,6 +71,9 @@ public class SettleOrdersWz {
      */
 	private int shouldTakeWzCost;
 
+    /**
+     * 是否使用钱包
+     */
 	private Boolean useWallet;
 	
 	

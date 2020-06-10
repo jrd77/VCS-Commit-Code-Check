@@ -104,6 +104,7 @@ public class OrderWzSettleNewService {
 
         //是否企业级用户订单
         settleOrdersWz.setEnterpriseUserOrder(renterMemberService.isEnterpriseUserOrder(renterOrder.getRenterOrderNo()));
+        settleOrdersWz.setUseWallet(Objects.nonNull(renterOrder.getIsUseWallet()) && renterOrder.getIsUseWallet() == OrderConstant.YES);
         //发送mq发送车主会员号信息预留。
         OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         if (!Objects.isNull(ownerOrder)) {
@@ -138,8 +139,6 @@ public class OrderWzSettleNewService {
                 }
             }
         }
-        //订单是否使用钱包
-        settleOrdersWz.setUseWallet(Objects.nonNull(renterOrder.getIsUseWallet()) && renterOrder.getIsUseWallet() == OrderConstant.YES);
         return settleOrdersWz;
     }
 
@@ -294,7 +293,7 @@ public class OrderWzSettleNewService {
 		orderStatusDTO.setStatus(OrderStatusEnum.COMPLETED.getStatus());
 		orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
 
-		// 1 租客违章费用 结余处理
+		// 租客违章费用 结余处理
 		log.info("OrderSettleService wzCostSettle 抵扣违章费用或产生违章欠款。settleOrders [{}], settleOrdersAccount [{}]", GsonUtils.toJson(settleOrders),GsonUtils.toJson(settleOrdersAccount));
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
 
@@ -304,7 +303,9 @@ public class OrderWzSettleNewService {
                 GsonUtils.toJson(settleOrdersAccount));
         orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
 
+
         log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
+
         int totalwzDebtAmt;
         int yingkouAmt;
         
@@ -327,7 +328,19 @@ public class OrderWzSettleNewService {
             orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
             // 2.2违章押金抵扣老系统欠款
             totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
-            yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+            // 2.3 钱包余额抵扣欠款
+            if (settleOrdersAccount.getDepositSurplusAmt() <= OrderConstant.ZERO
+                    && Objects.nonNull(settleOrders.getUseWallet()) && settleOrders.getUseWallet()) {
+                //使用钱包抵扣欠款
+                OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
+                        settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_WZ_SETTLE_TYPE);
+
+                totalwzDebtAmt = totalwzDebtAmt + resVO.getOldTotalRealDebtAmt();
+                yingkouAmt =
+                        settleOrdersAccount.getDepositAmt() + resVO.getOldTotalRealDebtAmt() + resVO.getNewTotalRealDebtAmt();
+            } else {
+                yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+            }
         }
 		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
