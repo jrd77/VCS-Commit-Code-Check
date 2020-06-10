@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 
@@ -86,5 +88,13 @@ public class OrderSourceStatService {
      **/
     public OrderSourceStatEntity selectByOrderNo(String orderNo){
         return orderSourceStatMapper.selectByOrderNo(orderNo);
+    }
+    
+    
+    public List<OrderSourceStatEntity> queryOrderSourceStatByOrderNos(List<String> orderNos) {
+    	if (orderNos == null || orderNos.isEmpty()) {
+    		return null;
+    	}
+    	return orderSourceStatMapper.queryOrderSourceStatByOrderNos(orderNos);
     }
 }

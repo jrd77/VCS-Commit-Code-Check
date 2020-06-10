@@ -17,6 +17,7 @@ public class DateUtils {
     public static final String DATE_DEFAUTE = "yyyyMMddHHmmss";
     public static final String DATE_DEFAUTE1 = "yyyy-MM-dd HH:mm:ss";
     public static final String fmt_yyyyMMdd = "yyyy-MM-dd";
+    public static final String fmt_next_yyyyMMdd = "yyyy/MM/dd";
     public static long  START_TIME = 20191001000000L;
     public static long  END_TIME = 20191007235959L;
 
@@ -106,10 +107,15 @@ public class DateUtils {
     	if(date == null) {
     		return "";
     	}
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
-        return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    	try {
+    		Instant instant = date.toInstant();
+            ZoneId zone = ZoneId.systemDefault();
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+            return DateTimeFormatter.ofPattern(format).format(localDateTime);
+		} catch (Exception e) {
+			logger.error("formate exception date=[{}],format=[{}] e:",date,format,e);
+		}
+        return "";
     }
 
     /**

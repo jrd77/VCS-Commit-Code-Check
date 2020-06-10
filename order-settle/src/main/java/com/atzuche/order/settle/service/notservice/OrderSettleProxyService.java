@@ -21,6 +21,8 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
+import com.atzuche.order.commons.vo.req.handover.rep.RenterHandoverCarInfoVO;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
@@ -103,7 +105,7 @@ public class OrderSettleProxyService {
     /**
      * 交接车-获取超里程费用
      */
-    public MileageAmtDTO getMileageAmtDTO(SettleOrders settleOrders, RenterOrderEntity renterOrder,HandoverCarRepVO handoverCarRep,RenterGoodsDetailDTO renterGoodsDetail) {
+    public MileageAmtDTO getMileageAmtDTO(SettleOrders settleOrders, RenterOrderEntity renterOrder,HandoverCarRespVO handoverCarRep,RenterGoodsDetailDTO renterGoodsDetail) {
         MileageAmtDTO mileageAmtDTO = new MileageAmtDTO();
         CostBaseDTO costBaseDTO = getCostBaseRent(settleOrders,renterOrder);
         mileageAmtDTO.setCostBaseDTO(costBaseDTO);
@@ -115,10 +117,10 @@ public class OrderSettleProxyService {
         //默认值0  取/还 车里程数
         mileageAmtDTO.setGetmileage(0);
         mileageAmtDTO.setReturnMileage(0);
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoEntities();
+        List<RenterHandoverCarInfoVO> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoVOS();// .getRenterHandoverCarInfoEntities();
         if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
             for(int i=0;i<renterHandoverCarInfos.size();i++){
-                RenterHandoverCarInfoEntity renterHandoverCarInfo = renterHandoverCarInfos.get(i);
+            	RenterHandoverCarInfoVO renterHandoverCarInfo = renterHandoverCarInfos.get(i);
                 if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
@@ -141,25 +143,34 @@ public class OrderSettleProxyService {
      * @param renterOrderNo
      * @return
      */
-    public boolean checkMileageData(String renterOrderNo) {
-    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
-    	handoverCarReq.setRenterOrderNo(renterOrderNo);
-    	//取送车里程数
-        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+    public boolean checkMileageData(String orderNo) {
+//    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
+//    	handoverCarReq.setRenterOrderNo(renterOrderNo);
+//    	//取送车里程数
+//        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+        //更新：按主订单号查询。
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(orderNo);
+
 
         
-        List<RenterHandoverCarInfoEntity> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoEntities();
+        List<RenterHandoverCarInfoVO> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoVOS();//.getRenterHandoverCarInfoEntities();
         if(CollectionUtils.isEmpty(renterHandoverCarInfos)) {
         	return false;
         }
         
         if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
             for(int i=0;i<renterHandoverCarInfos.size();i++){
-                RenterHandoverCarInfoEntity renterHandoverCarInfo = renterHandoverCarInfos.get(i);
+            	RenterHandoverCarInfoVO renterHandoverCarInfo = renterHandoverCarInfos.get(i);
                 if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0)) {
+                    if(
+                    		//里程刻度
+                    		(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0))
+                    		||
+                    		//油表刻度
+                    		(Objects.isNull(renterHandoverCarInfo.getOilNum()) || (renterHandoverCarInfo.getOilNum() != null && renterHandoverCarInfo.getOilNum().intValue() == 0))
+                    		) {
                     	return false;
                     }
                 }
@@ -167,7 +178,13 @@ public class OrderSettleProxyService {
                 if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
                         ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
-                    if(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0)){
+                    if(
+                    		//里程刻度
+                    		(Objects.isNull(renterHandoverCarInfo.getMileageNum()) || (renterHandoverCarInfo.getMileageNum() != null && renterHandoverCarInfo.getMileageNum().intValue() == 0))
+                    		||
+                    		//油表刻度
+                    		(Objects.isNull(renterHandoverCarInfo.getOilNum()) || (renterHandoverCarInfo.getOilNum() != null && renterHandoverCarInfo.getOilNum().intValue() == 0))
+                    		){
                     	return false;
                     }
                 }

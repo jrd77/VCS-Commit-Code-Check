@@ -584,6 +584,66 @@ public class MemProxyService {
         return false;
 
     }
+    
+    
+    /**
+     * 会员核心信息(不需要抛出异常，调该方法需要校验返回为空)
+     * @param memNo
+     * @return MemberCoreInfo
+     */
+    public MemberCoreInfo getMemberCoreInfoByMemNo(Integer memNo){
+        ResponseData<MemberCoreInfo> responseData = null;
+        log.info("Feign 获取开始会员核心信息,memNo={}",memNo);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemNoByMobile");
+            String parameter = "memNo="+memNo;
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = memberDetailFeignService.getMemberCoreInfo(memNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+            t.setStatus(Transaction.SUCCESS);
+            return responseData.getData();
+        }
+        catch (Exception e){
+            t.setStatus(e);
+            Cat.logError("Feign 获取会员核心信息失败",e);
+            log.error("Feign 获取会员核心信息失败,Response={},memNo={}",responseData,memNo,e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+    
+    
+    /**
+     * 返回用户的会员号(不需要抛出异常，调该方法需要校验返回为空)
+     * @param mobile
+     * @return Integer
+     */
+    public Integer getMemNoByMoileEx(Long mobile){
+        ResponseData<Integer> responseData = null;
+        log.info("Feign 开始根据手机号查询会员号,mobile={}",mobile);
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getMemNoByMobile");
+            String parameter = "mobile="+mobile;
+            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+            responseData = memberDetailFeignService.getMemNoByMobile(mobile);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseData));
+            ResponseCheckUtil.checkResponse(responseData);
+            t.setStatus(Transaction.SUCCESS);
+            return responseData.getData();
+        }
+        catch (Exception e){
+            t.setStatus(e);
+            Cat.logError("Feign 根据手机号查询会员号失败",e);
+            log.error("Feign 根据手机号查询会员号失败,Response={},mobile={}",responseData,mobile,e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
 
 
 }

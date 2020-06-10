@@ -65,6 +65,9 @@ public class OrderStatusEntity implements Serializable {
 	 * 车辆押金结算时间
 	 */
 	private LocalDateTime carDepositSettleTime;
+	
+	private String settleMsg;
+	
 	/**
 	 * 租车费用结算状态:0,否 1,是
 	 */

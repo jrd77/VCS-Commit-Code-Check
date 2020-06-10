@@ -50,7 +50,7 @@ public class OrderRefundPreAuthTask extends IJobHandler {
         	for (int i = 0; i < list.size(); i++) {
                 Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(list.get(i)));
                 try {
-                    cashierPayService.refundOrderPay(list.get(i));
+                    cashierPayService.refundOrderPayPreAuth(list.get(i));
                 } catch (Exception e) {
                     logger.error("执行 退款操作异常 异常 {},{}", GsonUtils.toJson(list.get(i)), e);
                     Cat.logError("执行 退款操作异常 异常 {}", e);

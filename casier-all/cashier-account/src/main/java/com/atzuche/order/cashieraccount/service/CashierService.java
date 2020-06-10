@@ -713,6 +713,7 @@ public class CashierService {
         
         //更新退款申请表的状态。
         CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyNoTService.updateRefundDepositSuccess(notifyDataVo);
+        //记录原本就已经是退款成功的状态，避免重复操作。
         if(cashierRefundApplyEntity != null && CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(cashierRefundApplyEntity.getStatus())){
         	log.info("refundCallBackSuccess params=[{}],cashierRefundApplyEntity=[{}],success again",GsonUtils.toJson(notifyDataVo),GsonUtils.toJson(cashierRefundApplyEntity));
         	return;

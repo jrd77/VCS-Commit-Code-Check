@@ -10,18 +10,30 @@ import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.*;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.InputErrorException;
+import com.atzuche.order.commons.exceptions.OilAndMileageException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.exceptions.RenterOrderEffectiveNotFoundException;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.res.*;
+import com.atzuche.order.coreapi.entity.dto.OilAndMileageDTO;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
+import com.atzuche.order.delivery.service.handover.HandoverCarService;
+import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
 import com.atzuche.order.rentercost.utils.FineDetailUtils;
@@ -29,16 +41,24 @@ import com.atzuche.order.rentercost.utils.OrderSubsidyDetailUtils;
 import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
+import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
 import com.atzuche.order.settle.vo.req.RentCosts;
+import com.atzuche.order.settle.vo.req.SettleOrders;
+import com.autoyol.platformcost.model.FeeResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 提供租客费用的对外接口服务
@@ -87,6 +107,18 @@ public class RenterCostFacadeService {
     private OrderConsoleCostHandleService orderConsoleCostHandleService;
     @Autowired
     private OwnerCouponLongService ownerCouponLongService;
+    @Autowired
+    private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    private OrderSettleProxyService orderSettleProxyService;
+    @Autowired
+    private RenterGoodsService renterGoodsService;
+    @Autowired
+    private RenterOrderService renterOrderService;
+    @Autowired
+    private HandoverCarService handoverCarService;
+    @Autowired
+    private OrderSettleNoTService orderSettleNoTService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -172,10 +204,56 @@ public class RenterCostFacadeService {
 
         List<OrderSupplementDetailVO> orderSupplementDetailVOS = supplementService.listOrderSupplementDetailVOByOrderNo(orderNo);
         basicCostDetailVO.setSupplementDetailVOList(orderSupplementDetailVOS);
-        //TODO: 超里程费用和油费没有计算
+
+        //如果获取超里程和油费失败，也返回其他数据给前端
+        try{
+            OilAndMileageDTO oilAndMileageDTO = getOilAndMileageDTO(orderNo);
+            if(oilAndMileageDTO == null || oilAndMileageDTO.getFeeResult() == null || oilAndMileageDTO.getRenterGetAndReturnCarDTO()==null){
+                throw new OilAndMileageException();
+            }
+            int oilCostAmt = oilAndMileageDTO.getRenterGetAndReturnCarDTO().getOilDifferenceCrash() == null ? 0 : Integer.valueOf(oilAndMileageDTO.getRenterGetAndReturnCarDTO().getOilDifferenceCrash());
+            int mileageCostAmt =oilAndMileageDTO.getFeeResult().getTotalFee();
+            basicCostDetailVO.setOilCostAmt(-oilCostAmt);
+            basicCostDetailVO.setMileageCostAmt(NumberUtils.convertNumberToZhengshu(mileageCostAmt));
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("获取油费和超里程费用异常",e);
+        }
         return basicCostDetailVO;
     }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/3 11:26
+     * @Description: 获取租客端当前有效的子订单的超理成和油费
+     *
+     **/
+    public OilAndMileageDTO getOilAndMileageDTO(String orderNo){
+        if(!StringUtils.isNotBlank(orderNo)){
+            logger.error("订单号不能为空！");
+            throw new InputErrorException();
+        }
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        if(renterOrderEntity == null || renterOrderEntity.getRenterOrderNo() == null){
+            RenterOrderEffectiveNotFoundException e = new RenterOrderEffectiveNotFoundException(orderNo);
+            logger.error("查询不到有效的子订单orderNo={}",orderNo,e);
+        }
+        String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 
+        HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
+        handoverCarReq.setRenterOrderNo(renterOrderNo);
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(renterOrderEntity.getOrderNo());
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo,Boolean.TRUE);
+        DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(orderNo,renterGoodsDetail.getCarEngineType());
+        RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostVO.getRenterGetAndReturnCarDTO();
+
+        SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
+        MileageAmtDTO mileageAmtDTO = orderSettleProxyService.getMileageAmtDTO(settleOrders,settleOrders.getRenterOrder(),handoverCarRep,renterGoodsDetail);
+        FeeResult feeResult = deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO);
+        OilAndMileageDTO oilAndMileageDTO = new OilAndMileageDTO();
+        oilAndMileageDTO.setFeeResult(feeResult);
+        oilAndMileageDTO.setRenterGetAndReturnCarDTO(renterGetAndReturnCarDTO);
+        return oilAndMileageDTO;
+    }
     public RenterSubsidyDetailVO getRenterSubsidyDetail(String orderNo, String renterOrderNo, String memNo){
         List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = subsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo);
         List<OrderConsoleSubsidyDetailEntity> consoleSubsidyDetailEntityList = consoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo,memNo);
