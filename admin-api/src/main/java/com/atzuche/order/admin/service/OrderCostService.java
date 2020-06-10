@@ -8,6 +8,7 @@ import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
+import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
@@ -63,6 +64,8 @@ public class OrderCostService {
 	private AutoCoinProxyService autoCoinProxyService;
 	@Autowired
 	private RemoteFeignService remoteFeignService;
+	@Autowired
+	private OrderCostDetailService orderCostDetailService;
 	/**
 	 * 
 	 * @param renterCostReqVO
@@ -70,7 +73,7 @@ public class OrderCostService {
 	 */
 	public OrderRenterCostResVO calculateRenterOrderCost(RenterCostReqVO renterCostReqVO) throws Exception{
 		OrderRenterCostResVO realVo = new OrderRenterCostResVO();
-		
+        realVo.setOrderNo(renterCostReqVO.getOrderNo());
 		//主订单
         OrderDTO orderDTO = remoteFeignService.queryOrderByOrderNoFromRemote(renterCostReqVO.getOrderNo());
         if(orderDTO == null){
@@ -389,9 +392,15 @@ public class OrderCostService {
 	}
 
 	private void putRenterOrderFine(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
-		int carServiceFine = 0;
+        RenterCostReqVO renterCostReqVO = new RenterCostReqVO();
+        renterCostReqVO.setRenterOrderNo(realVo.getRenterOrderNo());
+        renterCostReqVO.setOrderNo(realVo.getOrderNo());
+        OrderRenterFineAmtDetailResVO resp = orderCostDetailService.findfineAmtListByOrderNo(renterCostReqVO);
+
+        int carServiceFine = OrderRenterFineAmtDetailResVO.getTotlal(resp);
+/*        int carServiceFine = 0;
 		List<RenterOrderFineDeatailResVO> fineLst = data.getFineLst();
-		/*console_renter_order_fine_deatail    renter_order_fine_deatail  来源是租客的，累加求和*/
+		*//*console_renter_order_fine_deatail    renter_order_fine_deatail  来源是租客的，累加求和*//*
 		for (RenterOrderFineDeatailResVO renterOrderFineDeatailResVO : fineLst) {
 			//fine_type  罚金类型：1-修改订单取车违约金，2-修改订单还车违约金
 //			if(renterOrderFineDeatailResVO.getFineType().intValue() == 1) {
@@ -413,11 +422,10 @@ public class OrderCostService {
 			if("1".equals(consoleRenterOrderFineDeatailEntity.getFineSubsidySourceCode())) {
 				carServiceFine += consoleRenterOrderFineDeatailEntity.getFineAmount().intValue();
 			}
-		}
-		
-		
+		}*/
+
 		//违约罚金 显示求反，显示正数。
-		realVo.setCarServiceFine(String.valueOf(NumberUtils.convertNumberToZhengshu(carServiceFine)));
+		realVo.setCarServiceFine(String.valueOf(carServiceFine));
 	}
 	
 	

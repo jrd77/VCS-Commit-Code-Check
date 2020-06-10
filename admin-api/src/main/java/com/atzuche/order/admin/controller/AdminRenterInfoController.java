@@ -82,6 +82,7 @@ public class AdminRenterInfoController {
             if(Objects.nonNull(dto.getPhone())){
                 commUseDriverInfo.setMobile(Pattern.matches("^[-\\+]?\\d+$", dto.getPhone())?Long.valueOf(dto.getPhone()):null);
             }
+
             commUseDriverInfos.add(commUseDriverInfo);
         }
         return commUseDriverInfos;
