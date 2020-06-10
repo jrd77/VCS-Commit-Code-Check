@@ -15,7 +15,10 @@
         <result property="paySource" column="pay_source"/>
         <result property="amt" column="amt"/>
         <result property="status" column="status"/>
+        <result property="payTransNoParent" column="pay_trans_no_parent"/>
+        <result property="adminFlag" column="admin_flag"/>
         <result property="qn" column="qn"/>
+        <result property="payTransNo" column="pay_trans_no"/>
         <result property="uniqueNo" column="unique_no"/>
         <result property="flag" column="flag"/>
         <result property="type" column="type"/>
@@ -43,8 +46,11 @@
 	`pay_type`, 	
 	`pay_source`, 	
 	`amt`, 	
-	`status`, 	
-	`qn`, 	
+	`status`,
+	`pay_trans_no_parent`,
+	`admin_flag`,
+	`qn`,
+	`pay_trans_no`,
 	`unique_no`, 	
 	`flag`, 	
 	`type`, 	
@@ -63,7 +69,7 @@
 
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
-		select <include refid="Base_Column_List" /> from cashier_refund_apply where id = #{value}
+		select <include refid="Base_Column_List" /> from cashier_refund_apply where id = #{value} and is_delete = 0
 	</select>
 
     <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity" useGeneratedKeys="true" keyProperty="id">
@@ -79,7 +85,10 @@
             <if test="paySource != null">`pay_source`, </if>
             <if test="amt != null">`amt`, </if>
             <if test="status != null">`status`, </if>
+            <if test="payTransNoParent != null">`pay_trans_no_parent`, </if>
+            <if test="adminFlag != null">`admin_flag`, </if>
             <if test="qn != null">`qn`, </if>
+            <if test="payTransNo != null">`pay_trans_no`, </if>
             <if test="uniqueNo != null">`unique_no`, </if>
             <if test="flag != null">`flag`, </if>
             <if test="type != null">`type`, </if>
@@ -103,7 +112,10 @@
             <if test="paySource != null">#{paySource},  </if>
             <if test="amt != null">#{amt},  </if>
             <if test="status != null">#{status},  </if>
+            <if test="payTransNoParent != null">#{payTransNoParent},  </if>
+            <if test="adminFlag != null">#{adminFlag},  </if>
             <if test="qn != null">#{qn},  </if>
+            <if test="payTransNo != null">#{payTransNo},  </if>
             <if test="uniqueNo != null">#{uniqueNo},  </if>
             <if test="flag != null">#{flag},  </if>
             <if test="type != null">#{type},  </if>
@@ -118,7 +130,69 @@
         </trim>
     </insert>
 
-	 
+	<insert id="insertAgain">
+		INSERT INTO cashier_refund_apply(`mem_no`,
+		  `order_no`,
+		  `source_code`,
+		  `source_detail`,
+		  `atapp_id`,
+		  `pay_kind`,
+		  `pay_type`,
+		  `pay_source`,
+		  `amt`,
+		  `status`,
+		  `qn`,
+		  `pay_trans_no`,
+		  `pay_trans_no_parent`,
+		   admin_flag,
+		  `unique_no`,
+		  `refund_time`,
+		  `flag`,
+		  `type`,
+		  `num`,
+		  `pay_md5`,
+		  `remake`,
+		  `dept_name`,
+		  `create_time`,
+		  `create_op`,
+		  `update_time`,
+		  `update_op`,
+		  `version`,
+		  `is_delete` )
+		SELECT
+		  `mem_no`,
+		  `order_no`,
+		  `source_code`,
+		  `source_detail`,
+		  `atapp_id`,
+		  `pay_kind`,
+		  `pay_type`,
+		  `pay_source`,
+		  `amt`,
+		  `status`,
+		  `qn`,
+		  `pay_trans_no`,
+		  `pay_trans_no_parent`,
+		   admin_Flag,
+		  `unique_no`,
+		  `refund_time`,
+		  `flag`,
+		  `type`,
+		  0,
+		  `pay_md5`,
+		  `remake`,
+		  `dept_name`,
+		  `create_time`,
+		  `create_op`,
+		  `update_time`,
+		  `update_op`,
+		  `version`,
+		  `is_delete`
+		FROM
+		  `cashier_refund_apply`  WHERE id = #{id}
+	</insert>
+
+	<!-- where and version = #{version}  去掉 -->
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity">
 		update cashier_refund_apply 
 		<set>
@@ -132,7 +206,10 @@
 				<if test="paySource != null">`pay_source` = #{paySource}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
 				<if test="status != null">`status` = #{status}, </if>
+				<if test="payTransNoParent != null">`pay_trans_no_parent` = #{payTransNoParent}, </if>
+				<if test="adminFlag != null">`admin_flag` = #{adminFlag}, </if>
 				<if test="qn != null">`qn` = #{qn}, </if>
+				<if test="payTransNo != null">`pay_trans_no` = #{payTransNo}, </if>
 				<if test="uniqueNo != null">`unique_no` = #{uniqueNo}, </if>
 				<if test="flag != null">`flag` = #{flag}, </if>
 				<if test="type != null">`type` = #{type}, </if>
@@ -147,51 +224,59 @@
 				version = version +1 ,
 				<if test="isDelete != null">`is_delete` = #{isDelete}</if>
 			</set>
-		where id = #{id} and version = #{version}
+		where id = #{id} 
 	</update>
     <select id="selectRefundByQn" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} limit 1
+        select <include refid="Base_Column_List" /> from cashier_refund_apply where mem_no = #{memNo} and order_no = #{orderNo} and qn = #{qn} and is_delete = 0 limit 1
     </select>
     <select id="selectRefundByMd5" resultMap="BaseResultMap">
 
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where mem_no = #{memNo} and order_no = #{orderNo} and pay_md5 = #{payMd5} limit 1
+        where mem_no = #{memNo} and order_no = #{orderNo} and pay_md5 = #{payMd5} and is_delete = 0 limit 1
 
     </select>
     <select id="selectRefundByType" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where order_no = #{orderNo} and pay_kind = #{payKind} AND `status`='01' limit 1
+        where order_no = #{orderNo} and pay_kind = #{payKind} AND `status`='01' and is_delete = 0 limit 1
     </select>
 
     <select id="queryRefundTimeByOrderNo" resultType="java.util.Date">
         select refund_time from cashier_refund_apply
-        where order_no = #{orderNo} and pay_kind = #{payKind} limit 1
+        where order_no = #{orderNo} and pay_kind = #{payKind} and is_delete = 0 limit 1
     </select>
     <select id="getCashierRefundApplyByTime" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        <![CDATA[ where status ='01' and create_time < #{date} and num<3 limit 100 ]]>
+        <![CDATA[ where status ='01' and create_time < #{date} and num<3 and is_delete = 0 limit 100 ]]>
     </select>
     
     <!-- 去掉  limit 100  -->
     <select id="getCashierRefundApplyByTimeForPreAuth" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        <![CDATA[ where status ='01' and create_time < #{date} and num >= 3 and pay_type = '03' ]]>
+        <![CDATA[ where status ='01' and create_time < #{date} and num >= 3 and pay_type = '03' and is_delete = 0 ]]>
     </select>
     
     <!-- 去掉 and create_time < #{date} -->
     <select id="getCashierRefundApplyByTimeForPreAuthSum" resultType="java.lang.Integer">
         select SUM(amt) from cashier_refund_apply
-        <![CDATA[ where mem_no= #{memNo} and status ='01' and num >= 3 and pay_type = '03' ]]>
+        <![CDATA[ where mem_no= #{memNo} and status ='01' and num >= 3 and pay_type = '03' and is_delete = 0 ]]>
     </select>
     
     <select id="getRefundApplyByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo}
+        where  order_no = #{orderNo} and is_delete = 0
     </select>
 	
 	<select id="getRefundApplyByOrderNoPayKind" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from cashier_refund_apply
-        where  order_no = #{orderNo} AND pay_kind = #{payKind}
+        where  order_no = #{orderNo} AND pay_kind = #{payKind} and is_delete = 0
 	</select>
-
+	<select id="selectByOrerNoAndPayTransNo" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} and pay_trans_no = #{payTransNo} AND pay_type = '04' and is_delete = 0
+    </select>
+    <select id="getRefundApplyByPayTransNoParent" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cashier_refund_apply
+        where  order_no = #{orderNo} and pay_trans_no_parent = #{payTransNoParent} and is_delete = 0
+    </select>
+    
 </mapper>

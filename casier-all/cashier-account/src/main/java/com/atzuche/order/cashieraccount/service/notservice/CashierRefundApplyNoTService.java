@@ -97,6 +97,7 @@ public class CashierRefundApplyNoTService {
         if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){
             return entity.getId();
         }
+
         int result = cashierRefundApplyMapper.insertSelective(cashierRefundApplyEntity);
         if(result==0){
             throw new CashierRefundApplyException();
@@ -109,6 +110,8 @@ public class CashierRefundApplyNoTService {
      * 退款回调信息
      */
     public CashierRefundApplyEntity updateRefundDepositSuccess(AutoPayResultVo notifyDataVo) {
+    	log.info("updateRefundDepositSuccess notifyDataVo=[{}]",GsonUtils.toJson(notifyDataVo));
+    	
         //1 校验
         String refundIdStr = notifyDataVo.getRefundId();
         int refundId = StringUtil.isBlank(refundIdStr)?0:Integer.valueOf(refundIdStr);
@@ -125,6 +128,10 @@ public class CashierRefundApplyNoTService {
             cashierRefundApplyUpdate.setVersion(cashierRefundApplyEntity.getVersion());
             cashierRefundApplyUpdate.setId(cashierRefundApplyEntity.getId());
             cashierRefundApplyUpdate.setRefundTime(LocalDateTime.now());
+            ///更新qn和pay_trans_no
+            cashierRefundApplyUpdate.setQn(notifyDataVo.getQn());
+            cashierRefundApplyUpdate.setPayTransNo(notifyDataVo.getAtpayNewTransId());  //退款的ID
+            
             int result = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyUpdate);
             if(result==0){
 //                throw new OrderPayRefundCallBackAsnyException();
@@ -166,6 +173,23 @@ public class CashierRefundApplyNoTService {
         cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
         cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
     }
+    
+    public void deleteOrInitNewCashierRefundApplyEntity(CashierRefundApplyEntity cashierRefundApply) {
+    	//初始化
+    	int i = cashierRefundApplyMapper.insertAgain(cashierRefundApply.getId());
+    	log.info("insertAgain num=[{}],params cashierRefundApply=[{}]",i,GsonUtils.toJson(cashierRefundApply));
+    	
+    	//逻辑删除
+        CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
+        cashierRefundApplyEntity.setId(cashierRefundApply.getId());
+        cashierRefundApplyEntity.setStatus("99"); //作废
+        cashierRefundApplyEntity.setIsDelete(1);
+        cashierRefundApplyEntity.setVersion(cashierRefundApply.getVersion());
+        int j = cashierRefundApplyMapper.updateByPrimaryKeySelective(cashierRefundApplyEntity);
+        log.info("updateByPrimaryKeySelective num=[{}],params cashierRefundApplyEntity=[{}]",j,GsonUtils.toJson(cashierRefundApplyEntity));
+    }
+    
+    
 
     /**
      *
@@ -283,5 +307,10 @@ public class CashierRefundApplyNoTService {
     		return;
     	}
     	orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+    }
+
+    public CashierRefundApplyEntity selectByOrerNoAndPayTransNo(String orderNo, String payTransNo) {
+        CashierRefundApplyEntity cashierRefundApplyEntity = cashierRefundApplyMapper.selectByOrerNoAndPayTransNo(orderNo,payTransNo);
+        return cashierRefundApplyEntity;
     }
 }

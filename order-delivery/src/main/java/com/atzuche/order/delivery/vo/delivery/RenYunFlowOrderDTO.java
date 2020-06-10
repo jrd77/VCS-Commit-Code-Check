@@ -321,7 +321,6 @@ public class RenYunFlowOrderDTO implements Serializable {
      * 驾乘无忧保障服务是否购买
      */
     private String driverInsurFlag;
-    
     /**
      * 配送模式：0-区间配送，1-精准配送
      */
@@ -358,8 +357,11 @@ public class RenYunFlowOrderDTO implements Serializable {
      * 车主处最晚送达时间
      */
     private String ownerRevertTimeEnd; 
+    /**
+     * 车辆注册号
+     */
+    private String carRegNo;
     
-
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
         if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
             setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());

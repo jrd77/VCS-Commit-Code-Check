@@ -18,9 +18,7 @@ import org.springframework.util.CollectionUtils;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformProfitDetailEntity;
 import com.atzuche.order.accountplatorm.entity.AccountPlatformSubsidyDetailEntity;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
-import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.OilAmtDTO;
@@ -28,10 +26,9 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
-import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
@@ -39,7 +36,6 @@ import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.vo.delivery.DeliveryOilCostVO;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.ConsoleOwnerOrderFineDeatailEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -63,7 +59,6 @@ import com.atzuche.order.rentercost.service.OrderConsoleCostDetailService;
 import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.settle.exception.OrderSettleFlatAccountException;
 import com.atzuche.order.settle.service.OrderOwnerSettleNewService;
-import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
@@ -304,9 +299,11 @@ public class OrderOwnerSettleNoTService {
         ownerIncomeAmt += -ownerPlatFormOilService;
         //13 补充 租客端的超里程，计算给车主。 add 200306 huangjing
         //跟租客有关联的地方（徐开心，之前是根据该方法上部的车主的参数来计算。目前不支持）
-    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
-    	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
-        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+//    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
+//    	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
+//        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
+        //更新方法200608
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(settleOrders.getOrderNo());
 
 		RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
 		

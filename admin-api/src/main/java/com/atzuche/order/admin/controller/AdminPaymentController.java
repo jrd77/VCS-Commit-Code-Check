@@ -1,6 +1,10 @@
 package com.atzuche.order.admin.controller;
 
+import com.atzuche.order.admin.common.AdminUserUtil;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.vo.req.ClearingRefundReqVO;
+import com.autoyol.autopay.gateway.vo.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +32,10 @@ public class AdminPaymentController {
     private static final Logger logger = LoggerFactory.getLogger(AdminPaymentController.class);
     @Autowired
     PaymentService paymentService;
+    @Autowired
+    RemoteFeignService remoteFeignService;
 
 	@AutoDocMethod(description = "支付信息", value = "支付信息", response = PaymentInformationResponseVO.class)
-//	@GetMapping("payment/information")
 	@RequestMapping(value="payment/information",method = RequestMethod.POST)
 	public ResponseData platformPaymentList(@RequestBody @Validated PaymentRequestVO paymentRequestVO, BindingResult bindingResult) {
         BindingResultUtil.checkBindingResult(bindingResult);
@@ -45,6 +50,18 @@ public class AdminPaymentController {
 		}
 		
 	}
-
+    @AutoDocMethod(description = "清算退款", value = "清算退款", response = ClearingRefundReqVO.class)
+    @RequestMapping(value="/clearingRefund/clearingRefundSubmit",method = RequestMethod.POST)
+    public Response<?> clearingRefundSubmitToRefund(@RequestBody @Validated ClearingRefundReqVO clearingRefundReqVO, BindingResult bindingResult) {
+        BindingResultUtil.checkBindingResult(bindingResult);
+        clearingRefundReqVO.setOperateName(AdminUserUtil.getAdminUser().getAuthName());
+        Response<?> response = remoteFeignService.clearingRefundFromRemote(clearingRefundReqVO);
+        return response;
+    }
+    @AutoDocMethod(description = "清算退款权限", value = "清算退款权限", response = ClearingRefundReqVO.class)
+    @RequestMapping(value="/clearingRefund/clearingRefundSubmitpower",method = RequestMethod.POST)
+    public ResponseData<Boolean> clearingRefundSubmitToRefundPower(){
+        return ResponseData.success(true);
+    }
 
 }

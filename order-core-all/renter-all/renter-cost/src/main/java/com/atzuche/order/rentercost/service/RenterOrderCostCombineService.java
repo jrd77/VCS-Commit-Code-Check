@@ -689,10 +689,9 @@ public class RenterOrderCostCombineService {
         List<IllegalDepositConfigEntity> illegalDepositList = illegalDepositConfigSDK.getConfig(new DefaultConfigContext());
         log.info("config-获取城市押金列表illegalDepositList=[{}]",JSON.toJSONString(illegalDepositList));
 
-        Integer illegalDepositAmt = RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
-				specialCityCodes, specialIllegalDepositAmt, illegalDepositList, 
+        return RenterFeeCalculatorUtils.calIllegalDepositAmt(illDTO.getCityCode(), illDTO.getCarPlateNum(),
+				specialCityCodes, specialIllegalDepositAmt, illegalDepositList,
 				costBaseDTO.getStartTime(), costBaseDTO.getEndTime());
-		return illegalDepositAmt;
 	}
 	
 	
