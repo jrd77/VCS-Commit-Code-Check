@@ -805,8 +805,8 @@ public class OrderSettleNoTService {
         int yingkouAmt1 = accountRenterCostSettle.getShifuAmt() - settleOrdersAccount.getRentCostSurplusAmt();
         int totalOldRealDebtAmt;
         //总的应扣
-        int yingkouAmt = 0;
-        int yingkouAmt2 = 0;
+        int yingkouAmt;
+        int yingkouAmt2;
         if(Objects.nonNull(settleOrders.getIsEnterpriseUserOrder()) && settleOrders.getIsEnterpriseUserOrder()) {
             OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_SETTLE_TYPE);
             totalOldRealDebtAmt = resVO.getOldTotalRealDebtAmt();
