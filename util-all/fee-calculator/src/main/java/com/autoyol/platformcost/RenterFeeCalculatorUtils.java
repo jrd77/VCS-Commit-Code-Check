@@ -38,6 +38,7 @@ public class RenterFeeCalculatorUtils {
         {
             put(0, 2000);  //非内部员工。2000
             put(1, 1);  //内部员工，1
+            put(2, 3000);  //二线城市违章押金默认值
         }
     };
     
@@ -502,15 +503,12 @@ public class RenterFeeCalculatorUtils {
 	 */
 	public static Integer calIllegalDepositAmt(Integer cityCode, String carPlateNum, String specialCityCodes, Integer specialIllegalDepositAmt,
                                                List<IllegalDepositConfigEntity> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
-		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
 		if (carPlateNum != null && !"".equals(carPlateNum) && specialCityCodes != null && !"".equals(specialCityCodes)) {
 			if("粤".equals(carPlateNum.substring(0,1)) && cityCode != null && specialCityCodes.contains(String.valueOf(cityCode))){
-				illegalDepositAmt = specialIllegalDepositAmt == null ? illegalDepositAmt:specialIllegalDepositAmt;
-				return illegalDepositAmt;
+				return specialIllegalDepositAmt == null ? ILLEGAL_DEPOSIT.get(0) : specialIllegalDepositAmt;
 	        }
 		}
-		illegalDepositAmt = getIllegalDepositAmt(cityCode, illegalDepositList, rentTime, revertTime);
-		return illegalDepositAmt;
+		return getIllegalDepositAmt(cityCode, illegalDepositList, rentTime, revertTime);
 	}
 	
 	
@@ -523,7 +521,7 @@ public class RenterFeeCalculatorUtils {
 	 * @return Integer
 	 */
 	public static Integer getIllegalDepositAmt(Integer cityCode, List<IllegalDepositConfigEntity> illegalDepositList, LocalDateTime rentTime, LocalDateTime revertTime) {
-		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(0);
+		Integer illegalDepositAmt = ILLEGAL_DEPOSIT.get(2);
 		if (cityCode == null) {
 			return illegalDepositAmt;
 		}
