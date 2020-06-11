@@ -342,6 +342,11 @@ public class OrderDetailService {
         	BeanUtils.copyProperties(orderStopFreightInfo, orderStopFreightDTO);
         	orderDetailRespDTO.orderStopFreightDTO = orderStopFreightDTO;
         }
+        // 获取区间配送信息
+        if (renterOrderEntity != null) {
+        	SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+        	orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
+        }
         return orderDetailRespDTO;
 
     }

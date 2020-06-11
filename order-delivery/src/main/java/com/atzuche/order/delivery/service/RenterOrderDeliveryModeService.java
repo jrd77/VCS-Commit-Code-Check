@@ -52,7 +52,9 @@ public class RenterOrderDeliveryModeService {
 		sectionParam.setRentTime(rentTime);
 		sectionParam.setRevertTime(revertTime);
 		SectionDeliveryVO sectionDeliveryVO = SectionDeliveryUtils.getRenterSectionDeliveryVO(sectionParam, DateUtils.DATE_DEFAUTE1);
-		sectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
+		if (sectionDeliveryVO != null) {
+			sectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
+		}
 		return sectionDeliveryVO;
 	}
 	
@@ -93,7 +95,9 @@ public class RenterOrderDeliveryModeService {
 		sectionParam.setGetCarBeforeTime(getCarBeforeTime);
 		sectionParam.setReturnCarAfterTime(returnCarAfterTime);
 		SectionDeliveryVO sectionDeliveryVO = SectionDeliveryUtils.getOwnerSectionDeliveryVO(sectionParam, DateUtils.DATE_DEFAUTE1);
-		sectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
+		if (sectionDeliveryVO != null) {
+			sectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
+		}
 		return sectionDeliveryVO;
 	}
 }

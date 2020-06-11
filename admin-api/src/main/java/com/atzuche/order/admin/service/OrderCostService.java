@@ -634,6 +634,9 @@ public class OrderCostService {
 
         String tyreInsurCashNo = RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo();
         String driverInsurCashNo = RenterCashCodeEnum. DRIVER_INSURE_TOTAL_PRICES.getCashNo();
+        
+        String accurateGetSrvCashNo = RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo();
+        String accurateReturnSrvCashNo = RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo();
 		//默认0
 		int rentAmount = 0;
 
@@ -677,7 +680,13 @@ public class OrderCostService {
                 }else if(driverInsurCashNo.equals(renterOrderCostDetailResVO.getCostCode())){
                     driverInsurAmt += renterOrderCostDetailResVO.getTotalAmount().intValue();
 
-                }
+                }else if(accurateGetSrvCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+					carServiceFee +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+					
+				}else if(accurateReturnSrvCashNo.equals(renterOrderCostDetailResVO.getCostCode())) {
+					carServiceFee +=  renterOrderCostDetailResVO.getTotalAmount().intValue();
+					
+				}
 			}
 		}
 		//租客租金

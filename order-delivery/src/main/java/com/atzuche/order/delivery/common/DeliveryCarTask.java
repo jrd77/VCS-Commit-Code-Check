@@ -1,11 +1,19 @@
 package com.atzuche.order.delivery.common;
 
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.SectionParamDTO;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.commons.vo.res.SectionDeliveryResultVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.delivery.enums.OrderScenesSourceEnum;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
@@ -22,13 +30,17 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * @author 胡春林
@@ -54,6 +66,8 @@ public class DeliveryCarTask {
     private RenterOrderService renterOrderService;
     @Autowired
     private RenterGoodsService renterGoodsService;
+    @Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 
     /**
      * 添加订单到仁云流程系统
@@ -73,6 +87,8 @@ public class DeliveryCarTask {
      */
     @Async
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+    	// 追加参数
+    	updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO);
         String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
             sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
@@ -181,7 +197,125 @@ public class DeliveryCarTask {
         if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
             renYunFlowOrderDTO.setSceneName(OrderScenesSourceEnum.getOrderScenesSource(renYunFlowOrderDTO.getSceneName()));
         }
+        // 获取区间配送信息
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity);
+        renYunFlowOrderDTO = convertDataAdd(renYunFlowOrderDTO, deliveryResult);
     	return renYunFlowOrderDTO;
+    }
+    
+    
+    public RenYunFlowOrderDTO convertDataAdd(RenYunFlowOrderDTO renYunFlowOrderDTO, SectionDeliveryResultVO deliveryResult) {
+    	if (renYunFlowOrderDTO == null) {
+    		return null;
+    	}
+    	if (deliveryResult == null) {
+    		return renYunFlowOrderDTO;
+    	}
+    	Integer distributionMode = deliveryResult.getDistributionMode();
+    	renYunFlowOrderDTO.setDistributionMode(distributionMode == null ? "0":String.valueOf(distributionMode));
+    	if (distributionMode != null && distributionMode.intValue() == 1) {
+    		return renYunFlowOrderDTO;
+    	}
+    	SectionDeliveryVO renter = deliveryResult.getRenterSectionDelivery();
+    	SectionDeliveryVO owner = deliveryResult.getOwnerSectionDelivery();
+    	if (renter != null) {
+    		renYunFlowOrderDTO.setRenterRentTimeStart(renter.getRentTimeStart());
+    		renYunFlowOrderDTO.setRenterRentTimeEnd(renter.getRentTimeEnd());
+    		renYunFlowOrderDTO.setRenterRevertTimeStart(renter.getRevertTimeStart());
+    		renYunFlowOrderDTO.setRenterRevertTimeEnd(renter.getRevertTimeEnd());
+    	}
+    	if (owner != null) {
+    		renYunFlowOrderDTO.setOwnerRentTimeStart(owner.getRentTimeStart());
+    		renYunFlowOrderDTO.setOwnerRentTimeEnd(owner.getRentTimeEnd());
+    		renYunFlowOrderDTO.setOwnerRevertTimeStart(owner.getRevertTimeStart());
+    		renYunFlowOrderDTO.setOwnerRevertTimeEnd(owner.getRevertTimeEnd());
+    	}
+    	return renYunFlowOrderDTO;
+    }
+    
+    
+    /**
+     * 追加修改参数
+     * @param updFlow
+     * @return UpdateFlowOrderDTO
+     */
+    public UpdateFlowOrderDTO appendUpdateFlowOrderDTO(UpdateFlowOrderDTO updFlow) {
+    	if (updFlow == null) {
+    		return null;
+    	}
+    	// 获取有效的租客子订单
+    	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updFlow.getOrdernumber());
+    	// 获取区间配送信息
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity); 
+    	if (deliveryResult == null) {
+    		return updFlow;
+    	}
+    	Integer distributionMode = deliveryResult.getDistributionMode();
+    	updFlow.setDistributionMode(distributionMode == null ? "0":String.valueOf(distributionMode));
+    	if (distributionMode != null && distributionMode.intValue() == 1) {
+    		return updFlow;
+    	}
+    	SectionDeliveryVO renter = deliveryResult.getRenterSectionDelivery();
+    	SectionDeliveryVO owner = deliveryResult.getOwnerSectionDelivery();
+    	if (renter != null) {
+    		updFlow.setRenterRentTimeStart(renter.getRentTimeStart());
+    		updFlow.setRenterRentTimeEnd(renter.getRentTimeEnd());
+    		updFlow.setRenterRevertTimeStart(renter.getRevertTimeStart());
+    		updFlow.setRenterRevertTimeEnd(renter.getRevertTimeEnd());
+    	}
+    	if (owner != null) {
+    		updFlow.setOwnerRentTimeStart(owner.getRentTimeStart());
+    		updFlow.setOwnerRentTimeEnd(owner.getRentTimeEnd());
+    		updFlow.setOwnerRevertTimeStart(owner.getRevertTimeStart());
+    		updFlow.setOwnerRevertTimeEnd(owner.getRevertTimeEnd());
+    	}
+    	return updFlow;
+    }
+    
+    
+    /**
+     * 获取区间配送信息
+     * @param renterOrderEntity
+     * @return SectionDeliveryResultVO
+     */
+    public SectionDeliveryResultVO getSectionDeliveryResultVO(RenterOrderEntity renterOrderEntity) {
+    	if (renterOrderEntity == null) {
+    		log.info("获取区间配送信息getSectionDeliveryResultVO renterOrderEntity is null");
+    		return null;
+    	}
+    	RenterOrderDeliveryMode mode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+		if (mode == null) {
+			log.info("获取区间配送信息getSectionDeliveryResultVO RenterOrderDeliveryMode is null");
+			return null;
+		}
+		Integer getCarBeforeTime = 0;
+		Integer returnCarAfterTime = 0;
+		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				getCarBeforeTime = srvGetDelivery.getAheadOrDelayTime();
+			}
+			if (srvReturnDelivery != null) {
+				returnCarAfterTime = srvReturnDelivery.getAheadOrDelayTime();
+			}
+		}
+		SectionParamDTO sectionParam = new SectionParamDTO();
+		BeanUtils.copyProperties(mode, sectionParam);
+		sectionParam.setRentTime(renterOrderEntity.getExpRentTime());
+		sectionParam.setRevertTime(renterOrderEntity.getExpRevertTime());
+		sectionParam.setGetCarBeforeTime(getCarBeforeTime);
+		sectionParam.setReturnCarAfterTime(returnCarAfterTime);
+		SectionDeliveryResultVO sectionDeliveryResultVO = SectionDeliveryUtils.getSectionDeliveryResultVO(sectionParam, DateUtils.DATE_DEFAUTE1);
+		if (sectionDeliveryResultVO != null) {
+			sectionDeliveryResultVO.setDistributionMode(mode.getDistributionMode());
+		}
+		return sectionDeliveryResultVO;
     }
 
 }

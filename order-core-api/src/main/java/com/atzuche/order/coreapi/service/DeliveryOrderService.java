@@ -38,6 +38,7 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
+import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -151,6 +152,8 @@ public class DeliveryOrderService {
         list.stream().filter(r -> r.getCostCode().equals(RenterCashCodeEnum.RETURN_BLOCKED_RAISE_AMT.getCashNo())).findFirst().ifPresent(getCrashVO -> {
             distributionCostVO.setReturnCarChaoYunNeng(String.valueOf(getCrashVO.getUnitPrice() * getCrashVO.getCount()));
         });
+        distributionCostVO.setAccurateGetSrvAmt(-RenterOrderCostDetailUtils.getAccurateGetSrvAmt(list));
+        distributionCostVO.setAccurateReturnSrvAmt(-RenterOrderCostDetailUtils.getAccurateReturnSrvAmt(list));
         return distributionCostVO;
     }
     
