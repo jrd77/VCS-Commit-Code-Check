@@ -828,7 +828,7 @@ public class OrderSettleNoTService {
 	        orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
 	        // 10.2 抵扣老系统欠款
 	        totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
-            // 10.3 钱包余额抵扣欠款
+            // 10.3 钱包余额抵扣欠款(押金抵扣->欠款(押金不足)->钱包抵扣->欠款(钱包余额不足))
             if (settleOrdersAccount.getDepositSurplusAmt() <= OrderConstant.ZERO
                     && Objects.nonNull(settleOrders.getUseWallet()) && settleOrders.getUseWallet()) {
                 //使用钱包抵扣欠款
