@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.RenterOrderWzDetailLogList;
 import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
 
 import com.atzuche.violation.common.PageParam;
+import com.atzuche.violation.common.WzLogListReqDTO;
 import com.atzuche.violation.mapper.RenterOrderWzDetailLogMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -40,8 +41,8 @@ public class RenterOrderWzDetailLogService {
      * @Description: 分页查询
      *
      **/
-    public RenterOrderWzDetailLogList queryList(PageParam pageParam) {
-        PageHelper.startPage(pageParam.getPageNumber(),pageParam.getPageSize());
+    public RenterOrderWzDetailLogList queryList(WzLogListReqDTO wzLogListReqDTO) {
+        PageHelper.startPage(wzLogListReqDTO.getPageNumber(),wzLogListReqDTO.getPageSize());
         List<RenterOrderWzDetailLogEntity> renterOrderWzDetailLogEntityList = renterOrderWzDetailLogMapper.queryList();
         PageInfo<RenterOrderWzDetailLogEntity> pageInfo = new PageInfo<>(renterOrderWzDetailLogEntityList);
         List<RenterOrderWzDetailLogEntity> list = pageInfo.getList();

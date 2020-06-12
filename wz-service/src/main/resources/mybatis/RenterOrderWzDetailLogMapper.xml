@@ -79,8 +79,10 @@
 			</set>
 		where id = #{id}
 	</update>
-	<select id="queryList" resultMap="BaseResultMap">
-	    select <include refid="Base_Column_List" /> from renter_order_wz_detail_log order by create_time desc
+	<select id="queryList" resultMap="BaseResultMap" parameterType="com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity">
+	    select <include refid="Base_Column_List" /> from renter_order_wz_detail_log
+        where `order_no` = #{orderNo}
+        order by create_time desc
     </select>
 
   	

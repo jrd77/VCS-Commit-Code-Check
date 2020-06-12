@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.RenterOrderWzDetailLogList;
 import com.atzuche.violation.common.PageParam;
+import com.atzuche.violation.common.WzLogListReqDTO;
 import com.atzuche.violation.service.RenterOrderWzDetailLogService;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
@@ -33,11 +34,11 @@ public class RenterOrderWzDetailLogController {
      **/
     @RequestMapping("/queryList")
     @AutoDocMethod(description = "违章日志列表", value = "违章日志列表", response = RenterOrderWzDetailLogList.class)
-    public ResponseData<RenterOrderWzDetailLogList> queryList(@Valid PageParam pageParam, BindingResult bindingResult){
+    public ResponseData<RenterOrderWzDetailLogList> queryList(@Valid WzLogListReqDTO wzLogListReqDTO, BindingResult bindingResult){
         BindingResultUtil.checkBindingResult(bindingResult);
-        log.info("违章日志查询pageBean={}", JSON.toJSONString(pageParam));
-        RenterOrderWzDetailLogList data =  renterOrderWzDetailLogService.queryList(pageParam);
-        log.info("违章日志查询-参数pageBean={},data={}", JSON.toJSONString(pageParam),JSON.toJSONString(data));
+        log.info("违章日志查询wzLogListReqDTO={}", JSON.toJSONString(wzLogListReqDTO));
+        RenterOrderWzDetailLogList data =  renterOrderWzDetailLogService.queryList(wzLogListReqDTO);
+        log.info("违章日志查询-参数wzLogListReqDTO={},data={}", JSON.toJSONString(wzLogListReqDTO),JSON.toJSONString(data));
         return ResponseData.success(data);
     }
 

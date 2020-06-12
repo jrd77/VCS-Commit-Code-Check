@@ -21,5 +21,5 @@ public interface RenterOrderWzDetailLogMapper{
 
     int updateByPrimaryKeySelective(RenterOrderWzDetailLogEntity record);
 
-    List<RenterOrderWzDetailLogEntity> queryList();
+    List<RenterOrderWzDetailLogEntity> queryList(RenterOrderWzDetailLogEntity entity);
 }
