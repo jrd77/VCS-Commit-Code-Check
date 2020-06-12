@@ -196,6 +196,5 @@
         </foreach>
         )
         and is_delete = 0
-        order by id desc
     </select>
 </mapper>
