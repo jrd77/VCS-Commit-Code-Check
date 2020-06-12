@@ -135,6 +135,7 @@ public enum ErrorCode {
     CLEAN_REFOUND_ERR("60043","清算退款异常"),
     WZ_REPEAT_DATA_ERR("600041","违章数据重复"),
     WZ_DETAIL_DEL_STATUS_NOT_SUPPORT("600042","该状态下不能删除违章信息"),
+    WZ_DETAIL_DEL_ERR("600043","违章详情删除异常"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
     ;
 

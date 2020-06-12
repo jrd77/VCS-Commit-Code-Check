@@ -3,6 +3,7 @@ package com.atzuche.violation.controller;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
+import com.atzuche.order.commons.exceptions.WzDetailDeleteErrException;
 import com.atzuche.order.commons.exceptions.WzDetailDeleteException;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
@@ -30,6 +31,7 @@ import com.autoyol.doc.annotation.AutoDocVersion;
 
 import com.autoyol.event.rabbit.violation.ViolationRabbitMQEventEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.SendingContext.RunTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -184,7 +186,12 @@ public class ViolationManageController {
         //增加删除条件
         RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailMapper.queryRenterOrderWzDetailById(Long.valueOf(violationDeleteRequestVO.getViolationId()));
         RenterOrderWzStatusEntity renterOrderWzStatusEntity = renterOrderWzStatusService.selectByOrderNo(renterOrderWzDetailEntity.getOrderNo(), renterOrderWzDetailEntity.getCarPlateNum());
-        if(!WzStatusEnums.STATUS_25.getStatus().equals(renterOrderWzStatusEntity.getStatus()) || !"0".equals(renterOrderWzDetailEntity.getIllegalStatus())){
+        if(renterOrderWzStatusEntity == null){
+            WzDetailDeleteErrException e = new WzDetailDeleteErrException();
+            log.error("查询违章状态为空",e);
+            throw e;
+        }
+        if(!WzStatusEnums.STATUS_25.getStatus().equals(renterOrderWzStatusEntity.getStatus()) || 0 != renterOrderWzDetailEntity.getIllegalStatus()){
             WzDetailDeleteException e = new WzDetailDeleteException();
             log.error("该状态下不能删除违章信息",e);
             throw e;
