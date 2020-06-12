@@ -322,7 +322,11 @@ public class RenYunFlowOrderDTO implements Serializable {
      */
     private String driverInsurFlag;
      
-
+    /**
+     * 车辆注册号
+     */
+    private String carRegNo;
+    
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
         if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
             setServicetype(ServiceTypeEnum.TAKE_TYPE.getValue());
