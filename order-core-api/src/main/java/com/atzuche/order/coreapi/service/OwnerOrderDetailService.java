@@ -215,12 +215,12 @@ public class OwnerOrderDetailService {
 	            BeanUtils.copyProperties(x,consoleOwnerOrderFineDeatailDTO);
 	            consoleOwnerOrderFineDeatailDTOS.add(consoleOwnerOrderFineDeatailDTO);
 	        });
-            ownerModifyAddrAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE, consoleOwnerOrderFineDeatailDTOS);
+            ownerModifyAddrAmt = CostStatUtils.calConsoleOwnerFineByFineType(FineTypeCashCodeEnum.MODIFY_ADDRESS_FINE, consoleOwnerOrderFineDeatailDTOS);
 	        //费用编码不对
-	        consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum.MODIFY_ADVANCE, consoleOwnerOrderFineDeatailDTOS);
-	        consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum.DELAY_FINE, consoleOwnerOrderFineDeatailDTOS);
+	        consoleRenterAdvanceReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByFineType(FineTypeCashCodeEnum.MODIFY_ADVANCE, consoleOwnerOrderFineDeatailDTOS);
+	        consoleRenterDelayReturnCarFienAmt = CostStatUtils.calConsoleOwnerFineByFineType(FineTypeCashCodeEnum.DELAY_FINE, consoleOwnerOrderFineDeatailDTOS);
 
-            ownerFine += CostStatUtils.calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum.CANCEL_FINE, consoleOwnerOrderFineDeatailDTOS);
+            ownerFine += CostStatUtils.calConsoleOwnerFineByFineType(FineTypeCashCodeEnum.CANCEL_FINE, consoleOwnerOrderFineDeatailDTOS);
         }
         
         FienAmtDetailDTO fienAmtDetailDTO = new FienAmtDetailDTO();
