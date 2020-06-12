@@ -185,11 +185,11 @@
 			NOW())
 	</insert>
 
-	<select id="queryRenterOrderWzDetailById" resultType="com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
-		select <include refid="select_column" />
-		from renter_order_wz_detail
-		where id = #{id} and is_delete = 0
-	</select>
+    <select id="queryRenterOrderWzDetailById" resultMap="selectColumnMap">
+        select <include refid="select_column" />
+        from renter_order_wz_detail
+        where id = #{id}
+    </select>
 
 	<select id="queryList" resultMap="selectColumnMap">
 		select <include refid="select_column" />
@@ -307,7 +307,7 @@
 		update renter_order_wz_detail set is_valid = 0 where order_no=#{orderNo} and car_plate_num = #{carNum}
 	</update>
 
-	<insert id ="addIllegalDetailFromRenyun" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
+	<insert id ="addIllegalDetailFromRenyun" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO renter_order_wz_detail (order_no,car_plate_num,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,create_time,
 		order_flag,is_sms,ry_wz_code)
 		VALUES (#{orderNo},#{carPlateNum},#{illegalTime},#{illegalAddr},#{illegalReason},#{illegalAmt},#{illegalDeduct},#{createTime},#{orderFlag},#{isSms},#{ryWzCode})
@@ -444,8 +444,8 @@
         select <include refid="select_column" />
         from renter_order_wz_detail
         where  order_no = #{orderNo}
-        AND illegal_time <![CDATA[<=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 MINUTE)
-        AND illegal_time <![CDATA[>=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 MINUTE)
+        AND illegal_time <![CDATA[<=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        AND illegal_time <![CDATA[>=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 DAY)
         and is_delete = 0
     </select>
     <select id="queryListByPlateNumAndOrderNo" resultMap="selectColumnMap">

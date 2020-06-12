@@ -1,6 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
+import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzQueryRecordEntity;
 import com.atzuche.order.renterwz.service.*;
@@ -9,9 +13,11 @@ import com.atzuche.order.renterwz.vo.IllegalToDO;
 import com.atzuche.order.renterwz.vo.Violation;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -26,6 +32,7 @@ import java.util.stream.Collectors;
  * @author shisong
  * @date 2020/1/2
  */
+@Slf4j
 @Service
 public class IllegalToDoService {
 
@@ -51,7 +58,8 @@ public class IllegalToDoService {
 
     @Resource
     private RenterOrderWzFinishedTodoService renterOrderWzFinishedTodoService;
-
+    @Autowired
+    RenterOrderWzDetailLogService renterOrderWzDetailLogService;
 
     private static final String ORDER_CENTER_EXCHANGE = "auto-order-center-wz";
     private static final String ORDER_CENTER_WZ_QUERY_INFO_ROUTING_KEY = "order.center.wz.query.info.feedback";
@@ -115,6 +123,37 @@ public class IllegalToDoService {
                     //设置待发状态，后续短信发送的定时任务将对待发短信进行查询
                     detail.setIsSms(0);
                 }
+
+                //去重处理
+                String authName = "系统";
+                RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+                try{
+                    String IllegalTime = DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1);
+                    List<RenterOrderWzDetailEntity> renterOrderWzDetailEntityList = renterOrderWzDetailService.getRepeatData(detail.getOrderNo(),IllegalTime);
+                    if(renterOrderWzDetailEntityList != null && renterOrderWzDetailEntityList.size()>=1) {
+                        RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailEntityList.get(0);
+                        //记录日志
+                        String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                                detail.getIllegalAddr(),
+                                detail.getIllegalReason(),
+                                detail.getIllegalFine(),
+                                detail.getIllegalDeduct(),
+                                detail.getIllegalStatus());
+                        entity.setOrderNo(detail.getOrderNo());
+                        entity.setWzDetailId(renterOrderWzDetailEntity.getId());
+                        entity.setOperateType(WzLogOperateTypeEnums.SYSTEM_DISTINCT.getCode());
+                        entity.setContent(wzContent);
+                        entity.setCreateOp(authName);
+                        entity.setUpdateOp(authName);
+                        log.info("凹凸自动同步导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                        int insert = renterOrderWzDetailLogService.insert(entity);
+                        log.info("凹凸自动同步导入违章信息记录日志insert={},entity={}", insert, JSON.toJSONString(entity));
+                        continue;
+                    }
+                }catch (Exception e){
+                    log.error("任云同步导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
+                }
+
                 //根据时间、地点、订单号做比对
                 int count = renterOrderWzDetailService.countIllegalDetailByOrderNo(orderNo,violation.getTime(),violation.getAddress(),violation.getCode(),carNumber);
                 if (count == 0) {

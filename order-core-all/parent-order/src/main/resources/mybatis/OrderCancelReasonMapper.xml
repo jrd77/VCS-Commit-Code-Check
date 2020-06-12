@@ -196,6 +196,6 @@
         </foreach>
         )
         and is_delete = 0
+        order by ide desc
     </select>
-
 </mapper>

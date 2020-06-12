@@ -1,15 +1,20 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
+import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.*;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.order.renterwz.vo.IllegalHandleMqVO;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
@@ -27,6 +32,7 @@ import java.util.List;
  * @author shisong
  * @date 2019/12/28
  */
+@Slf4j
 @Service
 public class TransIllegalMqService {
 
@@ -58,6 +64,8 @@ public class TransIllegalMqService {
 
     @Resource
     private MqSendFeelbackLogService mqSendFeelbackLogService;
+    @Autowired
+    private RenterOrderWzDetailLogService renterOrderWzDetailLogService;
 
     private static Gson gson = new Gson();
 
@@ -127,10 +135,61 @@ public class TransIllegalMqService {
             if(CollectionUtils.isEmpty(illegals)) {
                 renterOrderWzStatusService.updateTransIllegalQuery(3,orderNo,carNum);
             }else{
-                //不为空，仁云给出违章查询结果后，需将违章表中之前的数据置为无效
-                renterOrderWzDetailService.updateIsValid(orderNo,carNum);
+                String authName = "系统";
                 for (RenterOrderWzDetailEntity illegal : illegals) {
+                    //去重处理
+                    RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+                    try{
+                        String IllegalTime = DateUtils.formate(illegal.getIllegalTime(), DateUtils.DATE_DEFAUTE1);
+                        List<RenterOrderWzDetailEntity> renterOrderWzDetailEntityList = renterOrderWzDetailService.getRepeatData(illegal.getOrderNo(),IllegalTime);
+                        if(renterOrderWzDetailEntityList != null && renterOrderWzDetailEntityList.size()>=1) {
+                            RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailEntityList.get(0);
+                            //记录日志
+                            String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(illegal.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                                    illegal.getIllegalAddr(),
+                                    illegal.getIllegalReason(),
+                                    illegal.getIllegalFine(),
+                                    illegal.getIllegalDeduct(),
+                                    illegal.getIllegalStatus());
+                            entity.setOrderNo(illegal.getOrderNo());
+                            entity.setWzDetailId(renterOrderWzDetailEntity.getId());
+                            entity.setOperateType(WzLogOperateTypeEnums.SYSTEM_DISTINCT.getCode());
+                            entity.setContent(wzContent);
+                            entity.setCreateOp(authName);
+                            entity.setUpdateOp(authName);
+                            log.info("任云同步导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                            int insert = renterOrderWzDetailLogService.insert(entity);
+                            log.info("任云同步导入违章信息记录日志insert={},entity={}", insert, JSON.toJSONString(entity));
+                            continue;
+                        }
+                    }catch (Exception e){
+                        log.error("任云同步导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
+                    }
+                    //不为空，仁云给出违章查询结果后，需将违章表中之前的数据置为无效
+                    renterOrderWzDetailService.updateIsValid(orderNo,carNum);
                     renterOrderWzDetailService.addIllegalDetailFromRenyun(illegal);
+
+                    //记录日志
+                    try{
+                        //记录日志
+                        String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(illegal.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                                illegal.getIllegalAddr(),
+                                illegal.getIllegalReason(),
+                                illegal.getIllegalFine(),
+                                illegal.getIllegalDeduct(),
+                                illegal.getIllegalStatus());
+                        entity.setOrderNo(illegal.getOrderNo());
+                        entity.setWzDetailId(illegal.getId());
+                        entity.setOperateType(WzLogOperateTypeEnums.RENYUN_SYNC_UPDATE.getCode());
+                        entity.setContent(wzContent);
+                        entity.setCreateOp(authName);
+                        entity.setUpdateOp(authName);
+                        log.info("任云同步导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                        int insert = renterOrderWzDetailLogService.insert(entity);
+                        log.info("任云同步导入违章信息记录日志insert={},entity={}", insert, JSON.toJSONString(entity));
+                    }catch (Exception e){
+                        log.error("任云同步导入违章信息记录日志失败entity={}",JSON.toJSONString(entity),e);
+                    }
                 }
                 //修改订单违章查询状态为，有违章
                 renterOrderWzStatusService.updateTransIllegalQuery(4,orderNo,carNum);

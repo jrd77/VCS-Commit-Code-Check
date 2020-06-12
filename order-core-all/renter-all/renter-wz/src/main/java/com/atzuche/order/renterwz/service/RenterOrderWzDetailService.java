@@ -123,4 +123,5 @@ public class RenterOrderWzDetailService {
     public List<RenterOrderWzDetailEntity> queryListByPlateNumAndOrderNo(String orderNo,String PlateNum){
         return renterOrderWzDetailMapper.queryListByPlateNumAndOrderNo(orderNo,PlateNum);
     }
+
 }

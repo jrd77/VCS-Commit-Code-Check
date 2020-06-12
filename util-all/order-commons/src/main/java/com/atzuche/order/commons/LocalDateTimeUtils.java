@@ -389,6 +389,9 @@ public class LocalDateTimeUtils {
      * @return
      */
     public static String localdateToString(LocalDateTime localDateTime, String format) {
+        if(localDateTime == null){
+            return null;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return localDateTime.format(formatter);
     }

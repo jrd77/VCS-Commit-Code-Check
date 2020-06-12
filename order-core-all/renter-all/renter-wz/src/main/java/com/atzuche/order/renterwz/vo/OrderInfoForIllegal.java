@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import java.util.Date;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value= Include.NON_EMPTY)
@@ -93,7 +94,16 @@ public class OrderInfoForIllegal {
 	private String engineSource;
 
 	private String moreLicenseFlag;
+    /*违章信息*/
+    private List<WzillegalVO> illegal;
 
+    public List<WzillegalVO> getIllegal() {
+        return illegal;
+    }
+
+    public void setIllegal(List<WzillegalVO> illegal) {
+        this.illegal = illegal;
+    }
 	public String getMoreLicenseFlag() {
 		return moreLicenseFlag;
 	}
