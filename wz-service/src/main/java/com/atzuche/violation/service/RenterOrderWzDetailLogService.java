@@ -43,7 +43,9 @@ public class RenterOrderWzDetailLogService {
      **/
     public RenterOrderWzDetailLogList queryList(WzLogListReqDTO wzLogListReqDTO) {
         PageHelper.startPage(wzLogListReqDTO.getPageNumber(),wzLogListReqDTO.getPageSize());
-        List<RenterOrderWzDetailLogEntity> renterOrderWzDetailLogEntityList = renterOrderWzDetailLogMapper.queryList();
+        RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+        entity.setOrderNo(wzLogListReqDTO.getOrderNo());
+        List<RenterOrderWzDetailLogEntity> renterOrderWzDetailLogEntityList = renterOrderWzDetailLogMapper.queryList(entity);
         PageInfo<RenterOrderWzDetailLogEntity> pageInfo = new PageInfo<>(renterOrderWzDetailLogEntityList);
         List<RenterOrderWzDetailLogEntity> list = pageInfo.getList();
         List<RenterOrderWzDetailLogDTO> renterOrderWzDetailLogDTOS = new ArrayList<>();
