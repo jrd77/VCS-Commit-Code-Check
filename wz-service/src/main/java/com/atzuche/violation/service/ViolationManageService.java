@@ -330,7 +330,7 @@ public class ViolationManageService {
             String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                     renterOrderWzDetail.getIllegalAddr(),
                     renterOrderWzDetail.getIllegalReason(),
-                    renterOrderWzDetail.getIllegalFine(),
+                    renterOrderWzDetail.getIllegalAmt()==null?0:Integer.valueOf(renterOrderWzDetail.getIllegalAmt()),
                     renterOrderWzDetail.getIllegalDeduct(),
                     renterOrderWzDetail.getIllegalStatus());
             entity.setOrderNo(renterOrderWzDetail.getOrderNo());

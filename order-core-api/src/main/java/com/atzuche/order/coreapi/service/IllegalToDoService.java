@@ -103,6 +103,7 @@ public class IllegalToDoService {
         List<Violation> violations = this.processInfo(rentTime, revertTime,carNumber, null, orderNo,resStr);
         violations = violations.stream().distinct().collect(Collectors.toList());
         int status;
+        String authName = "系统";
         if (!CollectionUtils.isEmpty(violations)) {
             status = 4;
             List<RenterOrderWzDetailEntity> details = new ArrayList<>();
@@ -125,7 +126,6 @@ public class IllegalToDoService {
                 }
 
                 //去重处理
-                String authName = "系统";
                 RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
                 try{
                     String IllegalTime = DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1);
@@ -164,7 +164,37 @@ public class IllegalToDoService {
                 details = details.stream().distinct().collect(Collectors.toList());
                 List<RenterOrderWzDetailEntity> temps = new ArrayList<>();
                 temps.addAll(details);
-                renterOrderWzDetailService.batchInsert(temps);
+                //renterOrderWzDetailService.batchInsert(temps);
+                details.forEach(x->{
+                    renterOrderWzDetailService.addIllegalDetailFromRenyun(x);
+                    try{
+                        temps.stream().forEach(detail->{
+                            RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+                            //记录日志
+                            String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                                    detail.getIllegalAddr(),
+                                    detail.getIllegalReason(),
+                                    detail.getIllegalFine(),
+                                    detail.getIllegalDeduct(),
+                                    detail.getIllegalStatus());
+                            entity.setOrderNo(detail.getOrderNo());
+                            entity.setWzDetailId(x.getId());
+                            entity.setOperateType(WzLogOperateTypeEnums.AUTO_QUERY.getCode());
+                            entity.setContent(wzContent);
+                            entity.setCreateOp(authName);
+                            entity.setUpdateOp(authName);
+                            log.info("凹凸自动同步导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                            int insert = renterOrderWzDetailLogService.insert(entity);
+                        });
+                    }catch (Exception e){
+                        log.error("批量记录凹凸自动查询违章数据异常",e);
+                    }
+                });
+
+
+
+
+
             }
 
             List<RenterOrderWzDetailEntity> temps = renterOrderWzDetailService.findDetailByOrderNo(orderNo,carNumber);
