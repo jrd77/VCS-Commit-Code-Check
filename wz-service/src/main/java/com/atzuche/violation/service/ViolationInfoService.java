@@ -305,7 +305,7 @@ public class ViolationInfoService {
                         String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                                 renterOrderWzDetail.getIllegalAddr(),
                                 renterOrderWzDetail.getIllegalReason(),
-                                renterOrderWzDetail.getIllegalFine(),
+                                renterOrderWzDetail.getIllegalAmt()==null?0:Integer.valueOf(renterOrderWzDetail.getIllegalAmt()),
                                 renterOrderWzDetail.getIllegalDeduct(),
                                 renterOrderWzDetail.getIllegalStatus());
                         entity.setOrderNo(renterOrderWzDetail.getOrderNo());
@@ -353,7 +353,7 @@ public class ViolationInfoService {
                     String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetailEntity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                             renterOrderWzDetailEntity.getIllegalAddr(),
                             renterOrderWzDetailEntity.getIllegalReason(),
-                            renterOrderWzDetailEntity.getIllegalFine(),
+                            renterOrderWzDetailEntity.getIllegalAmt()==null?0:Integer.valueOf(renterOrderWzDetailEntity.getIllegalAmt()),
                             renterOrderWzDetailEntity.getIllegalDeduct(),
                             renterOrderWzDetailEntity.getIllegalStatus());
                     entity.setOrderNo(renterOrderWzDetailEntity.getOrderNo());
