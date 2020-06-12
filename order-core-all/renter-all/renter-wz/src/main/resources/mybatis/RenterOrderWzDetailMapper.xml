@@ -444,8 +444,8 @@
         select <include refid="select_column" />
         from renter_order_wz_detail
         where  order_no = #{orderNo}
-        AND illegal_time <![CDATA[<=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
-        AND illegal_time <![CDATA[>=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 DAY)
+        AND illegal_time <![CDATA[<=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 MINUTE)
+        AND illegal_time <![CDATA[>=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 MINUTE)
         and is_delete = 0
     </select>
     <select id="queryListByPlateNumAndOrderNo" resultMap="selectColumnMap">
