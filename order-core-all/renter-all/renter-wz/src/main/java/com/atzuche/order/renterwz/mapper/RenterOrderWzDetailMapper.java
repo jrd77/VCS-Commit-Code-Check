@@ -166,4 +166,7 @@ public interface RenterOrderWzDetailMapper{
 	 */
 	List<RenterOrderWzDetailEntity> queryAllList(@Param("orderNo") String orderNo);
 
+    List<RenterOrderWzDetailEntity> getRepeatData(@Param("orderNo")String orderNo, @Param("date")String date);
+
+    List<RenterOrderWzDetailEntity> queryListByPlateNumAndOrderNo(@Param("orderNo")String orderNo, @Param("plateNum")String plateNum);
 }

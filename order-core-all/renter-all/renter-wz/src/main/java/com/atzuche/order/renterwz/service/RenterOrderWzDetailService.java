@@ -112,4 +112,15 @@ public class RenterOrderWzDetailService {
    public List<RenterOrderWzDetailEntity> queryList(String orderNo){
        return renterOrderWzDetailMapper.queryList(orderNo);
    }
+
+    public List<RenterOrderWzDetailEntity> getRepeatData(String orderNo, String date) {
+        return renterOrderWzDetailMapper.getRepeatData(orderNo,date);
+    }
+
+    public RenterOrderWzDetailEntity getRenterOrderWzDetailById(long id){
+        return renterOrderWzDetailMapper.queryRenterOrderWzDetailById(id);
+    }
+    public List<RenterOrderWzDetailEntity> queryListByPlateNumAndOrderNo(String orderNo,String PlateNum){
+        return renterOrderWzDetailMapper.queryListByPlateNumAndOrderNo(orderNo,PlateNum);
+    }
 }

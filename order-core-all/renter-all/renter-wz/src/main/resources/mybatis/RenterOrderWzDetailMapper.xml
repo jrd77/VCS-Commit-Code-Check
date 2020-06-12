@@ -440,5 +440,19 @@
 		from renter_order_wz_detail
 		where  order_no = #{orderNo} and is_delete = 0
 	</select>
-
+    <select id="getRepeatData" resultMap="selectColumnMap">
+        select <include refid="select_column" />
+        from renter_order_wz_detail
+        where  order_no = #{orderNo}
+        AND illegal_time <![CDATA[<=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL 1 MINUTE)
+        AND illegal_time <![CDATA[>=]]> DATE_ADD(DATE_FORMAT(#{date},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 MINUTE)
+        and is_delete = 0
+    </select>
+    <select id="queryListByPlateNumAndOrderNo" resultMap="selectColumnMap">
+        select <include refid="select_column" />
+        from renter_order_wz_detail
+        where  order_no = #{orderNo}
+        and car_plate_num =#{plateNum}
+        and is_delete = 0
+    </select>
 </mapper>

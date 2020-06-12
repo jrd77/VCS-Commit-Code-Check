@@ -1,24 +1,36 @@
 package com.atzuche.violation.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
+import com.atzuche.order.commons.enums.ErrorCode;
+import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
 import com.atzuche.order.commons.vo.req.ViolationReqVO;
 import com.atzuche.order.commons.vo.res.ViolationResVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.mapper.OrderStatusMapper;
+import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
+import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
+import com.atzuche.order.renterwz.mapper.RenterOrderWzCostDetailMapper;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
+import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
+import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.common.AnnotationHandler;
 import com.atzuche.violation.common.CommonUtil;
 import com.atzuche.violation.common.FileUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelUtil;
 import com.atzuche.violation.common.xlsx.ExportExcelWrapper;
 import com.atzuche.violation.common.xlsx.ImportExcel;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
 import com.atzuche.violation.enums.OilCostTypeEnum;
+import com.atzuche.violation.enums.WzCostEnums;
 import com.atzuche.violation.enums.WzInfoStatusEnum;
 import com.atzuche.violation.enums.WzStatusEnums;
+import com.atzuche.violation.exception.ViolationManageException;
+import com.atzuche.violation.vo.req.RenterWzCostDetailReqVO;
 import com.atzuche.violation.vo.req.ViolationDetailReqVO;
 import com.atzuche.violation.vo.resp.RenterOrderWzDetailResVO;
 import com.atzuche.violation.vo.resp.ViolationExportResVO;
@@ -28,6 +40,8 @@ import com.autoyol.commons.utils.StringUtils;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -36,10 +50,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author 胡春林
@@ -54,6 +65,20 @@ public class ViolationInfoService {
     RenterOrderWzStatusMapper renterOrderWzStatusMapper;
     @Resource
     OrderStatusMapper orderStatusMapper;
+    @Resource
+    RenterOrderWzCostDetailMapper renterOrderWzCostDetailMapper;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    WzService renterWzService;
+    @Autowired
+    RenterOrderWzDetailLogService renterOrderWzDetailLogService;
+    @Autowired
+    RenterOrderWzDetailService renterOrderWzDetailService;
+
+    private static final String ORDER_CENTER_WZ_WITHHOLD_EXCHANGE = "auto-order-center-wz";
+    private static final String ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY = "order.center.wz.with.hold.feedback";
+
     /**
      * 明细列表
      * @param violationDetailReqVO
@@ -74,6 +99,18 @@ public class ViolationInfoService {
             } catch (Exception e) {
                 log.info("違章時間爲空");
             }
+            List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetailEntities = renterOrderWzCostDetailMapper.queryInfosByOrderNo(r.getOrderNo());
+            if (!CollectionUtils.isEmpty(renterOrderWzCostDetailEntities)) {
+                renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_FINE.getCode())).findFirst().ifPresent(getCrashVO -> {
+                    renterOrderWzDetailRes.setIllegalFine(getCrashVO.getAmount());
+                });
+                renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_SERVICE_COST.getCode())).findFirst().ifPresent(getCrashVO -> {
+                    renterOrderWzDetailRes.setIllegalServiceCost(getCrashVO.getAmount());
+                });
+                renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_DYS_FINE.getCode())).findFirst().ifPresent(getCrashVO -> {
+                    renterOrderWzDetailRes.setIllegalDysFine(getCrashVO.getAmount());
+                });
+            }
             renterOrderWzDetailResVOS.add(renterOrderWzDetailRes);
         });
         return renterOrderWzDetailResVOS;
@@ -91,8 +128,14 @@ public class ViolationInfoService {
             violationResVO.setOrderType("普通订单");
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
-            }else{
+            }else {
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(3));
+            }
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
+                violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
+            }
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getPowerType())) {
+                violationResVO.setPowerType(OilCostTypeEnum.getOilCostType(Integer.valueOf(violationResVO.getPowerType())));
             }
             OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationResVO.getOrderNo());
             String orderDetain = "未暂扣";
@@ -102,12 +145,6 @@ public class ViolationInfoService {
                 orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
             }
             violationResVO.setWzDepositStatus(orderDetain);
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzStatus())) {
-                violationResVO.setWzStatus(WzStatusEnums.getStatusDesc(Integer.valueOf(violationResVO.getWzStatus())));
-            }
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getPowerType())) {
-                violationResVO.setPowerType(OilCostTypeEnum.getOilCostType(Integer.valueOf(violationResVO.getPowerType())));
-            }
             violationResVO.setCarType(CarOwnerTypeEnum.getNameByCode(Integer.valueOf(violationResVO.getCarType())));
             violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无" : "有");
         }
@@ -166,6 +203,20 @@ public class ViolationInfoService {
                 violationExportResVO.setIllegalPauseCost(orderDetain);
                 violationExportResVOS.add(violationExportResVO);
             }
+            for (ViolationExportResVO violationExportRes : violationExportResVOS) {
+                List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetailEntities = renterOrderWzCostDetailMapper.queryInfosByOrderNo(violationExportRes.getOrderNo());
+                if (!CollectionUtils.isEmpty(renterOrderWzCostDetailEntities)) {
+                    renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_FINE.getCode())).findFirst().ifPresent(getCrashVO -> {
+                        violationExportRes.setIllegalFine(String.valueOf(getCrashVO.getAmount()));
+                    });
+                    renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_SERVICE_COST.getCode())).findFirst().ifPresent(getCrashVO -> {
+                        violationExportRes.setIllegalServiceCost(String.valueOf(getCrashVO.getAmount()));
+                    });
+                    renterOrderWzCostDetailEntities.stream().filter(s -> s.getCostCode().equals(WzCostEnums.WZ_DYS_FINE.getCode())).findFirst().ifPresent(getCrashVO -> {
+                        violationExportRes.setIllegalDysFine(String.valueOf(getCrashVO.getAmount()));
+                    });
+                }
+            }
         }
         log.info("查询出的数据源总长：{},耗时：{}",violationExportResVOS.size() ,System.currentTimeMillis() - startTime);
         ExportExcelWrapper exportExcelWrapper = new ExportExcelWrapper();
@@ -196,9 +247,9 @@ public class ViolationInfoService {
             }
             messageInfo = "数据导入成功\n";
             List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = Lists.newArrayList();
-            RenterOrderWzDetailEntity renterOrderWzDetailEntity = new RenterOrderWzDetailEntity();
             for (int i = 0; i < list.size(); i++) {
                 try {
+                    RenterOrderWzDetailEntity renterOrderWzDetailEntity = new RenterOrderWzDetailEntity();
                     List<String> cellList = list.get(i);
                     renterOrderWzDetailEntity.setOrderNo(cellList.get(2));
                     renterOrderWzDetailEntity.setCarPlateNum(cellList.get(5));
@@ -213,6 +264,10 @@ public class ViolationInfoService {
                     renterOrderWzDetailEntity.setIllegalAddr(cellList.get(10));
                     renterOrderWzDetailEntity.setIllegalReason(cellList.get(11));
                     renterOrderWzDetailEntity.setIllegalDeduct(cellList.get(13));
+                    if (Objects.isNull(renterOrderWzDetailEntity.getOrderNo())) {
+                        log.info("导入的数据没有订单号{}", JSONObject.toJSONString(cellList));
+                        throw new ViolationManageException(ErrorCode.ORDER_QUERY_FAIL.getCode(), "找不到导入数据的订单");
+                    }
                     renterOrderWzDetailEntities.add(renterOrderWzDetailEntity);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -229,6 +284,7 @@ public class ViolationInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public synchronized String updateRenterOrderWzDetailInfo(List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities){
+        String authName = AdminUserUtil.getAdminUser().getAuthName();
         String importMsgInfo = "";
         int a = 0;
         int b = 0;
@@ -237,25 +293,131 @@ public class ViolationInfoService {
         }
         Iterator<RenterOrderWzDetailEntity> iterator = renterOrderWzDetailEntities.iterator();
         while (iterator.hasNext()){
-            RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailMapper.queryRenterOrderWzDetailById(iterator.next().getId());
+            RenterOrderWzDetailEntity renterOrderWzDetail = iterator.next();
+            Date illegalTime = renterOrderWzDetail.getIllegalTime();
+            if(illegalTime != null){
+                String IllegalTime = DateUtils.formate(illegalTime, DateUtils.DATE_DEFAUTE1);
+                List<RenterOrderWzDetailEntity> repeatData = renterOrderWzDetailService.getRepeatData(renterOrderWzDetail.getOrderNo(),IllegalTime);
+                if(repeatData != null && repeatData.size()>=1){
+                    log.error("当前违章数据重复,跳过保存data={}",JSON.toJSONString(renterOrderWzDetail));
+                    RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+                    try{
+                        String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                                renterOrderWzDetail.getIllegalAddr(),
+                                renterOrderWzDetail.getIllegalReason(),
+                                renterOrderWzDetail.getIllegalFine(),
+                                renterOrderWzDetail.getIllegalDeduct(),
+                                renterOrderWzDetail.getIllegalStatus());
+                        entity.setOrderNo(renterOrderWzDetail.getOrderNo());
+                        entity.setWzDetailId(renterOrderWzDetail.getId());
+                        entity.setOperateType(WzLogOperateTypeEnums.SYSTEM_DISTINCT.getCode());
+                        entity.setContent(wzContent);
+                        entity.setCreateOp(authName);
+                        entity.setUpdateOp(authName);
+                        log.info("批量导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                        int insert = renterOrderWzDetailLogService.insert(entity);
+                        log.info("批量导入违章信息记录日志insert={},entity={}",insert,JSON.toJSONString(entity));
+                    }catch (Exception e){
+                        log.error("批量导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
+                    }
+                    continue;
+                }
+            }
+
+
+            RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailMapper.queryRenterOrderWzDetailById(renterOrderWzDetail.getId());
             if (Objects.nonNull(renterOrderWzDetailEntity)) {
+
+                renterOrderWzDetailEntity.setIllegalTime(illegalTime);
+                renterOrderWzDetailEntity.setIllegalAmt(renterOrderWzDetail.getIllegalAmt());
+                renterOrderWzDetailEntity.setIllegalAddr(renterOrderWzDetail.getIllegalAddr());
+                renterOrderWzDetailEntity.setIllegalReason(renterOrderWzDetail.getIllegalReason());
+                renterOrderWzDetailEntity.setIllegalDeduct(renterOrderWzDetail.getIllegalDeduct());
                 int result = renterOrderWzDetailMapper.updateRenterOrderWzDetailById(renterOrderWzDetailEntity);
                 if (result > 0) {
                     a++;
+                    sendWeiZhangMessageWithIllegalDeduct(renterOrderWzDetailEntity);
                 } else {
                     b++;
                 }
             } else {
-                int result = renterOrderWzDetailMapper.saveRenterOrderWzDetail(renterOrderWzDetailEntity);
+                int result = renterOrderWzDetailMapper.saveRenterOrderWzDetail(renterOrderWzDetail);
                 if (result > 0) {
                     a++;
+                    sendWeiZhangMessageWithIllegalDeduct(renterOrderWzDetail);
                 } else {
                     b++;
+                }
+                RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+                try{
+                    String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetailEntity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                            renterOrderWzDetailEntity.getIllegalAddr(),
+                            renterOrderWzDetailEntity.getIllegalReason(),
+                            renterOrderWzDetailEntity.getIllegalFine(),
+                            renterOrderWzDetailEntity.getIllegalDeduct(),
+                            renterOrderWzDetailEntity.getIllegalStatus());
+                    entity.setOrderNo(renterOrderWzDetailEntity.getOrderNo());
+                    entity.setWzDetailId(renterOrderWzDetailEntity.getId());
+                    entity.setOperateType(WzLogOperateTypeEnums.ANUAL_BATCH_IMPORT.getCode());
+                    entity.setContent(wzContent);
+                    entity.setCreateOp(authName);
+                    entity.setUpdateOp(authName);
+                    log.info("批量导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                    int insert = renterOrderWzDetailLogService.insert(entity);
+                    log.info("批量导入违章信息记录日志insert={},entity={}",insert,JSON.toJSONString(entity));
+                }catch (Exception e){
+                    log.error("批量导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
                 }
             }
         }
         importMsgInfo = "提示：" + a + "条导入成功。" + b + "条导入失败。";
         return importMsgInfo;
+    }
+
+    /**
+     * 发送违章大于6分的数据
+     * @param renterOrderWzDetail
+     */
+    public void sendWeiZhangMessageWithIllegalDeduct(RenterOrderWzDetailEntity renterOrderWzDetail){
+        if(Integer.valueOf(renterOrderWzDetail.getIllegalDeduct()) >= 6) {
+            rabbitTemplate.convertAndSend(ORDER_CENTER_WZ_WITHHOLD_EXCHANGE, ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY, renterOrderWzDetail.getOrderNo());
+        }
+        updateTransWzDisposeStatus(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum());
+        updateViolationCostHandle(renterOrderWzDetail);
+    }
+
+    /**
+     * 更新违章处理信息
+     * @param renterOrderWzDetail
+     */
+    public void updateViolationCostHandle(RenterOrderWzDetailEntity renterOrderWzDetail) {
+        List<RenterWzCostDetailReqVO> costDetails = new ArrayList<>();
+        String orderNo = renterOrderWzDetail.getOrderNo();
+        RenterWzCostDetailReqVO wzOtherFine = new RenterWzCostDetailReqVO();
+        wzOtherFine.setAmount(renterOrderWzDetail.getIllegalAmt());
+        wzOtherFine.setCostCode(WzCostEnums.WZ_COST.getCode());
+        wzOtherFine.setCostDesc(WzCostEnums.WZ_COST.getDesc());
+        wzOtherFine.setCostType(WzCostEnums.WZ_COST.getType());
+        wzOtherFine.setOrderNo(orderNo);
+        wzOtherFine.setRemark(WzCostEnums.WZ_COST.getRemark());
+        costDetails.add(wzOtherFine);
+        renterWzService.updateWzCost(orderNo, costDetails);
+    }
+
+    /**
+     * 更新违章状态为有违章
+     * @param orderNo
+     * @param carNumber
+     */
+    public void updateTransWzDisposeStatus(String orderNo, String carNumber) {
+        RenterOrderWzStatusEntity renterOrderWzStatusEntity = new RenterOrderWzStatusEntity();
+        renterOrderWzStatusEntity.setOrderNo(orderNo);
+        renterOrderWzStatusEntity.setCarPlateNum(carNumber);
+        renterOrderWzStatusEntity.setStatus(5);
+        renterOrderWzStatusEntity.setIllegalQuery(4);
+        renterOrderWzStatusEntity.setStatusDesc(WzStatusEnums.getStatusDesc(5));
+        renterOrderWzStatusEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
+        renterOrderWzStatusMapper.updateOrderWzStatus(renterOrderWzStatusEntity);
     }
 
 }

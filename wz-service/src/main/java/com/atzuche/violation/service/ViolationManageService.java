@@ -1,22 +1,31 @@
 package com.atzuche.violation.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.enums.wz.WzCostEnums;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
 import com.atzuche.order.renterwz.entity.WzCostLogEntity;
 import com.atzuche.order.renterwz.service.*;
 import com.atzuche.violation.common.AdminUserUtil;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
+import com.atzuche.violation.enums.WzCostEnums;
 import com.atzuche.violation.enums.WzManageMentEnums;
 import com.atzuche.violation.enums.WzStatusEnums;
+import com.atzuche.violation.exception.WzRepeatDataException;
 import com.atzuche.violation.vo.req.*;
 import com.atzuche.violation.vo.resp.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +37,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class ViolationManageService {
     private static final Logger logger = LoggerFactory.getLogger(ViolationManageService.class);
@@ -62,10 +72,12 @@ public class ViolationManageService {
     AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
     @Autowired
     RenterOrderWzDetailService renterOrderWzDetailService;
-
-
-
-
+    @Autowired
+    RenterOrderWzDetailLogService renterOrderWzDetailLogService;
+    @Autowired
+    RenterGoodsService renterGoodsService;
+    @Autowired
+    RenterMemberService renterMemberService;
 
     @Autowired
     private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
@@ -269,6 +281,37 @@ public class ViolationManageService {
      * @param violationAdditionRequestVO
      */
     public void saveRenterOrderWzDetail(ViolationAdditionRequestVO violationAdditionRequestVO){
+        //判断重复数据，不重复的才添加
+        List<RenterOrderWzDetailEntity> renterOrderWzDetailEntityList = renterOrderWzDetailService.getRepeatData(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getViolationTime());
+        String authName = AdminUserUtil.getAdminUser().getAuthName();
+        if(renterOrderWzDetailEntityList != null && renterOrderWzDetailEntityList.size()>=1){
+            RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailEntityList.get(0);
+            RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+            //记录日志
+            try{
+                String wzContent = RenterOrderWzDetailLogEntity.getWzContent(violationAdditionRequestVO.getViolationTime(),
+                        violationAdditionRequestVO.getViolationAddress(),
+                        violationAdditionRequestVO.getViolationContent(),
+                        violationAdditionRequestVO.getViolationFine()==null?0:Integer.valueOf(violationAdditionRequestVO.getViolationFine()),
+                        violationAdditionRequestVO.getViolationScore(), 0);
+                entity.setOrderNo(violationAdditionRequestVO.getOrderNo());
+                entity.setWzDetailId(renterOrderWzDetailEntity==null?null:renterOrderWzDetailEntity.getId());
+                entity.setOperateType(WzLogOperateTypeEnums.SYSTEM_DISTINCT.getCode());
+                entity.setContent(wzContent);
+                entity.setCreateOp(authName);
+                entity.setUpdateOp(authName);
+                log.info("单条导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+                int insert = renterOrderWzDetailLogService.insert(entity);
+                log.info("单条导入违章信息记录日志insert={},entity={}",insert,JSON.toJSONString(entity));
+            }catch (Exception e){
+                log.error("单条导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
+            }
+
+            WzRepeatDataException e = new WzRepeatDataException();
+            logger.error("违章数据疑似重复violationAdditionRequestVO={}，renterOrderWzDetailEntityList={}",
+                    JSON.toJSONString(violationAdditionRequestVO),JSON.toJSONString(renterOrderWzDetailEntityList),e);
+            throw e;
+        }
         RenterOrderWzDetailEntity renterOrderWzDetail = new RenterOrderWzDetailEntity();
         renterOrderWzDetail.setIllegalAddr(violationAdditionRequestVO.getViolationAddress());
         renterOrderWzDetail.setIllegalAmt(violationAdditionRequestVO.getViolationFine());
@@ -279,8 +322,29 @@ public class ViolationManageService {
         renterOrderWzDetail.setCarPlateNum(violationAdditionRequestVO.getPlateNum());
         renterOrderWzDetail.setOrderFlag(1);
         renterOrderWzDetailService.saveRenterOrderWzDetail(renterOrderWzDetail);
-        renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, AdminUserUtil.getAdminUser().getAuthName());
+        renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, authName);
         renterOrderWzStatusService.updateTransWzDisposeStatusAndQueryStatus(violationAdditionRequestVO.getOrderNo(),violationAdditionRequestVO.getPlateNum(),25);
+        //记录日志
+        RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
+        try{
+            String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                    renterOrderWzDetail.getIllegalAddr(),
+                    renterOrderWzDetail.getIllegalReason(),
+                    renterOrderWzDetail.getIllegalFine(),
+                    renterOrderWzDetail.getIllegalDeduct(),
+                    renterOrderWzDetail.getIllegalStatus());
+            entity.setOrderNo(renterOrderWzDetail.getOrderNo());
+            entity.setWzDetailId(renterOrderWzDetail.getId());
+            entity.setOperateType(WzLogOperateTypeEnums.MANUAL_SINGLE_ADD.getCode());
+            entity.setContent(wzContent);
+            entity.setCreateOp(authName);
+            entity.setUpdateOp(authName);
+            log.info("单条导入违章信息记录日志entity={}", JSON.toJSONString(entity));
+            int insert = renterOrderWzDetailLogService.insert(entity);
+            log.info("单条导入违章信息记录日志insert={},entity={}",insert,JSON.toJSONString(entity));
+        }catch (Exception e){
+            log.error("单条导入数据记录日志失败entity={},e",JSON.toJSONString(entity),e);
+        }
 
     }
 
@@ -313,6 +377,7 @@ public class ViolationManageService {
         List<RenterOrderWzDetailEntity> wzList = renterOrderWzDetailService.queryList(violationListRequestVO.getOrderNo());
         if(!CollectionUtils.isEmpty(wzList)) {
             wzList.forEach(wzDetailEntity -> {
+
                 ViolationInformationResponseVO violationInformationResponseVO = new ViolationInformationResponseVO();
                 violationInformationResponseVO.setViolationAddress(wzDetailEntity.getIllegalAddr());
                 violationInformationResponseVO.setViolationContent(wzDetailEntity.getIllegalReason());
@@ -321,6 +386,13 @@ public class ViolationManageService {
                 violationInformationResponseVO.setViolationTime(DateUtils.formate(wzDetailEntity.getIllegalTime(), DateUtils.DATE_DEFAUTE1));
                 violationInformationResponseVO.setViolationId(String.valueOf(wzDetailEntity.getId()));
                 violationInformationResponseVO.setViolationStatus(wzDetailEntity.getIllegalStatus().toString());
+
+                RenterGoodsEntity renterGoodsEntity = renterGoodsService.queryByOrderNoAndPlatNum(wzDetailEntity.getOrderNo(), wzDetailEntity.getCarPlateNum());
+                if(renterGoodsEntity != null){
+                    RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(renterGoodsEntity.getRenterOrderNo(), false);
+                    violationInformationResponseVO.setMemNo(renterMemberDTO!=null?renterMemberDTO.getMemNo():"");
+                    violationInformationResponseVO.setOrderNo(renterGoodsEntity.getOrderNo());
+                }
                 violationList.add(violationInformationResponseVO);
             });
             violationInformationListResponseVO.setViolationList(violationList);
