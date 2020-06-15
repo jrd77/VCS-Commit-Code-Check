@@ -21,6 +21,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.enums.BuyInsurKeyEnum;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.ModifyInsurFlagVO;
+import com.atzuche.order.commons.vo.req.ModifyOrderConsoleCheckReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
@@ -361,6 +362,14 @@ public class AdminOrderController {
     }
 
 
-
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "修改时间前校验", value = "修改时间前校验",response = ResponseData.class)
+    @RequestMapping(value="console/order/modifyOrderCheck",method = RequestMethod.POST)
+    public ResponseData modifyOrderCheck(@Valid @RequestBody ModifyOrderConsoleCheckReq modifyOrderConsoleCheckReq, BindingResult bindingResult) {
+        log.info("修改时间前校验-modifyOrderConsoleCheckReq={}", JSON.toJSONString(modifyOrderConsoleCheckReq));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        return remoteFeignService.modifyOrderCheckForConsole(modifyOrderConsoleCheckReq);
+    }
 
 }

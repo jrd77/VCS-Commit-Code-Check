@@ -103,4 +103,6 @@ public class ModifyOrderReqVO {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	@AutoDocProperty(value="是否超级权限，可以跳过校验：0-否，1-是")
+	private Integer superPowerFlag;
 }
