@@ -22,7 +22,7 @@ public class ViolationReqVO extends BaseReqVO {
 
     @AutoDocProperty(value = "车辆类型")
     private String carType;
-    private String[] carTypeArr;
+    private String[] carTypeArr;    
 
     @AutoDocProperty(value = "车牌号")
     private String carNo;
