@@ -223,12 +223,16 @@ public class DeliveryCarTask {
     		renYunFlowOrderDTO.setRenterRentTimeEnd(renter.getRentTimeEnd());
     		renYunFlowOrderDTO.setRenterRevertTimeStart(renter.getRevertTimeStart());
     		renYunFlowOrderDTO.setRenterRevertTimeEnd(renter.getRevertTimeEnd());
+    		renYunFlowOrderDTO.setRenterProposalGetTime(renter.getDefaultRentTime());
+    		renYunFlowOrderDTO.setRenterProposalReturnTime(renter.getDefaultRevertTime());
     	}
     	if (owner != null) {
     		renYunFlowOrderDTO.setOwnerRentTimeStart(owner.getRentTimeStart());
     		renYunFlowOrderDTO.setOwnerRentTimeEnd(owner.getRentTimeEnd());
     		renYunFlowOrderDTO.setOwnerRevertTimeStart(owner.getRevertTimeStart());
     		renYunFlowOrderDTO.setOwnerRevertTimeEnd(owner.getRevertTimeEnd());
+    		renYunFlowOrderDTO.setOwnerProposalGetTime(owner.getDefaultRentTime());
+    		renYunFlowOrderDTO.setOwnerProposalReturnTime(owner.getDefaultRevertTime());
     	}
     	return renYunFlowOrderDTO;
     }
@@ -262,12 +266,16 @@ public class DeliveryCarTask {
     		updFlow.setRenterRentTimeEnd(renter.getRentTimeEnd());
     		updFlow.setRenterRevertTimeStart(renter.getRevertTimeStart());
     		updFlow.setRenterRevertTimeEnd(renter.getRevertTimeEnd());
+    		updFlow.setRenterProposalGetTime(renter.getDefaultRentTime());
+    		updFlow.setRenterProposalReturnTime(renter.getDefaultRevertTime());
     	}
     	if (owner != null) {
     		updFlow.setOwnerRentTimeStart(owner.getRentTimeStart());
     		updFlow.setOwnerRentTimeEnd(owner.getRentTimeEnd());
     		updFlow.setOwnerRevertTimeStart(owner.getRevertTimeStart());
     		updFlow.setOwnerRevertTimeEnd(owner.getRevertTimeEnd());
+    		updFlow.setOwnerProposalGetTime(owner.getDefaultRentTime());
+    		updFlow.setOwnerProposalReturnTime(owner.getDefaultRevertTime());
     	}
     	return updFlow;
     }
@@ -311,7 +319,7 @@ public class DeliveryCarTask {
 		sectionParam.setRevertTime(renterOrderEntity.getExpRevertTime());
 		sectionParam.setGetCarBeforeTime(getCarBeforeTime);
 		sectionParam.setReturnCarAfterTime(returnCarAfterTime);
-		SectionDeliveryResultVO sectionDeliveryResultVO = SectionDeliveryUtils.getSectionDeliveryResultVO(sectionParam, DateUtils.DATE_DEFAUTE1);
+		SectionDeliveryResultVO sectionDeliveryResultVO = SectionDeliveryUtils.getSectionDeliveryResultVO(sectionParam, DateUtils.FORMAT_STR_RENYUN);
 		if (sectionDeliveryResultVO != null) {
 			sectionDeliveryResultVO.setDistributionMode(mode.getDistributionMode());
 		}

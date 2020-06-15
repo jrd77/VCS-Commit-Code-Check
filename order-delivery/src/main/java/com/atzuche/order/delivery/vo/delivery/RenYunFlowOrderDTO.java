@@ -358,6 +358,22 @@ public class RenYunFlowOrderDTO implements Serializable {
      */
     private String ownerRevertTimeEnd; 
     /**
+     * 租客处建议送达时间
+     */
+    private String renterProposalGetTime;
+    /**
+     * 租客处建议取车时间
+     */
+    private String renterProposalReturnTime;
+    /**
+     * 车主处建议取车时间 
+     */
+    private String ownerProposalGetTime;
+    /**
+     * 车主处建议送达时间
+     */
+    private String ownerProposalReturnTime;
+    /**
      * 车辆注册号
      */
     private String carRegNo;
