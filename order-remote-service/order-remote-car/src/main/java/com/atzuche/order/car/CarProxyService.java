@@ -194,7 +194,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setIsLocal(carBaseVO.getIsLocal());
             renterGoodsDetailDto.setModelTxt(carBaseVO.getModelTxt());
             renterGoodsDetailDto.setCarNo(carBaseVO.getCarNo());
-            renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum());
+            renterGoodsDetailDto.setCarPlateNum(carBaseVO.getPlateNum()!=null?carBaseVO.getPlateNum().trim():carBaseVO.getPlateNum());
             renterGoodsDetailDto.setCarBrand(carBaseVO.getBrand());
             renterGoodsDetailDto.setCarBrandTxt(carBaseVO.getBrandTxt());
             renterGoodsDetailDto.setCarRating(carBaseVO.getRating());
