@@ -3,6 +3,7 @@ package com.atzuche.order.open.service;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /*
  * @Author ZhangBin
@@ -19,5 +20,5 @@ public interface FeignRenYunService {
      *
      **/
     @GetMapping("/AotuInterface/getclaimcount")
-    public ResponseData<?> getDangerCount(String orderNo,String plateNum,String carNo);
+    public ResponseData<?> getDangerCount(@RequestParam("orderNo")String orderNo, @RequestParam("plateNum")String plateNum, @RequestParam("carNo")String carNo);
 }
