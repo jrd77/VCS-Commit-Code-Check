@@ -18,8 +18,12 @@ public class ViolationReqVO extends BaseReqVO {
     private String orderNo;
     @AutoDocProperty(value = "用车城市")
     private String useCarCity;
+    private String[] userCarCityArr;
+
     @AutoDocProperty(value = "车辆类型")
     private String carType;
+    private String[] carTypeArr;
+
     @AutoDocProperty(value = "车牌号")
     private String carNo;
     @AutoDocProperty(value = " 最小进入违章管理日期")

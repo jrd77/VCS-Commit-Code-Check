@@ -251,11 +251,17 @@
         <if test="orderNo != null and orderNo != ''">
             and w.order_no = #{orderNo}
         </if>
-        <if test="useCarCity != null and useCarCity != ''">
-            and r.rent_city = #{useCarCity}
+        <if test="userCarCityArr != null and userCarCityArr.length >0 ">
+            and r.rent_city in 
+            <foreach collection="userCarCityArr" item="userCarCity" open="(" separator="," close=")">
+                #{userCarCity}
+            </foreach>
         </if>
-        <if test="carType != null and carType != ''">
-            and g.car_owner_type = #{carType}
+        <if test="carTypeArr != null and carTypeArr.length >0 ">
+            and g.car_owner_type in
+            <foreach collection="carTypeArr" item="carType" open="(" separator="," close=")">
+                #{carType}
+            </foreach>
         </if>
         <if test="carNo != null and carNo != ''">
             and w.car_plate_num = #{carNo}
