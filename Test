@@ -1,8 +1,5 @@
-  @AutoDocProperty(value = "轮胎保障服务费补贴")
-    private String tyreInsurSubsidy;
-    @AutoDocProperty(value = "轮胎保障服务费补贴(系统自动计算)")
-    private String tyreInsurSubsidySystem;
-    @AutoDocProperty(value = "驾乘无忧保障服务费补贴")
-    private String driverInsurSubsidy;
-    @AutoDocProperty(value = "驾乘无忧保障服务费补贴(系统自动计算)")
-    private String driverInsurSubsidySystem;
+ownerFine
+ownerGetReturnCarFienAmt
+ownerModifyAddrAmt
+renterAdvanceReturnCarFienAmt+consoleRenterAdvanceReturnCarFienAmt
+renterDelayReturnCarFienAmt+consoleRenterDelayReturnCarFienAmt
