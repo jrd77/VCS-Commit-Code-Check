@@ -230,6 +230,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setLastMileage(StringUtils.isNotBlank(carBaseVO.getLastMileage()) ? Integer.valueOf(carBaseVO.getLastMileage()) : 0);
             renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
             renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
+            renterGoodsDetailDto.setPremiumMoney(carBaseVO.getPremiumMoney());
         }
 
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());

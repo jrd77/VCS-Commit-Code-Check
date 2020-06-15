@@ -14,7 +14,9 @@ import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.config.oilpriceconfig.OilAverageCostCacheConfigService;
+import com.atzuche.order.open.service.FeignRenYunService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.autoyol.commons.web.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,8 @@ public class TestController {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private ServicePointConfigSDK servicePointConfigSDK;
+    @Autowired
+    private FeignRenYunService feignRenYunService;
 
     @GetMapping("/test")
     public String test(){
@@ -114,5 +118,10 @@ public class TestController {
     public Object servicePointConfigSDKTest(){
         List<ServicePointEntity> config = servicePointConfigSDK.getConfig(new DefaultConfigContext());
         return config;
+    }
+    @GetMapping("/getDangerCount")
+    public void getDangerCount(){
+        ResponseData<?> dangerCount = feignRenYunService.getDangerCount("480527810161","京C09090","111");
+        System.out.println(JSON.toJSONString(dangerCount));
     }
 }

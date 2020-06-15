@@ -314,6 +314,8 @@ public class OwnerGoodsDetailDTO {
     @AutoDocProperty("年检到期日期")
     private LocalDate inspectExpire;
 
+    @AutoDocProperty("保险出险导致次年保费上涨的收费")
+    private Integer premiumMoney;
 
     @AutoDocProperty("车龄")
     private Integer carAge;
