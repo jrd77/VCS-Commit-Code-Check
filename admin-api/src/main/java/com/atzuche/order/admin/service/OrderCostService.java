@@ -1132,6 +1132,7 @@ public class OrderCostService {
 
 
         ///子订单号
+        realVo.setOrderNo(renterCostReqVO.getOrderNo());
         realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
         //默认值处理  调价目前没有
 //		realVo.setAdjustAmt("0");
