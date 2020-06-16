@@ -2,6 +2,8 @@ package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
+import com.atzuche.order.accountownerincome.mapper.AddIncomeExamineMapper;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
@@ -66,6 +68,8 @@ public class OrderBusinessService {
     private RenterDepositDetailService renterDepositDetailService;
     @Autowired
     private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
+    @Autowired
+    private AddIncomeExamineMapper addIncomeExamineMapper;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -133,14 +137,43 @@ public class OrderBusinessService {
 
 
     public OwnerPreIncomRespDTO ownerPreIncom(String orderNo) {
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity == null){
+            log.error("订单状态查询失败orderNo={}",orderNo);
+            throw new OrderStatusNotFoundException();
+        }
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         if(ownerOrderEntity == null){
             log.error("找不到有效的车主子订单 orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
-        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
         OwnerPreIncomRespDTO ownerPreIncomRespDTO = new OwnerPreIncomRespDTO();
-        ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerCosts.getOwnerCostAmtFinal());
+        int ownerIncomAmt = 0;
+        if(SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+            List<AccountOwnerIncomeExamineEntity> accountOwnerIncomeExamineEntityList = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+            List<AccountOwnerIncomeExamineEntity> auditPassList = AccountOwnerIncomeExamineUtil.filterByStatus(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineStatus.PASS_EXAMINE);
+            if(auditPassList != null && auditPassList.size()>0){//优先选择审核通过的
+                ownerIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAmt(auditPassList);
+            }else{//取结算收益
+                AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = AccountOwnerIncomeExamineUtil.filterByType(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineType.OWNER_INCOME);
+                ownerIncomAmt =  accountOwnerIncomeExamineEntity==null?0:accountOwnerIncomeExamineEntity.getAmt()==null?0:accountOwnerIncomeExamineEntity.getAmt();
+            }
+        }else{
+            OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
+            ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
+            ownerPreIncomRespDTO.setSettleStatus(orderStatusEntity.getSettleStatus());
+        }
+
+        //获取追加收益
+        AddIncomeExamineDTO addIncomeExamineDTO = new AddIncomeExamineDTO();
+        addIncomeExamineDTO.setOrderNo(orderNo);
+        List<AddIncomeExamine> addIncomeExamineList = addIncomeExamineMapper.listAllAddIncomeExamine(addIncomeExamineDTO);
+        int addIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAddIncomAmt(addIncomeExamineList);
+        log.info("获取追加收益addIncomAmt={}",addIncomAmt);
+        ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerIncomAmt + addIncomAmt);
+        ownerPreIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
+        ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerIncomAmt);
+
         return ownerPreIncomRespDTO;
     }
 
