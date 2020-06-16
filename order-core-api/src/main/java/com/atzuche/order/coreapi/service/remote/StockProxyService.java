@@ -5,6 +5,7 @@ import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.submit.exception.*;
 import com.autoyol.car.api.CarRentalTimeApi;
+import com.autoyol.car.api.CarRentalTimeWriteApi;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Service;
 public class StockProxyService {
     @Autowired
     private CarRentalTimeApi carRentalTimeApi;
+    @Autowired
+    private CarRentalTimeWriteApi carRentalTimeWriteApi;
     
     /**
      * @Author ZhangBin
@@ -140,6 +143,33 @@ public class StockProxyService {
         }catch (Exception e){
             log.error("Feign 锁定车辆可租时间异常,responseObject:[{}],ownerCancel:[{}]",JSON.toJSONString(responseObject),JSON.toJSONString(ownerCancel),e);
             Cat.logError("Feign 锁定车辆可租时间异常",e);
+            t.setStatus(e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+
+    }
+    
+    
+    /**
+     * 超级权限扣库存
+     * @param orderInfoDTO
+     */
+    public void cutCarStockForSuperPower(OrderInfoDTO orderInfoDTO){
+        Boolean responseObject  = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "库存扣减");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"carRentalTimeApi.cutCarStock");
+            log.info("Feign 开始扣减库存信息,orderInfoDTO={}", JSON.toJSONString(orderInfoDTO));
+            Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderInfoDTO));
+            responseObject = carRentalTimeWriteApi.cutCarStock(orderInfoDTO);
+            log.info("Fegin 开始扣减库存信息,返回结果:[{}]",responseObject);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,responseObject+"");
+            t.setStatus(Transaction.SUCCESS);
+        }catch (Exception e){
+            log.error("Feign 扣减库存信息异常,responseObject={},orderInfoDTO={}",responseObject,JSON.toJSONString(orderInfoDTO),e);
+            Cat.logError("Feign 扣减库存信息异常",e);
             t.setStatus(e);
             throw e;
         }finally {
