@@ -197,11 +197,13 @@ public class DeliveryCarInfoPriceService {
             } else {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
-            if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getReturnCarOil()) || ownerGetAndReturnCarDTO.getReturnCarOil().equals("0")) {
-                oilDifference = 0;
-            }
-            if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getGetCarOil()) || ownerGetAndReturnCarDTO.getGetCarOil().equals("0")) {
-                oilDifference = 0;
+            if (HandoverCarInfoEntities.get(0).getType().intValue() == 1 || HandoverCarInfoEntities.get(0).getType().intValue() == 2) {
+                if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getReturnCarOil()) || ownerGetAndReturnCarDTO.getReturnCarOil().equals("0")) {
+                    oilDifference = 0;
+                }
+                if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getGetCarOil()) || ownerGetAndReturnCarDTO.getGetCarOil().equals("0")) {
+                    oilDifference = 0;
+                }
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
