@@ -113,15 +113,13 @@ public class RenterCommodityService {
                         newRenterGoodsPriceList.add(renterGoods);
                     });
 
-                    float diff = CommonUtils.getTotalHoursByRentAveragePrice(dbPriceMaxCarDay.getRevertTime(), revertTime);
-                    if(diff != 0f){
-                        RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
-                        renterGoods.setCarHourCount(diff);
-                        renterGoods.setCarDay(x.getCarDay());
-                        renterGoods.setCarUnitPrice(x.getCarUnitPrice());
-                        renterGoods.setRevertTime(x.getRevertTime());
-                        newRenterGoodsPriceList.add(renterGoods);
-                    }
+                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
+                    renterGoods.setCarHourCount(HFirst);
+                    renterGoods.setCarDay(x.getCarDay());
+                    renterGoods.setCarUnitPrice(x.getCarUnitPrice());
+                    renterGoods.setRevertTime(x.getRevertTime());
+                    newRenterGoodsPriceList.add(renterGoods);
                 }else if(carDay.isBefore(dbPriceMaxCarDay.getCarDay())){//取数据库中的数据
                     dbMapValue.forEach(y->{
                         RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();

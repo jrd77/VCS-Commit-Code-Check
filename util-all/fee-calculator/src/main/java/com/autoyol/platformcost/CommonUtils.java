@@ -219,8 +219,8 @@ public class CommonUtils {
 	}
 
     public static void main(String[] args) {
-        LocalDateTime rentTime = LocalDateTime.of(2020, 6, 14, 19, 0, 0);
-        LocalDateTime revertTime = LocalDateTime.of(2020, 6, 14, 22, 1, 0);
+        LocalDateTime rentTime = LocalDateTime.of(2020, 7, 25, 9, 30, 0);
+        LocalDateTime revertTime = LocalDateTime.of(2020, 7, 25, 23, 59, 59);
         float totalHoursByRentAveragePrice = getTotalHoursByRentAveragePrice(rentTime, revertTime);
         System.out.println(totalHoursByRentAveragePrice);
     }
