@@ -197,6 +197,12 @@ public class DeliveryCarInfoPriceService {
             } else {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
+            if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getReturnCarOil()) || ownerGetAndReturnCarDTO.getReturnCarOil().equals("0")) {
+                oilDifference = 0;
+            }
+            if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getGetCarOil()) || ownerGetAndReturnCarDTO.getGetCarOil().equals("0")) {
+                oilDifference = 0;
+            }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
             double lastOilDifference = MathUtil.mulByDouble(MathUtil.div(Integer.valueOf(oilContainer), oilTotalCalibration),oilDifference);
@@ -250,6 +256,21 @@ public class DeliveryCarInfoPriceService {
         if (costBaseDTO == null || costBaseDTO.getStartTime() == null) {
             log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
             Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
+            feeResult.setTotalFee(0);
+            feeResult.setUnitPrice(0);
+            return feeResult;
+        }
+        if (mileageAmtDTO.getGetmileage() == null || mileageAmtDTO.getGetmileage() == 0) {
+            log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.Getmileage对象为空");
+            Cat.logError("获取超里程费用mileageAmtDTO.getGetmileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用getGetmileage对象为空"));
+            feeResult.setTotalFee(0);
+            feeResult.setUnitPrice(0);
+            return feeResult;
+        }
+
+        if (mileageAmtDTO.getReturnMileage() == null || mileageAmtDTO.getReturnMileage() == 0) {
+            log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
+            Cat.logError("获取超里程费用mileageAmtDTO.ReturnMileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用ReturnMileage对象为空"));
             feeResult.setTotalFee(0);
             feeResult.setUnitPrice(0);
             return feeResult;
