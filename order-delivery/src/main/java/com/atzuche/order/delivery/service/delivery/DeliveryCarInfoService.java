@@ -354,6 +354,7 @@ public class DeliveryCarInfoService {
             if(renterOrderDelivery != null){
                 costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
                 costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+                costBaseDTO.setOrderNo(renterOrderDelivery.getOrderNo());
             }
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();
