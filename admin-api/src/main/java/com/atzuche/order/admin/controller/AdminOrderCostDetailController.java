@@ -35,6 +35,7 @@ import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
+import com.atzuche.order.commons.vo.res.DangerCountRespVO;
 import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailEntity;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
@@ -594,5 +595,13 @@ public class AdminOrderCostDetailController {
             logger.error("renterOrderCostDetail exception orderNo="+orderNo,e);
             return ResponseData.error();
         }
+    }
+
+    @AutoDocMethod(description = "获取出险次数", value = "获取出险次数",response = RenterCostDetailDTO.class)
+    @GetMapping("/renterOrderCostDetail")
+    public ResponseData<DangerCountRespVO> getDangerCount(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo) {
+        logger.info("renterOrderCostDetail controller orderNo={}，renterOrderNo={}",orderNo,renterOrderNo);
+        DangerCountRespVO dangerCountRespVO = orderCostDetailService.getDangerCount(orderNo,renterOrderNo);
+        return ResponseData.success(dangerCountRespVO);
     }
 }

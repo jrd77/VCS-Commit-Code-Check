@@ -25,11 +25,15 @@ import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.exceptions.DangerCountException;
+import com.atzuche.order.commons.exceptions.GoodsNotFoundException;
+import com.atzuche.order.commons.exceptions.RenterGoodsNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleFineVO;
 import com.atzuche.order.commons.vo.rentercost.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.commons.vo.rentercost.RenterOrderCostDetailEntity;
 import com.atzuche.order.commons.vo.req.AdditionalDriverInsuranceIdsReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
+import com.atzuche.order.commons.vo.res.DangerCountRespVO;
 import com.atzuche.order.commons.vo.res.rentcosts.*;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.open.service.FeignOrderCostService;
@@ -39,13 +43,17 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -72,6 +80,10 @@ public class OrderCostDetailService {
     private OrderCostRemoteService orderCostRemoteService;
     @Autowired
     private RemoteFeignService remoteFeignService;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Value("${auto.dangerCount.url}")
+    private String dangerCountUrl;
 
 	public ReductionDetailResVO findReductionDetailsListByOrderNo(RenterCostReqVO renterCostReqVO) throws Exception {
 		ReductionDetailResVO resVo = new ReductionDetailResVO();
@@ -208,7 +220,6 @@ public class OrderCostDetailService {
 	 * 已经保存的。
 	 * @param resVo
 	 * @param commUseDriverList
-	 * @param extraDriverDTO
 	 * @param lstDriverId
 	 * @throws Exception
 	 */
@@ -702,7 +713,32 @@ public class OrderCostDetailService {
     }
 
 
-
-
-
+    public DangerCountRespVO getDangerCount(String orderNo,String renterOrderNo) {
+        RenterGoodsDetailDTO renterGoodsDetailDTO = remoteFeignService.getRenterGoodsFromRemot(renterOrderNo, false);
+        if(renterGoodsDetailDTO == null){
+            GoodsNotFoundException e = new GoodsNotFoundException();
+            log.error("获取租客商品信息异常",e);
+            throw e;
+        }
+        Integer carNo = renterGoodsDetailDTO.getCarNo();
+        String carPlateNum = renterGoodsDetailDTO.getCarPlateNum();
+        String responseData = "";
+        try {
+            responseData = restTemplate.getForObject(dangerCountUrl+ "/AotuInterface/getclaimcount?orderNo="+orderNo+"&plateNum="+carPlateNum+"&carNo="+carNo, String.class);
+            log.info("获取出险次数responseData={}", responseData);
+            if (StringUtils.isNotBlank(responseData)) {
+                ResponseData response = JSON.parseObject(responseData, ResponseData.class);
+                if(response.getData() != null){
+                    DangerCountRespVO data = JSON.parseObject(JSON.toJSONString(response.getData()), DangerCountRespVO.class);
+                    return data;
+                }
+            }
+        } catch (Exception e) {
+            log.error("远程获取出险次数异常e",e);
+            throw e;
+        }
+        DangerCountException dangerCountException = new DangerCountException();
+        log.error("远程获取出险次数失败",dangerCountException);
+        throw dangerCountException;
+    }
 }

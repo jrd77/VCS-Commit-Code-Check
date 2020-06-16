@@ -23,6 +23,7 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -983,6 +984,27 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 查询车主补贴,responseObject={},orderNo={},ownerOrderNo={}",JSON.toJSONString(responseObject),orderNo,ownerOrderNo,e);
             Cat.logError("Feign 查询车主补贴",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    public RenterGoodsDetailDTO getRenterGoodsFromRemot(String renterOrderNo,boolean isNeedPrice){
+        ResponseData<RenterGoodsDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryRenterGoodsDetail");
+            log.info("Feign 开始获取租客商品信息,renterOrderNo={}", renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignGoodsService.queryRenterGoodsDetail(renterOrderNo,  isNeedPrice);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客商品信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 获取租客商品信息异常",e);
             throw e;
         }finally {
             t.complete();
