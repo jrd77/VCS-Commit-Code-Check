@@ -301,3 +301,6 @@ order-delivery/build
 order-wallet/order-wallet-server/build/
 order-detain/build/
 wz-service/build/
+*.iml
+
+
