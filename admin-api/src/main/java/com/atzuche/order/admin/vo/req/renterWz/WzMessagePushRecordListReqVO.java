@@ -1,4 +1,4 @@
-package com.atzuche.order.admin.vo.req.supplement;
+package com.atzuche.order.admin.vo.req.renterWz;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -15,10 +15,9 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 @ToString
-public class BufuMessagePushRecordListReqVO implements Serializable {
+public class WzMessagePushRecordListReqVO implements Serializable {
     private static final long serialVersionUID = 6277947143171115766L;
     @AutoDocProperty("订单号")
-    @NotNull(message = "订单号不能为空")
     private Long orderNo;
     @AutoDocProperty(value = "页码")
     @NotNull(message="页码不允许为空")
@@ -29,6 +28,6 @@ public class BufuMessagePushRecordListReqVO implements Serializable {
     private String idSort;
     @AutoDocProperty("发送时间排序 升序传ASC，降序传DESC")
     private String sendTimeSort;
-    @AutoDocProperty("补付ID")
-    private Long orderSupplementDetailId;
+    @AutoDocProperty("违章序号")
+    private Long orderViolationId;
 }
