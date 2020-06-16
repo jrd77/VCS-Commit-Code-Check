@@ -424,7 +424,7 @@
     mem_no desc
     limit #{pageNum},#{pageSize}
   </select>
-  <select id="countTotal" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
+  <select id="countTotal" resultType="long" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
       select count(1) from (
        SELECT DISTINCT
               m.reg_no as memNo,
