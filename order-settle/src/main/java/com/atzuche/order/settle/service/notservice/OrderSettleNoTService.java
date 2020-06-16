@@ -248,10 +248,10 @@ public class OrderSettleNoTService {
         }
         
     	//判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
-    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getOrderNo());
-    	if(flagMileage == false) {
-    		throw new RuntimeException("租客取车或还车里程数或油表刻度不完整不能结算");
-    	}
+//    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getOrderNo());
+//    	if(flagMileage == false) {
+//    		throw new RuntimeException("租客取车或还车里程数或油表刻度不完整不能结算");
+//    	}
     	
 //        //2校验租客是否还车
 //        if(Objects.nonNull(renterOrder.getIsReturnCar()) && renterOrder.getIsReturnCar()==1){
