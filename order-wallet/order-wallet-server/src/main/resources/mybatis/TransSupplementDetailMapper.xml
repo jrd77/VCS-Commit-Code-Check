@@ -420,9 +420,9 @@
     <if test="realName != null">
       and m.real_name like concat('%',#{realName},'%')
     </if>
-    limit #{pageNum},#{pageSize}
     ORDER BY
     mem_no desc
+    limit #{pageNum},#{pageSize}
   </select>
   <select id="countTotal" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
       select count(1) from (
@@ -465,9 +465,9 @@
     <if test="realName != null">
       and m.real_name like concat('%',#{realName},'%')
     </if>
-    limit #{pageNum},#{pageSize}
     ORDER BY
     reg_no desc
+    limit #{pageNum},#{pageSize}
   </select>
 
 </mapper>
