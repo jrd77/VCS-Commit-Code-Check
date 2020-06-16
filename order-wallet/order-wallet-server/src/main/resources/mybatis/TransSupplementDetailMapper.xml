@@ -436,6 +436,15 @@
           WHERE
               cash_type = 3
               AND pay_flag IN ( 1, 4, 5 )
+            <if test="memNo != null">
+              and m.reg_no = #{memNo}
+            </if>
+            <if test="mobile != null">
+              and m.mobile = #{mobile}
+            </if>
+            <if test="realName != null">
+              and m.real_name like concat('%',#{realName},'%')
+            </if>
       ) as temp
   </select>
   <select id="findMemberList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
