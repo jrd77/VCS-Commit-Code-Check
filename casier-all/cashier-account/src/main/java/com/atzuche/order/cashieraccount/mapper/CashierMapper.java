@@ -77,4 +77,6 @@ public interface CashierMapper{
      * @return
      */
     List<CashierEntity> getPayAmtByPayKinds(@Param("orderNo")String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
+
+    CashierEntity getCashierBypayTransNo(@Param("orderNo")String orderNo,@Param("payTransNo")String payTransNo);
 }

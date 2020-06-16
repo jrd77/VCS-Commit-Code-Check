@@ -284,4 +284,36 @@ public class OrderConsoleSubsidyDetailService{
     	// 再新增当前升级补贴
     	saveConsoleSubsidy(consoleSubsidy);
     }
+    
+    
+    /**
+     * 仁云追加补贴调用
+     * @param record
+     * @return int
+     */
+    public int saveOrUpdateOrderConsoleSubsidyDetailForRenyun(OrderConsoleSubsidyDetailEntity record) {
+    	List<OrderConsoleSubsidyDetailEntity> list = listOrderConsoleSubsidyDetailByOrderNoAndMemNo(record.getOrderNo(), record.getMemNo()); 
+    	boolean isExists = false;
+    	for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : list) {
+			//存在
+    		if(orderConsoleSubsidyDetailEntity.getSubsidySourceCode().equals(record.getSubsidySourceCode()) && orderConsoleSubsidyDetailEntity.getSubsidyTargetCode().equals(record.getSubsidyTargetCode()) && orderConsoleSubsidyDetailEntity.getSubsidyCostCode().equals(record.getSubsidyCostCode())) {
+    			record.setId(orderConsoleSubsidyDetailEntity.getId());
+    			//修改的话无需修改创建人
+    			record.setCreateOp(null);
+    			if (orderConsoleSubsidyDetailEntity.getSubsidyAmount() != null && record.getSubsidyAmount() != null) {
+    				record.setSubsidyAmount(orderConsoleSubsidyDetailEntity.getSubsidyAmount()+record.getSubsidyAmount());
+    			}
+    			orderConsoleSubsidyDetailMapper.updateByPrimaryKeySelective(record);
+    			isExists = true;
+			}
+		}
+    	
+    	if(!isExists) {
+    		//增加记录
+    		orderConsoleSubsidyDetailMapper.insertSelective(record);
+    	}
+    	
+    	
+    	return 1;
+    }
 }

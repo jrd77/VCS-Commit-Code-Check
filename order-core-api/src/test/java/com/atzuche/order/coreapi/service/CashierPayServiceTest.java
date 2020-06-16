@@ -12,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.AccountPayAbleResVO;
@@ -38,6 +40,16 @@ public class CashierPayServiceTest {
 	@Autowired PayCallbackService payCallbackService;
 	@Autowired
 	RenterOrderService renterOrderService;
+	@Autowired
+	CashierRefundApplyNoTService cashierRefundApplyNoTService;
+	
+	@Test
+	public void testRefundOrderPayPreAuth() {
+		List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNoWaitingAllForPreAuth();
+		//默认第一个
+		cashierPayService.refundOrderPayPreAuth(list.get(0));
+		
+	}
 	
 	@Test
 	public void testGetPaySignStrNewOfflinePay() {

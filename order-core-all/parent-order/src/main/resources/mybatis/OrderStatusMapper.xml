@@ -18,6 +18,7 @@
         <result property="carDepositSettleTime" column="car_deposit_settle_time"/>
         <result property="settleStatus" column="settle_status"/>
         <result property="settleTime" column="settle_time"/>
+        <result property="settleMsg" column="settle_msg"/>
         <result property="isDispatch" column="is_dispatch"/>
         <result property="dispatchStatus" column="dispatch_status"/>
         <result property="isClaims" column="is_claims"/>
@@ -37,7 +38,7 @@
 	<sql id="Base_Column_List">
         `id`, `order_no`, `rent_car_pay_status`, `rent_car_refund_status`, `deposit_pay_status`,
          `deposit_refund_status`, `wz_pay_status`, `wz_refund_status`, `wz_settle_status`, `wz_settle_time`,
-        `car_deposit_settle_status`, `car_deposit_settle_time`,  `settle_status`, `settle_time`,
+        `car_deposit_settle_status`, `car_deposit_settle_time`,  `settle_status`, `settle_time`, settle_msg,
         `is_dispatch`,  `dispatch_status`, `is_claims`, `is_detain`, `is_wz`,`is_detain_wz`, `is_risk_accident`, `status`,
         `create_time`, `create_op`, `update_time`, `update_op`, `is_delete`
 	</sql>
@@ -184,6 +185,7 @@
                 <if test="carDepositSettleTime != null">`car_deposit_settle_time` = #{carDepositSettleTime}, </if>
                 <if test="settleStatus != null">`settle_status` = #{settleStatus}, </if>
                 <if test="settleTime != null">`settle_time` = #{settleTime}, </if>
+                <if test="settleMsg != null">`settle_msg` = #{settleMsg}, </if>
                 <if test="isDispatch != null">`is_dispatch` = #{isDispatch}, </if>
                 <if test="dispatchStatus != null">`dispatch_status` = #{dispatchStatus}, </if>
                 <if test="isClaims != null">`is_claims` = #{isClaims}, </if>
@@ -217,6 +219,7 @@
 				`car_deposit_settle_time` = #{carDepositSettleTime}, 		
 				`settle_status` = #{settleStatus}, 		
 				`settle_time` = #{settleTime}, 		
+				`settle_msg` = #{settleMsg}, 		
 				`is_dispatch` = #{isDispatch}, 		
 				`dispatch_status` = #{dispatchStatus}, 		
 				`is_claims` = #{isClaims}, 		
@@ -272,7 +275,7 @@
     </select>
     
     <update id="updateDispatchStatus">
-    	update order_status set dispatch_status = #{dispatchStatus}
+    	update order_status set dispatch_status = #{dispatchStatus},is_dispatch = #{isDispatch}
     	where order_no = #{orderNo}
     </update>
     

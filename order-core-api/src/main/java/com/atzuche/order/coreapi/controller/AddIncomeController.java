@@ -157,7 +157,7 @@ public class AddIncomeController {
 		}
 		List<OrderSourceStatEntity> sourceStatList = orderSourceStatService.queryOrderSourceStatByOrderNos(orderNos);
 		if (sourceStatList == null || sourceStatList.isEmpty()) {
-			return null;
+			return list;
 		}
 		for (OrderSourceStatEntity sorsta:sourceStatList) {
 			for (AddIncomeExamine addi:list) {

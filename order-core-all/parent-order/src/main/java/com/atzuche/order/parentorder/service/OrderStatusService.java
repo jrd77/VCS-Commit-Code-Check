@@ -101,8 +101,8 @@ public class OrderStatusService {
      * @param dispatchStatus
      * @return Integer
      */
-    public Integer updateDispatchStatus(String orderNo, Integer dispatchStatus) {
-    	return orderStatusMapper.updateDispatchStatus(orderNo, dispatchStatus);
+    public Integer updateDispatchStatus(String orderNo, Integer dispatchStatus, Integer isDispatch) {
+    	return orderStatusMapper.updateDispatchStatus(orderNo, dispatchStatus, isDispatch);
     }
     
     /**

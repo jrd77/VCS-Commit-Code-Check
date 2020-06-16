@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.OtherSubsidyRenyunDTO;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.FineSubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -505,5 +506,62 @@ public class OrderCostAggregateService {
 			record.setOperatorId(userName);
 			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
 		}
+	}
+	
+	
+	/**
+	 * 仁云追加管理后台其他补贴
+	 * @param req
+	 */
+	public void updateOtherSubsidyRenyunByOrderNo(OtherSubsidyRenyunDTO req) {
+		CostBaseDTO costBaseDTO = new CostBaseDTO();
+		// 根据订单号查询会员号
+		// 主订单
+		OrderEntity orderEntity = orderService.getOrderEntity(req.getOrderNo());
+		if (orderEntity == null) {
+			log.error("获取订单数据为空orderNo={}", req.getOrderNo());
+			throw new ModifyOrderRenterOrderNotFindException();
+		}
+		OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(req.getOrderNo());
+		if (SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()
+				|| orderStatusEntity.getStatus() == OrderStatusEnum.CLOSED.getStatus()) {
+			log.error("已经结算不允许编辑orderNo={}", req.getOrderNo());
+			throw new NotAllowedEditException();
+		}
+		//根据订单号查询会员号
+		OwnerOrderEntity orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(req.getOrderNo());
+        if(orderEntityOwner == null){
+        	log.error("获取订单数据(车主)为空orderNo={}",req.getOrderNo());
+            throw new ModifyOrderRenterOrderNotFindException();
+        }
+		Integer renterOtherSubsidyAmt = req.getRenterOtherSubsidyAmt();
+		Integer ownerOtherSubsidyAmt = req.getOwnerOtherSubsidyAmt();
+		if (renterOtherSubsidyAmt != null && renterOtherSubsidyAmt.intValue() != 0) {
+			// 平台给租客的补贴
+			// 封装订单号和会员号
+			costBaseDTO.setOrderNo(req.getOrderNo());
+			costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
+			SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.PLATFORM;
+			SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.RENTER;
+	        OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, renterOtherSubsidyAmt,
+	                targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, RenterCashCodeEnum.SUBSIDY_OTHER);
+	        record.setCreateOp("renyun");
+	        record.setUpdateOp("renyun");
+	        orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailForRenyun(record);
+		}
+		
+		if (ownerOtherSubsidyAmt != null && ownerOtherSubsidyAmt.intValue() != 0) {
+			// 平台给车主的补贴
+			//封装订单号和会员号
+			costBaseDTO.setOrderNo(req.getOrderNo());
+			costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
+			SubsidySourceCodeEnum sourceEnum = SubsidySourceCodeEnum.PLATFORM;
+	    	SubsidySourceCodeEnum targetEnum = SubsidySourceCodeEnum.OWNER;
+			OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildDataOwner(costBaseDTO, ownerOtherSubsidyAmt, targetEnum, sourceEnum, SubsidyTypeCodeEnum.CONSOLE_AMT, OwnerCashCodeEnum.OWNER_OTHER_SUBSIDY);
+			record.setCreateOp("renyun");
+			record.setUpdateOp("renyun");
+			orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailForRenyun(record);
+		}
+    
 	}
 }
