@@ -114,7 +114,7 @@ public class CashierQueryService {
             return result;
         }
 
-        result.setWzDepositAmt(entity.getIsAuthorize() == 0 ? entity.getShishouDeposit() : entity.getAuthorizeDepositAmt());
+        result.setWzDepositAmt((entity.getIsAuthorize()==null || entity.getIsAuthorize() == 0) ? entity.getShishouDeposit() : entity.getAuthorizeDepositAmt());
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
@@ -125,7 +125,7 @@ public class CashierQueryService {
             result.setPayStatus("支付成功");
             result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
             result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
-            if(entity.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
+            if(entity.getIsAuthorize()!=null && entity.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
                 result.setPaySource(PaySourceEnum.ALIPAY_CREDIT.getText());;
             }else{
                 result.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
