@@ -172,8 +172,6 @@ public class OrderBusinessService {
         log.info("获取追加收益addIncomAmt={}",addIncomAmt);
         ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerIncomAmt + addIncomAmt);
         ownerPreIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
-        ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerIncomAmt);
-
         return ownerPreIncomRespDTO;
     }
 
