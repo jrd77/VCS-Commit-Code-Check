@@ -32,6 +32,8 @@ public class LongOrderFilterChain implements OrderFilter, ApplicationContextAwar
         orderFilterList.add(applicationContext.getBean(ConvertLatOrLonFilter.class));
         /*免押方式校验*/
         orderFilterList.add(applicationContext.getBean(FreeDepositModeFilter.class));
+        /*商业险审核校验*/
+        orderFilterList.add(applicationContext.getBean(CommercialInsuranceAuditFilter.class));
         /* 不能自己租自己 的车的检查 */
         orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
         /*平台显示校验*/

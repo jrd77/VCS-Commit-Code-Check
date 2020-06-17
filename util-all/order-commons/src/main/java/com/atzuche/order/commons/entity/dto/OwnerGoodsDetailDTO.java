@@ -342,10 +342,11 @@ public class OwnerGoodsDetailDTO {
      * 长租审核状态；1为已审核；0为未审核；2为审核失败
      */
     @AutoDocProperty("长租审核状态；1为已审核；0为未审核；2为审核失败")
-    private Integer longRentVerifyStatus;
+    private java.lang.Integer longRentVerifyStatus;
+
     /**
-     * 接受订单类型：1为所有；2为长租；3为短租
+     * 接受订单类型：1为所有；2为长租；3为短租(关闭长租上架)；4为打开长租上架且暂不开启长租
      */
-    @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租")
-    private Integer orderType;
+    @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租(关闭长租上架)；4为打开长租上架且暂不开启长租")
+    private java.lang.Integer orderType;
 }
