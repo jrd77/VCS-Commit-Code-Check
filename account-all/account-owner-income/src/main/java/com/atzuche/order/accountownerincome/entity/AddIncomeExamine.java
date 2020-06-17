@@ -1,28 +1,31 @@
 package com.atzuche.order.accountownerincome.entity;
 
+import com.autoyol.doc.annotation.AutoDocProperty;
+
 import java.util.Date;
 
 public class AddIncomeExamine {
+    @AutoDocProperty(value = "收益审核记录id")
     private Integer id;
-
+    @AutoDocProperty(value = "订单号")
     private String orderNo;
-
+    @AutoDocProperty(value = "会员号")
     private Integer memNo;
-
+    @AutoDocProperty(value = "手机号")
     private Long mobile;
-
+    @AutoDocProperty(value = "会员姓名")
     private String name;
 
     private Integer memType;
-
+    @AutoDocProperty(value = "追加类型")
     private String type;
-
+    @AutoDocProperty(value = "明细类型")
     private String detailType;
-
+    @AutoDocProperty(value = "追加金额")
     private Integer amt;
-
+    @AutoDocProperty(value = "追加说明")
     private String describe;
-
+    @AutoDocProperty(value = "申请部门")
     private String department;
 
     private Date applyTime;
@@ -30,13 +33,13 @@ public class AddIncomeExamine {
     private Integer origDebt;
 
     private Integer nowDebt;
-
+    @AutoDocProperty(value = "审核状态-0未审核 1审核通过 2审核不通过 3 审核中，待核查（异常）4审核中，待核查（测试）5其他")
     private Integer status;
 
     private String remark;
     
     private Long addId;
-
+    @AutoDocProperty(value = "创建时间")
     private Date createTime;
 
     private String createOp;
@@ -46,7 +49,7 @@ public class AddIncomeExamine {
     private String updateOp;
 
     private Integer isDelete;
-    
+    @AutoDocProperty(value = "内部分类 1:普通,2:套餐,3:长租")
     private String category;
 
     public Integer getId() {
