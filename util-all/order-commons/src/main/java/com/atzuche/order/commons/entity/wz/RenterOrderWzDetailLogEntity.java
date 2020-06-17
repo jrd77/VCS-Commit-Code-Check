@@ -63,7 +63,7 @@ public class RenterOrderWzDetailLogEntity implements Serializable {
 	 * @Description: 拼接content
 	 *
 	 **/
-	public static String getWzContent(String wzTime,String wzAddr,String wzDesc,Integer wzFineAmt,String score,Integer status){
+	public static String getWzContent(String wzTime,String wzAddr,String wzDesc,String wzFineAmt,String score,Integer status){
 	    String statusDesc = "";
 	    if(status != null){
             if(status == 1){

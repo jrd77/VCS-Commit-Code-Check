@@ -148,7 +148,7 @@ public class TransIllegalMqService {
                             String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(illegal.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                                     illegal.getIllegalAddr(),
                                     illegal.getIllegalReason(),
-                                    illegal.getIllegalAmt()==null?0:Integer.valueOf(illegal.getIllegalAmt()),
+                                    illegal.getIllegalAmt(),
                                     illegal.getIllegalDeduct(),
                                     illegal.getIllegalStatus());
                             entity.setOrderNo(illegal.getOrderNo());
@@ -175,7 +175,7 @@ public class TransIllegalMqService {
                         String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(illegal.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                                 illegal.getIllegalAddr(),
                                 illegal.getIllegalReason(),
-                                illegal.getIllegalAmt()==null?0:Integer.valueOf(illegal.getIllegalAmt()),
+                                illegal.getIllegalAmt(),
                                 illegal.getIllegalDeduct(),
                                 illegal.getIllegalStatus());
                         entity.setOrderNo(illegal.getOrderNo());
