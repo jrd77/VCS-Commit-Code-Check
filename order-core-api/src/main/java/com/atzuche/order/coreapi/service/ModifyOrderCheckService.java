@@ -218,14 +218,13 @@ public class ModifyOrderCheckService {
 		LocalDateTime now = LocalDateTime.now();
 		// 修改项目
 		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		checkDataChange(changeItemList);
 		// 主订单信息
 		OrderEntity orderEntity = modifyOrderDTO.getOrderEntity();
 		checkParentOrder(orderEntity);
 		// 修改前取车时间
 		LocalDateTime initRentTime = orderEntity.getExpRentTime();
 		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
-		if (changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())) {
+		if (changeCodeList != null && changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())) {
 			if (initRentTime != null && initRentTime.isBefore(now)) {
 				throw new ModifyOrderRentOrRevertTimeException("订单开始不能修改取车时间");
 			}
