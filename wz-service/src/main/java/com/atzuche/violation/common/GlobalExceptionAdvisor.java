@@ -28,15 +28,23 @@ public class GlobalExceptionAdvisor {
     }
 
     @ResponseBody
-    @ExceptionHandler(OrderException.class)
-    public ResponseData handleOrderException(OrderException e){
+    @ExceptionHandler(com.atzuche.order.commons.OrderException .class)
+    public ResponseData handleOrderException(com.atzuche.order.commons.OrderException  e){
         log.error("GlobalExceptionAdvisor.handleOrderException",e);
         Cat.logError(e);
         ResponseData responseData = ResponseData.createErrorCodeResponse(e.getErrorCode(),e.getErrorMsg());
         responseData.setData(e.getExtra());
         return responseData;
     }
-
+    @ResponseBody
+    @ExceptionHandler(OrderException.class)
+    public ResponseData handleOrderException2(OrderException e){
+        log.error("GlobalExceptionAdvisor.handleOrderException",e);
+        Cat.logError(e);
+        ResponseData responseData = ResponseData.createErrorCodeResponse(e.getErrorCode(),e.getErrorMsg());
+        responseData.setData(e.getExtra());
+        return responseData;
+    }
     @ResponseBody
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseData handleException(IllegalArgumentException exception){
