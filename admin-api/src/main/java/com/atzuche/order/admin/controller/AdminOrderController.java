@@ -371,5 +371,14 @@ public class AdminOrderController {
         BindingResultUtil.checkBindingResult(bindingResult);
         return remoteFeignService.modifyOrderCheckForConsole(modifyOrderConsoleCheckReq);
     }
+    
+    
+    @AutoDocVersion(version = "订单修改")
+    @AutoDocGroup(group = "订单修改")
+    @AutoDocMethod(description = "超级权限修改时间用于权限拦截", value = "超级权限修改时间用于权限拦截",response = ResponseData.class)
+    @RequestMapping(value="console/order/modifyOrderSuperPower",method = RequestMethod.GET)
+    public ResponseData modifyOrderSuperPower() {
+    	return ResponseData.success();
+    }
 
 }
