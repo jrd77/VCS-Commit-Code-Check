@@ -30,6 +30,9 @@ public class OrderFilterChain implements OrderFilter, ApplicationContextAware {
         orderFilterList.add(applicationContext.getBean(ParamInputFilter.class));
         /*经纬度转换校验*/
         orderFilterList.add(applicationContext.getBean(ConvertLatOrLonFilter.class));
+        /*短租车辆不接受长租订单*/
+        orderFilterList.add(applicationContext.getBean(OrderCategoryFilter.class));
+
         /*免押方式校验*/
         orderFilterList.add(applicationContext.getBean(FreeDepositModeFilter.class));
         /* 不能自己租自己 的车的检查 */
