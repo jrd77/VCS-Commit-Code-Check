@@ -56,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -730,6 +731,7 @@ public class OrderCostDetailService {
                 ResponseData response = JSON.parseObject(responseData, ResponseData.class);
                 if(response.getData() != null){
                     DangerCountRespVO data = JSON.parseObject(JSON.toJSONString(response.getData()), DangerCountRespVO.class);
+                    data.setUpdateTime(LocalDateTimeUtils.formatDateTime(LocalDateTime.now(),LocalDateTimeUtils.DEFAULT_PATTERN));
                     return data;
                 }
             }

@@ -6,4 +6,6 @@ import lombok.Data;
 public class DangerCountRespVO {
     //出险次数
     private Integer countClaim;
+
+    private String updateTime;
 }
