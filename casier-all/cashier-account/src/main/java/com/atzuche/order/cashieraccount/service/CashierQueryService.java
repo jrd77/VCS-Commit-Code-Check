@@ -21,6 +21,7 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
+import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
@@ -113,7 +114,7 @@ public class CashierQueryService {
             return result;
         }
 
-        result.setWzDepositAmt(entity.getShishouDeposit());
+        result.setWzDepositAmt(entity.getIsAuthorize() == 0 ? entity.getShishouDeposit() : entity.getAuthorizeDepositAmt());
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
@@ -124,7 +125,12 @@ public class CashierQueryService {
             result.setPayStatus("支付成功");
             result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
             result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
-            result.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+            if(entity.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
+                result.setPaySource(PaySourceEnum.ALIPAY_CREDIT.getText());;
+            }else{
+                result.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+            }
+
         }
 
         List<AccountRenterWzDepositDetailEntity> list = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);
