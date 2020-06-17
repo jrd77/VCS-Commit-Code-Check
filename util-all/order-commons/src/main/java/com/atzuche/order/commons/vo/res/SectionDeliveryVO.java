@@ -25,6 +25,10 @@ public class SectionDeliveryVO implements Serializable{
 	private String defaultRentTime;
 	// 租客默认建议取车时间/车主默认建议送达时间 yyyy-MM-dd HH:mm:ss
 	private String defaultRevertTime;
+	// 取车精准达费用
+	private Integer accurateGetSrvUnit;
+	// 还车精准达费用
+    private Integer accurateReturnSrvUnit;
 	
 	public Integer getDistributionMode() {
 		return distributionMode;
@@ -67,6 +71,18 @@ public class SectionDeliveryVO implements Serializable{
 	}
 	public void setDefaultRevertTime(String defaultRevertTime) {
 		this.defaultRevertTime = defaultRevertTime;
+	}
+	public Integer getAccurateGetSrvUnit() {
+		return accurateGetSrvUnit;
+	}
+	public void setAccurateGetSrvUnit(Integer accurateGetSrvUnit) {
+		this.accurateGetSrvUnit = accurateGetSrvUnit;
+	}
+	public Integer getAccurateReturnSrvUnit() {
+		return accurateReturnSrvUnit;
+	}
+	public void setAccurateReturnSrvUnit(Integer accurateReturnSrvUnit) {
+		this.accurateReturnSrvUnit = accurateReturnSrvUnit;
 	}
 	
 }

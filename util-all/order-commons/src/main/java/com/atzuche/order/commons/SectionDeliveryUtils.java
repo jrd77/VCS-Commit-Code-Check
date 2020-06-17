@@ -1,14 +1,26 @@
 package com.atzuche.order.commons;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import com.atzuche.order.commons.entity.dto.SectionParamDTO;
+import com.atzuche.order.commons.entity.dto.TransProgressDTO;
+import com.atzuche.order.commons.vo.res.QuHuanQujianVO;
+import com.atzuche.order.commons.vo.res.QuZhiHuanQujianVO;
+import com.atzuche.order.commons.vo.res.QuZhiHuanZhunshiVO;
+import com.atzuche.order.commons.vo.res.QuhuanZhunshiVO;
 import com.atzuche.order.commons.vo.res.SectionDeliveryResultVO;
 import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
+import com.atzuche.order.commons.vo.res.ZhiquZhihuanVO;
 
 public class SectionDeliveryUtils {
+	
+	private static final Integer RENTER = 1;
+	private static final Integer OWNER = 2;
 
 	/**
 	 * 同时获取租客处和车主处区间配送信息
@@ -192,5 +204,184 @@ public class SectionDeliveryUtils {
 		}
 		LocalDateTime afterTime = revertTime.plusMinutes(returnCarAfterTime);
 		return DateUtils.formate(afterTime, formate);
+	}
+	
+	
+	/**
+	 * 取还车区间配送
+	 * @param result
+	 * @param sectionParam
+	 * @param pro
+	 * @return List<QuHuanQujianVO>
+	 */
+	public static List<QuHuanQujianVO> listQuHuanQujianVO(SectionDeliveryResultVO result, SectionParamDTO sectionParam, TransProgressDTO pro) {
+		SectionDeliveryVO renterS = result.getRenterSectionDelivery();
+		List<QuHuanQujianVO> list = new ArrayList<QuHuanQujianVO>();
+		if (renterS != null) {
+			QuHuanQujianVO renter = new QuHuanQujianVO();
+			BeanUtils.copyProperties(renterS, renter);
+			renter.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			renter.setRealRentTime(pro.getRenterRentTime());
+			renter.setRealRevertTime(pro.getRenterRevertTime());
+			renter.setReturnCarAfterTime(sectionParam.getReturnCarAfterTime());
+			renter.setMemType(RENTER);
+			list.add(renter);
+		}
+		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
+		if (ownerS != null) {
+			QuHuanQujianVO owner = new QuHuanQujianVO();
+			BeanUtils.copyProperties(ownerS, owner);
+			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			owner.setRealRentTime(pro.getOwnerRentTime());
+			owner.setRealRevertTime(pro.getOwnerRevertTime());
+			owner.setReturnCarAfterTime(sectionParam.getReturnCarAfterTime());
+			owner.setMemType(OWNER);
+			list.add(owner);
+		}
+		return list;
+	}
+	
+	/**
+	 * 取还车准时达
+	 * @param result
+	 * @param sectionParam
+	 * @param pro
+	 * @param mode
+	 * @return List<QuhuanZhunshiVO>
+	 */
+	public static List<QuhuanZhunshiVO> listQuhuanZhunshiVO(SectionDeliveryResultVO result, SectionParamDTO sectionParam, TransProgressDTO pro) {
+		SectionDeliveryVO renterS = result.getRenterSectionDelivery();
+		List<QuhuanZhunshiVO> list = new ArrayList<QuhuanZhunshiVO>();
+		if (renterS != null) {
+			QuhuanZhunshiVO renter = new QuhuanZhunshiVO();
+			renter.setAccurateGetSrvUnit(renterS.getAccurateGetSrvUnit());
+			renter.setAccurateReturnSrvUnit(renterS.getAccurateReturnSrvUnit());
+			renter.setExpectRentTime(renterS.getDefaultRentTime());
+			renter.setExpectRevertTime(renterS.getDefaultRevertTime());
+			renter.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			renter.setReturnCarAfterTime(sectionParam.getReturnCarAfterTime());
+			renter.setRealRentTime(pro.getRenterRentTime());
+			renter.setRealRevertTime(pro.getRenterRevertTime());
+			renter.setMemType(RENTER);
+			list.add(renter);
+		}
+		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
+		if (ownerS != null) {
+			QuhuanZhunshiVO owner = new QuhuanZhunshiVO();
+			owner.setAccurateGetSrvUnit(ownerS.getAccurateGetSrvUnit());
+			owner.setAccurateReturnSrvUnit(ownerS.getAccurateReturnSrvUnit());
+			owner.setExpectRentTime(ownerS.getDefaultRentTime());
+			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			owner.setReturnCarAfterTime(sectionParam.getReturnCarAfterTime());
+			owner.setRealRentTime(pro.getOwnerRentTime());
+			owner.setRealRevertTime(pro.getOwnerRevertTime());
+			owner.setMemType(OWNER);
+			list.add(owner);
+		}
+		return list;
+	}
+	
+	/**
+	 * 取车服务-自还-区间配送
+	 * @param result
+	 * @param sectionParam
+	 * @param pro
+	 * @return List<QuZhiHuanQujianVO>
+	 */
+	public static List<QuZhiHuanQujianVO> listQuZhiHuanQujianVO(SectionDeliveryResultVO result, SectionParamDTO sectionParam, TransProgressDTO pro) {
+		SectionDeliveryVO renterS = result.getRenterSectionDelivery();
+		List<QuZhiHuanQujianVO> list = new ArrayList<QuZhiHuanQujianVO>();
+		if (renterS != null) {
+			QuZhiHuanQujianVO renter = new QuZhiHuanQujianVO();
+			BeanUtils.copyProperties(renterS, renter);
+			renter.setExpectRevertTime(renterS.getDefaultRevertTime());
+			renter.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			renter.setRealRentTime(pro.getRenterRentTime());
+			renter.setRealRevertTime(pro.getRenterRevertTime());
+			renter.setMemType(RENTER);
+			list.add(renter);
+		}
+		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
+		if (ownerS != null) {
+			QuZhiHuanQujianVO owner = new QuZhiHuanQujianVO();
+			BeanUtils.copyProperties(ownerS, owner);
+			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			owner.setRealRentTime(pro.getOwnerRentTime());
+			owner.setRealRevertTime(pro.getOwnerRevertTime());
+			owner.setMemType(OWNER);
+			list.add(owner);
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * 取车服务-自还-准时达
+	 * @param result
+	 * @param sectionParam
+	 * @param pro
+	 * @return List<QuZhiHuanQujianVO>
+	 */
+	public static List<QuZhiHuanZhunshiVO> listQuZhiHuanZhunshiVO(SectionDeliveryResultVO result, SectionParamDTO sectionParam, TransProgressDTO pro) {
+		SectionDeliveryVO renterS = result.getRenterSectionDelivery();
+		List<QuZhiHuanZhunshiVO> list = new ArrayList<QuZhiHuanZhunshiVO>();
+		if (renterS != null) {
+			QuZhiHuanZhunshiVO renter = new QuZhiHuanZhunshiVO();
+			renter.setAccurateGetSrvUnit(renterS.getAccurateGetSrvUnit());
+			renter.setExpectRentTime(renterS.getDefaultRentTime());
+			renter.setExpectRevertTime(renterS.getDefaultRevertTime());
+			renter.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			renter.setRealRentTime(pro.getRenterRentTime());
+			renter.setRealRevertTime(pro.getRenterRevertTime());
+			renter.setMemType(RENTER);
+			list.add(renter);
+		}
+		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
+		if (ownerS != null) {
+			QuZhiHuanZhunshiVO owner = new QuZhiHuanZhunshiVO();
+			owner.setAccurateGetSrvUnit(ownerS.getAccurateGetSrvUnit());
+			owner.setExpectRentTime(ownerS.getDefaultRentTime());
+			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
+			owner.setRealRentTime(pro.getOwnerRentTime());
+			owner.setRealRevertTime(pro.getOwnerRevertTime());
+			owner.setMemType(OWNER);
+			list.add(owner);
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * 自取自还
+	 * @param result
+	 * @param pro
+	 * @return List<ZhiquZhihuanVO>
+	 */
+	public static List<ZhiquZhihuanVO> listZhiquZhihuanVO(SectionDeliveryResultVO result, TransProgressDTO pro) {
+		List<ZhiquZhihuanVO> list = new ArrayList<ZhiquZhihuanVO>();
+		SectionDeliveryVO renterS = result.getRenterSectionDelivery();
+		if (renterS != null) {
+			ZhiquZhihuanVO renter = new ZhiquZhihuanVO();
+			renter.setExpectRentTime(renterS.getDefaultRentTime());
+			renter.setExpectRevertTime(renterS.getDefaultRevertTime());
+			renter.setRealRentTime(pro.getRenterRentTime());
+			renter.setRealRevertTime(pro.getRenterRevertTime());
+			renter.setMemType(RENTER);
+			list.add(renter);
+		}
+		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
+		if (ownerS != null) {
+			ZhiquZhihuanVO owner = new ZhiquZhihuanVO();
+			owner.setExpectRentTime(ownerS.getDefaultRentTime());
+			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setRealRentTime(pro.getOwnerRentTime());
+			owner.setRealRevertTime(pro.getOwnerRevertTime());
+			owner.setMemType(OWNER);
+			list.add(owner);
+		}
+		return list;
 	}
 }
