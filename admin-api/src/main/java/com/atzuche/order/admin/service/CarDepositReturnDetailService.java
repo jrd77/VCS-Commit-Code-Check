@@ -97,11 +97,11 @@ public class CarDepositReturnDetailService {
         String payType = "";
         if(cashierDTO != null){
             if(accountRenterDepositDTO.getIsAuthorize()!= null && accountRenterDepositDTO.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
-                depositType = PaySourceEnum.ALIPAY_CREDIT.getText();
+                payType = PaySourceEnum.ALIPAY_CREDIT.getText();
             }else{
-                depositType = PaySourceEnum.getFlagText(cashierDTO.getPayType());
+                payType = PaySourceEnum.getFlagText(cashierDTO.getPaySource());
             }
-            payType = PayTypeEnum.getFlagText(cashierDTO.getPaySource());
+            depositType = PayTypeEnum.getFlagText(cashierDTO.getPayType());
 
         }
 

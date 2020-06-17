@@ -113,8 +113,13 @@ public class CashierQueryService {
         if(Objects.isNull(entity) || Objects.isNull(entity.getOrderNo())){
             return result;
         }
-
-        result.setWzDepositAmt((entity.getIsAuthorize()==null || entity.getIsAuthorize() == 0) ? entity.getShishouDeposit() : entity.getAuthorizeDepositAmt());
+        if(entity.getIsAuthorize()==null || entity.getIsAuthorize() == 0){
+            result.setWzDepositAmt(entity.getShishouDeposit());
+        }else if(entity.getIsAuthorize() == 1){
+            result.setWzDepositAmt(entity.getAuthorizeDepositAmt());
+        }else if(entity.getIsAuthorize() == 2){
+            result.setWzDepositAmt(entity.getCreditPayAmt());
+        }
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
