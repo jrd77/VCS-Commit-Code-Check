@@ -12,6 +12,7 @@ import com.atzuche.order.admin.vo.req.supplement.MessagePushSendReqVO;
 import com.atzuche.order.admin.vo.resp.supplement.MessagePushRecordListResVO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
+import com.autoyol.event.rabbit.neworder.NewOrderMQOtherEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSupplementPayMq;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
@@ -100,8 +101,6 @@ public class SupplementSendmsgLogService {
                 sendShortMessage(reqVO,orderMessage);
                 break;
         }
-      /*  baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.exchange,
-                NewOrderMQActionEventEnum.SUPPLEMENT_PAY_MASSAGE.routingKey, orderMessage);*/
         log.info("插入消息记录数据库入参"+ JSON.toJSONString(supplementSendmsgLog));
         int insert = this.supplementSendmsgLogMapper.insertSelective(supplementSendmsgLog);
         return insert;
@@ -118,7 +117,7 @@ public class SupplementSendmsgLogService {
         map.put("orderNo",reqVO.getOrderNo());
         map.put("url",reqVO.getUrl());
         orderMessage.setMap(map);
-        baseProducer.sendTopicMessage("auto-order-action","test", orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.routingKey, orderMessage);
     }
 
     private void sendPlatformMessage(MessagePushSendReqVO reqVO,OrderMessage orderMessage) {
@@ -130,7 +129,7 @@ public class SupplementSendmsgLogService {
         pushParamMap.put("orderNo",reqVO.getOrderNo());
         // app推送
         orderMessage.setPushMap(pushParamMap);
-        baseProducer.sendTopicMessage("auto-order-action","test", orderMessage);
+        baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.routingKey, orderMessage);
     }
 
     /**

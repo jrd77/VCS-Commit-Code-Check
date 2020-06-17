@@ -217,7 +217,13 @@ public class CommonUtils {
 		}
 		return H;
 	}
-	
+
+    public static void main(String[] args) {
+        LocalDateTime rentTime = LocalDateTime.of(2020, 7, 25, 9, 30, 0);
+        LocalDateTime revertTime = LocalDateTime.of(2020, 7, 25, 23, 59, 59);
+        float totalHoursByRentAveragePrice = getTotalHoursByRentAveragePrice(rentTime, revertTime);
+        System.out.println(totalHoursByRentAveragePrice);
+    }
 	
 	/**
 	 * 计算起租时间到这一天的24点的小时数
@@ -722,22 +728,5 @@ public class CommonUtils {
 		return DRIVERCOEFFICIENT_INIT;
 	}
 	
-	
-	public static void main(String[] args) {
-		LocalDateTime rentTime = LocalDateTime.of(2020, 1, 17, 21, 30, 0);
-		LocalDateTime revertTime = LocalDateTime.of(2020, 1, 18, 21, 30, 0);
-		/*
-		 * List<CarPriceOfDay> a = new ArrayList<>(); CarPriceOfDay c1 = new
-		 * CarPriceOfDay(); c1.setCurDate(LocalDate.of(2019, 12, 15));
-		 * c1.setDayPrice(1); a.add(c1); CarPriceOfDay c2 = new CarPriceOfDay();
-		 * c2.setCurDate(LocalDate.of(2019, 12, 14)); c2.setDayPrice(2); a.add(c2);
-		 * CarPriceOfDay c3 = new CarPriceOfDay(); c3.setCurDate(LocalDate.of(2019, 12,
-		 * 15)); c3.setDayPrice(3); a.add(c3); a = distinctCarPriceOfDayList(a);
-		 * Map<LocalDate, Integer> dayPrices = a.stream()
-		 * .collect(Collectors.toMap(CarPriceOfDay::getCurDate,
-		 * CarPriceOfDay::getDayPrice));
-		 */
-		double dayPrices= getRentDays(rentTime, revertTime, 8);
-		System.out.println(dayPrices);
-	}
+
 }
