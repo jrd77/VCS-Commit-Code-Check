@@ -231,6 +231,8 @@ public class CarProxyService {
             renterGoodsDetailDto.setCarGuideDayPrice(carBaseVO.getGuideDayPrice());
             renterGoodsDetailDto.setOilTotalCalibration(carBaseVO.getOilTotalCalibration());
             renterGoodsDetailDto.setPremiumMoney(carBaseVO.getPremiumMoney());
+            renterGoodsDetailDto.setLongRentVerifyStatus(carBaseVO.getLongRentVerifyStatus());
+            renterGoodsDetailDto.setOrderType(carBaseVO.getOrderType());
         }
 
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());

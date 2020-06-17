@@ -338,4 +338,14 @@ public class OwnerGoodsDetailDTO {
     private Integer dayPrice;
     // car_charge_level表的车辆等级
     private Integer carChargeLevel;
+    /**
+     * 长租审核状态；1为已审核；0为未审核；2为审核失败
+     */
+    @AutoDocProperty("长租审核状态；1为已审核；0为未审核；2为审核失败")
+    private Integer longRentVerifyStatus;
+    /**
+     * 接受订单类型：1为所有；2为长租；3为短租
+     */
+    @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租")
+    private Integer orderType;
 }
