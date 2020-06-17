@@ -393,8 +393,8 @@ public class RenterCostFacadeService {
         BaseCostDTO baseCostDTO = new BaseCostDTO();
         baseCostDTO.renterAmt = abs(renterOrderCostEntity.getRentCarAmount());
         baseCostDTO.serviceFee = abs(RenterOrderCostDetailUtils.getFeeAmt(renterOrderCostDetailEntityList));
-        baseCostDTO.basicGuaranteeFee = abs(renterOrderCostEntity.getBasicEnsureAmount());
-        baseCostDTO.allGuaranteeFee = abs(renterOrderCostEntity.getComprehensiveEnsureAmount());
+        baseCostDTO.basicGuaranteeFee = abs(RenterOrderCostDetailUtils.getAmt(renterOrderCostDetailEntityList,RenterCashCodeEnum.INSURE_TOTAL_PRICES));
+        baseCostDTO.allGuaranteeFee = abs(RenterOrderCostDetailUtils.getAmt(renterOrderCostDetailEntityList,RenterCashCodeEnum.ABATEMENT_INSURE));
         baseCostDTO.driverInsurance = abs(renterOrderCostEntity.getAdditionalDrivingEnsureAmount());
         baseCostDTO.distributionCost = abs(RenterOrderCostDetailUtils.getDistributionCost(renterOrderCostDetailEntityList));
         baseCostDTO.penaltyBreachContract = renterFineVO.getTotalFine();
