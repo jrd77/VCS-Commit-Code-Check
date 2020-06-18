@@ -10,6 +10,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.enums.CloseEnum;
+import com.atzuche.order.commons.enums.ExamineStatusEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
@@ -158,6 +159,7 @@ public class OrderBusinessService {
                 AccountOwnerIncomeExamineEntity accountOwnerIncomeExamineEntity = AccountOwnerIncomeExamineUtil.filterByType(accountOwnerIncomeExamineEntityList, AccountOwnerIncomeExamineType.OWNER_INCOME);
                 ownerIncomAmt =  accountOwnerIncomeExamineEntity==null?0:accountOwnerIncomeExamineEntity.getAmt()==null?0:accountOwnerIncomeExamineEntity.getAmt();
             }
+            ownerPreIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         }else{
             OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo, ownerOrderEntity.getOwnerOrderNo());
             ownerIncomAmt = ownerCosts.getOwnerCostAmtFinal();
@@ -168,10 +170,9 @@ public class OrderBusinessService {
         AddIncomeExamineDTO addIncomeExamineDTO = new AddIncomeExamineDTO();
         addIncomeExamineDTO.setOrderNo(orderNo);
         List<AddIncomeExamine> addIncomeExamineList = addIncomeExamineMapper.listAllAddIncomeExamine(addIncomeExamineDTO);
-        int addIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAddIncomAmt(addIncomeExamineList);
+        int addIncomAmt = AccountOwnerIncomeExamineUtil.statisticsAddIncomAmt(addIncomeExamineList, ExamineStatusEnum.APPROVED);
         log.info("获取追加收益addIncomAmt={}",addIncomAmt);
         ownerPreIncomRespDTO.setOwnerCostAmtFinal(ownerIncomAmt + addIncomAmt);
-        ownerPreIncomRespDTO.setSettleStatus(SettleStatusEnum.SETTLED.getCode());
         return ownerPreIncomRespDTO;
     }
 
