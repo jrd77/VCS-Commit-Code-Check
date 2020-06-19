@@ -46,9 +46,9 @@
   </select>
   <select id="findDebtByMemNo" resultMap="BaseResultMap">
     select
-    <include refid="Base_Column_List" />
+    sum(amt) as amt
     from trans_supplement_detail
-    where mem_no=#{memNo} and cash_type = 3 AND pay_flag IN (1,4,5) order by id
+    where mem_no=#{memNo}  AND pay_flag IN (1,4,5) group by pid
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from trans_supplement_detail
