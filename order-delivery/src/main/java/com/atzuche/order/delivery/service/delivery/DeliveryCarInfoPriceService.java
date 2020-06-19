@@ -304,7 +304,7 @@ public class DeliveryCarInfoPriceService {
     public int getOwnerPlatFormOilServiceCharge(RenterGoodsDetailDTO renterGoodsDetailDTO,Integer ownerReturnOil,Integer renterGetOil){
         try {
             int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
-            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil < ownerReturnOil) {
                 return 25;
             }
         } catch (Exception e) {
@@ -329,8 +329,8 @@ public class DeliveryCarInfoPriceService {
                 return 0;
             }
             int ownerReturnOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 4).findFirst().get().getOilNum();
-            int renterGetOil = renterHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
-            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            int ownerGetOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && ownerReturnOil > ownerGetOil) {
                 return 25;
             }
         } catch (Exception e) {
