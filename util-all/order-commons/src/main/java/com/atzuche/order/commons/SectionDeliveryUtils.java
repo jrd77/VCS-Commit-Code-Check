@@ -19,8 +19,8 @@ import com.atzuche.order.commons.vo.res.ZhiquZhihuanVO;
 
 public class SectionDeliveryUtils {
 	
-	private static final Integer RENTER = 1;
-	private static final Integer OWNER = 2;
+	public static final Integer RENTER = 1;
+	public static final Integer OWNER = 2;
 
 	/**
 	 * 同时获取租客处和车主处区间配送信息
