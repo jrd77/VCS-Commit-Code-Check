@@ -205,14 +205,14 @@
         WHERE
         r.city_code IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
         and s.`status` > 16
-        <!--AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt; NOW()
-        &lt;!&ndash; 进入违章管理日期&ndash;&gt;
+        /*AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt; NOW()*/
+        <!-- 进入违章管理日期-->
         <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
             AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &gt;=#{mixViolationManagerDate})
         </if>
         <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
             AND (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 15 DAY) &lt;=#{maxViolationManagerDate})
-        </if>-->
+        </if>
         <include refid="whereCondition"/>
         UNION ALL
         SELECT w.id,w.order_no as orderNo,renter.exp_rent_time as rentTime, IFNULL(p.cid,0) as wzProcessedProof,
@@ -233,14 +233,14 @@
         WHERE
         r.city_code not IN (select city_code from wz_query_day_conf where illegal_query_day = 15)
         and s.`status` > 16
-        <!-- AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt; NOW()
-         &lt;!&ndash; 进入违章管理日期&ndash;&gt;
+         /*AND DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt; NOW()*/
+         <!-- 进入违章管理日期-->
          <if test="mixViolationManagerDate != null and mixViolationManagerDate != '' ">
              AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &gt;=#{mixViolationManagerDate})
          </if>
          <if test="maxViolationManagerDate != null and maxViolationManagerDate != '' ">
              AND  (DATE_ADD( DATE_FORMAT(renter.act_revert_time,'%Y%m%d'),INTERVAL 30 DAY) &lt;=#{maxViolationManagerDate})
-         </if>-->
+         </if>
         <include refid="whereCondition" />
         ) a
         order by a.actualRevertTime desc
