@@ -55,8 +55,7 @@ public class AdminOrderCostController {
 	
 	@Autowired
 	OrderCostService orderCostService;
-    @Autowired
-    private AdminDeliveryCarService deliveryCarInfoService;
+
     
 	@AutoDocMethod(description = "计算租客子订单费用", value = "计算租客子订单费用", response = OrderRenterCostResVO.class)
 	@RequestMapping(value="/calculateRenterOrderCost",method = RequestMethod.POST)
@@ -65,28 +64,8 @@ public class AdminOrderCostController {
 		BindingResultUtil.checkBindingResult(bindingResult);
         
         try {
-        	
         	OrderRenterCostResVO resp = orderCostService.calculateRenterOrderCost(renterCostReqVO);
         	logger.info("calculateRenterOrderCost resp[{}]", GsonUtils.toJson(resp));
-            // 计算油量和超里程费用
-//            DeliveryCarVO deliveryCarRepVO = getDeliveryCarVO(renterCostReqVO.getOrderNo());
-//            logger.info("calculateRenterOrderCost deliveryCarRepVO[{}]", GsonUtils.toJson(deliveryCarRepVO));
-//            if(Objects.nonNull(deliveryCarRepVO) && Objects.nonNull(deliveryCarRepVO.getRenterGetAndReturnCarDTO())){
-//                RenterGetAndReturnCarDTO renterGetAndReturnCarDTO = deliveryCarRepVO.getRenterGetAndReturnCarDTO();
-//                if(Objects.nonNull(renterGetAndReturnCarDTO)){
-//                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOilDifferenceCrash())){
-//                        String oilDifferenceCrash =  renterGetAndReturnCarDTO.getOilDifferenceCrash();
-//                        Integer oilAmt  = -Integer.valueOf(oilDifferenceCrash);
-//                        resp.setOilAmt(oilAmt.toString());
-//                    }
-//                    if(!StringUtil.isBlank(renterGetAndReturnCarDTO.getOverKNCrash())){
-//                        String overKNCrash =  renterGetAndReturnCarDTO.getOverKNCrash();
-//                        Integer overKNCrashAmt  = -Integer.valueOf(overKNCrash);
-//                        resp.setBeyondMileAmt(overKNCrashAmt.toString());
-//                    }
-//
-//                }
-//            }
         	return ResponseData.success(resp);
 		} catch (Exception e) {
 			Cat.logError("calculateRenterOrderCost exception params="+renterCostReqVO.toString(),e);

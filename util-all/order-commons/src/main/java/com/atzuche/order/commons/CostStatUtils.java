@@ -213,7 +213,7 @@ public class CostStatUtils {
         return amt;
     }
     
-    public static int calConsoleOwnerFineByCashNo(FineTypeCashCodeEnum ownerFineTypeCashCodeEnum, List<ConsoleOwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
+    public static int calConsoleOwnerFineByFineType(FineTypeCashCodeEnum ownerFineTypeCashCodeEnum, List<ConsoleOwnerOrderFineDeatailDTO> ownerOrderFineDeatailDTOS){
         if(ownerOrderFineDeatailDTOS == null || ownerOrderFineDeatailDTOS.size()<=0){
             return 0;
         }

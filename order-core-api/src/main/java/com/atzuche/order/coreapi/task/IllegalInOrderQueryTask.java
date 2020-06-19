@@ -11,6 +11,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,10 @@ import javax.annotation.Resource;
 
 import com.xxl.job.core.handler.IJobHandler;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * IllegalInOrderQueryTask
@@ -58,7 +62,11 @@ public class IllegalInOrderQueryTask extends IJobHandler{
             logger.info("查询 远程调用 查询当前进行中的订单列表,查询开始");
             XxlJobLogger.log("查询 远程调用 查询当前进行中的订单列表,查询开始" );
 
-            List<IllegalToDO> list = orderSearchRemoteService.violateProcessOrder();
+            List<IllegalToDO> list = orderSearchRemoteService.violateProcessOrder("1");
+            logger.info("list={}",list);
+            // List<IllegalToDO> list2 = orderSearchRemoteService.violateProcessOrder("2");
+            //logger.info("list2={}",list2);
+            // List<IllegalToDO> list = mergeDuplicateData(list1,list2);
 
             logger.info("查询 远程调用 查询当前进行中的订单列表,查询结果 models:[{}]", list);
             XxlJobLogger.log("查询 远程调用 查询当前进行中的订单列表,查询结果 models:" + list);
@@ -85,5 +93,15 @@ public class IllegalInOrderQueryTask extends IJobHandler{
                 t.complete();
             }
         }
+    }
+
+    public List<IllegalToDO> mergeDuplicateData(List<IllegalToDO> list1,List<IllegalToDO> list2){
+        List<IllegalToDO> list = new ArrayList<>();
+        if(list1 != null)list.addAll(list1);
+        if(list2 != null)list.addAll(list2);
+        List<IllegalToDO> mergeList = list.stream()
+                .filter(x-> StringUtils.isNotBlank(x.getOrderNo())&& StringUtils.isNotBlank(x.getPlateNum()))
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>((x, y) -> IllegalToDO.isDuplicate(x,y))), ArrayList::new));
+        return mergeList;
     }
 }

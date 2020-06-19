@@ -4,10 +4,7 @@ package com.atzuche.order.admin.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.vo.req.car.CarDepositReqVO;
 import com.atzuche.order.admin.vo.resp.car.CarDepositRespVo;
-import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
@@ -99,8 +96,13 @@ public class CarDepositReturnDetailService {
         String depositType = "";
         String payType = "";
         if(cashierDTO != null){
-            depositType = PaySourceEnum.getFlagText(cashierDTO.getPaySource());
-            payType = PayTypeEnum.getFlagText(cashierDTO.getPayType());
+            if(accountRenterDepositDTO.getIsAuthorize()!= null && accountRenterDepositDTO.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
+                payType = PaySourceEnum.ALIPAY_CREDIT.getText();
+            }else{
+                payType = PaySourceEnum.getFlagText(cashierDTO.getPaySource());
+            }
+            depositType = PayTypeEnum.getFlagText(cashierDTO.getPayType());
+
         }
 
         String payStatus = accountRenterDepositDTO.getPayStatus();

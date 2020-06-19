@@ -616,7 +616,7 @@ public class OrderCostDetailService {
 				.valueOf(NumberUtils.convertNumberToZhengshu(renterBeforeReturnCarFineAmount));// renterBeforeReturnCarFineAmount<0?String.valueOf(-renterBeforeReturnCarFineAmount):String.valueOf(renterBeforeReturnCarFineAmount);
 		renterDelayReturnCarFineAmt = String
 				.valueOf(NumberUtils.convertNumberToZhengshu(renterDelayReturnCarFineAmount));// renterDelayReturnCarFineAmount<0?String.valueOf(-renterDelayReturnCarFineAmount):String.valueOf(renterDelayReturnCarFineAmount);
-		renterFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterFineAmount));// renterFineAmount<0?String.valueOf(-renterFineAmount):String.valueOf(renterFineAmount);
+		renterFineAmt = String.valueOf(-renterFineAmount);// renterFineAmount<0?String.valueOf(-renterFineAmount):String.valueOf(renterFineAmount);
 		renterGetReturnCarFineAmt = String.valueOf(NumberUtils.convertNumberToZhengshu(renterGetReturnCarFineAmount)); // renterGetReturnCarFineAmount<0?String.valueOf(-renterGetReturnCarFineAmount):String.valueOf(renterGetReturnCarFineAmount);
 
 		resVo.setRenterBeforeReturnCarFineAmt(renterBeforeReturnCarFineAmt);

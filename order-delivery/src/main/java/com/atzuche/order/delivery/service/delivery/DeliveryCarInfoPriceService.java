@@ -188,9 +188,13 @@ public class DeliveryCarInfoPriceService {
         try {
             int oilDifference;
             String ownerDrivingKM = String.valueOf(Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnKM())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM())));
-            if(2 == type.intValue()) {
-                oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
-            }else {
+            if (2 == type.intValue()) {
+                if (HandoverCarInfoEntities.get(0).getType().intValue() == 1 || HandoverCarInfoEntities.get(0).getType().intValue() == 2) {
+                    oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
+                } else {
+                    oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil()));
+                }
+            } else {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
@@ -300,7 +304,7 @@ public class DeliveryCarInfoPriceService {
     public int getOwnerPlatFormOilServiceCharge(RenterGoodsDetailDTO renterGoodsDetailDTO,Integer ownerReturnOil,Integer renterGetOil){
         try {
             int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
-            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil < ownerReturnOil) {
                 return 25;
             }
         } catch (Exception e) {
@@ -325,8 +329,8 @@ public class DeliveryCarInfoPriceService {
                 return 0;
             }
             int ownerReturnOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 4).findFirst().get().getOilNum();
-            int renterGetOil = renterHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
-            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && renterGetOil > ownerReturnOil) {
+            int ownerGetOil = ownerHandoverCarInfoEntities.stream().filter(r -> r.getType() == 3).findFirst().get().getOilNum();
+            if (MathUtil.sub((ownerReturnOil / oilTotalCalibration), 0.25d) <= 0 && ownerReturnOil > ownerGetOil) {
                 return 25;
             }
         } catch (Exception e) {
