@@ -2,6 +2,8 @@ package com.atzuche.order.accountownerincome.utils;
 
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
+import com.atzuche.order.commons.enums.ExamineStatusEnum;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
 
@@ -41,4 +43,13 @@ public class AccountOwnerIncomeExamineUtil {
         return totalAmt;
     }
 
+
+    public static int statisticsAddIncomAmt(List<AddIncomeExamine> list, ExamineStatusEnum examineStatusEnum){
+        int totalAmt = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x->examineStatusEnum.getCode() == x.getStatus())
+                .collect(Collectors.summingInt(x -> x.getAmt() == null ? 0 : x.getAmt()));
+        return totalAmt;
+    }
 }
