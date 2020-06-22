@@ -2,6 +2,7 @@ package com.atzuche.order.commons.entity.orderDetailDto;
 
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -93,5 +94,8 @@ public class AccountRenterDepositDTO implements Serializable {
          */
         @AutoDocProperty(value="免押方式(1:绑卡减免,2:芝麻减免,3:支付押金)",required=true)
         private Integer freeDepositType;
+
+        @AutoDocProperty(value = "是否预授权,0否1是,2信用预授权")
+        private Integer isAuthorize;
     						
 }

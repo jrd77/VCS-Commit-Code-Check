@@ -15,5 +15,4 @@ public class ViolationDeleteRequestVO {
     @AutoDocProperty(value = "违章记录id")
     @NotBlank(message = "违章id不能为空")
     private String violationId;
-
 }

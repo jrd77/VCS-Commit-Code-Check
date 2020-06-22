@@ -1,8 +1,23 @@
 package com.atzuche.violation.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
+import com.atzuche.order.commons.exceptions.WzDetailDeleteErrException;
+import com.atzuche.order.commons.exceptions.WzDetailDeleteException;
+import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
+import com.atzuche.order.renterwz.entity.RenterOrderWzStatusEntity;
+import com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper;
+import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
+import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
+import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.atzuche.violation.cat.CatLogRecord;
 import com.atzuche.violation.common.AdminUserUtil;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
+import com.atzuche.violation.enums.WzStatusEnums;
 import com.atzuche.violation.exception.ViolationManageException;
+import com.atzuche.violation.mapper.ViolationManageMapper;
+import com.atzuche.violation.service.RenterOrderWzDetailLogService;
 import com.atzuche.violation.service.ViolationManageService;
 import com.atzuche.violation.vo.req.*;
 import com.atzuche.violation.vo.resp.ViolationAlterationLogListResponseVO;
@@ -15,6 +30,8 @@ import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
 
 import com.autoyol.event.rabbit.violation.ViolationRabbitMQEventEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.omg.SendingContext.RunTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,6 +45,7 @@ import javax.validation.Valid;
 @RequestMapping("/console/order/violation")
 @RestController
 @AutoDocVersion(version = "违章管理接口文档")
+@Slf4j
 public class ViolationManageController {
     private static final Logger logger = LoggerFactory.getLogger(ViolationManageController.class);
 
@@ -36,6 +54,14 @@ public class ViolationManageController {
 
     @Autowired
     RabbitTemplate rabbitTemplate;
+    @Autowired
+    RenterOrderWzDetailService renterOrderWzDetailService;
+    @Autowired
+    RenterOrderWzDetailLogService renterOrderWzDetailLogService;
+    @Autowired
+    RenterOrderWzStatusService renterOrderWzStatusService;
+    @Autowired
+    RenterOrderWzDetailMapper renterOrderWzDetailMapper;
 
 
     @AutoDocMethod(description = "无违章", value = "无违章", response = ResponseData.class)
@@ -144,16 +170,11 @@ public class ViolationManageController {
     public ResponseData add(@Valid @RequestBody ViolationAdditionRequestVO violationAdditionRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
-        try{
-            logger.info("新增违章入参:{}",violationAdditionRequestVO.toString());
-            violationManageService.saveRenterOrderWzDetail(violationAdditionRequestVO);
-            CatLogRecord.successLog("新增违章成功","console/order/violation/add",violationAdditionRequestVO);
-            return ResponseData.success();
-        } catch (Exception e) {
-            logger.error("新增违章异常:{}",e);
-            CatLogRecord.failLog("新增违章异常","console/order/violation/add",violationAdditionRequestVO, e);
-            throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
-        }
+        logger.info("新增违章入参:{}",violationAdditionRequestVO.toString());
+        violationManageService.saveRenterOrderWzDetail(violationAdditionRequestVO);
+        CatLogRecord.successLog("新增违章成功","console/order/violation/add",violationAdditionRequestVO);
+        return ResponseData.success();
+
     }
 
 
@@ -162,16 +183,50 @@ public class ViolationManageController {
     public ResponseData delete(@Valid @RequestBody ViolationDeleteRequestVO violationDeleteRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
-        try{
-            logger.info("删除违章入参:{}",violationDeleteRequestVO.toString());
-            violationManageService.deleteRenterOrderWzDetailById(violationDeleteRequestVO);
-            CatLogRecord.successLog("删除违章成功","console/order/violation/delete",violationDeleteRequestVO);
-            return ResponseData.success();
-        } catch (Exception e) {
-            logger.error("删除违章异常:{}",e);
-            CatLogRecord.failLog("删除违章异常","console/order/violation/delete",violationDeleteRequestVO, e);
-            throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
+        //增加删除条件
+        RenterOrderWzDetailEntity renterOrderWzDetailEntity = renterOrderWzDetailMapper.queryRenterOrderWzDetailById(Long.valueOf(violationDeleteRequestVO.getViolationId()));
+        RenterOrderWzStatusEntity renterOrderWzStatusEntity = renterOrderWzStatusService.selectByOrderNo(renterOrderWzDetailEntity.getOrderNo(), renterOrderWzDetailEntity.getCarPlateNum());
+        if(renterOrderWzStatusEntity == null){
+            WzDetailDeleteErrException e = new WzDetailDeleteErrException();
+            log.error("查询违章状态为空",e);
+            throw e;
         }
+        if(!WzStatusEnums.STATUS_25.getStatus().equals(renterOrderWzStatusEntity.getStatus()) || 0 != renterOrderWzDetailEntity.getIllegalStatus()){
+            WzDetailDeleteException e = new WzDetailDeleteException();
+            log.error("该状态下不能删除违章信息",e);
+            throw e;
+        }
+
+
+        logger.info("删除违章入参:{}",violationDeleteRequestVO.toString());
+        violationManageService.deleteRenterOrderWzDetailById(violationDeleteRequestVO);
+        CatLogRecord.successLog("删除违章成功","console/order/violation/delete",violationDeleteRequestVO);
+
+        RenterOrderWzDetailEntity entity = renterOrderWzDetailService.getRenterOrderWzDetailById(Long.valueOf(violationDeleteRequestVO.getViolationId()));
+        RenterOrderWzDetailLogEntity renterOrderWzDetailLogEntity = new RenterOrderWzDetailLogEntity();
+        try{
+            String authName = AdminUserUtil.getAdminUser().getAuthName();
+            String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(entity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                    entity.getIllegalAddr(),
+                    entity.getIllegalReason(),
+                    entity.getIllegalAmt(),
+                    entity.getIllegalDeduct(),
+                    entity.getIllegalStatus());
+            renterOrderWzDetailLogEntity.setOrderNo(entity.getOrderNo());
+            renterOrderWzDetailLogEntity.setWzDetailId(entity.getId());
+            renterOrderWzDetailLogEntity.setOperateType(WzLogOperateTypeEnums.ANUAL_DELETE.getCode());
+            renterOrderWzDetailLogEntity.setContent(wzContent);
+            renterOrderWzDetailLogEntity.setCreateOp(authName);
+            renterOrderWzDetailLogEntity.setUpdateOp(authName);
+            log.info("删除违章-违章信息记录日志entity={}", JSON.toJSONString(entity));
+            int insert = renterOrderWzDetailLogService.insert(renterOrderWzDetailLogEntity);
+            log.info("删除违章-违章信息记录日志insert={},renterOrderWzDetailLogEntity={}",insert,JSON.toJSONString(renterOrderWzDetailLogEntity));
+        }catch (Exception e){
+            log.error("删除违章-renterOrderWzDetailLogEntity={},e",JSON.toJSONString(renterOrderWzDetailLogEntity),e);
+        }
+
+        return ResponseData.success();
+
     }
 
 
@@ -180,16 +235,33 @@ public class ViolationManageController {
     public ResponseData updateConfirmStatus(@Valid @RequestBody ViolationConfirmRequestVO violationConfirmRequestVO, BindingResult bindingResult) {
         //参数验证
         validateParameter(bindingResult);
+        logger.info("确认已处理入参:{}",violationConfirmRequestVO.toString());
+        violationManageService.confirmHandle(violationConfirmRequestVO);
+        CatLogRecord.successLog("确认已处理成功","console/order/violation/confirm/handle",violationConfirmRequestVO);
+        RenterOrderWzDetailLogEntity renterOrderWzDetailLogEntity = new RenterOrderWzDetailLogEntity();
         try{
-            logger.info("确认已处理入参:{}",violationConfirmRequestVO.toString());
-            violationManageService.confirmHandle(violationConfirmRequestVO);
-            CatLogRecord.successLog("确认已处理成功","console/order/violation/confirm/handle",violationConfirmRequestVO);
-            return ResponseData.success();
-        } catch (Exception e) {
-            logger.error("确认已处理异常:{}",e);
-            CatLogRecord.failLog("确认已处理异常","console/order/violation/confirm/handle",violationConfirmRequestVO, e);
-            throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
+            RenterOrderWzDetailEntity entity = renterOrderWzDetailService.getRenterOrderWzDetailById(Long.valueOf(violationConfirmRequestVO.getViolationId()));
+            String authName = AdminUserUtil.getAdminUser().getAuthName();
+            String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(entity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
+                    entity.getIllegalAddr(),
+                    entity.getIllegalReason(),
+                    entity.getIllegalAmt(),
+                    entity.getIllegalDeduct(),
+                    entity.getIllegalStatus());
+            renterOrderWzDetailLogEntity.setOrderNo(entity.getOrderNo());
+            renterOrderWzDetailLogEntity.setWzDetailId(entity.getId());
+            renterOrderWzDetailLogEntity.setOperateType(WzLogOperateTypeEnums.CONFIRM_HANDLE.getCode());
+            renterOrderWzDetailLogEntity.setContent(wzContent);
+            renterOrderWzDetailLogEntity.setCreateOp(authName);
+            renterOrderWzDetailLogEntity.setUpdateOp(authName);
+            log.info("确认已处理-违章信息记录日志entity={}", JSON.toJSONString(entity));
+            int insert = renterOrderWzDetailLogService.insert(renterOrderWzDetailLogEntity);
+            log.info("确认已处理-违章信息记录日志insert={},renterOrderWzDetailLogEntity={}",insert,JSON.toJSONString(renterOrderWzDetailLogEntity));
+        }catch (Exception e){
+            log.error("确认已处理-renterOrderWzDetailLogEntity={},e",JSON.toJSONString(renterOrderWzDetailLogEntity),e);
         }
+        return ResponseData.success();
+
     }
 
     @AutoDocMethod(description = "获取违章列表", value = "获取违章列表", response = ViolationInformationListResponseVO.class)
@@ -208,9 +280,6 @@ public class ViolationManageController {
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
         }
     }
-
-
-
 
 
     /**

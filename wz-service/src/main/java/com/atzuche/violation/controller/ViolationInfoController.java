@@ -125,12 +125,11 @@ public class ViolationInfoController {
                 return ResponseData.success();
             }
             String messageInfo = violationInfoService.importExcel(xlsfile, request);
-            ResponseData.createErrorCodeResponse(ErrorCode.SUCCESS.getCode(), messageInfo);
+            return ResponseData.createErrorCodeResponse(ErrorCode.SUCCESS.getCode(), messageInfo);
         } catch (Exception e) {
             logger.info("导入批量修改打款状态excel异常", e);
             throw new ViolationManageException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());
         }
-        return ResponseData.success();
     }
 
 

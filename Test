@@ -1,5 +1,1 @@
-ownerFine
-ownerGetReturnCarFienAmt
-ownerModifyAddrAmt
-renterAdvanceReturnCarFienAmt+consoleRenterAdvanceReturnCarFienAmt
-renterDelayReturnCarFienAmt+consoleRenterDelayReturnCarFienAmt
+detail.getIllegalFine(),
