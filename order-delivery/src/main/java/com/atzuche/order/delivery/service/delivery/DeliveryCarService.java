@@ -481,7 +481,7 @@ public class DeliveryCarService {
         }
         if (2 != type) {
             orderDelivery.setStatus(3);
-            orderDelivery.setIsNotifyRenyun(0);
+           // orderDelivery.setIsNotifyRenyun(0);
         }
         orderDelivery.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDelivery);

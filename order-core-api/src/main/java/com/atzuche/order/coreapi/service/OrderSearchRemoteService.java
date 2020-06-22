@@ -9,12 +9,14 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
+import com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity;
 import com.atzuche.order.renterwz.service.DeRenCarApproachCitiesService;
 import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
 import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
 import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.renterwz.vo.IllegalToDO;
+import com.atzuche.order.renterwz.vo.WzillegalVO;
 import com.autoyol.car.api.model.enums.OwnerTypeEnum;
 import com.autoyol.search.api.OrderSearchService;
 import com.autoyol.search.entity.ResponseData;
@@ -78,14 +80,14 @@ public class OrderSearchRemoteService {
     private static final LocalDateTime FESTIVAL_START_TIME = LocalDateTime.of(2019,10,1,0,0,0);
     private static final LocalDateTime FESTIVAL_END_TIME = LocalDateTime.of(2019,10,7,23,59,59);
 
-    public List<IllegalToDO> violateProcessOrder() {
+    public List<IllegalToDO> violateProcessOrder(String type) {
         //FIXME:需要修改成翻页
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "每天定时查询当前进行中的订单");
         try {
             ViolateVO reqVO = new ViolateVO();
             reqVO.setPageNum(1);
             reqVO.setPageSize(10000);
-            reqVO.setType("1");
+            reqVO.setType(type);
             reqVO.setDate(DateUtils.minDays(2));
             Cat.logEvent(CatConstants.FEIGN_METHOD,"orderSearchService.violateProcessOrder");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(reqVO));
@@ -189,7 +191,50 @@ public class OrderSearchRemoteService {
         all.addAll(list);
         return all;
     }
+    private List<IllegalToDO> queryIllegalList(Map<Integer, List<Integer>> map,String type) {
+        if (map.isEmpty()) {
+            return null;
+        }
+        //用TREEMAP，默认按KEY的增值排序
+        TreeMap<Integer, List<Integer>> treeMap = new TreeMap<>(map);
+        //15,18,30,33
+        Set<Integer> queryDays = treeMap.keySet();
+        //城市编码
+        List<Integer> cityCodeAll = new ArrayList<>();
 
+        List<IllegalToDO> all = new ArrayList<>();
+        //最小的天数
+        Integer minKey = treeMap.firstKey();
+        ViolateVO reqVO;
+        for (Integer day : queryDays) {
+            List<Integer> cityCode = treeMap.get(day);
+            //查询天数
+            reqVO = new ViolateVO();
+            reqVO.setPageNum(1);
+            reqVO.setPageSize(10000);
+            reqVO.setType(type);
+            reqVO.setDate(DateUtils.minDays(day));
+            //所有城市的列表,15天的
+            cityCodeAll.addAll(cityCode);
+            List<IllegalToDO> list = this.violatePendingOrderByDay(reqVO);
+            //不符合条件的过滤
+            list = list.parallelStream().filter(illegal -> isInQueryRange(illegal, cityCode, day, minKey)).collect(Collectors.toList());
+            all.addAll(list);
+        }
+        //30
+        Integer maxKey = treeMap.lastKey();
+        //查询最大
+        reqVO = new ViolateVO();
+        reqVO.setPageNum(1);
+        reqVO.setPageSize(10000);
+        reqVO.setType(type);
+        reqVO.setDate(DateUtils.minDays(maxKey));
+        List<IllegalToDO> list = this.violatePendingOrderByDay(reqVO);
+        //过滤城市cityCodeAll集合之外的数据（默认都以最大值查询）
+        list = list.parallelStream().filter(illegal -> isOutOfQueryRange(illegal, cityCodeAll)).collect(Collectors.toList());
+        all.addAll(list);
+        return all;
+    }
     private boolean isInQueryRange(IllegalToDO illegal, List<Integer> cityCode, Integer days, Integer minKey) {
         if (illegal!=null
                 && illegal.getCityCode()!=null
@@ -401,12 +446,29 @@ public class OrderSearchRemoteService {
         dto.setSuccessCount(0);
         dto.setRenterCount(0);
         dto.setIllegalCount(0);
+        logger.info("推送违章数据给仁云查询前的数据库入参orderNo={},platNum={}",dto.getOrderno(), dto.getPlatenum());
+        List<RenterOrderWzDetailEntity> renterOrderWzDetailEntityList = renterOrderWzDetailService.queryListByPlateNumAndOrderNo(dto.getOrderno(), dto.getPlatenum());
+        logger.info("推送违章数据给仁云查询前的数据库结果-renterOrderWzDetailEntityList={}",JSON.toJSONString(renterOrderWzDetailEntityList));
+        List<WzillegalVO> wzillegalVOList = Optional.ofNullable(renterOrderWzDetailEntityList).orElseGet(ArrayList::new).stream().map(x -> {
+            WzillegalVO wzillegalVO = new WzillegalVO();
+            wzillegalVO.setIllegalTime(x.getIllegalTime() != null ? DateUtils.formate(x.getIllegalTime(), DateUtils.DATE_DEFAUTE) : "");
+            wzillegalVO.setIllegalAddr(x.getIllegalAddr());
+            wzillegalVO.setIllegalReason(x.getIllegalReason());
+            wzillegalVO.setIllegalFine(x.getIllegalAmt());
+            wzillegalVO.setIllegalDeduct(x.getIllegalDeduct());
+            wzillegalVO.setIllegalStatus(x.getIllegalStatus());
+            return wzillegalVO;
+        }).collect(Collectors.toList());
+        dto.setIllegal(wzillegalVOList);
+
+        logger.info("wzillegalVOList={}",JSON.toJSONString(wzillegalVOList));
         SuccessOrderStaCount successOrderStaCountBo = getSuccessOrderStaCount(dto.getCarNo(), dto.getLicenseExpire());
         if(successOrderStaCountBo != null) {
             dto.setSuccessCount(successOrderStaCountBo.getSuccessCount());
             dto.setRenterCount(successOrderStaCountBo.getRenterCount());
             dto.setIllegalCount(successOrderStaCountBo.getIllegalCount());
         }
+        logger.info("推送违章数据给仁云dto={}",JSON.toJSONString(dto));
         return dto;
     }
 

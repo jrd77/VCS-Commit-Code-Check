@@ -48,15 +48,15 @@ dependencies {
 
     compile 'org.apache.poi:poi-ooxml:3.14'
     compile 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.13'
-    compile("com.autoframework:auto-mq-event:1.0.2-SNAPSHOT")
+    compile("com.autoframework:auto-mq-event:2.0.2-SNAPSHOT")
     compile 'org.springframework.amqp:spring-rabbit:1.7.5.RELEASE'
 
     compile project(":config:config-client")
     compile project(":config:config-common")
     compile project(":util-all:fee-calculator")
     compile project(":util-all:order-commons")
-    compile project(":order-delivery")
-    compile project(":order-core-all:renter-all:renter-wz")
+    //compile project(":order-delivery")
+    //compile project(":order-core-all:renter-all:renter-wz")
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-core-all:renter-all:renter-cost")
     compile project(":order-core-all:parent-order")

@@ -240,7 +240,9 @@ public class AddIncomeService {
     		oldDebtList.add(accountOldDebtReqVO);
     		List<AccountOldDebtResVO> debtResList = accountDebtService.deductOldDebt(oldDebtList);
 			oldRealDebtAmt = (debtResList == null || debtResList.isEmpty() || debtResList.get(0).getRealDebtAmt() == null) ? 0:debtResList.get(0).getRealDebtAmt();
-			amt = amt - oldRealDebtAmt;
+			if (oldRealDebtAmt > 0) {
+				amt = amt - oldRealDebtAmt;
+			}
 		}
 		if (amt > 0) {
 			// 更新会员收益

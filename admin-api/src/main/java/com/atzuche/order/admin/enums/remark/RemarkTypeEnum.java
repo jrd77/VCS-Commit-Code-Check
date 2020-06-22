@@ -13,8 +13,10 @@ public enum RemarkTypeEnum {
     TELEMARKETING_CENTER("9", "电销中心备注"),
     OPERATION("10", "商品运营备注"),
     RISK("11", "风控备注"),
-    CAR_SERVICE("12", "取送车备注");
-
+    CAR_SERVICE("12", "取送车备注"),
+    YINGYUN_CLEAN("13","运营清算备注"),
+    GOODS_YINGYUN("14", "商品运营备注")
+    ;
 
     private String type;
 

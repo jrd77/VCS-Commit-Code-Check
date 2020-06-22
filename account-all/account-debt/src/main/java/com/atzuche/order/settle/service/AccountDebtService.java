@@ -142,7 +142,7 @@ public class AccountDebtService{
     	String memNo = oldDebtList.get(0).getMemNo();
     	Integer oldDebtAmt = remoteOldSysDebtService.getMemBalance(memNo);
     	log.info("老系统欠款 oldDebtAmt=[{}]", oldDebtAmt);
-    	if (oldDebtAmt == null || oldDebtAmt == 0) {
+    	if (oldDebtAmt == null || oldDebtAmt.intValue() <= 0) {
     		// 老系统无欠款，无需抵扣
     		log.info("老系统无欠款，无需抵扣");
     		return null;

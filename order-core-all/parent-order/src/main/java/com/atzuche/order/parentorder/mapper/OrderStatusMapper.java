@@ -32,7 +32,7 @@ public interface OrderStatusMapper{
 
     Integer getStatusByOrderNo(@Param("orderNo") String orderNo);
     
-    Integer updateDispatchStatus(@Param("orderNo") String orderNo, @Param("dispatchStatus") Integer dispatchStatus);
+    Integer updateDispatchStatus(@Param("orderNo") String orderNo, @Param("dispatchStatus") Integer dispatchStatus, @Param("isDispatch") Integer isDispatch);
     
     Integer updateOrderStatus(@Param("orderNo") String orderNo, @Param("status") Integer status);
 
