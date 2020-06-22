@@ -229,11 +229,14 @@ public class OrderSettleNoTService {
         return settleOrders;
     }
     
+    public boolean check(SettleOrders settleOrders) {
+    	return check(settleOrders, null);
+    }
     /**
      * 校验是否可以结算 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
      * @param settleOrders
      */
-    public boolean check(SettleOrders settleOrders) {
+    public boolean check(SettleOrders settleOrders,List<String> listOrderNos) {
     	RenterOrderEntity renterOrder = settleOrders.getRenterOrder();
     	
     	//总开关
@@ -248,7 +251,7 @@ public class OrderSettleNoTService {
         }
         
     	//判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
-    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getOrderNo());
+    	boolean flagMileage = orderSettleProxyService.checkMileageData(settleOrders.getOrderNo(),listOrderNos);
     	if(flagMileage == false) {
     		throw new RuntimeException("租客取车或还车里程数或油表刻度不完整不能结算");
     	}
