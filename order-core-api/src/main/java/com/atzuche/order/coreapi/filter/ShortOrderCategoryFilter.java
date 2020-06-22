@@ -18,7 +18,7 @@ public class ShortOrderCategoryFilter implements OrderFilter {
     @Override
     public void validate(OrderReqContext context) throws OrderFilterException {
         Integer orderType = context.getOwnerGoodsDetailDto().getOrderType();
-        if(orderType != null && !new ArrayList<>(orderTypeList).contains(orderType)){
+        if(orderType == null || !new ArrayList<>(orderTypeList).contains(orderType)){
             NotSupportLongRentException notSupportLongRentException = new NotSupportLongRentException();
             log.error("不支持长租下单orderType={}",orderType,notSupportLongRentException);
             throw notSupportLongRentException;
