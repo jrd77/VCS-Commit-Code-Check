@@ -604,4 +604,5 @@ public class AdminOrderCostDetailController {
         DangerCountRespVO dangerCountRespVO = orderCostDetailService.getDangerCount(orderNo,renterOrderNo);
         return ResponseData.success(dangerCountRespVO);
     }
+
 }
