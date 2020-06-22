@@ -79,7 +79,7 @@ public class OwnerOrderCalCostService {
                 }
             }
         }
-        log.info("");
+        log.info("租金总费用realRentAmt={},未折扣租金rentAmt={}",realRentAmt,rentAmt);
         //平台服务费
         OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(realRentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
         int serviceExpense = null == serviceExpenseEntity ? OrderConstant.ZERO : serviceExpenseEntity.getTotalAmount();
