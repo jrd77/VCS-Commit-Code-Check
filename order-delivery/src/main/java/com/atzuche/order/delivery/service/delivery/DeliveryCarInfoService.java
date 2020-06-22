@@ -264,7 +264,9 @@ public class DeliveryCarInfoService {
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
         try {
-            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(renterGoodsDetailDTO,Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(renterGoodsDetailDTO,
+                    Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil().contains("L") ? ownerGetAndReturnCarDTO.getReturnCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getReturnCarOil()),
+                    Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil())) + "元");
         } catch (Exception e) {
             log.info("获取平台加邮费出错,ownerGetAndReturnCarDTO:[]", JSONObject.toJSONString(ownerGetAndReturnCarDTO));
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
@@ -354,6 +356,7 @@ public class DeliveryCarInfoService {
             if(renterOrderDelivery != null){
                 costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
                 costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+                costBaseDTO.setOrderNo(renterOrderDelivery.getOrderNo());
             }
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();

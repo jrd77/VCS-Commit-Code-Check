@@ -275,7 +275,7 @@
     </select>
     
     <update id="updateDispatchStatus">
-    	update order_status set dispatch_status = #{dispatchStatus}
+    	update order_status set dispatch_status = #{dispatchStatus},is_dispatch = #{isDispatch}
     	where order_no = #{orderNo}
     </update>
     

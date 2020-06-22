@@ -184,7 +184,7 @@ public class ModifyOrderConfirmService {
 		// 保存换车记录
 		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
 		// 更新调度状态
-		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
+		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode(), 0);
 		// 查询订单状态
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		// 订单状态
