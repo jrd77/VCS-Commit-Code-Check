@@ -598,7 +598,7 @@ public class AdminOrderCostDetailController {
     }
 
     @AutoDocMethod(description = "获取出险次数", value = "获取出险次数",response = RenterCostDetailDTO.class)
-    @GetMapping("/renterOrderCostDetail")
+    @GetMapping("/getDangerCount")
     public ResponseData<DangerCountRespVO> getDangerCount(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo") String renterOrderNo) {
         logger.info("renterOrderCostDetail controller orderNo={}，renterOrderNo={}",orderNo,renterOrderNo);
         DangerCountRespVO dangerCountRespVO = orderCostDetailService.getDangerCount(orderNo,renterOrderNo);
