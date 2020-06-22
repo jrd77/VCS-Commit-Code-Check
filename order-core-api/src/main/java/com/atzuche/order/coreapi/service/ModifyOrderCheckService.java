@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.atzuche.order.commons.exceptions.CommercialInsuranceAuditFailException;
 import com.atzuche.order.commons.exceptions.NotSupportLongRentException;
+import com.atzuche.order.commons.exceptions.NotSupportShortRentException;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -408,9 +409,9 @@ public class ModifyOrderCheckService {
 		}else{//非长租
             Integer orderType = modifyOrderDTO.getRenterGoodsDetailDTO().getOrderType();
             if(orderType == null || !new ArrayList<>(Arrays.asList(1,3,4)).contains(orderType)){
-                NotSupportLongRentException notSupportLongRentException = new NotSupportLongRentException();
-                log.error("不支持长租下单orderType={}",orderType,notSupportLongRentException);
-                throw notSupportLongRentException;
+                NotSupportShortRentException e = new NotSupportShortRentException();
+                log.error("不支持短租下单orderType={}",orderType,e);
+                throw e;
             }
         }
 	}

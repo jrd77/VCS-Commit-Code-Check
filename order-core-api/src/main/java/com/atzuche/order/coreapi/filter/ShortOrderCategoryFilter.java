@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.filter;
 
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.exceptions.NotSupportLongRentException;
+import com.atzuche.order.commons.exceptions.NotSupportShortRentException;
 import com.atzuche.order.commons.filter.OrderFilter;
 import com.atzuche.order.commons.filter.OrderFilterException;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,9 @@ public class ShortOrderCategoryFilter implements OrderFilter {
     public void validate(OrderReqContext context) throws OrderFilterException {
         Integer orderType = context.getOwnerGoodsDetailDto().getOrderType();
         if(orderType == null || !new ArrayList<>(orderTypeList).contains(orderType)){
-            NotSupportLongRentException notSupportLongRentException = new NotSupportLongRentException();
-            log.error("不支持长租下单orderType={}",orderType,notSupportLongRentException);
-            throw notSupportLongRentException;
+            NotSupportShortRentException e = new NotSupportShortRentException();
+            log.error("不支持短租下单orderType={}",orderType,e);
+            throw e;
         }
     }
 }
