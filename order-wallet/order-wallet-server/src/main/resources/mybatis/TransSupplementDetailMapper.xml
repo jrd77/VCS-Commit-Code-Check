@@ -45,11 +45,26 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="findDebtByMemNo" resultMap="BaseResultMap">
-    select
-    id,
-    sum(amt) as amt
-    from trans_supplement_detail
-    where mem_no=#{memNo}  AND pay_flag IN (1,4,5) AND cash_type=3 group by pid
+      SELECT
+    <include refid="Base_Column_List" />
+      FROM
+          trans_supplement_detail
+      WHERE
+          pid IN (
+                      SELECT
+                          pid
+                      FROM
+                          `atzuchedb`.trans_supplement_detail
+                      WHERE
+                          mem_no=#{memNo}
+                          AND cash_type = 3
+                          AND op_status = 1
+                          AND pay_flag IN ( 1, 4, 5 )
+                          AND is_delete = 0
+          )
+          AND op_status = 1
+          AND pay_flag IN ( 1, 4, 5 )
+          AND is_delete = 0
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from trans_supplement_detail
