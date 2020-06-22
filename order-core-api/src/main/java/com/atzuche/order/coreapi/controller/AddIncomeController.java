@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.autoyol.doc.annotation.AutoDocMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -93,6 +94,7 @@ public class AddIncomeController {
 	 * @return ResponseData<AddIncomeExamineVO>
 	 */
 	@PostMapping("/income/examine/list")
+	@AutoDocMethod(description = "获取追加收益审核列表(分页)", value = "获取追加收益审核列表(分页)",response = AddIncomeExamineVO.class)
     public ResponseData<AddIncomeExamineVO> getAddIncomeExamineVO(@RequestBody AddIncomeExamineDTO req) {
 		log.info("获取追加收益审核列表(分页) AddIncomeExamineDTO=[{}]", req);
 		AddIncomeExamineVO addIncomeExamineVO = addIncomeExamineService.getAddIncomeExamineVO(req);
