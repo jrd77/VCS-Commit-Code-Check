@@ -20,7 +20,12 @@ public class CommercialInsuranceAuditFilter implements OrderFilter {
     public void validate(OrderReqContext context) throws OrderFilterException {
         Integer orderType = context.getOwnerGoodsDetailDto().getOrderType();
         Integer longRentVerifyStatus = context.getOwnerGoodsDetailDto().getLongRentVerifyStatus();
-        if(!(orderType != null && new ArrayList<>(orderTypeList).contains(orderType) && longRentVerifyStatus !=null && longRentVerifyStatus == 1)){
+        if(orderType == null || !new ArrayList<>(orderTypeList).contains(orderType)){
+            NotSupportLongRentException e = new NotSupportLongRentException();
+            log.error("当前车辆不接受长租orderType={}",orderType,e);
+            throw e;
+        }
+        if(longRentVerifyStatus ==null || longRentVerifyStatus != 1){
             CommercialInsuranceAuditFailException e = new CommercialInsuranceAuditFailException();
             log.error("商业险审核状态不通过orderType={}",orderType,e);
             throw e;

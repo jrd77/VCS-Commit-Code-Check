@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
@@ -73,7 +74,7 @@ public class OwnerOrderCalCostService {
             for(OwnerOrderSubsidyDetailEntity s : ownerOrderCostReqDTO.getOwnerOrderSubsidyDetails()) {
                 if(Objects.nonNull(s.getSubsidyAmount())) {
                     subsidyAmt = subsidyAmt + s.getSubsidyAmount();
-                    if(StringUtils.equals(s.getSubsidyCostCode(), RenterCashCodeEnum.RENT_AMT.getCashNo())) {
+                    if(StringUtils.equals(s.getSubsidyCostCode(), OwnerCashCodeEnum.RENT_AMT.getCashNo())) {
                         realRentAmt = realRentAmt + s.getSubsidyAmount();
                     }
                 }
