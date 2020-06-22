@@ -394,14 +394,20 @@ public class ModifyOrderCheckService {
 			}
             Integer orderType = modifyOrderDTO.getRenterGoodsDetailDTO().getOrderType();
             Integer longRentVerifyStatus = modifyOrderDTO.getRenterGoodsDetailDTO().getLongRentVerifyStatus();
-            if(orderType != null && new ArrayList<>(Arrays.asList(1,2)).contains(orderType) && longRentVerifyStatus !=null && longRentVerifyStatus == 1){
+
+            if(orderType == null || !new ArrayList<>(Arrays.asList(1,2)).contains(orderType)){
+                NotSupportLongRentException e = new NotSupportLongRentException();
+                log.error("当前车辆不接受长租orderType={}",orderType,e);
+                throw e;
+            }
+            if(longRentVerifyStatus == null || longRentVerifyStatus != 1){
                 CommercialInsuranceAuditFailException e = new CommercialInsuranceAuditFailException();
                 log.error("商业险审核状态不通过orderType={}",orderType,e);
                 throw e;
             }
 		}else{//非长租
             Integer orderType = modifyOrderDTO.getRenterGoodsDetailDTO().getOrderType();
-            if(orderType != null && !new ArrayList<>(Arrays.asList(1,3,4)).contains(orderType)){
+            if(orderType == null || !new ArrayList<>(Arrays.asList(1,3,4)).contains(orderType)){
                 NotSupportLongRentException notSupportLongRentException = new NotSupportLongRentException();
                 log.error("不支持长租下单orderType={}",orderType,notSupportLongRentException);
                 throw notSupportLongRentException;
