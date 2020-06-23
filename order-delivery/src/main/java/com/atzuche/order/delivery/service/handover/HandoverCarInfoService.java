@@ -116,9 +116,6 @@ public class HandoverCarInfoService {
         if (StringUtils.isBlank(orderNo)) {
             throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误,没有订单号");
         }
-        if (StringUtils.isBlank(orderNo)) {
-            throw new HandoverCarOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "参数错误,没有订单号");
-        }
         List<OwnerHandoverCarInfoEntity> ownerHandoverCarInfoEntityList = ownerHandoverCarService.selectOwnerByOrderNo(orderNo);
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryMapper.findRenterOrderListByorderNo(orderNo);
         List<RenterHandoverCarInfoEntity> renterHandoverCarInfoEntityList = renterHandoverCarService.selectRenterByOrderNo(orderNo);
