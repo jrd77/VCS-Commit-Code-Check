@@ -19,6 +19,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderConsoleCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.enums.RightTypeEnum;
@@ -720,6 +721,10 @@ public class OrderCostDetailService {
 
 
     public DangerCountRespVO getDangerCount(String orderNo,String renterOrderNo) {
+        if(renterOrderNo == null || renterOrderNo.trim().length()<=0){
+            RenterOrderDTO renterOrderDTO = remoteFeignService.getRenterOrderFromRemot(orderNo);
+            renterOrderNo = renterOrderDTO.getRenterOrderNo();
+        }
         RenterGoodsDetailDTO renterGoodsDetailDTO = remoteFeignService.getRenterGoodsFromRemot(renterOrderNo, false);
         if(renterGoodsDetailDTO == null){
             GoodsNotFoundException e = new GoodsNotFoundException();

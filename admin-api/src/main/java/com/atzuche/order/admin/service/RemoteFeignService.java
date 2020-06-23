@@ -1013,6 +1013,25 @@ public class RemoteFeignService {
         }
     }
 
-
+    public RenterOrderDTO getRenterOrderFromRemot(String orderNo){
+        ResponseData<RenterOrderDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryRenterOrderByOrderNo");
+            log.info("Feign 开始获取租客有效子订单,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignOrderService.queryRenterOrderByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客商品信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取租客有效子订单异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 
 }
