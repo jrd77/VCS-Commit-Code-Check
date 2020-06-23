@@ -72,26 +72,15 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
             XxlJobLogger.log("查询 远程调用 查询还车4小时后的订单列表,查询结果 models:" + orderNos);
 
             if(CollectionUtils.isNotEmpty(orderNos)){
+            	List<String> listOrderNos = new ArrayList<String>();
+            	
                 for (String orderNo : orderNos) {
                     try {
                         logger.info("执行 还车4小时后，自动结算 orderNo:[{}]",orderNo);
                         /**
                          * 结算失败通知邮件列表
                          */
-                        List<String> listOrderNos = new ArrayList<String>();
-                        
                         orderSettle.settleOrder(orderNo,listOrderNos);
-                        
-                        //发送邮件通知。
-                        if(listOrderNos != null && listOrderNos.size() > 0) {
-                        	ExceptionEmailServerVo email = exceptionEmailService.getEmailServer();
-                            String[] emails = this.exceptionEmail();
-                            String content = "订单号列表如下：";
-                            for (String obj : orderNos) {
-                            	content += " " + obj + ", ";
-							}
-                        	new ExceptionGPSMail(email.getHostName(),email.getFromAddr(),email.getFromName(),email.getFromPwd(),emails).send("请关注取还车油表或里程刻度异常结算被拦截",content);
-                        }
                     } catch (Exception e) {
                         XxlJobLogger.log("执行 还车4小时后，自动结算 异常:" + e);
                         logger.error("执行 还车4小时后，自动结算 异常 orderNo:[{}] , e:[{}]",orderNo , e);
@@ -99,6 +88,20 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
                         t.setStatus(e);
                     }
                 }
+                
+                
+                //发送邮件通知。
+                if(listOrderNos != null && listOrderNos.size() > 0) {
+                	ExceptionEmailServerVo email = exceptionEmailService.getEmailServer();
+                    String[] emails = this.exceptionEmail();
+                    String content = "订单号列表如下：";
+                    for (String orderno : listOrderNos) {
+                    	content += " " + orderno + ", ";
+					}
+                    logger.info("邮件发送内容:"+content);
+                	new ExceptionGPSMail(email.getHostName(),email.getFromAddr(),email.getFromName(),email.getFromPwd(),emails).send("请关注取还车油表或里程刻度异常结算被拦截",content);
+                }
+                
             }
             logger.info("结束执行 还车4小时后，自动结算");
             XxlJobLogger.log("结束执行 还车4小时后，自动结算");
