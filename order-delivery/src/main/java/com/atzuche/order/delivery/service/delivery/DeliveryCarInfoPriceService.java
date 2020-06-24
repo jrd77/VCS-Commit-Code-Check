@@ -272,7 +272,7 @@ public class DeliveryCarInfoPriceService {
                 feeResult.setUnitPrice(0);
                 return feeResult;
             }
-            if (renterOrderDeliveryEntityList.get(0).getIsNotifyRenyun().intValue() == 0) {
+            if (renterOrderDeliveryEntityList.get(0).getIsNotifyRenyun().intValue() == 0 && renterOrderDeliveryEntityList.get(1).getIsNotifyRenyun().intValue() == 0) {
                 log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
                 Cat.logError("获取超里程费用mileageAmtDTO.ReturnMileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用ReturnMileage对象为空"));
                 feeResult.setTotalFee(0);
