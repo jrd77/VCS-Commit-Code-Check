@@ -1,30 +1,57 @@
 package com.atzuche.order.delivery.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.SysConfigSDK;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.entity.dto.SectionParamDTO;
+import com.atzuche.order.commons.entity.dto.TransProgressDTO;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
+import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
+import com.atzuche.order.commons.vo.res.QuHuanQujianVO;
+import com.atzuche.order.commons.vo.res.QuZhiHuanQujianVO;
+import com.atzuche.order.commons.vo.res.QuZhiHuanZhunshiVO;
+import com.atzuche.order.commons.vo.res.QuhuanZhunshiVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryResultVO;
 import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
+import com.atzuche.order.commons.vo.res.SummarySectionDeliveryVO;
+import com.atzuche.order.commons.vo.res.ZhiquZhihuanVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
+import com.atzuche.order.delivery.entity.TransSimpleMode;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryModeMapper;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class RenterOrderDeliveryModeService {
 
 	@Autowired
 	private RenterOrderDeliveryModeMapper renterOrderDeliveryModeMapper;
 	@Autowired
 	private RenterOrderDeliveryService renterOrderDeliveryService;
+	@Autowired
+	private CityConfigSDK cityConfigSDK;
+	@Autowired
+	private SysConfigSDK sysConfigSDK;
 	
 	public RenterOrderDeliveryMode getDeliveryModeByRenterOrderNo(String renterOrderNo) {
 		return renterOrderDeliveryModeMapper.getDeliveryModeByRenterOrderNo(renterOrderNo);
@@ -99,5 +126,127 @@ public class RenterOrderDeliveryModeService {
 			sectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
 		}
 		return sectionDeliveryVO;
+	}
+	
+	
+	/**
+	 * 新增或修改区间配送信息
+	 * @param transDeliveryMode
+	 * @return RenterOwnerSummarySectionDeliveryVO
+	 */
+	public RenterOwnerSummarySectionDeliveryVO getSectionDeliveryDetail(TransSimpleMode transSimpleMode, RenterOrderEntity renterOrderEntity, TransProgressDTO initpro) {
+		// 数据转换
+		RenterOrderDeliveryMode transDeliveryMode = convertTransDeliveryMode(transSimpleMode);
+		log.info("新增或修改区间配送信息saveOrUpdateTransDeliveryMode transDeliveryMode=[{}]",transDeliveryMode);
+		String renterOrderNo = renterOrderEntity.getRenterOrderNo();
+		RenterOrderDeliveryMode mode = getDeliveryModeByRenterOrderNo(renterOrderNo);
+		SectionParamDTO sectionParam = new SectionParamDTO();
+		sectionParam.setGetCarBeforeTime(transSimpleMode.getGetCarBeforeTime());
+		sectionParam.setRentAfterMinutes(transDeliveryMode.getRentAfterMinutes());
+		sectionParam.setRentBeforeMinutes(transDeliveryMode.getRentBeforeMinutes());
+		sectionParam.setRentTime(transSimpleMode.getRentTime());
+		sectionParam.setReturnCarAfterTime(transSimpleMode.getReturnCarAfterTime());
+		sectionParam.setRevertAfterMinutes(transDeliveryMode.getRevertAfterMinutes());
+		sectionParam.setRevertBeforeMinutes(transDeliveryMode.getRevertBeforeMinutes());
+		sectionParam.setRevertTime(transSimpleMode.getRevertTime());
+		SectionDeliveryResultVO result = SectionDeliveryUtils.getSectionDeliveryResultVO(sectionParam,  DateUtils.FORMAT_STR_RENYUN);
+		if (result == null) {
+			return null;
+		}
+		result.getOwnerSectionDelivery().setAccurateGetSrvUnit(transDeliveryMode.getAccurateGetSrvUnit());
+		result.getOwnerSectionDelivery().setAccurateReturnSrvUnit(transDeliveryMode.getAccurateReturnSrvUnit());
+		result.getRenterSectionDelivery().setAccurateGetSrvUnit(transDeliveryMode.getAccurateGetSrvUnit());
+		result.getRenterSectionDelivery().setAccurateReturnSrvUnit(transDeliveryMode.getAccurateReturnSrvUnit());
+		
+		// 取还车区间配送
+		Map<Integer,QuHuanQujianVO> quHuanQujianMap = SectionDeliveryUtils.listQuHuanQujianVO(result, sectionParam, initpro).stream().collect(Collectors.toMap(QuHuanQujianVO::getMemType, curObj -> curObj));
+		// 取还车准时达
+		Map<Integer,QuhuanZhunshiVO> quhuanZhunshiMap = SectionDeliveryUtils.listQuhuanZhunshiVO(result, sectionParam, initpro).stream().collect(Collectors.toMap(QuhuanZhunshiVO::getMemType, curObj -> curObj));
+		TransProgressDTO pro = getQuZhiHuanTP(initpro, renterOrderEntity);
+		// 取车服务-自还-区间配送
+		Map<Integer,QuZhiHuanQujianVO> quZhiHuanQujianMap = SectionDeliveryUtils.listQuZhiHuanQujianVO(result, sectionParam, pro).stream().collect(Collectors.toMap(QuZhiHuanQujianVO::getMemType, curObj -> curObj));
+		// 取车服务-自还-准时达
+		Map<Integer,QuZhiHuanZhunshiVO> quZhiHuanZhunshiMap = SectionDeliveryUtils.listQuZhiHuanZhunshiVO(result, sectionParam, pro).stream().collect(Collectors.toMap(QuZhiHuanZhunshiVO::getMemType, curObj -> curObj));
+		// 自取自还
+		TransProgressDTO zzpro = getZhiQuZhiHuanTP(renterOrderEntity);
+		Map<Integer,ZhiquZhihuanVO> zhiquZhihuanMap = SectionDeliveryUtils.listZhiquZhihuanVO(result, zzpro).stream().collect(Collectors.toMap(ZhiquZhihuanVO::getMemType, curObj -> curObj));
+		RenterOwnerSummarySectionDeliveryVO renterOwnerSummarySectionDeliveryVO = new RenterOwnerSummarySectionDeliveryVO();
+		SummarySectionDeliveryVO renter = new SummarySectionDeliveryVO();
+		renter.setQuHuanQujianVO(quHuanQujianMap.get(SectionDeliveryUtils.RENTER));
+		renter.setQuhuanZhunshiVO(quhuanZhunshiMap.get(SectionDeliveryUtils.RENTER));
+		renter.setQuZhiHuanQujianVO(quZhiHuanQujianMap.get(SectionDeliveryUtils.RENTER));
+		renter.setQuZhiHuanZhunshiVO(quZhiHuanZhunshiMap.get(SectionDeliveryUtils.RENTER));
+		renter.setZhiquZhihuanVO(zhiquZhihuanMap.get(SectionDeliveryUtils.RENTER));
+		SummarySectionDeliveryVO owner = new SummarySectionDeliveryVO();
+		owner.setQuHuanQujianVO(quHuanQujianMap.get(SectionDeliveryUtils.OWNER));
+		owner.setQuhuanZhunshiVO(quhuanZhunshiMap.get(SectionDeliveryUtils.OWNER));
+		owner.setQuZhiHuanQujianVO(quZhiHuanQujianMap.get(SectionDeliveryUtils.OWNER));
+		owner.setQuZhiHuanZhunshiVO(quZhiHuanZhunshiMap.get(SectionDeliveryUtils.OWNER));
+		owner.setZhiquZhihuanVO(zhiquZhihuanMap.get(SectionDeliveryUtils.OWNER));
+		renterOwnerSummarySectionDeliveryVO.setRenter(renter);
+		renterOwnerSummarySectionDeliveryVO.setOwner(owner);
+		if (mode != null) {
+			renterOwnerSummarySectionDeliveryVO.setDistributionMode(mode.getDistributionMode());
+		} else {
+			renterOwnerSummarySectionDeliveryVO.setDistributionMode(0);
+		}
+		renterOwnerSummarySectionDeliveryVO.setAccurateGetSrvUnit(transDeliveryMode.getAccurateGetSrvUnit());
+		renterOwnerSummarySectionDeliveryVO.setAccurateReturnSrvUnit(transDeliveryMode.getAccurateReturnSrvUnit());
+		return renterOwnerSummarySectionDeliveryVO;
+	}
+	
+	
+	public TransProgressDTO getQuZhiHuanTP(TransProgressDTO initpro, RenterOrderEntity transRealTimeVO) {
+		String ownerRentTime = initpro == null ? null:initpro.getOwnerRentTime();
+		String renterRentTime = initpro == null ? null:initpro.getRenterRentTime();
+		LocalDateTime realRevertTime = transRealTimeVO == null ? null:transRealTimeVO.getActRevertTime();
+		String realRevertDateTime = realRevertTime == null ? null:DateUtils.formate(realRevertTime, DateUtils.FORMAT_STR_RENYUN);
+		TransProgressDTO pro = new TransProgressDTO(ownerRentTime, renterRentTime, realRevertDateTime, realRevertDateTime);
+		return pro;
+	}
+	
+	public TransProgressDTO getZhiQuZhiHuanTP(RenterOrderEntity transRealTimeVO) {
+		LocalDateTime realRentTime = transRealTimeVO == null ? null:transRealTimeVO.getActRentTime();
+		LocalDateTime realRevertTime = transRealTimeVO == null ? null:transRealTimeVO.getActRevertTime();
+		String realRentDateTime = realRentTime == null ? null:DateUtils.formate(realRentTime, DateUtils.FORMAT_STR_RENYUN);
+		String realRevertDateTime = realRevertTime == null ? null:DateUtils.formate(realRevertTime, DateUtils.FORMAT_STR_RENYUN);
+		TransProgressDTO pro = new TransProgressDTO(realRentDateTime, realRentDateTime, realRevertDateTime, realRevertDateTime);
+		return pro;
+	}
+	
+	
+	/**
+	 * 数据转换
+	 * @param transSimpleMode
+	 * @return RenterOrderDeliveryMode
+	 */
+	public RenterOrderDeliveryMode convertTransDeliveryMode(TransSimpleMode transSimpleMode) {
+		log.info("新增或修改区间配送信息 convertTransDeliveryMode transSimpleMode=[{}]",transSimpleMode);
+		if (transSimpleMode == null) {
+			return null;
+		}
+        log.info("config-从城市配置中获取区间配置,cityCode=[{}]", transSimpleMode.getCityCode());
+        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(),Integer.valueOf(transSimpleMode.getCityCode()));
+        log.info("config-从城市配置中获取区间配置,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
+        RenterOrderDeliveryMode mode = new RenterOrderDeliveryMode();
+        BeanUtils.copyProperties(configByCityCode, mode);
+        List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        log.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? null : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        log.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        mode.setId(null);
+        //mode.setOrderNo(transSimpleMode.getOrderNo());
+        //mode.setRenterOrderNo(transSimpleMode.getRenterOrderNo());
+        mode.setAccurateGetSrvUnit(getAccurateCost);
+        mode.setAccurateReturnSrvUnit(returnAccurateCost);
+		return mode;
 	}
 }

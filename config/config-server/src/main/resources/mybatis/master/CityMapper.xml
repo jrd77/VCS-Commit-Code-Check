@@ -68,6 +68,10 @@
         <result column="address_range" jdbcType="LONGVARCHAR" property="addressRange"/>
         <result column="free_address_range" jdbcType="LONGVARCHAR" property="freeAddressRange"/>
         <result column="ota_address_range" jdbcType="LONGVARCHAR" property="otaAddressRange"/>
+        <result column="rent_before_minutes" jdbcType="INTEGER" property="rentBeforeMinutes"/>
+        <result column="rent_after_minutes" jdbcType="INTEGER" property="rentAfterMinutes"/>
+        <result column="revert_before_minutes" jdbcType="INTEGER" property="revertBeforeMinutes"/>
+        <result column="revert_after_minutes" jdbcType="INTEGER" property="revertAfterMinutes"/>
     </resultMap>
     <select id="findAll" resultMap="base">
         SELECT
@@ -83,7 +87,8 @@
         is_limit, first_letter, is_distribute, level, peak_time_slot, before_trans_time_span,
         unservice_begin_time, unservice_end_time, delivery_service_cost, package_delivery_service_cost,
         peak_starts_with, peak_not_starts_with, is_free_package, city_center_address, is_ofd_scooter,
-        address_range, free_address_range, ota_address_range
+        address_range, free_address_range, ota_address_range,
+        rent_before_minutes,rent_after_minutes,revert_before_minutes,revert_after_minutes
         FROM city
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.delivery.rep;
 
+import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class DeliveryCarVO {
     private String orderNo;
     @AutoDocProperty("油耗总刻度")
     private String maxOilNumber;
-
-
+    @AutoDocProperty("区间配送信息")
+    private RenterOwnerSummarySectionDeliveryVO sectionDelivery;
 
 }
