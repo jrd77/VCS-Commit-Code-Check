@@ -152,6 +152,7 @@ public class AdminDeliveryCarService {
     public OwnerTransAddressReqVO createModifyOrderOwnerInfoParams(DeliveryCarVO deliveryCarVO){
         OwnerTransAddressReqVO ownerTransAddressReqVO = new OwnerTransAddressReqVO();
         ownerTransAddressReqVO.setOrderNo(deliveryCarVO.getOrderNo());
+        ownerTransAddressReqVO.setConsoleInvoke("1");
         ownerTransAddressReqVO.setMemNo(deliveryCarVO.getOwnerMemNo());
         if(Objects.nonNull(deliveryCarVO.getGetHandoverCarDTO())) {
             ownerTransAddressReqVO.setGetCarAddressText(deliveryCarVO.getGetHandoverCarDTO().getOwnRealReturnAddr());
