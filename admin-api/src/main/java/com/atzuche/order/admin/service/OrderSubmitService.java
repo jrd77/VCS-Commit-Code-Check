@@ -130,7 +130,7 @@ public class OrderSubmitService {
         param.setOrderCategory("1");
         param.setSceneCode("EX007");
         param.setSource("3");
-        param.setFreeDoubleTypeId("3");
+        param.setFreeDoubleTypeId("2");
         param.setSpecialConsole("1");
         param.setOfflineOrderStatus("0");
         param.setPlatformParentType("7");

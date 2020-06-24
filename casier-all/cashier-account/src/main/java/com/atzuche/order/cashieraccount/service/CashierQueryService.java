@@ -21,6 +21,7 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
+import com.atzuche.order.commons.AuthorizeEnum;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
@@ -112,8 +113,13 @@ public class CashierQueryService {
         if(Objects.isNull(entity) || Objects.isNull(entity.getOrderNo())){
             return result;
         }
-
-        result.setWzDepositAmt(entity.getShishouDeposit());
+        if(entity.getIsAuthorize()==null || entity.getIsAuthorize() == 0){
+            result.setWzDepositAmt(entity.getShishouDeposit());
+        }else if(entity.getIsAuthorize() == 1){
+            result.setWzDepositAmt(entity.getAuthorizeDepositAmt());
+        }else if(entity.getIsAuthorize() == 2){
+            result.setWzDepositAmt(entity.getCreditPayAmt());
+        }
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
@@ -124,7 +130,12 @@ public class CashierQueryService {
             result.setPayStatus("支付成功");
             result.setPayTime(DateUtils.formate(cashierEntity.getCreateTime(),DateUtils.DATE_DEFAUTE1));
             result.setPayType(PayTypeEnum.getFlagText(cashierEntity.getPayType()));
-            result.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+            if(entity.getIsAuthorize()!=null && entity.getIsAuthorize() == AuthorizeEnum.CREDIT.getCode()){
+                result.setPaySource(PaySourceEnum.ALIPAY_CREDIT.getText());;
+            }else{
+                result.setPaySource(PaySourceEnum.getFlagText(cashierEntity.getPaySource()));
+            }
+
         }
 
         List<AccountRenterWzDepositDetailEntity> list = accountRenterWzDepositDetailNoTService.findByOrderNo(orderNo);

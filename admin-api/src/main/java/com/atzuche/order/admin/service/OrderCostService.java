@@ -360,9 +360,9 @@ public class OrderCostService {
 
 
 
-		platformSubsidyTotalAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
-		platformSubsidyAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
-		platformSubsidyRealAmt = String.valueOf( NumberUtils.convertNumberToFushu(platformSubsidyAmount));
+		platformSubsidyTotalAmt = String.valueOf(-platformSubsidyAmount);
+		platformSubsidyAmt = String.valueOf(-platformSubsidyAmount);
+		platformSubsidyRealAmt = String.valueOf(-platformSubsidyAmount);
 		///车主给租客的租金补贴
 		ownerSubsidyTotalAmt = String.valueOf(-ownerSubsidyRentTotalAmount);
 		//文本框中填入负数，保存负数，暂不处理
@@ -1132,6 +1132,7 @@ public class OrderCostService {
 
 
         ///子订单号
+        realVo.setOrderNo(renterCostReqVO.getOrderNo());
         realVo.setRenterOrderNo(renterCostReqVO.getRenterOrderNo());
         //默认值处理  调价目前没有
 //		realVo.setAdjustAmt("0");

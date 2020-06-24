@@ -186,7 +186,7 @@
         select
         <include refid="Base_Column_List"/>
         from order_cancel_reason
-        where owner_order_no in 
+        where owner_order_no in
         <foreach collection="ownerOrderNos" item="ownerOrderNo" open="(" separator="," close=")">
             #{ownerOrderNo}
         </foreach>
@@ -197,5 +197,4 @@
         )
         and is_delete = 0
     </select>
-
 </mapper>

@@ -163,12 +163,16 @@ public class DebtService {
     }
 
     public Page<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req) {
-        PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<MemberDebtListReqDTO> debtByMemberNoList = transSupplementDetailMapper.findDebtByMemberNoList(req);
         if(CollectionUtils.isEmpty(debtByMemberNoList)){
             debtByMemberNoList = transSupplementDetailMapper.findMemberList(req);
         }
-        return new Page<>(debtByMemberNoList);
+        Page<MemberDebtListReqDTO> objectPage = new Page<>();
+        objectPage.setList(debtByMemberNoList);
+        objectPage.setPageNum(req.getPageNum());
+        objectPage.setPageSize(req.getPageSize());
+        objectPage.setTotal(transSupplementDetailMapper.countTotal(req));
+        return objectPage;
 
     }
 }
