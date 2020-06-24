@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.delivery;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import lombok.Data;
 import lombok.ToString;
@@ -26,4 +27,8 @@ public class OrderDeliveryVO implements Serializable {
      * 租客配送地址信息
      */
     private RenterDeliveryAddrDTO renterDeliveryAddrDTO;
+    /*
+    * 租客商品信息
+    * */
+    private RenterGoodsDetailDTO renterGoodsDetailDTO;
 }
