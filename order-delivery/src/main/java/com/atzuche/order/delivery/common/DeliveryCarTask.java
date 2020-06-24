@@ -63,41 +63,37 @@ public class DeliveryCarTask {
     /**
      * 添加订单到仁云流程系统
      */
-    //@Async
-    public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
-        try{
-            //追加参数
-            appendRenyunrenYunFlowOrderDTOParam(renYunFlowOrderDTO);
-            // 追加参数
-            renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
-            String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
-            log.info("添加订单到仁云流程系统addRenYunFlowOrderInfo,renYunFlowOrderDTO={},result={}", JSON.toJSONString(renYunFlowOrderDTO),result);
-            if (StringUtils.isBlank(result)) {
-                sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
-            }
-        }catch (Exception e){
-            log.error("添加仁云流程系统异常",e);
-        }
 
+    public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
+        // 追加参数
+        renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
+        addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
+    }
+    @Async
+    public void addRenYunFlowOrderInfoproxy(RenYunFlowOrderDTO renYunFlowOrderDTO){
+        String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+        log.info("添加订单到仁云流程系统addRenYunFlowOrderInfo,renYunFlowOrderDTO={},result={}", JSON.toJSONString(renYunFlowOrderDTO),result);
+        if (StringUtils.isBlank(result)) {
+            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
+        }
     }
 
     /**
      * 更新订单到仁云流程系统
      */
-    //@Async
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        try{
-            appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);//添加参数化
-            String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
-            log.info("更新仁云流程系统updateRenYunFlowOrderInfo，updateFlowOrderDTO={},result={}",JSON.toJSONString(updateFlowOrderDTO),result);
-            if (StringUtils.isBlank(result)) {
-                sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
-            }
-        }catch (Exception e){
-            log.error("更新仁云流程系统异常",e);
-        }
-
+        appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);//添加参数化
+        updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
     }
+    @Async
+    public void updateRenYunFlowOrderInfoProxy(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
+        log.info("更新仁云流程系统updateRenYunFlowOrderInfo，updateFlowOrderDTO={},result={}",JSON.toJSONString(updateFlowOrderDTO),result);
+        if (StringUtils.isBlank(result)) {
+            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
+        }
+    }
+
     /**
      * 实时更新订单信息到流程系统
      */
@@ -201,20 +197,12 @@ public class DeliveryCarTask {
     	if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
             renYunFlowOrderDTO.setSceneName(OrderScenesSourceEnum.getOrderScenesSource(renYunFlowOrderDTO.getSceneName()));
         }
-    	return renYunFlowOrderDTO;
-    }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/6/24 14:54
-     * @Description: 追加参数
-     *
-     **/
-    public void appendRenyunrenYunFlowOrderDTOParam(RenYunFlowOrderDTO renYunFlowOrderDTO){
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renYunFlowOrderDTO.getOrdernumber());
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
         renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
         log.info("推送仁云子订单号renterOrderNo={}",renterOrderEntity.getRenterOrderNo());
+    	return renYunFlowOrderDTO;
     }
+
     /*
      * @Author ZhangBin
      * @Date 2020/6/24 14:54
