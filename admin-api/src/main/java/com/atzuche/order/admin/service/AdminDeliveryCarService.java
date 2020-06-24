@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service;
 
+import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.filter.CityLonLatFilter;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.OrderReqContext;
@@ -137,6 +138,8 @@ public class AdminDeliveryCarService {
             modifyOrderReqVO.setRevertCarLon(deliveryCarVO.getReturnHandoverCarDTO().getRenterRealReturnLng());
         }
         modifyOrderReqVO.setSrvGetFlag(deliveryCarVO.getIsGetCar());
+        modifyOrderReqVO.setConsoleFlag(true);
+        modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         modifyOrderReqVO.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
         modifyOrderReqVO.setDistributionMode(deliveryCarVO.getDistributionMode());
         return modifyOrderReqVO;
