@@ -81,8 +81,9 @@ public class RenYunDeliveryCarService {
     public String changeRenYunFlowOrderInfo(ChangeOrderInfoDTO changeOrderInfoDTO) {
         try {
             String flowOrderMap = getFlowOrderMap(changeOrderInfoDTO);
+            log.info("changeRenYunFlowOrderInfo-flowOrderMap={}",flowOrderMap);
             String result = retryDeliveryCarService.sendHttpToRenYun(deliveryRenYunConfig.OTHER_CHANGE_FLOW_ORDER, flowOrderMap, DeliveryTypeEnum.CHANGE_TYPE.getValue().intValue());
-            log.info("changeRenYunFlowOrderInfo,url={}",deliveryRenYunConfig.OTHER_CHANGE_FLOW_ORDER);
+            log.info("changeRenYunFlowOrderInfo-url={}",deliveryRenYunConfig.OTHER_CHANGE_FLOW_ORDER);
             return result;
         } catch (Exception e) {
             log.error("changeRenYunFlowOrderInfo实时更新订单信息到流程系统失败，changeOrderInfoDTO={},失败原因：{}",changeOrderInfoDTO, e.getMessage());
