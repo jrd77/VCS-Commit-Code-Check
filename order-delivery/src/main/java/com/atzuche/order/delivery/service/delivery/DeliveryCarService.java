@@ -256,9 +256,6 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setReturnTime(orderDeliveryEntity.getRevertTime());
         orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryEntity.getRentTime(), DateUtils.DATE_DEFAUTE_1));
         orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryEntity.getRevertTime(), DateUtils.DATE_DEFAUTE_1));
-        orderDeliveryFlowEntity.setCarGuideDayPrice();
-        orderDeliveryFlowEntity.setRentAmt();
-
         return orderDeliveryFlowEntity;
     }
 
