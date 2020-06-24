@@ -43,5 +43,5 @@ dependencies {
     compile project(":order-mq")
     compile project(":order-core-all:renter-all:renter-commodity")
     compile project(":order-core-all:renter-all:renter-order")
-
+    compile project(":order-core-all:parent-order")
 }
