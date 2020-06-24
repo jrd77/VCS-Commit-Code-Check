@@ -410,6 +410,7 @@ public class DeliveryCarService {
         orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
+        orderDeliveryVO.setRenterGoodsDetailDTO(orderReqContext.getRenterGoodsDetailDto());
         return orderDeliveryVO;
     }
 
