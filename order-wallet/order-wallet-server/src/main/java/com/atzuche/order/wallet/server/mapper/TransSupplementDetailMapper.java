@@ -33,4 +33,5 @@ public interface TransSupplementDetailMapper {
     List<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req);
 
     List<MemberDebtListReqDTO> findMemberList(MemberDebtListReqDTO req);
+    long countTotal(MemberDebtListReqDTO req);
 }

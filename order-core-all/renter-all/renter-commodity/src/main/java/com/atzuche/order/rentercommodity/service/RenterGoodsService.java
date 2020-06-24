@@ -129,6 +129,10 @@ public class RenterGoodsService{
         return renterGoodsMapper.queryInfoByOrderNo(orderNo);
     }
 
+    public RenterGoodsEntity queryByOrderNoAndPlatNum(String orderNo,String platNum){
+        return renterGoodsMapper.queryByOrderNoAndPlatNum(orderNo,platNum);
+    }
+
 
     @Data
     public static class JSONStr{

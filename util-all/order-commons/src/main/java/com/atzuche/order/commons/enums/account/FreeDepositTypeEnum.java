@@ -34,7 +34,7 @@ public enum FreeDepositTypeEnum {
     public static FreeDepositTypeEnum getFreeDepositTypeEnumByCode(Integer code) {
 
         for (FreeDepositTypeEnum freeDepositTypeEnum : FreeDepositTypeEnum.values()) {
-            if(freeDepositTypeEnum.getCode() == code) {
+            if(freeDepositTypeEnum.getCode().equals(code)) {
                 return freeDepositTypeEnum;
             }
         }
