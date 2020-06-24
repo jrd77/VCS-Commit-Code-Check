@@ -277,8 +277,7 @@ public class DeliveryCarInfoPriceService {
                 return feeResult;
             }
             boolean isNotify = renterOrderDeliveryEntityList.parallelStream().anyMatch(renter -> renter.getIsNotifyRenyun().intValue() == 1);
-            if(isNotify)
-            {
+            if (isNotify) {
                 log.info("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
                 feeResult.setTotalFee(0);
                 feeResult.setUnitPrice(0);
