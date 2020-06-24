@@ -258,7 +258,6 @@ public class DeliveryCarInfoPriceService {
         CostBaseDTO costBaseDTO = mileageAmtDTO.getCostBaseDTO();
         if (costBaseDTO == null || costBaseDTO.getStartTime() == null) {
             log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
-            Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
             feeResult.setTotalFee(0);
             feeResult.setUnitPrice(0);
             return feeResult;
@@ -267,23 +266,19 @@ public class DeliveryCarInfoPriceService {
             List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(costBaseDTO.getOrderNo());
             if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
                 log.info("没有配送订单，获取不了相关的配送费用,orderNo:", costBaseDTO.getOrderNo());
-                Cat.logError("获取超里程费用renterOrderDeliveryEntityList对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用renterOrderDeliveryEntityList对象为空"));
                 feeResult.setTotalFee(0);
                 feeResult.setUnitPrice(0);
                 return feeResult;
             }
             if (renterOrderDeliveryEntityList.get(0).getIsNotifyRenyun().intValue() == 0 && renterOrderDeliveryEntityList.get(1).getIsNotifyRenyun().intValue() == 0) {
-                log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
-                Cat.logError("获取超里程费用mileageAmtDTO.ReturnMileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用ReturnMileage对象为空"));
+                log.info("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
                 feeResult.setTotalFee(0);
                 feeResult.setUnitPrice(0);
                 return feeResult;
             }
             boolean isNotify = renterOrderDeliveryEntityList.parallelStream().anyMatch(renter -> renter.getIsNotifyRenyun().intValue() == 1);
-            if(isNotify)
-            {
-                log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
-                Cat.logError("获取超里程费用mileageAmtDTO.ReturnMileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用ReturnMileage对象为空"));
+            if (isNotify) {
+                log.info("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
                 feeResult.setTotalFee(0);
                 feeResult.setUnitPrice(0);
                 return feeResult;
