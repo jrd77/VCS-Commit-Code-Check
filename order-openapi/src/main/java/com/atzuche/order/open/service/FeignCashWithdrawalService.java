@@ -5,6 +5,8 @@ import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
+import com.atzuche.order.commons.vo.res.account.income.AcctOwnerWithdrawalRuleResVO;
 import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -39,4 +41,8 @@ public interface FeignCashWithdrawalService {
 	 */
 	@PostMapping("/debt/queryList")
 	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req);
+
+
+    @PostMapping("/account/withdraw/pre/rule")
+    public ResponseData<AcctOwnerWithdrawalRuleResVO> getAcctOwnerWithdrawalRule(@RequestBody AcctOwnerWithdrawalRuleReqVO req);
 }

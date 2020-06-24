@@ -28,6 +28,11 @@ public class AccountOwnerIncomeEntity implements Serializable {
 	 * 收益总金额
 	 */
 	private Integer incomeAmt;
+
+    /**
+     * 上海二清收益总金额
+     */
+	private Integer secondaryIncomeAmt;
 	/**
 	 * 更新版本号
 	 */

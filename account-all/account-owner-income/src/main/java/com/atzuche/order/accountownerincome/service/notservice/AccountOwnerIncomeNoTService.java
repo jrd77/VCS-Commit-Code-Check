@@ -5,6 +5,7 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeDetailMapper;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeMapper;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeDetailType;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
@@ -52,13 +53,12 @@ public class AccountOwnerIncomeNoTService {
     }
 
     public AccountOwnerIncomeEntity getOwnerIncomeByMemNO(String memNo) {
-        if(Objects.isNull(memNo)){
-            Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
-        }
+        Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
         if(Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())){
             accountOwnerIncome = new AccountOwnerIncomeEntity();
-            accountOwnerIncome.setIncomeAmt(0);
+            accountOwnerIncome.setIncomeAmt(OrderConstant.ZERO);
+            accountOwnerIncome.setSecondaryIncomeAmt(OrderConstant.ZERO);
         }
         return accountOwnerIncome;
     }
