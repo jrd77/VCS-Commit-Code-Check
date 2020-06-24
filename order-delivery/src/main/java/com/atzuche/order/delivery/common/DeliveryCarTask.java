@@ -64,7 +64,7 @@ public class DeliveryCarTask {
      */
     @Async
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
-    	//追加咱叔
+    	//追加参数
         appendRenyunrenYunFlowOrderDTOParam(renYunFlowOrderDTO);
         // 追加参数
     	renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
@@ -201,7 +201,7 @@ public class DeliveryCarTask {
     public void appendRenyunrenYunFlowOrderDTOParam(RenYunFlowOrderDTO renYunFlowOrderDTO){
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renYunFlowOrderDTO.getOrdernumber());
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
-        renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(renterOrderCostEntity.getRentCarAmount()));
+        renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
     }
     /*
      * @Author ZhangBin
@@ -213,7 +213,7 @@ public class DeliveryCarTask {
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updateFlowOrderDTO.getOrdernumber());
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-        updateFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(renterOrderCostEntity.getRentCarAmount()));
+        updateFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
         updateFlowOrderDTO.setDayUnitPrice(renterGoodsDetail.getCarGuideDayPrice()==null?"":String.valueOf(renterGoodsDetail.getCarGuideDayPrice()));
     }
 }
