@@ -992,6 +992,18 @@ public class RemoteFeignService {
         }
     }
 
+
+    /**
+     * 管理后台修改时间校验接口
+     * @param modifyOrderConsoleCheckReq
+     * @return ResponseData
+     */
+    public ResponseData modifyOrderCheckForConsole(ModifyOrderConsoleCheckReq modifyOrderConsoleCheckReq) {
+        log.info("Feign 修改时间校验,modifyOrderConsoleCheckReq={}", JSON.toJSONString(modifyOrderConsoleCheckReq));
+        ResponseData<?> responseObject = feignOrderModifyService.modifyOrderCheckForConsole(modifyOrderConsoleCheckReq);
+        return responseObject;
+    }
+
     public RenterGoodsDetailDTO getRenterGoodsFromRemot(String renterOrderNo,boolean isNeedPrice){
         ResponseData<RenterGoodsDetailDTO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客商品信息");
@@ -1033,5 +1045,4 @@ public class RemoteFeignService {
             t.complete();
         }
     }
-
 }

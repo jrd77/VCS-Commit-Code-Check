@@ -93,6 +93,10 @@ public class ModifyOrderCheckService {
 			// 扫码还车不校验
 			return;
 		}
+		// 超级权限不需要校验时间
+		if (modifyOrderDTO.getSuperPowerFlag() != null && modifyOrderDTO.getSuperPowerFlag().intValue() == 1) {
+			return;
+		}
 		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
 		orderInfoDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		orderInfoDTO.setCityCode(modifyOrderDTO.getCityCode() != null ? Integer.valueOf(modifyOrderDTO.getCityCode()):null);
@@ -137,10 +141,13 @@ public class ModifyOrderCheckService {
 		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
 		// 校验是否修改数据
 		checkDataChange(changeItemList);
-		// 校验时间
-		checkTime(modifyOrderDTO);
-		// 长租校验
-		checkLongRent(modifyOrderDTO);
+		// 超级权限不需要校验时间
+		if (modifyOrderDTO.getSuperPowerFlag() == null || modifyOrderDTO.getSuperPowerFlag().intValue() != 1) {
+			// 校验时间
+			checkTime(modifyOrderDTO);
+			// 长租校验
+			checkLongRent(modifyOrderDTO);
+		}
 		// 主订单信息
 		OrderEntity orderEntity = modifyOrderDTO.getOrderEntity();
 		// 校验主订单
@@ -218,14 +225,13 @@ public class ModifyOrderCheckService {
 		LocalDateTime now = LocalDateTime.now();
 		// 修改项目
 		List<OrderChangeItemDTO> changeItemList = modifyOrderDTO.getChangeItemList();
-		checkDataChange(changeItemList);
 		// 主订单信息
 		OrderEntity orderEntity = modifyOrderDTO.getOrderEntity();
 		checkParentOrder(orderEntity);
 		// 修改前取车时间
 		LocalDateTime initRentTime = orderEntity.getExpRentTime();
 		List<String> changeCodeList = modifyOrderConfirmService.listChangeCode(changeItemList);
-		if (changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())) {
+		if (changeCodeList != null && changeCodeList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())) {
 			if (initRentTime != null && initRentTime.isBefore(now)) {
 				throw new ModifyOrderRentOrRevertTimeException("订单开始不能修改取车时间");
 			}
@@ -414,5 +420,17 @@ public class ModifyOrderCheckService {
                 throw e;
             }
         }
+	}
+	
+	
+	/**
+	 * 管理后台修改时间校验
+	 * @param modifyOrderDTO
+	 */
+	public void checkForConsole(ModifyOrderDTO modifyOrderDTO) {
+		// 校验时间
+		checkTime(modifyOrderDTO);
+		// 长租校验
+		checkLongRent(modifyOrderDTO);
 	}
 }

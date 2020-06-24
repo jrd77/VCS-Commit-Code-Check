@@ -557,7 +557,12 @@ public class ModifyOrderConfirmService {
 			// 长租订单
 			orderInfoDTO.setLongRent(1);
 		}
-		stockService.cutCarStock(orderInfoDTO);
+		// 超级权限
+		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			stockService.cutCarStockForSuperPower(orderInfoDTO);
+		} else {
+			stockService.cutCarStock(orderInfoDTO);
+		}
 	}
 	
 	/**
