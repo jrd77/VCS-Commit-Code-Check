@@ -346,7 +346,7 @@ public class DeliveryCarInfoService {
             if(renterGoodsDetailDTO != null){
                 mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType()==null?null:renterGoodsDetailDTO.getCarOwnerType());
                 mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage()==null?null:renterGoodsDetailDTO.getCarDayMileage());
-                mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?null:renterGoodsDetailDTO.getCarDayMileage());
+                mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?null:renterGoodsDetailDTO.getCarGuideDayPrice());
             }
             if(ownerGetAndReturnCarDTO != null){
                 mileageAmtDTO.setGetmileage(ownerGetAndReturnCarDTO.getGetKM()==null?null:Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
@@ -356,6 +356,7 @@ public class DeliveryCarInfoService {
             if(renterOrderDelivery != null){
                 costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
                 costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+                costBaseDTO.setOrderNo(renterOrderDelivery.getOrderNo());
             }
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();

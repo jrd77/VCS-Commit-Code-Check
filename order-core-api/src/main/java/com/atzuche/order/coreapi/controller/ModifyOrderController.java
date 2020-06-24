@@ -9,6 +9,7 @@ import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.commons.vo.req.ModifyOrderConsoleCheckReq;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
@@ -69,6 +70,8 @@ public class ModifyOrderController {
     private OrderCouponService orderCouponService;
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private ModifyOrderCommonService modifyOrderCommonService;
     /**
 	 * 修改订单（APP端或H5端）
 	 * @param modifyOrderAppReq
@@ -317,5 +320,25 @@ public class ModifyOrderController {
             orderCouponDTOS.add(orderCouponDTO);
         });
         return ResponseData.success(orderCouponDTOS);
+    }
+    
+    
+    /**
+     * 管理后台修改时间检验
+     * @param modifyOrderReq
+     * @param bindingResult
+     * @return ResponseData
+     */
+    @PostMapping("/order/modifyconsole/check")
+    public ResponseData<?> checkForConsole(@Valid @RequestBody ModifyOrderConsoleCheckReq modifyOrderConsoleCheckReq, BindingResult bindingResult) {
+        log.info("管理后台修改时间检验modifyOrderConsoleCheckReq=[{}] ", modifyOrderConsoleCheckReq);
+		BindingResultUtil.checkBindingResult(bindingResult);
+		String memNo = renterMemberService.getRenterNoByOrderNo(modifyOrderConsoleCheckReq.getOrderNo());
+		// 属性拷贝
+		ModifyOrderReq modifyOrderReq = new ModifyOrderReq();
+		BeanUtils.copyProperties(modifyOrderConsoleCheckReq, modifyOrderReq);
+		modifyOrderReq.setMemNo(memNo);
+		modifyOrderCommonService.checkForConsole(modifyOrderReq);
+        return ResponseData.success();
     }
 }
