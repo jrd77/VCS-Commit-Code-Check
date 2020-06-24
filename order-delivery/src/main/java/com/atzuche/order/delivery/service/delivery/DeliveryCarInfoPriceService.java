@@ -279,6 +279,15 @@ public class DeliveryCarInfoPriceService {
                 feeResult.setUnitPrice(0);
                 return feeResult;
             }
+            boolean isNotify = renterOrderDeliveryEntityList.parallelStream().anyMatch(renter -> renter.getIsNotifyRenyun().intValue() == 1);
+            if(isNotify)
+            {
+                log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
+                Cat.logError("获取超里程费用mileageAmtDTO.ReturnMileage对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(), "获取超里程费用ReturnMileage对象为空"));
+                feeResult.setTotalFee(0);
+                feeResult.setUnitPrice(0);
+                return feeResult;
+            }
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);
