@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.entity.dto.SectionParamDTO;
+import com.atzuche.order.commons.entity.dto.SectionProposaltimeDTO;
 import com.atzuche.order.commons.entity.dto.TransProgressDTO;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
@@ -37,6 +39,7 @@ import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.delivery.entity.TransSimpleMode;
 import com.atzuche.order.delivery.mapper.RenterOrderDeliveryModeMapper;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +52,8 @@ public class RenterOrderDeliveryModeService {
 	@Autowired
 	private RenterOrderDeliveryService renterOrderDeliveryService;
 	@Autowired
+	private RenterOrderService renterOrderService;
+	@Autowired
 	private CityConfigSDK cityConfigSDK;
 	@Autowired
 	private SysConfigSDK sysConfigSDK;
@@ -59,6 +64,43 @@ public class RenterOrderDeliveryModeService {
 	
 	public int saveRenterOrderDeliveryMode(RenterOrderDeliveryMode renterOrderDeliveryMode) {
 		return renterOrderDeliveryModeMapper.insertSelective(renterOrderDeliveryMode);
+	}
+	
+	/**
+	 * 更新建议时间
+	 * @param req
+	 * @return int
+	 */
+	public int updateRenterOrderDeliveryMode(SectionProposaltimeDTO req) {
+		if (req == null || StringUtils.isBlank(req.getOrderNo())) {
+			return 0;
+		}
+		// 获取有效的租客子订单
+    	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(req.getOrderNo());
+		if (renterOrderEntity == null) {
+			return 0;
+		}
+		RenterOrderDeliveryMode mode = getDeliveryModeByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+    	if (mode == null) {
+    		return 0;
+    	}
+		RenterOrderDeliveryMode renterOrderDeliveryMode = new RenterOrderDeliveryMode();
+		renterOrderDeliveryMode.setOrderNo(req.getOrderNo());
+		renterOrderDeliveryMode.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+		renterOrderDeliveryMode.setId(mode.getId());
+		if (StringUtils.isNotBlank(req.getOwnerProposalGetTime())) {
+			renterOrderDeliveryMode.setOwnerProposalGetTime(DateUtils.parseDate(req.getOwnerProposalGetTime(), DateUtils.DATE_DEFAUTE1));
+		}
+		if (StringUtils.isNotBlank(req.getOwnerProposalReturnTime())) {
+			renterOrderDeliveryMode.setOwnerProposalReturnTime(DateUtils.parseDate(req.getOwnerProposalReturnTime(), DateUtils.DATE_DEFAUTE1));
+		}
+		if (StringUtils.isNotBlank(req.getRenterProposalGetTime())) {
+			renterOrderDeliveryMode.setRenterProposalGetTime(DateUtils.parseDate(req.getRenterProposalGetTime(), DateUtils.DATE_DEFAUTE1));
+		}
+		if (StringUtils.isNotBlank(req.getRenterProposalReturnTime())) {
+			renterOrderDeliveryMode.setRenterProposalReturnTime(DateUtils.parseDate(req.getRenterProposalReturnTime(), DateUtils.DATE_DEFAUTE1));
+		}
+		return renterOrderDeliveryModeMapper.updateByPrimaryKeySelective(renterOrderDeliveryMode);
 	}
 	
 	
