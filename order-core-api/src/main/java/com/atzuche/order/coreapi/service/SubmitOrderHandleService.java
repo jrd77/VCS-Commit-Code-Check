@@ -57,6 +57,8 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -292,7 +294,9 @@ public class SubmitOrderHandleService {
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        if (replyFlag) {
+        LocalDateTime rentTime = orderReqVO.getRentTime();
+
+        if (replyFlag && Duration.between(LocalDateTime.now(), rentTime).toHours() > 4) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());

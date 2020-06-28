@@ -79,8 +79,12 @@ public class RenterFeeCalculatorUtils {
 		feeResult.setUnitPrice(holidayAverage);
 		return feeResult;
 	}
-	
-	
+
+    public static void main(String[] args) {
+        Double rentDays = CommonUtils.getRentDays(LocalDateTime.of(2020,6,19,18,0,0),
+                LocalDateTime.of(2020,6,20,21,0,0), 8);
+        System.out.println(rentDays);
+    }
 	/**
 	 * 计算租金
 	 * @param rentTime 取车时间
