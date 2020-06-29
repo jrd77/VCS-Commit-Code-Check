@@ -36,6 +36,7 @@ import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -70,7 +71,9 @@ public class DeliveryOrderService {
 	private RenterOrderDeliveryService renterOrderDeliveryService;
 	@Autowired
 	private OrderCarTrusteeshipService orderCarTrusteeshipService;
-
+	@Autowired
+	private RenterGoodsService renterGoodsService;
+ 
 	/**
      * 获取配送相关信息
      * @param deliveryCarDTO
@@ -91,6 +94,17 @@ public class DeliveryOrderService {
         int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
         DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, isEscrowCar, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
         deliveryCarVO.setMaxOilNumber(String.valueOf(oilTotalCalibration));
+        // 获取商品信息
+        RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        if (carInfo.getCarAddrIndex() == null || carInfo.getCarAddrIndex().intValue() == 0) {
+        	// 非虚拟地址
+        	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
+        	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
+        } else {
+        	// 虚拟地址
+        	deliveryCarVO.setGetCarShowAddr(carInfo.getCarShowAddr());
+        	deliveryCarVO.setReturnCarShowAddr(carInfo.getCarShowAddr());
+        }
         return deliveryCarVO;
     }
     

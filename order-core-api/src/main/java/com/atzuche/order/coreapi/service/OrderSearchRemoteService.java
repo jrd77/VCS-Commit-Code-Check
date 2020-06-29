@@ -454,7 +454,7 @@ public class OrderSearchRemoteService {
             wzillegalVO.setIllegalTime(x.getIllegalTime() != null ? DateUtils.formate(x.getIllegalTime(), DateUtils.DATE_DEFAUTE) : "");
             wzillegalVO.setIllegalAddr(x.getIllegalAddr());
             wzillegalVO.setIllegalReason(x.getIllegalReason());
-            wzillegalVO.setIllegalFine(x.getIllegalFine());
+            wzillegalVO.setIllegalFine(x.getIllegalAmt());
             wzillegalVO.setIllegalDeduct(x.getIllegalDeduct());
             wzillegalVO.setIllegalStatus(x.getIllegalStatus());
             return wzillegalVO;

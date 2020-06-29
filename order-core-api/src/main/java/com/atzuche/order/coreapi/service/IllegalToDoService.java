@@ -136,7 +136,7 @@ public class IllegalToDoService {
                         String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                                 detail.getIllegalAddr(),
                                 detail.getIllegalReason(),
-                                detail.getIllegalAmt()==null?0:Integer.valueOf(detail.getIllegalAmt()),
+                                detail.getIllegalAmt(),
                                 detail.getIllegalDeduct(),
                                 detail.getIllegalStatus());
                         entity.setOrderNo(detail.getOrderNo());
@@ -174,7 +174,7 @@ public class IllegalToDoService {
                             String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(detail.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                                     detail.getIllegalAddr(),
                                     detail.getIllegalReason(),
-                                    detail.getIllegalAmt()==null?0:Integer.valueOf(detail.getIllegalAmt()),
+                                    detail.getIllegalAmt(),
                                     detail.getIllegalDeduct(),
                                     detail.getIllegalStatus());
                             entity.setOrderNo(detail.getOrderNo());

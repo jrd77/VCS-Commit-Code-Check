@@ -410,6 +410,7 @@ public class DeliveryCarService {
         orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
+        orderDeliveryVO.setRenterGoodsDetailDTO(orderReqContext.getRenterGoodsDetailDto());
         return orderDeliveryVO;
     }
 
@@ -481,7 +482,7 @@ public class DeliveryCarService {
         }
         if (2 != type) {
             orderDelivery.setStatus(3);
-            orderDelivery.setIsNotifyRenyun(0);
+           // orderDelivery.setIsNotifyRenyun(0);
         }
         orderDelivery.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDelivery);

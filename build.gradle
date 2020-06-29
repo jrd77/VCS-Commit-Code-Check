@@ -52,7 +52,7 @@ subprojects {
 
 
         compile('org.springframework.boot:spring-boot-starter-actuator')
-        compile "com.autoyol:auto-web-starter:1.0-SNAPSHOT"
+        compile "com.autoyol:auto-web-starter:1.1-SNAPSHOT"
         compile 'org.springframework.boot:spring-boot-starter-web'
         compile('org.springframework.boot:spring-boot-starter-actuator')
         compile('org.springframework.boot:spring-boot-starter-aop')

@@ -6,6 +6,7 @@ package com.atzuche.order.open.service;
 import com.atzuche.order.commons.entity.dto.ModifyOrderConsoleDTO;
 import com.atzuche.order.commons.entity.dto.OrderTransferRecordDTO;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
+import com.atzuche.order.commons.vo.req.ModifyOrderConsoleCheckReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderMainQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
@@ -97,4 +98,7 @@ public interface FeignOrderModifyService {
 	 */
 	@GetMapping("/order/carplatenum/get")
     public ResponseData<String> getCarPlateNum(@RequestParam(value="orderNo",required = true) String orderNo);
+	
+	@PostMapping("/order/modifyconsole/check")
+    ResponseData<?> modifyOrderCheckForConsole(@Valid @RequestBody ModifyOrderConsoleCheckReq modifyOrderConsoleCheckReq);
 }

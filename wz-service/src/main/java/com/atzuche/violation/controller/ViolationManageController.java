@@ -209,7 +209,7 @@ public class ViolationManageController {
             String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(entity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                     entity.getIllegalAddr(),
                     entity.getIllegalReason(),
-                    entity.getIllegalAmt()==null?0:Integer.valueOf(entity.getIllegalAmt()),
+                    entity.getIllegalAmt(),
                     entity.getIllegalDeduct(),
                     entity.getIllegalStatus());
             renterOrderWzDetailLogEntity.setOrderNo(entity.getOrderNo());
@@ -245,7 +245,7 @@ public class ViolationManageController {
             String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(entity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),
                     entity.getIllegalAddr(),
                     entity.getIllegalReason(),
-                    entity.getIllegalAmt()==null?0:Integer.valueOf(entity.getIllegalAmt()),
+                    entity.getIllegalAmt(),
                     entity.getIllegalDeduct(),
                     entity.getIllegalStatus());
             renterOrderWzDetailLogEntity.setOrderNo(entity.getOrderNo());

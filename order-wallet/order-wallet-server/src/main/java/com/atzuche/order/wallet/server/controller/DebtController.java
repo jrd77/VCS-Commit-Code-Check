@@ -1,13 +1,13 @@
 package com.atzuche.order.wallet.server.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
-import com.atzuche.order.wallet.api.DeductBalanceVO;
 import com.atzuche.order.wallet.api.DeductDebtVO;
-import com.atzuche.order.wallet.api.MemBalanceVO;
 import com.atzuche.order.wallet.api.MemDebtVO;
 import com.atzuche.order.wallet.server.service.DebtService;
+import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,5 +63,16 @@ public class DebtController {
     public ResponseData<DebtDetailVO> getDebtDetailVO(@RequestParam("memNo")String memNo){
     	DebtDetailVO debtDetailVO = debtService.getDebtDetailVO(memNo);
         return ResponseData.success(debtDetailVO);
+    }
+
+    /**
+     * 返回有欠款的用户
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
+    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req){
+        Page<MemberDebtListReqDTO> debtByMemberNoList = debtService.findDebtByMemberNoList(req);
+        return ResponseData.success(debtByMemberNoList);
     }
 }

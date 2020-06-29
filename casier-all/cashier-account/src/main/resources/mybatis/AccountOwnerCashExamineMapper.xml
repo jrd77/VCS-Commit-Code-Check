@@ -434,6 +434,7 @@
     from account_owner_cash_examine
     where mem_no = #{memNo}
     and is_delete = 0
+    order by id desc
   </select>
   
   <select id="getCountByMemNoAndDateTime" resultType="Integer">
