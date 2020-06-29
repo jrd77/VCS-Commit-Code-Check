@@ -45,6 +45,7 @@ public class SubmitOrderInitContextService {
         //1.请求参数处理
         OrderReqContext reqContext = new OrderReqContext();
         orderReqVO.setReqTime(LocalDateTime.now());
+        orderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         reqContext.setOrderReqVO(orderReqVO);
         //租客会员信息
         RenterMemberDTO renterMemberDTO =
