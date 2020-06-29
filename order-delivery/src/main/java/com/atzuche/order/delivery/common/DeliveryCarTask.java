@@ -26,6 +26,8 @@ import com.atzuche.order.delivery.vo.delivery.CancelOrderDeliveryVO;
 import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
+import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
@@ -360,7 +362,7 @@ public class DeliveryCarTask {
      *
      **/
     public void appendRenyunUpdateFlowOrderParam(UpdateFlowOrderDTO updateFlowOrderDTO){
-        orderEntity orderEntity = orderService.getOrderEntity(updateFlowOrderDTO.getOrdernumber());
+        OrderEntity orderEntity = orderService.getOrderEntity(updateFlowOrderDTO.getOrdernumber());
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updateFlowOrderDTO.getOrdernumber());
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
