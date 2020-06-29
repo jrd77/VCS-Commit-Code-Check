@@ -33,6 +33,11 @@ public class WzQueryDayConfService {
         return wzQueryDayConfMapper.queryList();
     }
 
+    public WzQueryDayConfEntity queryListByCityCode(String cityCode){
+        return wzQueryDayConfMapper.queryListByCityCode(cityCode);
+    }
+
+
     public Map<Integer, List<Integer>> convertCityByList(List<WzQueryDayConfEntity> list) {
         Map<Integer, List<Integer>> map = new HashMap<>(16);
         if (list == null || list.size() == 0) {
