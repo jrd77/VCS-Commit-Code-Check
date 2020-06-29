@@ -63,6 +63,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -238,10 +239,15 @@ public class SubmitOrderService {
         //6.3主订单状态信息(统计信息)处理
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
-        } else {
+
+        boolean replyFlag = null != context.getRenterGoodsDetailDto().getReplyFlag() &&
+                context.getRenterGoodsDetailDto().getReplyFlag() == OrderConstant.YES;
+        LocalDateTime rentTime = orderReqVO.getRentTime();
+
+        if (replyFlag && (context.getRenterGoodsDetailDto().getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= context.getRenterGoodsDetailDto().getAdvanceOrderTime())) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+        } else {
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
 

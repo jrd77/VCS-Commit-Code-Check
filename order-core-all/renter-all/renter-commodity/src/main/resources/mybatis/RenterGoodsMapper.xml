@@ -54,6 +54,7 @@
         <result property="choiceCar" column="choice_car"/>
         <result property="sucessRate" column="sucess_rate"/>
         <result property="inspectExpire" column="inspect_expire"/>
+        <result property="advanceOrderTime" column="advance_order_time"/>
         <result property="dangerCount" column="danger_count"/>
         <result property="premiumMoney" column="premium_money"/>
         <result property="lastMileage" column="last_mileage"/>
@@ -116,6 +117,7 @@
 	`choice_car`,
 	`sucess_rate`,
 	`inspect_expire`,
+	`advance_order_time`,
 	`danger_count`,
 	`premium_money`,
 	`last_mileage`,
@@ -184,6 +186,7 @@
         `choice_car`,
         `sucess_rate`,
         `inspect_expire`,
+        `advance_order_time`,
         `danger_count`,
         `premium_money`,
         `last_mileage`,
@@ -241,6 +244,7 @@
         #{choiceCar},
         #{sucessRate},
         #{inspectExpire},
+        #{advanceOrderTime},
         #{dangerCount},
         #{premiumMoney},
         #{lastMileage},
@@ -301,6 +305,7 @@
             <if test="choiceCar != null">`choice_car`, </if>
             <if test="sucessRate != null">`sucess_rate`, </if>
             <if test="inspectExpire != null">`inspect_expire`, </if>
+            <if test="advanceOrderTime != null">`advance_order_time`, </if>
             <if test="dangerCount != null">`danger_count`, </if>
             <if test="premiumMoney != null">`premium_money`, </if>
             <if test="lastMileage != null">`last_mileage`, </if>
@@ -357,6 +362,7 @@
             <if test="choiceCar != null">#{choiceCar},  </if>
             <if test="sucessRate != null">#{sucessRate},  </if>
             <if test="inspectExpire != null">#{inspectExpire},  </if>
+            <if test="advanceOrderTime != null">#{advanceOrderTime},  </if>
             <if test="dangerCount != null">#{dangerCount},  </if>
             <if test="premiumMoney != null">#{premiumMoney},  </if>
             <if test="lastMileage != null">#{lastMileage}, </if>
@@ -417,6 +423,7 @@
             <if test="updateTime != null">`update_time` = #{updateTime}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
+            <if test="advanceOrderTime != null">`advance_order_time` = #{advanceOrderTime}, </if>
             <if test="dangerCount != null">`danger_count` = #{dangerCount}, </if>
             <if test="premiumMoney != null">`premium_money` = #{premiumMoney}, </if>
             <if test="lastMileage != null">`last_mileage` = #{lastMileage}, </if>
@@ -468,6 +475,7 @@
             `oil_total_calibration` = #{oilTotalCalibration}
             `stop_cost_rate` = #{stopCostRate},
             `inspect_expire` = #{inspectExpire},
+            `advance_order_time` = #{advanceOrderTime},
             `danger_count` = #{dangerCount},
             `premium_money` = #{premiumMoney},
             `engine_source` = #{engineSource},

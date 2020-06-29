@@ -360,4 +360,6 @@ public class RenterGoodsDetailDTO {
      */
     @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租")
     private Integer orderType;
+    @AutoDocProperty("租客提前下单时间（小时）")
+    private Integer advanceOrderTime;
 }

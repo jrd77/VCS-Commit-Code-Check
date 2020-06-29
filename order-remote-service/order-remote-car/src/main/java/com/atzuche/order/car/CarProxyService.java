@@ -9,12 +9,14 @@ import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
+import com.atzuche.order.commons.enums.OrderCategoryEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.car.api.feign.api.CarDetailQueryFeignApi;
 import com.autoyol.car.api.model.dto.OrderCarInfoParamDTO;
 import com.autoyol.car.api.model.vo.*;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.Data;
@@ -50,6 +52,7 @@ public class CarProxyService {
         private boolean useSpecialPrice;
         private LocalDateTime rentTime;
         private LocalDateTime revertTime;
+        private String orderCategory;
     }
 
     @Data
@@ -233,13 +236,20 @@ public class CarProxyService {
             renterGoodsDetailDto.setPremiumMoney(carBaseVO.getPremiumMoney());
             renterGoodsDetailDto.setLongRentVerifyStatus(carBaseVO.getLongRentVerifyStatus());
             renterGoodsDetailDto.setOrderType(carBaseVO.getOrderType());
+            TransReplyVO transReplyVO = null;
+            if(OrderCategoryEnum.SHORT_ORDER.getCategory().equals(reqVO.getOrderCategory())){
+               transReplyVO = carBaseVO.getTransReplyVO();
+            }else if(OrderCategoryEnum.LONG_ORDER.getCategory().equals(reqVO.getOrderCategory())){
+                transReplyVO = carBaseVO.getLongRentTransReplyVO();
+            }
+            renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
+            renterGoodsDetailDto.setAdvanceOrderTime(transReplyVO ==null || transReplyVO.getAdvanceOrderTime() == null ? null: transReplyVO.getAdvanceOrderTime());
         }
 
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
-        TransReplyVO transReplyVO = carBaseVO==null?null:carBaseVO.getTransReplyVO();
-        renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
+
         renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
 
         renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));

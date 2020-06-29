@@ -220,6 +220,10 @@ public class RenterGoodsEntity implements Serializable {
 	 */
 	private LocalDate inspectExpire;
     /**
+     * 租客提前下单时间（小时）
+     */
+    private Integer advanceOrderTime;
+    /**
      * 出险次数
      */
     private Integer dangerCount;

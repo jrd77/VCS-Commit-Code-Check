@@ -349,4 +349,6 @@ public class OwnerGoodsDetailDTO {
      */
     @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租(关闭长租上架)；4为打开长租上架且暂不开启长租")
     private java.lang.Integer orderType;
+    @AutoDocProperty("租客提前下单时间（小时）")
+    private Integer advanceOrderTime;
 }
