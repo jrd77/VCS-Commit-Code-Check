@@ -431,8 +431,12 @@ public class ModificationOrderService {
 				CompareBeanUtils<ModifyOrderReqVO> compareBeanUtils = CompareBeanUtils.newInstance(oldObj, modifyOrderReqVO);
 				desc = compareBeanUtils.compare();
 			}
-			// 保存
-			adminLogService.insertLog(AdminOpTypeEnum.CHANGE_ODER_REQ, modifyOrderReqVO.getOrderNo(), desc);
+			if (modifyOrderReqVO.getSuperPowerFlag() != null && modifyOrderReqVO.getSuperPowerFlag().intValue() == 1) {
+				// 超级权限
+				adminLogService.insertLog(AdminOpTypeEnum.SUPERPOWER_CHANGE_ODER_REQ, modifyOrderReqVO.getOrderNo(), desc);
+			} else {
+				adminLogService.insertLog(AdminOpTypeEnum.CHANGE_ODER_REQ, modifyOrderReqVO.getOrderNo(), desc);
+			}
 		} catch (Exception e) {
 			log.error("管理后台保存修改订单操作日志异常  modifyOrderReqVO=[{}]", modifyOrderReqVO, e);
 		}

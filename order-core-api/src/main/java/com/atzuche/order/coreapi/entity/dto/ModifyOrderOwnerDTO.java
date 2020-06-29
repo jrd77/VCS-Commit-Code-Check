@@ -112,5 +112,9 @@ public class ModifyOrderOwnerDTO {
      * 长租优惠券码
      */
     private String longCouponCode;
+    /**
+	 * 是否超级权限，可以跳过校验：0-否，1-是
+	 */
+	private Integer superPowerFlag;
     
 }

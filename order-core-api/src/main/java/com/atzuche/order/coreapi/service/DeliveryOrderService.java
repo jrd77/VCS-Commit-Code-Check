@@ -43,6 +43,7 @@ import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
@@ -81,7 +82,9 @@ public class DeliveryOrderService {
 	private OrderCarTrusteeshipService orderCarTrusteeshipService;
 	@Autowired
 	private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
-
+	@Autowired
+	private RenterGoodsService renterGoodsService;
+ 
 	/**
      * 获取配送相关信息
      * @param deliveryCarDTO
@@ -105,6 +108,17 @@ public class DeliveryOrderService {
         // 获取区间配送信息
         RenterOwnerSummarySectionDeliveryVO summary = getRenterOwnerSummarySectionDeliveryVO(renterOrderEntity, deliveryCarVO);
         deliveryCarVO.setSectionDelivery(summary);
+        // 获取商品信息
+        RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        if (carInfo.getCarAddrIndex() == null || carInfo.getCarAddrIndex().intValue() == 0) {
+        	// 非虚拟地址
+        	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
+        	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
+        } else {
+        	// 虚拟地址
+        	deliveryCarVO.setGetCarShowAddr(carInfo.getCarShowAddr());
+        	deliveryCarVO.setReturnCarShowAddr(carInfo.getCarShowAddr());
+        }
         return deliveryCarVO;
     }
     

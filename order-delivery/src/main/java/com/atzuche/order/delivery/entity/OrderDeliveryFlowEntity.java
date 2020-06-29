@@ -111,6 +111,14 @@ public class OrderDeliveryFlowEntity implements Serializable {
 	 * 排量
 	 */
 	private String displacement;
+    /**
+     * 车辆日均指导价
+     */
+    private Integer carGuideDayPrice;
+    /**
+     * 租金
+     */
+    private Integer rentAmt;
 	/**
 	 * 交易来源 1：手机，2：网站，3：管理后台, 4:CP B2C, 5: CP UPOP，6：携程，7:返利网，8:机场租车,10:H5一键租车,12：凹凸微信,13：APP分享下单
 	 */

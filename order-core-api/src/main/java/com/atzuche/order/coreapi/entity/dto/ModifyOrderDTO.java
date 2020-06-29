@@ -181,4 +181,8 @@ public class ModifyOrderDTO {
 	 * 配送模式：0-区间配送，1-精准配送
 	 */
 	private Integer distributionMode;
+	/**
+	 * 是否超级权限，可以跳过校验：0-否，1-是
+	 */
+	private Integer superPowerFlag;
 }

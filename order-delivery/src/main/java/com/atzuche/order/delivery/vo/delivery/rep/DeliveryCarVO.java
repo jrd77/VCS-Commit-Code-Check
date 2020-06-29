@@ -32,5 +32,9 @@ public class DeliveryCarVO {
     private String maxOilNumber;
     @AutoDocProperty("区间配送信息")
     private RenterOwnerSummarySectionDeliveryVO sectionDelivery;
+    @AutoDocProperty("取车虚拟地址")
+    private String getCarShowAddr;
+    @AutoDocProperty("还车虚拟地址")
+    private String returnCarShowAddr;
 
 }

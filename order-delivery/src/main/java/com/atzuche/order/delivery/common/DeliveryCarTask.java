@@ -2,6 +2,7 @@ package com.atzuche.order.delivery.common;
 
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.SectionDeliveryUtils;
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.SectionParamDTO;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
@@ -15,6 +16,7 @@ import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
@@ -25,6 +27,8 @@ import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
+import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 
@@ -68,15 +72,25 @@ public class DeliveryCarTask {
     private RenterGoodsService renterGoodsService;
     @Autowired
     private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
-
+    @Autowired
+    private RenterOrderCostService renterOrderCostService;
+    @Autowired
+    private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
+    @Autowired
+    private OrderService orderService;
     /**
      * 添加订单到仁云流程系统
      */
-    @Async
+
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
-    	// 追加参数
-    	renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
+        // 追加参数
+        renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
+        addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
+    }
+    @Async
+    public void addRenYunFlowOrderInfoproxy(RenYunFlowOrderDTO renYunFlowOrderDTO){
         String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+        log.info("添加订单到仁云流程系统addRenYunFlowOrderInfo,renYunFlowOrderDTO={},result={}", JSON.toJSONString(renYunFlowOrderDTO),result);
         if (StringUtils.isBlank(result)) {
             sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
         }
@@ -85,16 +99,21 @@ public class DeliveryCarTask {
     /**
      * 更新订单到仁云流程系统
      */
-    @Async
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
     	// 追加参数
     	updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO);
+        appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);//添加参数化
+        updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
+    }
+    @Async
+    public void updateRenYunFlowOrderInfoProxy(UpdateFlowOrderDTO updateFlowOrderDTO) {
         String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
+        log.info("更新仁云流程系统updateRenYunFlowOrderInfo，updateFlowOrderDTO={},result={}",JSON.toJSONString(updateFlowOrderDTO),result);
         if (StringUtils.isBlank(result)) {
             sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
         }
     }
-    
+
     /**
      * 实时更新订单信息到流程系统
      */
@@ -180,7 +199,8 @@ public class DeliveryCarTask {
      */
     public RenYunFlowOrderDTO appendRenYunFlowOrderDTO(RenYunFlowOrderDTO renYunFlowOrderDTO) {
     	// 获取有效的租客子订单
-    	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renYunFlowOrderDTO.getOrdernumber());
+        OrderEntity orderEntity = orderService.getOrderEntity(renYunFlowOrderDTO.getOrdernumber());
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(renYunFlowOrderDTO.getOrdernumber());
     	RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
     	renYunFlowOrderDTO.setSsaRisks(renterOrderEntity.getIsAbatement() == null ? "0":renterOrderEntity.getIsAbatement().toString());
     	if ("8".equals(renYunFlowOrderDTO.getOrderType())) {
@@ -194,13 +214,20 @@ public class DeliveryCarTask {
     	renYunFlowOrderDTO.setTyreInsurFlag(renterOrderEntity.getTyreInsurFlag() == null ? "0":renterOrderEntity.getTyreInsurFlag().toString());
     	renYunFlowOrderDTO.setDriverInsurFlag(renterOrderEntity.getDriverInsurFlag() == null ? "0":renterOrderEntity.getDriverInsurFlag().toString());
     	renYunFlowOrderDTO.setCarRegNo(renterGoodsDetailDTO.getCarNo() == null ? "":String.valueOf(renterGoodsDetailDTO.getCarNo()));
-        if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
+        renYunFlowOrderDTO.setDayUnitPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?"":String.valueOf(renterGoodsDetailDTO.getCarGuideDayPrice()));
+    	if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
             renYunFlowOrderDTO.setSceneName(OrderScenesSourceEnum.getOrderScenesSource(renYunFlowOrderDTO.getSceneName()));
         }
         // 获取区间配送信息
         SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity);
         renYunFlowOrderDTO = convertDataAdd(renYunFlowOrderDTO, deliveryResult);
-    	return renYunFlowOrderDTO;
+        RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
+        renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
+        log.info("推送仁云子订单号renterOrderNo={}",renterOrderEntity.getRenterOrderNo());
+
+        Double oilPriceByCityCodeAndType = deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(orderEntity.getCityCode()), renterGoodsDetailDTO.getCarEngineType());
+        renYunFlowOrderDTO.setOilPrice(oilPriceByCityCodeAndType==null?"0":String.valueOf(oilPriceByCityCodeAndType));
+        return renYunFlowOrderDTO;
     }
     
     
@@ -326,4 +353,21 @@ public class DeliveryCarTask {
 		return sectionDeliveryResultVO;
     }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/24 14:54
+     * @Description: 追加参数
+     *
+     **/
+    public void appendRenyunUpdateFlowOrderParam(UpdateFlowOrderDTO updateFlowOrderDTO){
+        orderEntity orderEntity = orderService.getOrderEntity(updateFlowOrderDTO.getOrdernumber());
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updateFlowOrderDTO.getOrdernumber());
+        RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        updateFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
+        updateFlowOrderDTO.setDayUnitPrice(renterGoodsDetail.getCarGuideDayPrice()==null?"":String.valueOf(renterGoodsDetail.getCarGuideDayPrice()));
+        Double oilPriceByCityCodeAndType = deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(orderEntity.getCityCode()), renterGoodsDetail.getCarEngineType());
+        updateFlowOrderDTO.setOilPrice(oilPriceByCityCodeAndType==null?"0":String.valueOf(oilPriceByCityCodeAndType));
+        log.info("推送仁云子订单号renterOrderNo={}",renterOrderEntity.getRenterOrderNo());
+    }
 }
