@@ -1,8 +1,14 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.SysConfigSDK;
+import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.commons.BindingResultUtil;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
@@ -10,20 +16,29 @@ import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.coreapi.service.SubmitOrderBeforeCostCalService;
+import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.autoyol.platformcost.model.FeeResult;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -44,6 +59,8 @@ public class SubmitOrderBeforeCostCalculateController {
 
     @Autowired
     private SubmitOrderBeforeCostCalService submitOrderBeforeCostCalService;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
 
 
     @AutoDocMethod(description = "提交订单前费用计算", value = "提交订单前费用计算", response = NormalOrderCostCalculateResVO.class)
@@ -102,6 +119,26 @@ public class SubmitOrderBeforeCostCalculateController {
         LOGGER.info("Get a list of tenant coupons.result is,resVO:[{}]", JSON.toJSONString(resVO));
         return ResponseData.success(resVO);
 
+    }
+    
+    @GetMapping("/admin/getAccurateGetReturnSrvAmt")
+    public ResponseData<AccurateGetReturnSrvVO> getAccurateGetReturnSrvAmt() {
+    	AccurateGetReturnSrvVO accurateGetReturnSrvVO = new AccurateGetReturnSrvVO();
+    	List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        accurateGetReturnSrvVO.setAccurateGetSrvAmt(getAccurateCost);
+        accurateGetReturnSrvVO.setAccurateReturnSrvAmt(returnAccurateCost);
+        return ResponseData.success(accurateGetReturnSrvVO);
     }
 
 
