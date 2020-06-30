@@ -306,8 +306,10 @@ public class SubmitOrderHandleService {
 
         if (replyFlag && (renterGoodsDetailDto.getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= renterGoodsDetailDto.getAdvanceOrderTime())) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(0);
         }
         parentOrderDTO.setOrderDTO(orderDTO);
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);

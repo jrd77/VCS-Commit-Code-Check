@@ -41,6 +41,10 @@ public class RenterGoodsDetailDTO {
      */
     @AutoDocProperty("应答标识位")
     private Integer replyFlag;
+
+    @AutoDocProperty("最终是否自动接单标志")
+    private Integer isAutoReplayFlag;
+
     /**
      * 车辆号
      */

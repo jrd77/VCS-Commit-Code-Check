@@ -245,8 +245,10 @@ public class SubmitOrderService {
         LocalDateTime rentTime = orderReqVO.getRentTime();
 
         if (replyFlag && (context.getRenterGoodsDetailDto().getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= context.getRenterGoodsDetailDto().getAdvanceOrderTime())) {
+            context.getRenterGoodsDetailDto().setIsAutoReplayFlag(1);
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
+            context.getRenterGoodsDetailDto().setIsAutoReplayFlag(0);
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
@@ -276,7 +278,7 @@ public class SubmitOrderService {
         orderTransferRecordService.saveOrderTransferRecord(submitOrderHandleService.convertToOrderTransferRecordEntity(context, orderNo));
 
         //是自动应答的车辆才能锁库存，其他类型车辆要车主同意时才能锁库存。
-        if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getReplyFlag())) {
+        if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getIsAutoReplayFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(context.getOrderReqVO());
             orderInfoDTO.setOrderNo(orderNo);
             stockService.cutCarStock(orderInfoDTO);
@@ -318,7 +320,7 @@ public class SubmitOrderService {
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
-        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getReplyFlag(), orderReqVO);
+        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
         return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getReplyFlag());
     }
 
