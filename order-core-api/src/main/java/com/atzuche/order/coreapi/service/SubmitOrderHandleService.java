@@ -7,7 +7,6 @@ import com.atzuche.config.common.entity.CarChargeLevelConfigEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
-import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.CommonUtils;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -49,11 +48,6 @@ import com.atzuche.order.renterorder.entity.OrderTransferRecordEntity;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
-import com.autoyol.autopay.gateway.vo.Response;
-import com.autoyol.car.api.feign.api.LongRentTransReplyFeignApi;
-import com.autoyol.car.api.model.vo.LongRentTransReplyVO;
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +56,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -115,8 +108,7 @@ public class SubmitOrderHandleService {
     private OrderStopFreightInfoService orderStopFreightInfoService;
     @Autowired
     private CarChargeLevelConfigSDK carChargeLevelConfigSDK;
-    @Autowired
-    private LongRentTransReplyFeignApi longRentTransReplyFeignApi;
+
 
     /**
      * 下单数据落库操作
