@@ -223,6 +223,14 @@ public class OwnerGoodsEntity implements Serializable {
 	 * 年检到期日期
 	 */
 	private LocalDate inspectExpire;
+    /**
+     * 出险次数
+     */
+    private Integer dangerCount;
+    /**
+     * 保险出险导致次年保费上涨的收费
+     */
+    private Integer premiumMoney;
 	/**
 	 * 车龄
 	 */

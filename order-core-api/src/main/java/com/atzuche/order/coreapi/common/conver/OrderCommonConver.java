@@ -135,6 +135,7 @@ public class OrderCommonConver {
         carDetailReqVO.setRevertTime(orderReqVO.getRevertTime());
         carDetailReqVO.setUseSpecialPrice(StringUtils.equals("1",
                 orderReqVO.getUseSpecialPrice()));
+        carDetailReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         return carDetailReqVO;
     }
 

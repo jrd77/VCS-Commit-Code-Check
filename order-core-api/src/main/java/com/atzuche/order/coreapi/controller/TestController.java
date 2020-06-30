@@ -13,13 +13,16 @@ import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.vo.res.DangerCountRespVO;
 import com.atzuche.order.config.oilpriceconfig.OilAverageCostCacheConfigService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.autoyol.commons.web.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +52,8 @@ public class TestController {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private ServicePointConfigSDK servicePointConfigSDK;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @GetMapping("/test")
     public String test(){
@@ -114,5 +119,14 @@ public class TestController {
     public Object servicePointConfigSDKTest(){
         List<ServicePointEntity> config = servicePointConfigSDK.getConfig(new DefaultConfigContext());
         return config;
+    }
+    @GetMapping("/getDangerCount")
+    public void getDangerCount(){
+        String json = restTemplate.getForObject("http://114.55.63.205:8888/AOTU_TEST/AotuInterface/getclaimcount?orderNo=480527810161&plateNum=京C09090&carNo=111", String.class);
+        System.out.println(json);
+        ResponseData responseData = JSON.parseObject(json, ResponseData.class);
+        DangerCountRespVO data = JSON.parseObject(JSON.toJSONString(responseData.getData()), DangerCountRespVO.class);
+        System.out.println(JSON.toJSONString(data));
+
     }
 }
