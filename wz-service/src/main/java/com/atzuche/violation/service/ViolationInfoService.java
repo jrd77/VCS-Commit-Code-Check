@@ -122,6 +122,8 @@ public class ViolationInfoService {
      * @return
      */
     public List<ViolationResVO> list(ViolationReqVO violationReqVO) {
+        violationReqVO.setCarTypeArr(StringUtils.isBlank(violationReqVO.getCarType())?null:violationReqVO.getCarType().split(","));
+        violationReqVO.setUserCarCityArr(StringUtils.isBlank(violationReqVO.getUseCarCity())?null:violationReqVO.getUseCarCity().split(","));
         PageHelper.startPage(violationReqVO.getPageNum(),violationReqVO.getPageSize());
         List<ViolationResVO> violationResDesVOList = renterOrderWzStatusMapper.queryIllegalOrderList(violationReqVO);
         for (ViolationResVO violationResVO: violationResDesVOList) {
