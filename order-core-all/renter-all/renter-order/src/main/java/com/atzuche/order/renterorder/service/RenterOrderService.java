@@ -1,9 +1,29 @@
 package com.atzuche.order.renterorder.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.AbatementAmtDTO;
+import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
+import com.atzuche.order.commons.entity.dto.GetReturnCarCostReqDto;
+import com.atzuche.order.commons.entity.dto.GetReturnCarOverCostReqDto;
+import com.atzuche.order.commons.entity.dto.InsurAmtDTO;
+import com.atzuche.order.commons.entity.dto.RentAmtDTO;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
@@ -14,26 +34,16 @@ import com.atzuche.order.renterorder.entity.dto.DeductAndSubsidyContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
-import com.atzuche.order.renterorder.mapper.OwnerCouponLongMapper;
 import com.atzuche.order.renterorder.mapper.RenterDepositDetailMapper;
 import com.atzuche.order.renterorder.mapper.RenterOrderMapper;
-import com.atzuche.order.renterorder.vo.*;
+import com.atzuche.order.renterorder.vo.CouponAndAutoCoinResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
+import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.renterorder.vo.RenterOrderResVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.autoyol.coupon.api.CouponSettleRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -82,6 +92,11 @@ public class RenterOrderService {
      */
     public RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(String orderNo) {
         return renterOrderMapper.getRenterOrderByOrderNoAndIsEffective(orderNo);
+    }
+    
+    //
+    public int updateRenterOrderUseWalletByOrderNo(String orderNo) {
+    	return renterOrderMapper.updateRenterOrderUseWalletByOrderNo(orderNo);
     }
     
     /**
