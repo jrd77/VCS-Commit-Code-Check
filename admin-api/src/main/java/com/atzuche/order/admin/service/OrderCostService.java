@@ -1194,7 +1194,7 @@ public class OrderCostService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = data.getRenterGoodsDetailDTO();
         if(renterGoodsDetailDTO!= null){
             Integer premiumMoney = renterGoodsDetailDTO.getPremiumMoney();
-            realVo.setPremiumMoney(String.valueOf(premiumMoney));
+            realVo.setPremiumMoney(premiumMoney==null?"0":String.valueOf(premiumMoney));
         }
     }
 
