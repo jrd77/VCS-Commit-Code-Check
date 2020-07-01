@@ -306,7 +306,7 @@ public class SectionDeliveryUtils {
 		if (ownerS != null) {
 			QuZhiHuanQujianVO owner = new QuZhiHuanQujianVO();
 			BeanUtils.copyProperties(ownerS, owner);
-			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setExpectRevertTime(renterS == null ? null:renterS.getDefaultRevertTime()); // 自还还车时间和租客一样
 			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
 			owner.setRealRentTime(pro.getOwnerRentTime());
 			owner.setRealRevertTime(pro.getOwnerRevertTime());
@@ -343,7 +343,7 @@ public class SectionDeliveryUtils {
 			QuZhiHuanZhunshiVO owner = new QuZhiHuanZhunshiVO();
 			owner.setAccurateGetSrvUnit(ownerS.getAccurateGetSrvUnit());
 			owner.setExpectRentTime(ownerS.getDefaultRentTime());
-			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setExpectRevertTime(renterS == null ? null:renterS.getDefaultRevertTime()); // 自还还车时间和租客一样
 			owner.setGetCarBeforeTime(sectionParam.getGetCarBeforeTime());
 			owner.setRealRentTime(pro.getOwnerRentTime());
 			owner.setRealRevertTime(pro.getOwnerRevertTime());
@@ -375,8 +375,8 @@ public class SectionDeliveryUtils {
 		SectionDeliveryVO ownerS = result.getOwnerSectionDelivery();
 		if (ownerS != null) {
 			ZhiquZhihuanVO owner = new ZhiquZhihuanVO();
-			owner.setExpectRentTime(ownerS.getDefaultRentTime());
-			owner.setExpectRevertTime(ownerS.getDefaultRevertTime());
+			owner.setExpectRentTime(renterS == null ? null:renterS.getDefaultRentTime());// 自还取车时间和租客一样
+			owner.setExpectRevertTime(renterS == null ? null:renterS.getDefaultRevertTime());// 自还还车时间和租客一样
 			owner.setRealRentTime(pro.getOwnerRentTime());
 			owner.setRealRevertTime(pro.getOwnerRevertTime());
 			owner.setMemType(OWNER);
