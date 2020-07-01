@@ -25,9 +25,9 @@ public class SectionDeliveryVO implements Serializable{
 	private String defaultRentTime;
 	// 租客默认建议取车时间/车主默认建议送达时间 yyyy-MM-dd HH:mm:ss
 	private String defaultRevertTime;
-	// 取车精准达费用
+	@AutoDocProperty(value = "取车精准达费用")
 	private Integer accurateGetSrvUnit;
-	// 还车精准达费用
+	@AutoDocProperty(value = "还车精准达费用")
     private Integer accurateReturnSrvUnit;
 	
 	public Integer getDistributionMode() {

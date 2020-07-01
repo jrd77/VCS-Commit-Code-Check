@@ -3,8 +3,11 @@ package com.atzuche.order.coreapi.service;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.SysConfigSDK;
 import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -13,6 +16,7 @@ import com.atzuche.order.commons.entity.dto.SectionParamDTO;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
@@ -104,6 +108,8 @@ public class SubmitOrderBeforeCostCalService {
     private LongSubmitOrderBeforeCostFilterChain longSubmitOrderBeforeCostFilterChain;
     @Autowired
     private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
 
 
 
@@ -385,6 +391,11 @@ public class SubmitOrderBeforeCostCalService {
     	// 配送模式：0-区间配送，1-精准配送
         Integer distributionMode = orderReqVO.getDistributionMode() == null ? 0:orderReqVO.getDistributionMode();
         sectionDeliveryVO.setDistributionMode(distributionMode);
+        AccurateGetReturnSrvVO accurateGetReturnSrvVO = getAccurateGetReturnSrvVO();
+        if (accurateGetReturnSrvVO != null) {
+        	sectionDeliveryVO.setAccurateGetSrvUnit(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
+        	sectionDeliveryVO.setAccurateReturnSrvUnit(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
     	if (distributionMode.intValue() == 1) {
         	// 精准配送
         	return sectionDeliveryVO;
@@ -400,6 +411,10 @@ public class SubmitOrderBeforeCostCalService {
     		return null;
     	}
     	sectionDeliveryVO.setDistributionMode(distributionMode);
+    	if (accurateGetReturnSrvVO != null) {
+        	sectionDeliveryVO.setAccurateGetSrvUnit(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
+        	sectionDeliveryVO.setAccurateReturnSrvUnit(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
     	if (srvGetFlag.intValue() == 0) {
     		sectionDeliveryVO.setRentTimeEnd(null);
     		sectionDeliveryVO.setRentTimeStart(null);
@@ -411,7 +426,13 @@ public class SubmitOrderBeforeCostCalService {
         return sectionDeliveryVO;
     }
     
-    
+    /**
+     * 数据转换
+     * @param rentTime
+     * @param revertTime
+     * @param mode
+     * @return SectionParamDTO
+     */
     public SectionParamDTO getSectionParamDTO(LocalDateTime rentTime, LocalDateTime revertTime, RenterOrderDeliveryMode mode) {
     	SectionParamDTO sectionParamDTO = new SectionParamDTO();
     	sectionParamDTO.setRentAfterMinutes(mode.getRentAfterMinutes());
@@ -421,5 +442,28 @@ public class SubmitOrderBeforeCostCalService {
     	sectionParamDTO.setRevertBeforeMinutes(mode.getRevertBeforeMinutes());
     	sectionParamDTO.setRevertTime(revertTime);
     	return sectionParamDTO;
+    }
+    
+    /**
+     * 获取准时达服务单价
+     * @return AccurateGetReturnSrvVO
+     */
+    public AccurateGetReturnSrvVO getAccurateGetReturnSrvVO() {
+    	AccurateGetReturnSrvVO accurateGetReturnSrvVO = new AccurateGetReturnSrvVO();
+    	List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        accurateGetReturnSrvVO.setAccurateGetSrvAmt(getAccurateCost);
+        accurateGetReturnSrvVO.setAccurateReturnSrvAmt(returnAccurateCost);
+        return accurateGetReturnSrvVO;
     }
 }

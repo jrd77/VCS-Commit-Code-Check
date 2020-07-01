@@ -123,21 +123,7 @@ public class SubmitOrderBeforeCostCalculateController {
     
     @GetMapping("/admin/getAccurateGetReturnSrvAmt")
     public ResponseData<AccurateGetReturnSrvVO> getAccurateGetReturnSrvAmt() {
-    	AccurateGetReturnSrvVO accurateGetReturnSrvVO = new AccurateGetReturnSrvVO();
-    	List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
-        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
-                .orElseGet(ArrayList::new)
-                .stream()
-                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
-                .collect(Collectors.toList());
-        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-        LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
-        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysGetAccurateAmt.getItemValue());
-        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-        LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
-        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
-        accurateGetReturnSrvVO.setAccurateGetSrvAmt(getAccurateCost);
-        accurateGetReturnSrvVO.setAccurateReturnSrvAmt(returnAccurateCost);
+    	AccurateGetReturnSrvVO accurateGetReturnSrvVO = submitOrderBeforeCostCalService.getAccurateGetReturnSrvVO();
         return ResponseData.success(accurateGetReturnSrvVO);
     }
 
