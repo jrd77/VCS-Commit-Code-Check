@@ -79,7 +79,7 @@ public class OrderPhotoController{
      * @param bindingResult
      * @return
      */
-	@AutoDocMethod(description = "订单照片列表(包含油表和交接车单子)", value = "订单照片列表(包含油表和交接车单子)", response = OrderPhotoResponseVO.class)
+	@AutoDocMethod(description = "订单照片列表(包含油表和交接车单子)", value = "订单照片列表(包含油表和交接车单子)", response = OrderPhotoDTO.class)
 	@GetMapping("/listContainsOils")
     public ResponseData<List<OrderPhotoDTO>> listContainsOils(@Valid OrderOilRequestVO orderRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
