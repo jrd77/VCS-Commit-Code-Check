@@ -4,11 +4,12 @@ import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @ToString
-public class OrderPhotoDTO {
+public class OrderPhotoDTO implements Serializable {
 	@AutoDocProperty(value = "图片id")
 	private String id;
 	@AutoDocProperty(value = "图片路径")

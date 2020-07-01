@@ -72,6 +72,21 @@ public class OrderPhotoController{
 		orderPhotoResponseVO.setOrderViolationPhotoResponseVO(orderViolationPhotoResponseVO);
 		return ResponseData.success(orderPhotoResponseVO);
 	}
+
+    /**
+     *订单照片列表(包含油表和交接车单子)
+     * @param orderRequestVO
+     * @param bindingResult
+     * @return
+     */
+	@AutoDocMethod(description = "订单照片列表(包含油表和交接车单子)", value = "订单照片列表(包含油表和交接车单子)", response = OrderPhotoResponseVO.class)
+	@GetMapping("/listContainsOils")
+    public ResponseData<List<OrderPhotoDTO>> listContainsOils(@Valid OrderOilRequestVO orderRequestVO, BindingResult bindingResult) {
+        validateParameter(bindingResult);
+        String orderNo = orderRequestVO.getOrderNo();
+        List<OrderPhotoDTO> getCarList = orderPhotoService.queryGetSrvCarList(orderNo, orderRequestVO.getType());
+        return ResponseData.success(getCarList);
+    }
 	
 	/**
 	 * 
