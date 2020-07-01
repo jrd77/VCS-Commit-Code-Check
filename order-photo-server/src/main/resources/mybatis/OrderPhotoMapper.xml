@@ -17,7 +17,7 @@
 	
 	<insert id="addUploadOrderPhoto" parameterType="map">
 		 INSERT INTO
-		 <if test="photoType==1||photoType==2">
+		 <if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 		  order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},0,#{operator});
 		 </if>
 		 <if test="photoType==3">
@@ -31,7 +31,7 @@
 
 	<update id="updateUploadOrderPhoto" parameterType="map">
 		update
-		<if test="photoType==1||photoType==2">
+		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 			order_car_condition_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 		<if test="photoType==3">
@@ -69,7 +69,7 @@
 
 	<select id="queryPhotoInfo" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		select order_no as orderNo, user_type as userType
-		<if test="photoType==1||photoType==2">
+		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 			from order_car_condition_photo where id = #{photoId};
 		</if>
 		<if test="photoType==3">
@@ -82,7 +82,7 @@
 
 	<insert id="addRenYunUploadOrderPhoto" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		INSERT INTO
-		<if test="photoType==1||photoType==2">
+		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 			order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator});
 		</if>
 	</insert>
@@ -94,7 +94,7 @@
 
 	<update id="updateUploadRenYunOrderPhoto" parameterType="map">
 	update
-	<if test="photoType==1||photoType==2">
+	<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 		order_car_condition_photo set path = #{path},user_type = #{userType},serial_number = #{serialNumber},operator = #{operator},photo_type = #{photoType} where id = #{photoId};
 	</if>
 	</update>
