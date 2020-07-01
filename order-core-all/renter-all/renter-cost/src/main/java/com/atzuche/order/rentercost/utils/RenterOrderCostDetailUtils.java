@@ -138,7 +138,8 @@ public class RenterOrderCostDetailUtils {
      */
     public static int getDistributionCost(List<RenterOrderCostDetailEntity> costDetailEntityList){
         return getReturnBlockedRaiseAmt(costDetailEntityList) + getGetBlockedRaiseAmt(costDetailEntityList)
-                + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList);
+                + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList)
+                + getAccurateGetSrvAmt(costDetailEntityList) + getAccurateReturnSrvAmt(costDetailEntityList);
     }
     
     /**
