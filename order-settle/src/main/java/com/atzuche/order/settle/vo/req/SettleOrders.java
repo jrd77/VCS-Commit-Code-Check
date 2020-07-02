@@ -84,6 +84,11 @@ public class SettleOrders {
      * 是否企业级用户订单
      */
 	private Boolean isEnterpriseUserOrder;
+
+    /**
+     * 是否使用钱包
+     */
+    private Boolean useWallet;
     
 	
 	public Boolean getIsEnterpriseUserOrder() {
@@ -182,5 +187,20 @@ public class SettleOrders {
 	public void setRentDepositVirtualPayFlag(Boolean rentDepositVirtualPayFlag) {
 		this.rentDepositVirtualPayFlag = rentDepositVirtualPayFlag;
 	}
-    
+
+    public Boolean getEnterpriseUserOrder() {
+        return isEnterpriseUserOrder;
+    }
+
+    public void setEnterpriseUserOrder(Boolean enterpriseUserOrder) {
+        isEnterpriseUserOrder = enterpriseUserOrder;
+    }
+
+    public Boolean getUseWallet() {
+        return useWallet;
+    }
+
+    public void setUseWallet(Boolean useWallet) {
+        this.useWallet = useWallet;
+    }
 }

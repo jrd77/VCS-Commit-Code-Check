@@ -35,6 +35,9 @@ public class RestTemplateService {
                 if(response.getData() != null){
                     DangerCountRespVO data = JSON.parseObject(JSON.toJSONString(response.getData()), DangerCountRespVO.class);
                     data.setUpdateTime(LocalDateTimeUtils.formatDateTime(LocalDateTime.now(),LocalDateTimeUtils.DEFAULT_PATTERN));
+                    if(data.getCountClaim() == null){
+                        data.setCountClaim(0);
+                    }
                     return data;
                 }
             }
