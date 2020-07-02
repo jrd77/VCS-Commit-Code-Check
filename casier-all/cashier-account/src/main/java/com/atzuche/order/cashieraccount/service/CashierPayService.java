@@ -1534,5 +1534,10 @@ public class CashierPayService{
 		return vo;
 	}
 
+
+	public int getWalletDeductAmt(String orderNo, List<String> payKind) {
+		return cashierService.getWalletDeductAmt(orderNo,payKind);
+	}
+
 }
 

@@ -1139,6 +1139,11 @@ public class CashierService {
         int id = accountOwnerCostSettleDetailNoTService.insertAccountOwnerCostSettleDetail(entity);
     }
 
+    
+	public int getWalletDeductAmt(String orderNo, List<String> payKind) {
+		return cashierMapper.getWalletDeductAmt(orderNo,payKind);
+	}
+
 
 
 
