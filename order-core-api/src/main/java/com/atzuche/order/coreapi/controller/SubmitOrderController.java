@@ -93,7 +93,11 @@ public class SubmitOrderController {
         }
 
         OrderResVO orderResVO = null;
-
+        //按未使用钱包来处理。
+        if(normalOrderReqVO.getUseBal() == null) {
+        	normalOrderReqVO.setUseBal(0);
+        }
+        
         BeanCopier beanCopier = BeanCopier.create(NormalOrderReqVO.class, OrderReqVO.class, false);
         OrderReqVO orderReqVO = new OrderReqVO();
         beanCopier.copy(normalOrderReqVO, orderReqVO, null);
@@ -211,6 +215,11 @@ public class SubmitOrderController {
         if (StringUtils.isBlank(memNo)) {
             return new ResponseData<>(ErrorCode.NEED_LOGIN.getCode(), ErrorCode.NEED_LOGIN.getText());
         }
+        //是否使用钱包的处理 200701
+        if(adminOrderReqVO.getUseBal() == null) {
+        	adminOrderReqVO.setUseBal(0); //按不使用钱包来处理。
+        }
+        
         OrderResVO orderResVO = null;
 
         BeanCopier beanCopier = BeanCopier.create(AdminOrderReqVO.class, OrderReqVO.class, false);
@@ -249,6 +258,7 @@ public class SubmitOrderController {
             
             //自动接单的，刷新是否钱包支付抵扣
             //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+            //调整为钱包支付需求：200701
             OrderPaySignReqVO vo = null;
             try {
               	//自动接单 并且 使用钱包
@@ -260,6 +270,7 @@ public class SubmitOrderController {
        		} catch (Exception e) {
        			LOGGER.error("刷新钱包支付抵扣:params=[{}]",(vo!=null)?GsonUtils.toJson(vo):"EMPTY",e);
        		}
+            
               
             //发送订单成功的MQ事件
             orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);

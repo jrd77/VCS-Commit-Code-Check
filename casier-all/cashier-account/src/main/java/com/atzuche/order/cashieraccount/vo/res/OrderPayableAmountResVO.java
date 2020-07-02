@@ -104,6 +104,13 @@ public class OrderPayableAmountResVO {
      */
     @AutoDocProperty("钱包抵扣金额")
     private int amtWallet;
+    
+    // ------------------------------------- 200701
+    @AutoDocProperty("钱包余额")
+    private int walletBalance;
+    @AutoDocProperty("钱包已抵扣金额")
+    private int walletDeductAmt;
+    // -------------------------------------
 
     /**
      * 是否使用钱包 0-否，1-是
@@ -143,6 +150,8 @@ public class OrderPayableAmountResVO {
 	
 	//去掉订单号，该字段已经存在。
 //	private String orderNo; //订单号
+	
+	
 	
     
 	public int getAmtIncrementRent() {
@@ -376,6 +385,22 @@ public class OrderPayableAmountResVO {
 
 	public void setEnterpriseUserOrder(boolean isEnterpriseUserOrder) {
 		this.isEnterpriseUserOrder = isEnterpriseUserOrder;
+	}
+
+	public int getWalletBalance() {
+		return walletBalance;
+	}
+
+	public void setWalletBalance(int walletBalance) {
+		this.walletBalance = walletBalance;
+	}
+
+	public int getWalletDeductAmt() {
+		return walletDeductAmt;
+	}
+
+	public void setWalletDeductAmt(int walletDeductAmt) {
+		this.walletDeductAmt = walletDeductAmt;
 	}
     
     
