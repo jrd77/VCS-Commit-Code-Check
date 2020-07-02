@@ -618,7 +618,8 @@ public class CashierPayService{
 				vo.setCipherText(desString);
 				vo.setInternalNo(String.valueOf("0"));
 				vo.setOpenId("");
-				vo.setPaySource(orderPaySign.getPaySource());
+//				vo.setPaySource(orderPaySign.getPaySource());
+				vo.setPaySource("00");  //00 默认是钱包。
 				vo.setReqOs(orderPaySign.getReqOs());  //需要处理
 				
 				
@@ -700,26 +701,38 @@ public class CashierPayService{
         //补付不能使用钱包
 //        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE) || orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEBT)) {
         //只有租车费用可以使用钱包。ONLY LIMIT
-        if(!orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
-        	isUseWallet = 0;
-        }else {
+        //需求扩展：钱包支付方式。 全部放开。
+//        if(!orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
+//        	isUseWallet = 0;
+//        }else {
+        	//renterOrderEntity 如果该对象为空，则上面已经返回。
         	if(renterOrderEntity != null) {
         		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
+        	}else {
+        		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?0:orderPayReqVO.getIsUseWallet(); //默认否
         	}
         	
-        	if(isEnterpriseUserOrder==false) {
-	        	//如果已经使用过钱包抵扣，不允许再次做抵扣。
-	        	int walletAmt = accountRenterCostDetailNoTService.getRentCostPayByWallet(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
-	        	if(walletAmt > 0) {
-	        		isUseWallet = 0;
-	        		log.info("当前订单已经使用过钱包抵扣，无需再次抵扣。orderNo=[{}],walletAmt=[{}]",orderPayReqVO.getOrderNo(),walletAmt);
-	        	}
-        	}else {
+        	
+//        	if(isEnterpriseUserOrder==false) {
+//	        	//如果已经使用过钱包抵扣，不允许再次做抵扣。
+//	        	int walletAmt = accountRenterCostDetailNoTService.getRentCostPayByWallet(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
+//	        	if(walletAmt > 0) {
+//	        		isUseWallet = 0;
+//	        		log.info("当前订单已经使用过钱包抵扣，无需再次抵扣。orderNo=[{}],walletAmt=[{}]",orderPayReqVO.getOrderNo(),walletAmt);
+//	        	}
+//        	}else {
+//        		isUseWallet = 1;
+//        		log.info("当前订单企业用户钱包允许多次抵扣。orderNo=[{}]",orderPayReqVO.getOrderNo());
+//        	}
+        	/**
+        	 * 企业用户默认按钱包走。
+        	 */
+        	if(isEnterpriseUserOrder) {
         		isUseWallet = 1;
         		log.info("当前订单企业用户钱包允许多次抵扣。orderNo=[{}]",orderPayReqVO.getOrderNo());
         	}
         	
-        }
+//        }
         result.setIsUseWallet(isUseWallet);
         
 
@@ -804,6 +817,19 @@ public class CashierPayService{
             
             amtRent = rentAmt + rentAmtPayed;
         }
+
+        // 计算钱包 支付 目前支付抵扣租费费用
+        int amtWallet =0;
+        //租车费用
+        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+            //预计钱包抵扣金额 = amtWallet
+            amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
+            // 抵扣钱包后  应付租车费用金额
+            amtRent =  amtRent + amtWallet;
+            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+        }
+        
         
         //APP修改订单补付
         int rentIncrementAmt = 0;
@@ -930,21 +956,6 @@ public class CashierPayService{
             amtRentIncrementDebt = rentIncrementDebtAmt;
         }
         
-        
-
-        // 计算钱包 支付 目前支付抵扣租费费用
-        int amtWallet =0;
-        //租车费用
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            amtWallet = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
-            // 抵扣钱包后  应付租车费用金额
-            amtRent =  amtRent + amtWallet;
-            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
-        }
-        
-
         //管理后台补付
         //支付欠款
         //待支付总额
@@ -1485,7 +1496,8 @@ public class CashierPayService{
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
 //		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
-		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+//		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+		vo.setPaySource("00");
 		return vo;
 	}
     
@@ -1517,8 +1529,14 @@ public class CashierPayService{
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
 //		vo.setPaySource(DataPaySourceConstant.ALIPAY);
-		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+//		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+		vo.setPaySource("00");
 		return vo;
+	}
+
+
+	public int getWalletDeductAmt(String orderNo, List<String> payKind) {
+		return cashierService.getWalletDeductAmt(orderNo,payKind);
 	}
 
 }
