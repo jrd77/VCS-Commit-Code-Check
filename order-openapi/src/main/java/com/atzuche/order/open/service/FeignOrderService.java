@@ -2,6 +2,7 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,4 +28,13 @@ public interface FeignOrderService {
      **/
     @RequestMapping("/order/parentOrder/queryByOrderNo")
     ResponseData<OrderDTO> queryOrderByOrderNo(@RequestParam("orderNo")String orderNo);
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/23 10:41
+     * @Description: 获取有效额租客子订单
+     *
+     **/
+    @RequestMapping("/order/renterOrder/queryRenterOrderByOrderNo")
+    ResponseData<RenterOrderDTO> queryRenterOrderByOrderNo(@RequestParam("orderNo")String orderNo);
+
 }

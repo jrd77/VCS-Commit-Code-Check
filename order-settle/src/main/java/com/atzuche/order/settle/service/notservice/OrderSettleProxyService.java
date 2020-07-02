@@ -22,12 +22,11 @@ import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.account.CostTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
+import com.atzuche.order.commons.vo.req.handover.rep.OwnerHandoverCarInfoVO;
 import com.atzuche.order.commons.vo.req.handover.rep.RenterHandoverCarInfoVO;
-import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
+import com.atzuche.order.delivery.enums.OwnerHandoverCarTypeEnum;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
-import com.atzuche.order.delivery.vo.handover.HandoverCarRepVO;
-import com.atzuche.order.delivery.vo.handover.HandoverCarReqVO;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
@@ -47,6 +46,7 @@ public class OrderSettleProxyService {
 	private CashierNoTService cashierNoTService;
 	@Autowired
 	private HandoverCarService handoverCarService;
+
 	
 	public CostTypeEnum getCostTypeEnumByConsoleCost(String fineSubsidyCode){
         CostTypeEnum costTypeEnum = CostTypeEnum.OWNER_CONSOLE_COST;
@@ -138,12 +138,15 @@ public class OrderSettleProxyService {
         return mileageAmtDTO;
     }
     
+    public boolean checkMileageData(String orderNo) {
+    	return checkMileageData(orderNo,null);
+    }
     /**
      * 结算查询确认里程数是否完善。
      * @param renterOrderNo
      * @return
      */
-    public boolean checkMileageData(String orderNo) {
+    public boolean checkMileageData(String orderNo,List<String> listOrderNos) {
 //    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
 //    	handoverCarReq.setRenterOrderNo(renterOrderNo);
 //    	//取送车里程数
@@ -157,12 +160,23 @@ public class OrderSettleProxyService {
         if(CollectionUtils.isEmpty(renterHandoverCarInfos)) {
         	return false;
         }
+        List<OwnerHandoverCarInfoVO> ownerHandoverCarInfos = handoverCarRep.getOwnerHandoverCarInfoVOS();
+        if(CollectionUtils.isEmpty(ownerHandoverCarInfos)) {
+        	return false;
+        }
+        
         
         if(!CollectionUtils.isEmpty(renterHandoverCarInfos)){
             for(int i=0;i<renterHandoverCarInfos.size();i++){
             	RenterHandoverCarInfoVO renterHandoverCarInfo = renterHandoverCarInfos.get(i);
-                if(RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
-                        ||  RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+            	/**
+            	 * 去掉  200622
+            	 * RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  
+            	 */
+
+                
+                if(RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     if(
                     		//里程刻度
@@ -171,12 +185,20 @@ public class OrderSettleProxyService {
                     		//油表刻度
                     		(Objects.isNull(renterHandoverCarInfo.getOilNum()) || (renterHandoverCarInfo.getOilNum() != null && renterHandoverCarInfo.getOilNum().intValue() == 0))
                     		) {
+                    	//邮件通知提醒
+                    	if(listOrderNos != null) {
+                    		listOrderNos.add(orderNo);
+                    	}
                     	return false;
                     }
                 }
-
-                if(RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
-                        ||  RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
+                
+                /**
+                 * 去掉  200622
+                 * RenterHandoverCarTypeEnum.RENTER_TO_OWNER.getValue().equals(renterHandoverCarInfo.getType())
+                        ||  
+                 */
+                if(RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(renterHandoverCarInfo.getType())
                 ){
                     if(
                     		//里程刻度
@@ -185,11 +207,56 @@ public class OrderSettleProxyService {
                     		//油表刻度
                     		(Objects.isNull(renterHandoverCarInfo.getOilNum()) || (renterHandoverCarInfo.getOilNum() != null && renterHandoverCarInfo.getOilNum().intValue() == 0))
                     		){
+                    	//邮件通知提醒
+                    	if(listOrderNos != null) {
+                    		listOrderNos.add(orderNo);
+                    	}
                     	return false;
                     }
                 }
             }
         }
+        
+        if(!CollectionUtils.isEmpty(ownerHandoverCarInfos)){
+            for(int i=0;i<ownerHandoverCarInfos.size();i++){
+            	OwnerHandoverCarInfoVO ownerHandoverCarInfo = ownerHandoverCarInfos.get(i);
+            	
+                if(ownerHandoverCarInfo != null && OwnerHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().equals(ownerHandoverCarInfo.getType())
+                ){
+                    if(
+                    		//里程刻度
+                    		(Objects.isNull(ownerHandoverCarInfo.getMileageNum()) || (ownerHandoverCarInfo.getMileageNum() != null && ownerHandoverCarInfo.getMileageNum().intValue() == 0))
+                    		||
+                    		//油表刻度
+                    		(Objects.isNull(ownerHandoverCarInfo.getOilNum()) || (ownerHandoverCarInfo.getOilNum() != null && ownerHandoverCarInfo.getOilNum().intValue() == 0))
+                    		) {
+                    	//邮件通知提醒
+                    	if(listOrderNos != null) {
+                    		listOrderNos.add(orderNo);
+                    	}
+                    	return false;
+                    }
+                }
+                
+                if(ownerHandoverCarInfo != null && OwnerHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().equals(ownerHandoverCarInfo.getType())
+                ){
+                    if(
+                    		//里程刻度
+                    		(Objects.isNull(ownerHandoverCarInfo.getMileageNum()) || (ownerHandoverCarInfo.getMileageNum() != null && ownerHandoverCarInfo.getMileageNum().intValue() == 0))
+                    		||
+                    		//油表刻度
+                    		(Objects.isNull(ownerHandoverCarInfo.getOilNum()) || (ownerHandoverCarInfo.getOilNum() != null && ownerHandoverCarInfo.getOilNum().intValue() == 0))
+                    		){
+                    	//邮件通知提醒
+                    	if(listOrderNos != null) {
+                    		listOrderNos.add(orderNo);
+                    	}
+                    	return false;
+                    }
+                }
+            }
+        }
+        
         
         return true;
     }

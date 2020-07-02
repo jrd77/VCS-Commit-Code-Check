@@ -3,6 +3,7 @@ package com.atzuche.order.delivery.service.delivery;
 import com.atzuche.config.client.api.OilAverageCostConfigSDK;
 import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.entity.OilAverageCostEntity;
+import com.atzuche.order.commons.StringUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.MileageAmtDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -197,6 +198,14 @@ public class DeliveryCarInfoPriceService {
             } else {
                 oilDifference = Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getReturnCarOil())) - Math.abs(Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil()));
             }
+            if (HandoverCarInfoEntities.get(0).getType().intValue() == 1 || HandoverCarInfoEntities.get(0).getType().intValue() == 2) {
+                if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getReturnCarOil()) || ownerGetAndReturnCarDTO.getReturnCarOil().equals("0")) {
+                    oilDifference = 0;
+                }
+                if (StringUtils.isBlank(ownerGetAndReturnCarDTO.getGetCarOil()) || ownerGetAndReturnCarDTO.getGetCarOil().equals("0")) {
+                    oilDifference = 0;
+                }
+            }
             ownerGetAndReturnCarDTO.setDrivingKM(ownerDrivingKM);
             String oilContainer = ownerGetAndReturnCarDTO.getOilContainer().contains("L") ? ownerGetAndReturnCarDTO.getOilContainer().replaceAll("L","") : ownerGetAndReturnCarDTO.getOilContainer();
             double lastOilDifference = MathUtil.mulByDouble(MathUtil.div(Integer.valueOf(oilContainer), oilTotalCalibration),oilDifference);
@@ -249,10 +258,31 @@ public class DeliveryCarInfoPriceService {
         CostBaseDTO costBaseDTO = mileageAmtDTO.getCostBaseDTO();
         if (costBaseDTO == null || costBaseDTO.getStartTime() == null) {
             log.error("getMileageAmtEntity 获取超里程费用mileageAmtDTO.costBaseDTO对象为空");
-            Cat.logError("获取超里程费用mileageAmtDTO.costBaseDTO对象为空", new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR.getValue(),"获取超里程费用mileageAmtDTO对象为空"));
             feeResult.setTotalFee(0);
             feeResult.setUnitPrice(0);
             return feeResult;
+        }
+        if ((mileageAmtDTO.getReturnMileage() == null || mileageAmtDTO.getReturnMileage() == 0 || mileageAmtDTO.getGetmileage() == null || mileageAmtDTO.getGetmileage() == 0) && StringUtils.isNotBlank(costBaseDTO.getOrderNo())) {
+            List<RenterOrderDeliveryEntity> renterOrderDeliveryEntityList = renterOrderDeliveryService.findRenterOrderListByOrderNo(costBaseDTO.getOrderNo());
+            if (CollectionUtils.isEmpty(renterOrderDeliveryEntityList)) {
+                log.info("没有配送订单，获取不了相关的配送费用,orderNo:", costBaseDTO.getOrderNo());
+                feeResult.setTotalFee(0);
+                feeResult.setUnitPrice(0);
+                return feeResult;
+            }
+            if (renterOrderDeliveryEntityList.get(0).getIsNotifyRenyun().intValue() == 0 && renterOrderDeliveryEntityList.get(1).getIsNotifyRenyun().intValue() == 0) {
+                log.info("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
+                feeResult.setTotalFee(0);
+                feeResult.setUnitPrice(0);
+                return feeResult;
+            }
+            boolean isNotify = renterOrderDeliveryEntityList.parallelStream().anyMatch(renter -> renter.getIsNotifyRenyun().intValue() == 1);
+            if (isNotify) {
+                log.info("getMileageAmtEntity 获取超里程费用mileageAmtDTO.ReturnMileage对象为空");
+                feeResult.setTotalFee(0);
+                feeResult.setUnitPrice(0);
+                return feeResult;
+            }
         }
         Integer mileageAmt = RenterFeeCalculatorUtils.calMileageAmt(mileageAmtDTO.getDayMileage(), mileageAmtDTO.getGuideDayPrice(),
                 mileageAmtDTO.getGetmileage(), mileageAmtDTO.getReturnMileage(), costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), configHours);

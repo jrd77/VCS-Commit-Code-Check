@@ -2,12 +2,15 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.entity.OrderStopFreightInfo;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +30,8 @@ public class OrderConsoleController {
     private OrderService orderService;
     @Autowired
     private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private RenterOrderService renterOrderService;
 
     /*
      * @Author ZhangBin
@@ -71,5 +76,12 @@ public class OrderConsoleController {
     public ResponseData<OrderStopFreightInfo> getStopFreightInfo(@RequestParam(value="orderNo",required = true) String orderNo){
     	OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
     	return ResponseData.success(orderStopFreightInfo);
+    }
+
+
+    @RequestMapping("/order/renterOrder/queryRenterOrderByOrderNo")
+    ResponseData<RenterOrderEntity> queryRenterOrderByOrderNo(@RequestParam("orderNo")String orderNo){
+        RenterOrderEntity renterOrderByOrderNoAndIsEffective = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        return ResponseData.success(renterOrderByOrderNoAndIsEffective);
     }
 }

@@ -48,6 +48,10 @@ public class ModifyOrderRiskService {
 			// 扫码还车不校验
 			return;
 		}
+		// 超级权限不需要校验时间
+		if (modifyOrderDTO.getSuperPowerFlag() != null && modifyOrderDTO.getSuperPowerFlag().intValue() == 1) {
+			return;
+		}
 		LocalDateTime initRevertTime = modifyOrderDTO.getOrderEntity().getExpRevertTime();
 		LocalDateTime updRevertTime = modifyOrderDTO.getRevertTime();
 		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {

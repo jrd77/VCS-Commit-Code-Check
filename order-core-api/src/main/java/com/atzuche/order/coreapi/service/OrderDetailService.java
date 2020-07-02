@@ -72,6 +72,8 @@ import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.*;
 import com.atzuche.order.renterorder.service.*;
+import com.atzuche.order.renterwz.entity.WzQueryDayConfEntity;
+import com.atzuche.order.renterwz.service.WzQueryDayConfService;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.service.notservice.AccountDebtReceivableaDetailNoTService;
@@ -187,6 +189,8 @@ public class OrderDetailService {
     private OrderSettleService orderSettleService;
     @Autowired
     private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private WzQueryDayConfService wzQueryDayConfService;
 
     private static final String UNIT_HOUR = "小时";
 
@@ -322,6 +326,16 @@ public class OrderDetailService {
             }
             BeanUtils.copyProperties(ownerOrderEntity,ownerOrderDTO);
         }
+        //违章查询城市天数
+        WzQueryDayConfEntity wzQueryDayConfEntity = wzQueryDayConfService.queryListByCityCode(orderDTO.getCityCode());
+        if(wzQueryDayConfEntity == null){
+            wzQueryDayConfEntity = wzQueryDayConfService.queryListByCityCode("111111");
+        }
+        WzQueryDayConfDTO wzQueryDayConfDTO = null;
+        if(wzQueryDayConfEntity != null){
+            wzQueryDayConfDTO = new WzQueryDayConfDTO();
+            BeanUtils.copyProperties(wzQueryDayConfEntity, wzQueryDayConfDTO);
+        }
 
         OrderDetailRespDTO  orderDetailRespDTO = new OrderDetailRespDTO();
         orderDetailRespDTO.order = orderDTO;
@@ -329,6 +343,7 @@ public class OrderDetailService {
         orderDetailRespDTO.renterOrder = renterOrderDTO;
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
+        orderDetailRespDTO.wzQueryDayConfDTO = wzQueryDayConfDTO;
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
         // 获取停运费信息
         OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
@@ -695,7 +710,6 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,accountRenterCostDetailDTO);
             accountRenterCostDetailDTOS.add(accountRenterCostDetailDTO);
         });
-
 
         orderDetailRespDTO.orderStatus = orderStatusDTO;
         orderDetailRespDTO.orderSourceStat = orderSourceStatDTO;
