@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -23,7 +24,9 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -983,6 +986,60 @@ public class RemoteFeignService {
         }catch (Exception e){
             log.error("Feign 查询车主补贴,responseObject={},orderNo={},ownerOrderNo={}",JSON.toJSONString(responseObject),orderNo,ownerOrderNo,e);
             Cat.logError("Feign 查询车主补贴",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+
+    /**
+     * 管理后台修改时间校验接口
+     * @param modifyOrderConsoleCheckReq
+     * @return ResponseData
+     */
+    public ResponseData modifyOrderCheckForConsole(ModifyOrderConsoleCheckReq modifyOrderConsoleCheckReq) {
+        log.info("Feign 修改时间校验,modifyOrderConsoleCheckReq={}", JSON.toJSONString(modifyOrderConsoleCheckReq));
+        ResponseData<?> responseObject = feignOrderModifyService.modifyOrderCheckForConsole(modifyOrderConsoleCheckReq);
+        return responseObject;
+    }
+
+    public RenterGoodsDetailDTO getRenterGoodsFromRemot(String renterOrderNo,boolean isNeedPrice){
+        ResponseData<RenterGoodsDetailDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryRenterGoodsDetail");
+            log.info("Feign 开始获取租客商品信息,renterOrderNo={}", renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,renterOrderNo);
+            responseObject =  feignGoodsService.queryRenterGoodsDetail(renterOrderNo,  isNeedPrice);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,renterOrderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客商品信息异常,responseObject={},renterOrderNo={}",JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 获取租客商品信息异常",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+
+    public RenterOrderDTO getRenterOrderFromRemot(String orderNo){
+        ResponseData<RenterOrderDTO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取租客商品信息");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignGoodsService.queryRenterOrderByOrderNo");
+            log.info("Feign 开始获取租客有效子订单,orderNo={}", orderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,orderNo);
+            responseObject =  feignOrderService.queryRenterOrderByOrderNo(orderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,orderNo);
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取租客商品信息异常,responseObject={},orderNo={}",JSON.toJSONString(responseObject),orderNo,e);
+            Cat.logError("Feign 获取租客有效子订单异常",e);
             throw e;
         }finally {
             t.complete();

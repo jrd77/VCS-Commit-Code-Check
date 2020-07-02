@@ -133,6 +133,13 @@ public enum ErrorCode {
     OIL_MILEAGE_ERR("600042","获取超里程或油费失败"),
     PAY_TRANS_NO_NOT_FOUNT_CASHIER("60042","该流水号查询不到记录"),
     CLEAN_REFOUND_ERR("60043","清算退款异常"),
+    WZ_REPEAT_DATA_ERR("600041","违章数据重复"),
+    WZ_DETAIL_DEL_STATUS_NOT_SUPPORT("600042","该状态下不能删除违章信息"),
+    WZ_DETAIL_DEL_ERR("600043","违章详情删除异常"),
+    DANGER_COUNT_FAIL("60044","获取出险次数失败"),
+    NOT_SUPPORT_LONG("60045","操作失败，当前车辆不接受长租"),
+    NOT_SUPPORT_SHORT("60046","操作失败，当前车辆不接受短租"),
+    COMMERCIAL_INSURANCE_AUDIT_FAIL("60046","操作失败，当前车辆长租接单商业险审核未通过/过期"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
 
     ;

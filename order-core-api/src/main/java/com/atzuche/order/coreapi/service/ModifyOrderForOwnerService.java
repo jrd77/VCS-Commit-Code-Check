@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,7 +116,7 @@ public class ModifyOrderForOwnerService {
 		// 获取租金费用信息
 		List<OwnerOrderPurchaseDetailEntity> purchaseList = getOwnerOrderPurchaseDetailEntityList(costBaseDTO, ownerGoodsDetailDTO);
 		// 获取增值服务费用信息
-		List<OwnerOrderIncrementDetailEntity> incrementList = getOwnerOrderIncrementDetailEntityList(costBaseDTO, modifyOrderOwnerDTO, ownerGoodsDetailDTO, purchaseList);
+		List<OwnerOrderIncrementDetailEntity> incrementList = getOwnerOrderIncrementDetailEntityList(costBaseDTO, modifyOrderOwnerDTO, ownerGoodsDetailDTO, purchaseList,renterSubsidyList);
 		// 获取租客车主券补贴
 		RenterOrderSubsidyDetailEntity renterSubsidy = getOwnerCouponSubsidy(renterSubsidyList);
 		// 获取车主补贴（车主券）
@@ -308,7 +309,8 @@ public class ModifyOrderForOwnerService {
 	 * @param ownerGoodsDetailDTO
 	 * @return
 	 */
-	public List<OwnerOrderIncrementDetailEntity> getOwnerOrderIncrementDetailEntityList(CostBaseDTO costBaseDTO, ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerGoodsDetailDTO ownerGoodsDetailDTO, List<OwnerOrderPurchaseDetailEntity> purchaseList) {
+	public List<OwnerOrderIncrementDetailEntity> getOwnerOrderIncrementDetailEntityList(CostBaseDTO costBaseDTO, ModifyOrderOwnerDTO modifyOrderOwnerDTO, OwnerGoodsDetailDTO ownerGoodsDetailDTO, List<OwnerOrderPurchaseDetailEntity> purchaseList,
+                                                                                        List<RenterOrderSubsidyDetailEntity> renterSubsidyList) {
 		List<OwnerOrderIncrementDetailEntity> incrementList = new ArrayList<OwnerOrderIncrementDetailEntity>();
 		// 获取车主取车费用
 		OwnerOrderIncrementDetailEntity srvGetFeeEntity = ownerOrderCostCombineService.getOwnerSrvGetAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvGetFlag());
@@ -343,7 +345,12 @@ public class ModifyOrderForOwnerService {
             if (purchaseList != null && !purchaseList.isEmpty()) {
                 purchaseAmount = purchaseList.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
             }
-            OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount, useServiceRate.intValue());
+            int subsidyRentAmt = Optional.ofNullable(renterSubsidyList).orElseGet(ArrayList::new).stream()
+                    .filter(x -> RenterCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode()))
+                    .mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount)
+                    .sum();
+            log.info("长租-修改订单-获取租金补贴金额subsidyRentAmt={}",subsidyRentAmt);
+            OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount+(-subsidyRentAmt), useServiceRate.intValue());
             if (serviceFeeEntity != null) {
                 incrementList.add(serviceFeeEntity);
             }

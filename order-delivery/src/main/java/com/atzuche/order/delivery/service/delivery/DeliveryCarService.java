@@ -21,6 +21,8 @@ import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,8 @@ public class DeliveryCarService {
     CodeUtils codeUtils;
     @Autowired
     OrderDeliveryFlowService deliveryFlowService;
+    @Autowired
+    OrderStatusService orderStatusService;
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
@@ -410,6 +414,7 @@ public class DeliveryCarService {
         orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlowEntity);
         orderDeliveryVO.setOrderDeliveryDTO(orderDeliveryDTO);
         orderDeliveryVO.setRenterDeliveryAddrDTO(renterDeliveryAddrDTO);
+        orderDeliveryVO.setRenterGoodsDetailDTO(orderReqContext.getRenterGoodsDetailDto());
         return orderDeliveryVO;
     }
 
@@ -481,7 +486,7 @@ public class DeliveryCarService {
         }
         if (2 != type) {
             orderDelivery.setStatus(3);
-            orderDelivery.setIsNotifyRenyun(0);
+           // orderDelivery.setIsNotifyRenyun(0);
         }
         orderDelivery.setRenterOrderNo(renterOrderNo);
         renterOrderDeliveryService.updateDeliveryByPrimaryKey(orderDelivery);
@@ -495,7 +500,10 @@ public class DeliveryCarService {
      * @param changeOrderInfoDTO
      */
     public void changeRenYunFlowOrderInfo(ChangeOrderInfoDTO changeOrderInfoDTO) {
-    	deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+        //增加参数（是否支付完车辆押金）
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(changeOrderInfoDTO.getOrderNo());
+        changeOrderInfoDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
+        deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
     }
 
 }

@@ -1,20 +1,26 @@
 package com.atzuche.order.admin.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.admin.common.Page;
 import com.atzuche.order.admin.constant.AdminOpTypeEnum;
 import com.atzuche.order.admin.service.RenterWzService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.vo.req.renterWz.RenterWzCostReqVO;
 import com.atzuche.order.admin.vo.req.renterWz.TemporaryRefundReqVO;
+import com.atzuche.order.admin.vo.req.renterWz.WzMessagePushRecordListReqVO;
+import com.atzuche.order.admin.vo.req.renterWz.WzMessagePushReqVO;
 import com.atzuche.order.admin.vo.resp.renterWz.RenterWzDetailResVO;
 import com.atzuche.order.admin.vo.resp.renterWz.WzCostLogsResVO;
+import com.atzuche.order.admin.vo.resp.renterWz.WzMessagePushRecordListResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
+import com.dianping.cat.Cat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +39,7 @@ import javax.validation.Valid;
 @AutoDocVersion(version = "管理后台违章押金信息")
 public class AdminRenterWzController extends BaseController {
 
-    @Resource
+    @Autowired
     private RenterWzService renterWzService;
 
     @Resource
@@ -94,6 +100,37 @@ public class AdminRenterWzController extends BaseController {
 
         return ResponseData.success();
     }
+    @AutoDocMethod(description = "新后台发送违章消息", value = "新后台发送违章消息")
+    @RequestMapping(value = "console/order/wz/sendMsg", method = RequestMethod.POST)
+    public ResponseData<?> send(@Valid @RequestBody WzMessagePushReqVO wzMessagePushReqVO, BindingResult bindingResult) throws Exception {
+        log.info("发送违章消息开始,messagePushSendReqVO:[{}]", JSON.toJSONString(wzMessagePushReqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        Integer res;
+        try {
+            res = renterWzService.insertMassage(wzMessagePushReqVO);
+        } catch (Exception e) {
+            log.error("发送违章消息异常,messagePushSendReqVO:[{}]", JSON.toJSONString(wzMessagePushReqVO), e);
+            Cat.logError("发送违章消息异常," + JSON.toJSONString(wzMessagePushReqVO), e);
+            return ResponseData.error();
+        }
+        log.info("发送违章消息结束,res:[{}]", JSON.toJSONString(res));
+        return ResponseData.success();
+    }
 
+    @AutoDocMethod(description = "查询新后台违章消息列表", value = "查询新后台违章消息列表", response = WzMessagePushRecordListResVO.class)
+    @RequestMapping(value = "console/order/wz/massageList", method = RequestMethod.GET)
+    public ResponseData<?> list(@Valid WzMessagePushRecordListReqVO reqVO, BindingResult bindingResult) {
+        log.info("查询违章消息列表开始,bufuMessagePushRecordListReqNewVO:[{}]", JSON.toJSONString(reqVO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        try {
+            Page<WzMessagePushRecordListResVO> wzRecordListByPage = renterWzService.selectByPage(reqVO);
+            log.info("查询违章消息列表结束,bufuRecordListByPage:[{}]", JSON.toJSONString(wzRecordListByPage));
+            return ResponseData.success(wzRecordListByPage);
+        } catch (Exception e) {
+            log.error("查询违章消息列表异常,bufuMessagePushRecordListReqVO:[{}]",JSON.toJSONString(reqVO), e);
+            Cat.logError("查询违章消息列表异常," + JSON.toJSONString(reqVO), e);
+            return ResponseData.error();
+        }
+    }
 }
 

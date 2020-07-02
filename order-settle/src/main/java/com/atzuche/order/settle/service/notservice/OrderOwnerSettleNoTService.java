@@ -3,10 +3,7 @@
  */
 package com.atzuche.order.settle.service.notservice;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -231,25 +228,28 @@ public class OrderOwnerSettleNoTService {
         if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
         	ownerIncomeAmt += -proxyExpense.getTotalAmount();
         }
-        
+        //3 获取车主补贴明细列表
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        if (ownerOrderSubsidyDetail != null) {
+            ownerIncomeAmt += ownerOrderSubsidyDetail.stream().mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount).sum();
+        }
+
         //2 车主端平台服务费
         //服务费比例 商品
+        //获取租金补贴部分
+        int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
         Double serviceRate = ownerGoodsDetail.getServiceRate();
         if(serviceRate==null){
             serviceRate = Double.valueOf(0.0);
         }
         int serviceProportion = serviceRate.intValue();
-        OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt,serviceProportion);
+        OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt+rentAmtSubsidy,serviceProportion);
         if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
         	ownerIncomeAmt += -serviceExpense.getTotalAmount();
         }
         
         
-        //3 获取车主补贴明细列表
-        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
-        if (ownerOrderSubsidyDetail != null) {
-        	ownerIncomeAmt += ownerOrderSubsidyDetail.stream().mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount).sum();
-        }
+
         //5 获取车主增值服务费用列表
         List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         if (ownerOrderIncrementDetail != null) {

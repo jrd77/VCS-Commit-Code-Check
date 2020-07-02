@@ -38,7 +38,8 @@ public enum AdminOpTypeEnum {
     TYREINSURFLAG(27,"轮胎/轮毂保障服务费"),
     DRIVERINSURFLAG(28,"驾乘无忧保障费"),
     OWNER_FINE(29,"车主罚金操作"),
-    OWNER_TO_PLATFORM(30,"车主需支付给平台的费用操作")
+    OWNER_TO_PLATFORM(30,"车主需支付给平台的费用操作"),
+    SUPERPOWER_CHANGE_ODER_REQ(31,"修改订单（超级权限）")
     ;
     private int opCode;
     private String opType;

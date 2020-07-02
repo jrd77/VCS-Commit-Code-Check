@@ -32,12 +32,14 @@ public class LongOrderFilterChain implements OrderFilter, ApplicationContextAwar
         orderFilterList.add(applicationContext.getBean(ConvertLatOrLonFilter.class));
         /*免押方式校验*/
         orderFilterList.add(applicationContext.getBean(FreeDepositModeFilter.class));
+        /*商业险审核校验*/
+        orderFilterList.add(applicationContext.getBean(CommercialInsuranceAuditFilter.class));
         /* 不能自己租自己 的车的检查 */
         orderFilterList.add(applicationContext.getBean(NotRentSelfCarFilter.class));
         /*平台显示校验*/
         orderFilterList.add(applicationContext.getBean(PlatformShowFilter.class));
         /*长租标签校验*/
-        orderFilterList.add(applicationContext.getBean(TagCheckFilter.class));
+        //orderFilterList.add(applicationContext.getBean(TagCheckFilter.class));
         /*长租订单租期必须大于30天*/
         orderFilterList.add(applicationContext.getBean(LongMinRentTimeFilter.class));
         /*最大租期校验*/

@@ -57,6 +57,8 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -155,7 +157,7 @@ public class SubmitOrderHandleService {
                 baseReqDTO.getOrderNo(),
                 context.getRiskAuditId(),
                 replyFlag,
-                context.getOrderReqVO());
+                context.getOrderReqVO(),context.getRenterGoodsDetailDto());
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
         // 订单流程处理(orderFlow)
         orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
@@ -285,25 +287,29 @@ public class SubmitOrderHandleService {
      * @return ParentOrderDTO
      */
     public ParentOrderDTO buildParentOrderDTO(String orderNo, String riskAuditId, boolean replyFlag,
-                                              OrderReqVO orderReqVO) {
+                                              OrderReqVO orderReqVO,RenterGoodsDetailDTO renterGoodsDetailDto) {
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         OrderDTO orderDTO = buildOrderDTO(orderNo, riskAuditId, orderReqVO);
         OrderSourceStatDTO orderSourceStatDTO = buildOrderSourceStatDTO(orderNo, orderReqVO);
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        if (replyFlag) {
+        LocalDateTime rentTime = orderReqVO.getRentTime();
+
+        if (replyFlag && (renterGoodsDetailDto.getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= renterGoodsDetailDto.getAdvanceOrderTime())) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(0);
         }
-
         parentOrderDTO.setOrderDTO(orderDTO);
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderDTO.setOrderSourceStatDTO(orderSourceStatDTO);
         return parentOrderDTO;
 
     }
+
 
 
     /**

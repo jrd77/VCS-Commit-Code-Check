@@ -12,13 +12,17 @@ import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * IllegalQueryTask
@@ -58,7 +62,6 @@ public class IllegalQueryTask extends IJobHandler {
 
             List<IllegalToDO> list = orderSearchRemoteService.violatePendingOrder();
 
-            logger.info("查询 远程调用 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 ,查询结果 models:[{}]", list);
             XxlJobLogger.log("查询 远程调用 查询按规则配置日期内完成的订单，获取待查询违章的对象列表 ,查询结果 models:" + list);
 
             if(CollectionUtils.isNotEmpty(list)){
@@ -83,5 +86,15 @@ public class IllegalQueryTask extends IJobHandler {
                 t.complete();
             }
         }
+    }
+
+    public List<IllegalToDO> mergeDuplicateData(List<IllegalToDO> list1,List<IllegalToDO> list2){
+        List<IllegalToDO> list = new ArrayList<>();
+        if(list1 != null)list.addAll(list1);
+        if(list2 != null)list.addAll(list2);
+        List<IllegalToDO> mergeList = list.stream()
+                .filter(x-> StringUtils.isNotBlank(x.getOrderNo())&& StringUtils.isNotBlank(x.getPlateNum()))
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>((x, y) -> IllegalToDO.isDuplicate(x,y))), ArrayList::new));
+        return mergeList;
     }
 }

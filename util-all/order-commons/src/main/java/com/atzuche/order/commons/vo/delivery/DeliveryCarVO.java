@@ -35,6 +35,9 @@ public class DeliveryCarVO {
     @AutoDocProperty("油耗总刻度")
     private String maxOilNumber;
 
-
+    @AutoDocProperty("取车虚拟地址")
+    private String getCarShowAddr;
+    @AutoDocProperty("还车虚拟地址")
+    private String returnCarShowAddr;
 
 }

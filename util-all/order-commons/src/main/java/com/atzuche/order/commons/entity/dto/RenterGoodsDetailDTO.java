@@ -41,6 +41,10 @@ public class RenterGoodsDetailDTO {
      */
     @AutoDocProperty("应答标识位")
     private Integer replyFlag;
+
+    @AutoDocProperty("最终是否自动接单标志")
+    private Integer isAutoReplayFlag;
+
     /**
      * 车辆号
      */
@@ -316,6 +320,9 @@ public class RenterGoodsDetailDTO {
     @AutoDocProperty("年检到期日期")
     private LocalDate inspectExpire;
 
+    @AutoDocProperty("保险出险导致次年保费上涨的收费")
+    private Integer premiumMoney;
+
     /**
      * 周末价格
      */
@@ -346,4 +353,17 @@ public class RenterGoodsDetailDTO {
     private Integer dayPrice;
     // car_charge_level表的车辆等级
     private Integer carChargeLevel;
+
+    /**
+     * 长租审核状态；1为已审核；0为未审核；2为审核失败
+     */
+    @AutoDocProperty("长租审核状态；1为已审核；0为未审核；2为审核失败")
+    private Integer longRentVerifyStatus;
+    /**
+     * 接受订单类型：1为所有；2为长租；3为短租
+     */
+    @AutoDocProperty("接受订单类型：1为所有；2为长租；3为短租")
+    private Integer orderType;
+    @AutoDocProperty("租客提前下单时间（小时）")
+    private Integer advanceOrderTime;
 }

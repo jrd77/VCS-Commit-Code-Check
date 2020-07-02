@@ -15,6 +15,10 @@ import lombok.ToString;
 @ToString
 @Data
 public class OrderRenterCostResVO {
+
+    @AutoDocProperty(value = "主订单号")
+    private String orderNo;
+
 	@AutoDocProperty(value="子订单编号")
 	private String renterOrderNo;
 
@@ -89,6 +93,9 @@ public class OrderRenterCostResVO {
 	
 	@AutoDocProperty(value="加油服务费用")  ///
 	private String addOilSrvAmt;
+
+    @AutoDocProperty(value = "保险出险导致次年保费上涨的收费")
+    public String premiumMoney;
 
 	//--------------------------------------------
 	@AutoDocProperty(value="优惠抵扣")

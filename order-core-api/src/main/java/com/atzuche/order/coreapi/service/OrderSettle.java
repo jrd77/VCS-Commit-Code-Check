@@ -40,6 +40,11 @@ public class OrderSettle {
     public void settleOrder(String orderNo){
         orderSettleService.settleOrder(orderNo,payCallbackService);
     }
+    
+    public void settleOrder(String orderNo,List<String> listOrderNos){
+        orderSettleService.settleOrder(orderNo,payCallbackService,listOrderNos);
+    }
+    
 
     public void settleWzOrder(String orderNo){
     	orderWzSettleService.settleWzOrder(orderNo);

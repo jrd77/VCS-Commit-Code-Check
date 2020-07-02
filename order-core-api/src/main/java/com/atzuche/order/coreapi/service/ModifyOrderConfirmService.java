@@ -184,7 +184,7 @@ public class ModifyOrderConfirmService {
 		// 保存换车记录
 		orderTransferRecordService.saveOrderTransferRecord(orderTransferRecordEntity);
 		// 更新调度状态
-		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode());
+		orderStatusService.updateDispatchStatus(modifyOrderOwnerDTO.getOrderNo(), DispatcherStatusEnum.DISPATCH_SUCCESS.getCode(), 0);
 		// 查询订单状态
 		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
 		// 订单状态
@@ -557,7 +557,12 @@ public class ModifyOrderConfirmService {
 			// 长租订单
 			orderInfoDTO.setLongRent(1);
 		}
-		stockService.cutCarStock(orderInfoDTO);
+		// 超级权限
+		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			stockService.cutCarStockForSuperPower(orderInfoDTO);
+		} else {
+			stockService.cutCarStock(orderInfoDTO);
+		}
 	}
 	
 	/**

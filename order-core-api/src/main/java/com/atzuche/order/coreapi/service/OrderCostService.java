@@ -453,7 +453,12 @@ public class OrderCostService {
         resVo.setOrderConsoleSubsidyDetails(orderConsoleSubsidyDetailsReal);
         RenterCostVO costVo = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderEntity.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
         resVo.setRenterCostVO(costVo);
-		return resVo;
+
+        //租客商品信息
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
+        resVo.setRenterGoodsDetailDTO(renterGoodsDetail);
+
+        return resVo;
 	}
 
 	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req)  {

@@ -56,6 +56,8 @@
         <result property="moreLicenseFlag" column="more_license_flag"/>
         <result property="licenseExpire" column="license_expire"/>
         <result property="inspectExpire" column="inspect_expire"/>
+        <result property="dangerCount" column="danger_count"/>
+        <result property="premiumMoney" column="premium_money"/>
         <result property="carAge" column="car_age"/>
         <result property="isLocal" column="is_local"/>
         <result property="year" column="year"/>
@@ -123,6 +125,8 @@
 	`more_license_flag`,
 	`license_expire`,
 	`inspect_expire`,
+	`danger_count`,
+	`premium_money`,
 	`car_age`,
 	`is_local`,
 	`year`,
@@ -195,6 +199,8 @@
         `more_license_flag`,
         `license_expire`,
         `inspect_expire`,
+        `danger_count`,
+        `premium_money`,
         `car_age`,
         `is_local`,
         `year`,
@@ -257,6 +263,8 @@
         #{moreLicenseFlag},
         #{licenseExpire},
         #{inspectExpire},
+        #{dangerCount},
+        #{premiumMoney},
         #{carAge},
         #{isLocal},
         #{year},
@@ -322,6 +330,8 @@
             <if test="moreLicenseFlag != null">`more_license_flag`, </if>
             <if test="licenseExpire != null">`license_expire`, </if>
             <if test="inspectExpire != null">`inspect_expire`, </if>
+            <if test="dangerCount != null">`danger_count`, </if>
+            <if test="premiumMoney != null">`premium_money`, </if>
             <if test="carAge != null">`car_age`, </if>
             <if test="isLocal != null">`is_local`, </if>
             <if test="year != null">`year`, </if>
@@ -383,6 +393,8 @@
             <if test="moreLicenseFlag != null">#{moreLicenseFlag},  </if>
             <if test="licenseExpire != null">#{licenseExpire},  </if>
             <if test="inspectExpire != null">#{inspectExpire},  </if>
+            <if test="dangerCount != null">#{dangerCount},  </if>
+            <if test="premiumMoney != null">#{premiumMoney},  </if>
             <if test="carAge != null">#{carAge},  </if>
             <if test="isLocal != null">#{isLocal},  </if>
             <if test="year != null">#{year},  </if>
@@ -451,6 +463,8 @@
             <if test="createOp != null">`create_op` = #{createOp}, </if>
             <if test="updateOp != null">`update_op` = #{updateOp}, </if>
             <if test="inspectExpire != null">`inspect_expire` = #{inspectExpire}, </if>
+            <if test="dangerCount != null">`danger_count` = #{dangerCount}, </if>
+            <if test="premiumMoney != null">`premium_money` = #{premiumMoney}, </if>
             <if test="lastMileage != null">`last_mileage` = #{lastMileage}, </if>
             <if test="modelTxt != null">`model_txt` = #{modelTxt}, </if>
             <if test="year != null">`year` = #{year}</if>
@@ -513,6 +527,8 @@
             `create_op` = #{createOp},
             `update_op` = #{updateOp},
             `inspect_expire` = #{inspectExpire},
+            `danger_count` = #{dangerCount},
+            `premium_money` = #{premiumMoney},
             `year` = #{year},
             `model_txt` = #{modelTxt},
             `last_mileage` = #{lastMileage}
