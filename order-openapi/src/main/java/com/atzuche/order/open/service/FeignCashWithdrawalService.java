@@ -27,6 +27,15 @@ public interface FeignCashWithdrawalService {
 	@GetMapping("/account/withdraw/list")
     public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid SearchCashWithdrawalReqDTO req);
 
+    /**
+     * 判断提现金额是否包含二清
+     *
+     * @param req 请求参数
+     * @return ResponseData<AcctOwnerWithdrawalRuleResVO>
+     */
+    @PostMapping("/account/withdraw/pre/rule")
+    public ResponseData<AcctOwnerWithdrawalRuleResVO> getAcctOwnerWithdrawalRule(@RequestBody AcctOwnerWithdrawalRuleReqVO req);
+
 	/**
 	 * 获取用户总欠款
 	 * @param req
@@ -43,6 +52,5 @@ public interface FeignCashWithdrawalService {
 	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req);
 
 
-    @PostMapping("/account/withdraw/pre/rule")
-    public ResponseData<AcctOwnerWithdrawalRuleResVO> getAcctOwnerWithdrawalRule(@RequestBody AcctOwnerWithdrawalRuleReqVO req);
+
 }
