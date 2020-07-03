@@ -634,5 +634,7 @@ public class ModifyOrderConfirmService {
 				deliveryCarService.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
 			}
 		}
+        //再补发一次
+        deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(modify.getOrderNo()));
 	}
 }
