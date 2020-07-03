@@ -278,6 +278,7 @@ public class SubmitOrderHandleService {
                 Integer.valueOf(orderReqVO.getSpecialConsole()));
         orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
         orderSourceStatDTO.setLongRentCouponCode(orderReqVO.getLongOwnerCouponNo());
+        orderSourceStatDTO.setOilType(orderReqVO.getOilType());
         logger.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
     }
