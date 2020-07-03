@@ -35,6 +35,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -71,6 +72,8 @@ public class ModifyOrderFeeService {
 	private OwnerOrderService ownerOrderService;
 	@Autowired
 	private AccountRenterCostSettleService accountRenterCostSettleService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 
 	/**
 	 * 获取修改订单前后费用
@@ -141,6 +144,8 @@ public class ModifyOrderFeeService {
 		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,modifyOrderReq.getMemNo());
 		// 应付
 		int payable = getTotalRentCarFee(updateModifyOrderFeeVO);
+		// 平台给租客的补贴总额
+		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderNo, modifyOrderReq.getMemNo());
 		if (rentAmtPayed >= Math.abs(payable)) {
 			// 实付大于应付，不需要支付
 			modifyOrderCompareVO.setCleanSupplementAmt(1);
