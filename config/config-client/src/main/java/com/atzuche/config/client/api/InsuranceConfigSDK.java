@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atzuche.config.common.api.ConfigContext;
 import com.atzuche.config.common.api.ConfigItemDTO;
+import com.atzuche.config.common.entity.IllegalDepositConfigEntity;
 import com.atzuche.config.common.entity.InsuranceConfigEntity;
 import com.atzuche.config.common.entity.SysConfigEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,4 +30,5 @@ public class InsuranceConfigSDK {
 
         return JSON.parseObject(itemDTO.getConfigValue(),new TypeReference<List<InsuranceConfigEntity>>(){});
     }
+    
 }
