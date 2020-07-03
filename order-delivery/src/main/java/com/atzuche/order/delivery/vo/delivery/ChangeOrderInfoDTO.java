@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
+@Accessors(chain = true)
 @Data
 @ToString
 public class ChangeOrderInfoDTO implements Serializable{
