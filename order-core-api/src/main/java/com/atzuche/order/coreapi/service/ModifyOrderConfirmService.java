@@ -396,13 +396,15 @@ public class ModifyOrderConfirmService {
 			}
 			if (srvGetFlag != null && srvGetFlag == 1) {
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改时间
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "time");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 				}
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改地址
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "addr");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
@@ -411,13 +413,15 @@ public class ModifyOrderConfirmService {
 			
 			if (srvReturnFlag != null && srvReturnFlag == 1) {
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改时间
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "time");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 				}
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改地址
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "addr");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
