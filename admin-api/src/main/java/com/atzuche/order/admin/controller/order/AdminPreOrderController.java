@@ -166,11 +166,12 @@ public class AdminPreOrderController {
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
         int totalWallet = walletProxyService.getWalletByMemNo(memNo);
-        RenterMemberRightDTO renterMemberRightDTO = filterRight(renterMember.getRenterMemberRightDTOList(), RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
-        if(renterMemberRightDTO != null && totalWallet > 0){
+        if(totalWallet<=0){
+            responseVO.setIsUseWallet(0);
+        }else if(filterRight(renterMember.getRenterMemberRightDTOList(), RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1") != null && totalWallet > 0){
             responseVO.setIsUseWallet(1);
         }else{
-            responseVO.setIsUseWallet(0);
+            responseVO.setIsUseWallet(-1);
         }
         responseVO.setTotalWallet(totalWallet);
         responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
