@@ -323,6 +323,9 @@ public class ModifyOrderConfirmService {
 			if (modify == null) {
 				return;
 			}
+            //换车就通知任云
+            log.info("换车触发事件通知任云modify={}",modify);
+            deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(modify.getOrderNo()));
 			if (changeItemList == null || changeItemList.isEmpty()) {
 				return;
 			}
@@ -557,7 +560,12 @@ public class ModifyOrderConfirmService {
 			// 长租订单
 			orderInfoDTO.setLongRent(1);
 		}
-		stockService.cutCarStock(orderInfoDTO);
+		// 超级权限
+		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			stockService.cutCarStockForSuperPower(orderInfoDTO);
+		} else {
+			stockService.cutCarStock(orderInfoDTO);
+		}
 	}
 	
 	/**

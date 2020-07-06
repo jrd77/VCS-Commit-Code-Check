@@ -264,7 +264,8 @@ public class DeliveryCarInfoService {
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
         //车主平台加油服务费carOwnerOilCrash
         try {
-            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(deliveryCarInfoPriceService.getOwnerPlatFormOilServiceCharge(renterGoodsDetailDTO,Integer.valueOf(ownerGetAndReturnCarDTO.getGetCarOil().contains("L") ? ownerGetAndReturnCarDTO.getGetCarOil().replace("L", "") : ownerGetAndReturnCarDTO.getGetCarOil()), Integer.valueOf(renterGetAndReturnCarDTO.getGetCarOil().contains("L") ? renterGetAndReturnCarDTO.getGetCarOil().replace("L", "") : renterGetAndReturnCarDTO.getGetCarOil())) + "元");
+            int platFormOilServiceCharge = -deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(oilTotalCalibration,renterGoodsDetailDTO.getOrderNo());
+            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(platFormOilServiceCharge+ "元");
         } catch (Exception e) {
             log.info("获取平台加邮费出错,ownerGetAndReturnCarDTO:[]", JSONObject.toJSONString(ownerGetAndReturnCarDTO));
             ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
@@ -344,7 +345,7 @@ public class DeliveryCarInfoService {
             if(renterGoodsDetailDTO != null){
                 mileageAmtDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType()==null?null:renterGoodsDetailDTO.getCarOwnerType());
                 mileageAmtDTO.setDayMileage(renterGoodsDetailDTO.getCarDayMileage()==null?null:renterGoodsDetailDTO.getCarDayMileage());
-                mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?null:renterGoodsDetailDTO.getCarDayMileage());
+                mileageAmtDTO.setGuideDayPrice(renterGoodsDetailDTO.getCarGuideDayPrice()==null?null:renterGoodsDetailDTO.getCarGuideDayPrice());
             }
             if(ownerGetAndReturnCarDTO != null){
                 mileageAmtDTO.setGetmileage(ownerGetAndReturnCarDTO.getGetKM()==null?null:Integer.valueOf(ownerGetAndReturnCarDTO.getGetKM()));
@@ -354,6 +355,7 @@ public class DeliveryCarInfoService {
             if(renterOrderDelivery != null){
                 costBaseDTO.setStartTime(renterOrderDelivery.getRentTime());
                 costBaseDTO.setEndTime(renterOrderDelivery.getRevertTime());
+                costBaseDTO.setOrderNo(renterOrderDelivery.getOrderNo());
             }
             mileageAmtDTO.setCostBaseDTO(costBaseDTO);
             return deliveryCarInfoPriceService.getMileageAmtEntity(mileageAmtDTO).getTotalFee();

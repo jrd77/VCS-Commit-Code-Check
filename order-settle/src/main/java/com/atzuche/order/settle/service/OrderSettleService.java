@@ -517,12 +517,16 @@ public class OrderSettleService{
         settleOrders.getOwnerCosts().setOwnerNo(settleOrders.getOwnerMemNo());
     	return settleOrders.getOwnerCosts();
     }
+    
+    public void settleOrder(String orderNo, OrderPayCallBack callBack) {
+    	settleOrder(orderNo, callBack, null);
+    }
     /**
      * 车辆押金结算(默认租客)
      * 需要平账检测，保持一个入口，仅仅结算结构上做调整。
      * 先注释调事务
      */
-    public void settleOrder(String orderNo, OrderPayCallBack callBack) {
+    public void settleOrder(String orderNo, OrderPayCallBack callBack,List<String> listOrderNos) {
         log.info("OrderSettleService settleOrder orderNo [{}]",orderNo);
         Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "车俩结算服务");
         SettleOrders settleOrders = new SettleOrders();
@@ -537,7 +541,7 @@ public class OrderSettleService{
             log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
             //检查是否可以结算。 外置。
-            boolean checkFlag = orderSettleNoTService.check(settleOrders);
+            boolean checkFlag = orderSettleNoTService.check(settleOrders,listOrderNos);
             if(!checkFlag) {
             	log.info("提前终止结算，当前结算状态不符合。orderNo [{}]",orderNo);
             	return;

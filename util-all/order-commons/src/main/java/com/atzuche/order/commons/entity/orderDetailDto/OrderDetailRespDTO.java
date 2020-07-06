@@ -60,5 +60,7 @@ public class OrderDetailRespDTO {
     public Integer ownerPreIncom;
     // 停运费信息
     public OrderStopFreightDTO orderStopFreightDTO;
+    //违章结算
+    public WzQueryDayConfDTO wzQueryDayConfDTO;
 
 }

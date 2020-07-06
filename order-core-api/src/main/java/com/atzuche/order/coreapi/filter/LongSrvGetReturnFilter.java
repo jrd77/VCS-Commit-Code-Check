@@ -31,8 +31,8 @@ public class LongSrvGetReturnFilter implements OrderFilter {
     }
 
     public static void main(String[] args) {
-        LocalDateTime start = LocalDateTime.of(2019, 12, 31, 23, 00, 00);
-        LocalDateTime end = LocalDateTime.of(2020, 1, 1, 23, 00, 00);
+        LocalDateTime start = LocalDateTime.of(2019, 12, 31, 23, 02, 00);
+        LocalDateTime end = LocalDateTime.of(2020, 1, 2, 22, 01, 00);
         System.out.println(Duration.between(start, end).toHours());
     }
 }

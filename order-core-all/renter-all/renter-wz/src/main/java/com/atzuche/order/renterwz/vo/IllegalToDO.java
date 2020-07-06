@@ -239,4 +239,29 @@ public class IllegalToDO implements Serializable {
                 ", cityCode=" + cityCode +
                 '}';
     }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/6/5 16:53
+     * @Description: 对比两个对象是否相同
+     *
+     **/
+    public static int isDuplicate(IllegalToDO illegalToDO1,IllegalToDO illegalToDO2){
+        if(illegalToDO1 == null || illegalToDO2 == null){
+            return 1;
+        }
+        String orderNo1 = illegalToDO1.getOrderNo();
+        String orderNo2 = illegalToDO2.getOrderNo();
+        String plateNum1 = illegalToDO1.getPlateNum();
+        String plateNum2 = illegalToDO2.getPlateNum();
+
+        if(orderNo1 ==null || orderNo2 == null || plateNum1==null || plateNum2==null){
+            return 1;
+        }
+
+        if(orderNo1.equals(orderNo2) && plateNum1.equals(plateNum2)){
+            return 0;
+        }
+        return 1;
+    }
 }

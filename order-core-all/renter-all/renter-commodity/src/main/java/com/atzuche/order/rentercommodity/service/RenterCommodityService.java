@@ -51,7 +51,7 @@ public class RenterCommodityService {
 
     /**
      * 计算小时数 设置分组日期
-     * @param orderContextDto
+     * @param
      */
     public RenterGoodsDetailDTO setPriceAndGroup(RenterGoodsDetailDTO renterGoodsDetailDTO){
         init(renterGoodsDetailDTO);
@@ -112,8 +112,12 @@ public class RenterCommodityService {
                         renterGoods.setRevertTime(y.getRevertTime());
                         newRenterGoodsPriceList.add(renterGoods);
                     });
-
-                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    float HFirst = 0;
+                    if(x.isMaxDay()){
+                        HFirst = CommonUtils.getTotalHoursByRentAveragePrice(dbPriceMaxCarDay.getRevertTime(),x.getRevertTime());
+                    }else{
+                        HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    }
                     RenterGoodsPriceDetailDTO renterGoods = new RenterGoodsPriceDetailDTO();
                     renterGoods.setCarHourCount(HFirst);
                     renterGoods.setCarDay(x.getCarDay());
@@ -222,6 +226,7 @@ public class RenterCommodityService {
             float HLast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(dateLast));
             renterGoodsPriceDetailDto.setRevertTime(revertTime);
             renterGoodsPriceDetailDto.setCarHourCount(HLast);
+            renterGoodsPriceDetailDto.setMaxDay(true);
         }
 
     }

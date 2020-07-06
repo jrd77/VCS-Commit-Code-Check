@@ -32,5 +32,9 @@ public class ViolationInformationResponseVO {
 
     @AutoDocProperty(value = "违章状态")
     private String violationStatus;
+    @AutoDocProperty(value = "会员号")
+    private String memNo;
+    @AutoDocProperty(value = "订单号")
+    private String orderNo;
 
 }

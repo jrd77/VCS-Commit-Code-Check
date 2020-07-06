@@ -29,4 +29,7 @@ public class IllegalDepositConfigSDK {
 
         return JSON.parseObject(itemDTO.getConfigValue(),new TypeReference<List<IllegalDepositConfigEntity>>(){});
     }
+    
+
+    
 }

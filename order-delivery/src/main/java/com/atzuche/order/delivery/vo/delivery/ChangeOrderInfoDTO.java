@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
+@Accessors(chain = true)
 @Data
 @ToString
 public class ChangeOrderInfoDTO implements Serializable{
@@ -39,5 +41,9 @@ public class ChangeOrderInfoDTO implements Serializable{
      * 驾乘无忧保障服务是否购买
      */
     private String driverInsurFlag;
+    /*
+    * 是否支付车辆押金
+    * */
+    private String isPayDeposit;
 	
 }

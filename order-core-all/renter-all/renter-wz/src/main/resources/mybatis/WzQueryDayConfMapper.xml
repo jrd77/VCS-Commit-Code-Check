@@ -70,4 +70,8 @@
 		where id = #{id}
 	</update>
 
+	<select id="queryListByCityCode" resultMap="selectColumnMap">
+        select * from wz_query_day_conf where city_code = #{cityCode} limit 1
+    </select>
+
 </mapper>

@@ -374,6 +374,7 @@ public class RenterCostFacadeService {
             logger.error("订单状态信息不存在orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
@@ -393,8 +394,8 @@ public class RenterCostFacadeService {
         BaseCostDTO baseCostDTO = new BaseCostDTO();
         baseCostDTO.renterAmt = abs(renterOrderCostEntity.getRentCarAmount());
         baseCostDTO.serviceFee = abs(RenterOrderCostDetailUtils.getFeeAmt(renterOrderCostDetailEntityList));
-        baseCostDTO.basicGuaranteeFee = abs(renterOrderCostEntity.getBasicEnsureAmount());
-        baseCostDTO.allGuaranteeFee = abs(renterOrderCostEntity.getComprehensiveEnsureAmount());
+        baseCostDTO.basicGuaranteeFee = abs(RenterOrderCostDetailUtils.getAmt(renterOrderCostDetailEntityList,RenterCashCodeEnum.INSURE_TOTAL_PRICES));
+        baseCostDTO.allGuaranteeFee = abs(RenterOrderCostDetailUtils.getAmt(renterOrderCostDetailEntityList,RenterCashCodeEnum.ABATEMENT_INSURE));
         baseCostDTO.driverInsurance = abs(renterOrderCostEntity.getAdditionalDrivingEnsureAmount());
         baseCostDTO.distributionCost = abs(RenterOrderCostDetailUtils.getDistributionCost(renterOrderCostDetailEntityList));
         baseCostDTO.penaltyBreachContract = renterFineVO.getTotalFine();
@@ -404,6 +405,7 @@ public class RenterCostFacadeService {
         baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         baseCostDTO.tyreInsurAmt =  abs(RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         baseCostDTO.driverInsurAmt =  abs(RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null?renterGoodsDetailDTO.getPremiumMoney():null;
         rentCarCostDTO.baseCostDTO = baseCostDTO;
         //1.2、优惠券抵扣
         CouponDeductionDTO couponDeductionDTO = new CouponDeductionDTO();

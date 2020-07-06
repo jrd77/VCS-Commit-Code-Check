@@ -49,4 +49,12 @@ public interface WzQueryDayConfMapper{
 	 * @return 删除的数量
 	 */
 	Integer deleteWzQueryDayConfById(@Param("id") Long id);
+
+    /**
+     * 根据cityCode 查询
+     * @param cityCode
+     * @return
+     */
+    WzQueryDayConfEntity queryListByCityCode(@Param("cityCode")String cityCode);
+
 }

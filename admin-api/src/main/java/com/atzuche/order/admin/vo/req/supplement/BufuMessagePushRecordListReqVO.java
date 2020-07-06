@@ -30,5 +30,5 @@ public class BufuMessagePushRecordListReqVO implements Serializable {
     @AutoDocProperty("发送时间排序 升序传ASC，降序传DESC")
     private String sendTimeSort;
     @AutoDocProperty("补付ID")
-    private Integer orderSupplementDetailId;
+    private Long orderSupplementDetailId;
 }
