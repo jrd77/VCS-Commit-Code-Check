@@ -351,6 +351,18 @@ public class DeliveryCarTask {
 		SectionDeliveryResultVO sectionDeliveryResultVO = SectionDeliveryUtils.getSectionDeliveryResultVO(sectionParam, DateUtils.FORMAT_STR_RENYUN);
 		if (sectionDeliveryResultVO != null) {
 			sectionDeliveryResultVO.setDistributionMode(mode.getDistributionMode());
+			if (mode.getRenterProposalGetTime() != null && sectionDeliveryResultVO.getRenterSectionDelivery() != null) {
+				sectionDeliveryResultVO.getRenterSectionDelivery().setDefaultRentTime(DateUtils.formate(mode.getRenterProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getRenterProposalReturnTime() != null && sectionDeliveryResultVO.getRenterSectionDelivery() != null) {
+				sectionDeliveryResultVO.getRenterSectionDelivery().setDefaultRevertTime(DateUtils.formate(mode.getRenterProposalReturnTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getOwnerProposalGetTime() != null && sectionDeliveryResultVO.getOwnerSectionDelivery() != null) {
+				sectionDeliveryResultVO.getOwnerSectionDelivery().setDefaultRentTime(DateUtils.formate(mode.getOwnerProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getOwnerProposalReturnTime() != null && sectionDeliveryResultVO.getOwnerSectionDelivery() != null) {
+				sectionDeliveryResultVO.getOwnerSectionDelivery().setDefaultRevertTime(DateUtils.formate(mode.getOwnerProposalReturnTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
 		}
 		return sectionDeliveryResultVO;
     }

@@ -202,11 +202,13 @@ public class RenterOrderDeliveryModeService {
 		
 		// 取还车区间配送
 		Map<Integer,QuHuanQujianVO> quHuanQujianMap = SectionDeliveryUtils.listQuHuanQujianVO(result, sectionParam, initpro).stream().collect(Collectors.toMap(QuHuanQujianVO::getMemType, curObj -> curObj));
+		handProposalTime(mode, quHuanQujianMap);
 		// 取还车准时达
 		Map<Integer,QuhuanZhunshiVO> quhuanZhunshiMap = SectionDeliveryUtils.listQuhuanZhunshiVO(result, sectionParam, initpro).stream().collect(Collectors.toMap(QuhuanZhunshiVO::getMemType, curObj -> curObj));
 		TransProgressDTO pro = getQuZhiHuanTP(initpro, renterOrderEntity);
 		// 取车服务-自还-区间配送
 		Map<Integer,QuZhiHuanQujianVO> quZhiHuanQujianMap = SectionDeliveryUtils.listQuZhiHuanQujianVO(result, sectionParam, pro).stream().collect(Collectors.toMap(QuZhiHuanQujianVO::getMemType, curObj -> curObj));
+		handProposalTimeZihuan(mode, quZhiHuanQujianMap);
 		// 取车服务-自还-准时达
 		Map<Integer,QuZhiHuanZhunshiVO> quZhiHuanZhunshiMap = SectionDeliveryUtils.listQuZhiHuanZhunshiVO(result, sectionParam, pro).stream().collect(Collectors.toMap(QuZhiHuanZhunshiVO::getMemType, curObj -> curObj));
 		// 自取自还
@@ -290,5 +292,48 @@ public class RenterOrderDeliveryModeService {
         mode.setAccurateGetSrvUnit(getAccurateCost);
         mode.setAccurateReturnSrvUnit(returnAccurateCost);
 		return mode;
+	}
+	
+	public void handProposalTime(RenterOrderDeliveryMode mode, Map<Integer,QuHuanQujianVO> quHuanQujianMap) {
+		if (mode == null || quHuanQujianMap == null) {
+			return;
+		}
+		for (Map.Entry<Integer, QuHuanQujianVO> entry : quHuanQujianMap.entrySet()) {  
+			QuHuanQujianVO result = entry.getValue();
+			if (result == null) {
+				continue;
+			}
+			if (mode.getRenterProposalGetTime() != null && SectionDeliveryUtils.RENTER.equals(result.getMemType())) {
+				result.setDefaultRentTime(DateUtils.formate(mode.getRenterProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getRenterProposalReturnTime() != null && SectionDeliveryUtils.RENTER.equals(result.getMemType())) {
+				result.setDefaultRevertTime(DateUtils.formate(mode.getRenterProposalReturnTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getOwnerProposalGetTime() != null && SectionDeliveryUtils.OWNER.equals(result.getMemType())) {
+				result.setDefaultRentTime(DateUtils.formate(mode.getOwnerProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getOwnerProposalReturnTime() != null && SectionDeliveryUtils.OWNER.equals(result.getMemType())) {
+				result.setDefaultRevertTime(DateUtils.formate(mode.getOwnerProposalReturnTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+		} 
+	}
+	
+	
+	public void handProposalTimeZihuan(RenterOrderDeliveryMode mode, Map<Integer,QuZhiHuanQujianVO> quZhiHuanQujianMap) {
+		if (mode == null || quZhiHuanQujianMap == null) {
+			return;
+		}
+		for (Map.Entry<Integer, QuZhiHuanQujianVO> entry : quZhiHuanQujianMap.entrySet()) {  
+			QuZhiHuanQujianVO result = entry.getValue();
+			if (result == null) {
+				continue;
+			}
+			if (mode.getRenterProposalGetTime() != null && SectionDeliveryUtils.RENTER.equals(result.getMemType())) {
+				result.setDefaultRentTime(DateUtils.formate(mode.getRenterProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+			if (mode.getOwnerProposalGetTime() != null && SectionDeliveryUtils.OWNER.equals(result.getMemType())) {
+				result.setDefaultRentTime(DateUtils.formate(mode.getOwnerProposalGetTime(), DateUtils.FORMAT_STR_RENYUN));
+			}
+		} 
 	}
 }
