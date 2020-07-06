@@ -473,7 +473,10 @@ public class ModifyOrderService {
 		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(modifyOrderDTO.getOrderNo(),modifyOrderDTO.getMemNo());
 		// 应付
 		int payable = modifyOrderFeeService.getTotalRentCarFee(updateModifyOrderFeeVO);
-		if (rentAmtPayed >= Math.abs(payable)) {
+		// 平台给租客的补贴总额
+		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(modifyOrderDTO.getOrderNo(),modifyOrderDTO.getMemNo());
+		payable = payable + platformToRenterAmt;
+		if (payable >= 0 || rentAmtPayed >= Math.abs(payable)) {
 			// 不需要补付
 			return 0;
 		}

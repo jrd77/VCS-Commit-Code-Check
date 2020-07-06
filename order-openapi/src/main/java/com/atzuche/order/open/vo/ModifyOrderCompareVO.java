@@ -1,6 +1,9 @@
 package com.atzuche.order.open.vo;
 
 import java.io.Serializable;
+import java.util.List;
+
+import com.atzuche.order.commons.vo.res.order.CostItemVO;
 
 import lombok.Data;
 import lombok.ToString;
@@ -36,4 +39,9 @@ public class ModifyOrderCompareVO implements Serializable{
 	 * 需要补付金额
 	 */
 	private Integer needSupplementAmt;
+	
+	/**
+	 * 平台给租客的补贴明细
+	 */
+	List<CostItemVO> platformToRenterSubsidyList;
 }

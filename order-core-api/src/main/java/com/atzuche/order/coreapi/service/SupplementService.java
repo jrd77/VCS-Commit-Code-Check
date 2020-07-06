@@ -30,6 +30,7 @@ import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -53,6 +54,8 @@ public class SupplementService {
 	private RenterOrderService renterOrderService;
 	@Autowired
 	private CashierService cashierService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 	
 	/**
 	 * 保存补付记录
@@ -101,7 +104,9 @@ public class SupplementService {
 		
         //应付租车费用（已经求和）
         int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
-        
+        // 平台给租客的补贴总额
+		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderNo, renterOrder.getRenterMemNo());
+		rentAmtAfter = rentAmtAfter + platformToRenterAmt;
         //已付租车费用(shifu  租车费用的实付)
         int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,renterOrder.getRenterMemNo());
         

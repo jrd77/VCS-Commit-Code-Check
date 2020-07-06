@@ -24,6 +24,7 @@ import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
@@ -50,6 +51,8 @@ public class CashierBatchPayService {
     AccountRenterCostSettleService accountRenterCostSettleService;
     @Autowired
     CashierPayService cashierPayService;
+    @Autowired
+    private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     
     
 	public OrderPayableAmountResVO getOrderPayableAmount(OrderPayBatchReqVO orderPayReqVO) {
@@ -129,6 +132,9 @@ public class CashierBatchPayService {
 	            result.setPayableVOs(payableVOs);
 	            //应付租车费用
 	            rentIncrementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+	            // 平台给租客的补贴总额
+	    		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderNo, orderPayReqVO.getMenNo());
+	    		rentIncrementAmt = rentIncrementAmt + platformToRenterAmt;
 	            //已付租车费用(shifu  租车费用的实付)
 	            rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,orderPayReqVO.getMenNo());
 	            if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementAmt+rentAmtPayed < 0){   // +rentAmtPayed
@@ -139,7 +145,7 @@ public class CashierBatchPayService {
 	                    if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.equals(type)){
 	                        result.setIsPayAgain(YesNoEnum.YES.getCode());
 	                    }
-	                    accountPayAbles.add(new AccountPayAbleResVO(orderNo,orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+	                    accountPayAbles.add(new AccountPayAbleResVO(orderNo,orderPayReqVO.getMenNo(),payableVO.getAmt()+platformToRenterAmt,type,payableVO.getTitle(),payableVO.getUniqueNo()));
 	                }
 	            }
 	        }
