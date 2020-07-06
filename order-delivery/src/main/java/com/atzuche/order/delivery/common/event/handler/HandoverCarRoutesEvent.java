@@ -109,7 +109,7 @@ public class HandoverCarRoutesEvent {
                 if (!handoverCarVO.getProId().equals("8")) {
                     return;
                 }
-                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(), handoverCarVO.getServiceType());
+                HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(), handoverCarVO.getServiceType());
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
             }
