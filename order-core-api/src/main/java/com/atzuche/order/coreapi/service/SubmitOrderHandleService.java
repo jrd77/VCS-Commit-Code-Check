@@ -189,7 +189,13 @@ public class SubmitOrderHandleService {
         OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
         orderTransferRecordEntity.setCarNo(renterGoodsDetailDto.getCarNo() == null ? null : String.valueOf(renterGoodsDetailDto.getCarNo()));
         orderTransferRecordEntity.setCarPlateNum(renterGoodsDetailDto.getCarPlateNum());
-        orderTransferRecordEntity.setOperator(OrderConstant.SYSTEM_OPERATOR);
+
+        String specialConsole = reqContext.getOrderReqVO().getSpecialConsole();
+        if("1".equals(specialConsole)){
+            orderTransferRecordEntity.setOperator(reqContext.getOrderReqVO().getOperator());
+        }else{
+            orderTransferRecordEntity.setOperator( OrderConstant.SYSTEM_OPERATOR);
+        }
         RenterMemberDTO renterMemberDto = reqContext.getRenterMemberDto();
         if (renterMemberDto != null) {
             orderTransferRecordEntity.setMemNo(renterMemberDto.getMemNo());
@@ -272,6 +278,7 @@ public class SubmitOrderHandleService {
                 Integer.valueOf(orderReqVO.getSpecialConsole()));
         orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
         orderSourceStatDTO.setLongRentCouponCode(orderReqVO.getLongOwnerCouponNo());
+        orderSourceStatDTO.setOilType(orderReqVO.getOilType());
         logger.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
     }

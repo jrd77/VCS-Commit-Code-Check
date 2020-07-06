@@ -213,6 +213,10 @@ public class OrderSourceStatEntity implements Serializable {
 	 * android id
 	 */
 	private String androidId;
+    /**
+     * 油费计算方式 1:原油位返还,2:自行结算,3:原油位返还或自行结算
+     */
+    private String oilType;
 	/**
 	 * 创建时间
 	 */

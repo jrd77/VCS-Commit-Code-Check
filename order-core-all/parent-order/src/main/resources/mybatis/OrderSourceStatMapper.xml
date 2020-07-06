@@ -53,6 +53,7 @@
         <result property="mac" column="mac"/>
         <result property="appChannelId" column="app_channel_id"/>
         <result property="androidId" column="android_id"/>
+        <result property="oilType" column="oil_type"/>
         <result property="createTime" column="create_time"/>
         <result property="createOp" column="create_op"/>
         <result property="updateTime" column="update_time"/>
@@ -62,24 +63,61 @@
 
 
 	<sql id="Base_Column_List">
-        `id`, `order_no`,`app_version`,`device`,
-        `channel_id`, `popularize`,
-        `cooperation_city`, `insurance_company`,
-        `pay_source`, `activity_id`,
-        `utm_source`, `utm_medium`,`utm_campaign`, `utm_term`,
-        `other_type`, `entry_code`,`category`,
-        `business_parent_type`,`business_child_type`,`platform_parent_type`, `platform_child_type`,
-        `source`, `operator`,`use_auto_coin`,`special_console`,`long_rent_coupon_code`,
-        `req_os`,`req_source`,`req_version`, `request_id`,`schema`,
-        `module_name`,`function_name`,`sub_source`,
-        `src_port`,`src_ip`,`OAID`,`rent_reason`,
-        `imei`,`OS`,`device_name`,`query_id`,
-        `req_ip`, `mac`, `app_channel_id`,`android_id`,req_addr,public_longitude,public_latitude,
-        `create_time`,
-        `create_op`,
-        `update_time`,
-        `update_op`,
-        `is_delete`
+        `id`,
+	`order_no`,
+	`app_version`,
+	`device`,
+	`channel_id`,
+	`popularize`,
+	`cooperation_city`,
+	`insurance_company`,
+	`pay_source`,
+	`activity_id`,
+	`utm_source`,
+	`utm_medium`,
+	`utm_campaign`,
+	`utm_term`,
+	`other_type`,
+	`entry_code`,
+	`category`,
+	`business_parent_type`,
+	`business_child_type`,
+	`platform_parent_type`,
+	`platform_child_type`,
+	`source`,
+	`operator`,
+	`use_auto_coin`,
+	`special_console`,
+	`long_rent_coupon_code`,
+	`req_os`,
+	`req_source`,
+	`req_addr`,
+	`public_longitude`,
+	`public_latitude`,
+	`req_version`,
+	`request_id`,
+	`schema`,
+	`module_name`,
+	`function_name`,
+	`sub_source`,
+	`src_port`,
+	`src_ip`,
+	`OAID`,
+	`rent_reason`,
+	`imei`,
+	`OS`,
+	`device_name`,
+	`query_id`,
+	`req_ip`,
+	`mac`,
+	`app_channel_id`,
+	`android_id`,
+	`oil_type`,
+	`create_time`,
+	`create_op`,
+	`update_time`,
+	`update_op`,
+	`is_delete`
 	</sql>
 
 
@@ -134,6 +172,7 @@
             `mac`,
             `app_channel_id`,
             `android_id`,
+            `oil_type`,
             `req_addr`,
             `public_longitude`,
             `public_latitude`
@@ -183,6 +222,7 @@
             #{mac},
             #{appChannelId},
             #{androidId},
+            #{oilType},
             #{reqAddr},
             #{publicLongitude},
             #{publicLatitude}
@@ -237,6 +277,7 @@
             <if test="mac != null">`mac`, </if>
             <if test="appChannelId != null">`app_channel_id`, </if>
             <if test="androidId != null">`android_id`, </if>
+            <if test="oilType != null">`oil_type`, </if>
             <if test="reqAddr != null">`req_addr`, </if>
             <if test="publicLongitude != null">`public_longitude`, </if>
             <if test="publicLatitude != null">`public_latitude` </if>
@@ -287,6 +328,7 @@
             <if test="mac != null">#{mac},  </if>
             <if test="appChannelId != null">#{appChannelId},  </if>
             <if test="androidId != null">#{androidId},  </if>
+            <if test="oilType != null">#{oilType},  </if>
             <if test="reqAddr != null">#{reqAddr}, </if>
             <if test="publicLongitude != null">#{publicLongitude}, </if>
             <if test="publicLatitude != null">#{publicLatitude} </if>
@@ -342,6 +384,7 @@
 				<if test="mac != null">`mac` = #{mac}, </if>
 				<if test="appChannelId != null">`app_channel_id` = #{appChannelId}, </if>
 				<if test="androidId != null">`android_id` = #{androidId}, </if>
+                <if test="oilType != null">`oil_type` = #{oilType}, </if>
                 <if test="reqAddr != null">`req_addr` = #{reqAddr}, </if>
                 <if test="publicLongitude != null">`public_longitude` = #{publicLongitude}, </if>
                 <if test="publicLatitude != null">`public_latitude` = #{publicLatitude}, </if>
