@@ -69,8 +69,6 @@ public class PayCallbackService implements OrderPayCallBack {
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
-        log.info("押金支付发送给任云entity={}",entity);
-        deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(orderNo));
     }
 
     /**

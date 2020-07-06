@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +115,8 @@ public class CashierPayService{
 	private String newOrderPayGatewayURL;
 	@Autowired
 	private CashierPayService cashierPayService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
 	
 
     public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
@@ -349,7 +353,8 @@ public class CashierPayService{
 	            }
 	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-	            
+                log.info("押金支付发送给任云orderStatusDTO={}",orderStatusDTO);
+                deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(vo.getOrderNo()));
 	            //更新配送 订单补付等信息 只有订单状态为已支付
 	            //callback
 	            if(isGetCar(vo)){
