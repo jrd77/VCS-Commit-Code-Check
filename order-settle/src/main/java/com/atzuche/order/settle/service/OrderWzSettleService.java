@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import com.atzuche.order.cashieraccount.service.MemberSecondSettleService;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
@@ -28,6 +29,9 @@ public class OrderWzSettleService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
+	@Autowired
+	private MemberSecondSettleService memberSecondSettleService;
+	
 	
 	public void settleWzOrder(String orderNo) {
 		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
@@ -61,6 +65,10 @@ public class OrderWzSettleService {
             // 调远程抵扣老系统历史欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getTotalWzDebtAmt());
             orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
+            
+            //记录分流标识(已车主的会员号为准。) 200616
+            memberSecondSettleService.initDepositWzMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));
+            
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,orderNo={},",orderNo, e);
