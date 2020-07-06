@@ -82,10 +82,16 @@ public class HandoverCarRoutesEvent {
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+                if (!handoverCarVO.getProId().equals("4")) {
+                    return;
+                }
                 HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(), handoverCarVO.getServiceType());
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+                if (!handoverCarVO.getProId().equals("8")) {
+                    return;
+                }
                 HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(), handoverCarVO.getServiceType());
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
@@ -93,10 +99,16 @@ public class HandoverCarRoutesEvent {
         } else if (userType == UserTypeEnum.OWNER_TYPE.getValue().intValue()) {
             log.info("发送车主端事件,OrderNo:{}", handoverCarVO.getOrderNo());
             if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
+                if (!handoverCarVO.getProId().equals("3")) {
+                    return;
+                }
                 HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(), handoverCarVO.getServiceType());
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
+                if (!handoverCarVO.getProId().equals("8")) {
+                    return;
+                }
                 HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue().intValue(), handoverCarVO.getServiceType());
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
