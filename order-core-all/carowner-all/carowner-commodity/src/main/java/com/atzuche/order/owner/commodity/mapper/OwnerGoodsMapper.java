@@ -34,4 +34,6 @@ public interface OwnerGoodsMapper{
     OwnerGoodsEntity getOwnerGoodsByCarNoAndOrderNo(@Param("carNo")Integer carNo, @Param("orderNo")String orderNo);
     
     List<String> listOrderNoByCarNo(@Param("carNo")Integer carNo);
+
+    OwnerGoodsEntity getOwnerGoodsByPlatNum(@Param("platNum")String platNum);
 }
