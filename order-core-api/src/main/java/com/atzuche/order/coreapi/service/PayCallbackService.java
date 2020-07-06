@@ -67,10 +67,9 @@ public class PayCallbackService implements OrderPayCallBack {
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
             log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", renterOrderNo);
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
-            deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(orderNo));
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
-
+        deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(orderNo));
     }
 
     /**
