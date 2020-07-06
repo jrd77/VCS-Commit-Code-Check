@@ -323,6 +323,9 @@ public class ModifyOrderConfirmService {
 			if (modify == null) {
 				return;
 			}
+            //换车就通知任云
+            log.info("换车触发事件通知任云modify={}",modify);
+            deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(modify.getOrderNo()));
 			if (changeItemList == null || changeItemList.isEmpty()) {
 				return;
 			}
