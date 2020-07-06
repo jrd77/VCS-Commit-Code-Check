@@ -75,7 +75,7 @@ public class HandoverCarRoutesEvent {
         if (StringUtils.isBlank(handoverCarVO.getProId()) || !handoverCarVO.isUserType()) {
             return;
         }
-        if (!handoverCarVO.getProId().equals("4") && !handoverCarVO.getProId().equals("8")) {
+        if (!handoverCarVO.getProId().equals("4") && !handoverCarVO.getProId().equals("8") && !handoverCarVO.getProId().equals("3")) {
             return;
         }
         int userType = Integer.valueOf(handoverCarVO.getUserType());
