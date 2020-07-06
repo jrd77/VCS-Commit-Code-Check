@@ -2,7 +2,11 @@ package com.atzuche.order.coreapi.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
+import com.atzuche.order.commons.vo.res.account.income.AcctOwnerWithdrawalRuleResVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,6 +92,9 @@ public class CashWithdrawalService {
 		if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
 			balance += incomeEntity.getIncomeAmt();
 		}
+        if (Objects.nonNull(incomeEntity) && Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
+            balance += incomeEntity.getSecondaryIncomeAmt();
+        }
 		return balance;
 	}
 	
@@ -119,4 +126,21 @@ public class CashWithdrawalService {
 		}
 		return list;
 	}
+
+
+
+	public AcctOwnerWithdrawalRuleResVO getWithdrawalRule(AcctOwnerWithdrawalRuleReqVO req) {
+        // 调远程获取老系统可提现余额
+        MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
+        AcctOwnerWithdrawalRuleResVO resVO = new AcctOwnerWithdrawalRuleResVO();
+        //优先提现老系统收益金额
+        if(Objects.isNull(memBalanceVO) || Objects.isNull(memBalanceVO.getBalance()) || memBalanceVO.getBalance() < Integer.parseInt(req.getAmt())) {
+            resVO.setIsContainSecondary(String.valueOf(OrderConstant.YES));
+        } else {
+            resVO.setIsContainSecondary(String.valueOf(OrderConstant.NO));
+        }
+        return resVO;
+    }
+
+
 }

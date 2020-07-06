@@ -5,6 +5,8 @@ import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
+import com.atzuche.order.commons.vo.res.account.income.AcctOwnerWithdrawalRuleResVO;
 import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -25,6 +27,15 @@ public interface FeignCashWithdrawalService {
 	@GetMapping("/account/withdraw/list")
     public ResponseData<List<AccountOwnerCashExamineDTO>> listCashWithdrawal(@Valid SearchCashWithdrawalReqDTO req);
 
+    /**
+     * 判断提现金额是否包含二清
+     *
+     * @param req 请求参数
+     * @return ResponseData<AcctOwnerWithdrawalRuleResVO>
+     */
+    @PostMapping("/account/withdraw/pre/rule")
+    public ResponseData<AcctOwnerWithdrawalRuleResVO> getAcctOwnerWithdrawalRule(@RequestBody AcctOwnerWithdrawalRuleReqVO req);
+
 	/**
 	 * 获取用户总欠款
 	 * @param req
@@ -39,4 +50,7 @@ public interface FeignCashWithdrawalService {
 	 */
 	@PostMapping("/debt/queryList")
 	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req);
+
+
+
 }
