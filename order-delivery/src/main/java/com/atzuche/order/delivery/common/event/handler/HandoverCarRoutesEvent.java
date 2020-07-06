@@ -75,9 +75,6 @@ public class HandoverCarRoutesEvent {
         if (StringUtils.isBlank(handoverCarVO.getProId()) || !handoverCarVO.isUserType()) {
             return;
         }
-        if (!handoverCarVO.getProId().equals("4") && !handoverCarVO.getProId().equals("8") && !handoverCarVO.getProId().equals("3")) {
-            return;
-        }
         int userType = Integer.valueOf(handoverCarVO.getUserType());
         if (userType == UserTypeEnum.RENTER_TYPE.getValue().intValue()) {
             log.info("发送租客端事件,OrderNo:{}", handoverCarVO.getOrderNo());
