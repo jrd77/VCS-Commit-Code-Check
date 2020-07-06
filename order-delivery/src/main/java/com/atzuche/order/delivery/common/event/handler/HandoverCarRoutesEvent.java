@@ -89,7 +89,7 @@ public class HandoverCarRoutesEvent {
                 log.info("交接车时间数据入库：{}", JSONObject.toJSONString(handoverCar));
                 handoverCarService.addHandoverCarInfo(handoverCar, userType);
             } else if (handoverCarVO.getServiceType().equals(ServiceTypeEnum.BACK_TYPE.getValue())) {
-                if (!handoverCarVO.getProId().equals("8")) {
+                if (!handoverCarVO.getProId().equals("7")) {
                     return;
                 }
                 HandoverCarVO handoverCar = createHandoverParams(handoverCarVO, RenterHandoverCarTypeEnum.RENTER_TO_RENYUN.getValue().intValue(), handoverCarVO.getServiceType());
