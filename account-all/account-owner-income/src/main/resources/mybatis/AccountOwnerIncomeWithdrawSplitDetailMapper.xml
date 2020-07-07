@@ -39,6 +39,10 @@
 		select <include refid="Base_Column_List" /> from account_owner_income_withdraw_split_detail where id = #{value}
 	</select>
 
+    <select id="selectByMemNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_income_withdraw_split_detail where mem_no = #{value}
+    </select>
+
 	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeWithdrawSplitDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_income_withdraw_split_detail
 		(

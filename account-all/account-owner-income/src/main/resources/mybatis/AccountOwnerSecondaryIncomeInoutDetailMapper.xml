@@ -35,6 +35,11 @@
 		select <include refid="Base_Column_List" /> from account_owner_secondary_income_inout_detail where id = #{value}
 	</select>
 
+
+    <select id="selectByOwnerIncomeId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_secondary_income_inout_detail where `owner_income_id` = #{value}
+    </select>
+
 	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_secondary_income_inout_detail (
             `owner_income_id`,

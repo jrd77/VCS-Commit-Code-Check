@@ -1,13 +1,5 @@
 package com.atzuche.order.cashieraccount.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
@@ -20,6 +12,15 @@ import com.atzuche.order.commons.entity.dto.CashWithdrawalSimpleMemberDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.wallet.api.MemBalanceVO;
 import com.autoyol.platformcost.CommonUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AccountOwnerCashExamineService {
@@ -42,12 +43,36 @@ public class AccountOwnerCashExamineService {
 	public List<AccountOwnerCashExamine> listAccountOwnerCashExamineByMemNo(Integer memNo) {
 		return accountOwnerCashExamineMapper.listAccountOwnerCashExamineByMemNo(memNo);
 	}
-	
+
+
+    /**
+     * 会员提现处理
+     *
+     * @param req 请求参数
+     * @param simpleMem 会员信息
+     */
+	public void memberWithdrawalHandle(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem) {
+
+        //todo 计算老交易提现金额
+
+        //todo 计算新交易提现金额(非二清)
+
+        //todo 计算新交易提现金额(二清)
+
+        //todo 记录提现金额拆分明细
+
+        //todo 更新新交易车主收益信息
+
+        //todo 更新老交易车主收益信息
+    }
+
 	/**
 	 * 保存提现记录
-	 * @param req
-	 * @return Integer
+     *
+     * @param req 请求参数
+     * @param simpleMem 会员信息
 	 */
+    @Transactional(rollbackFor=Exception.class)
 	public void saveAccountOwnerCashExamine(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem) {
 		if (req == null) {
 			return;
@@ -69,11 +94,12 @@ public class AccountOwnerCashExamineService {
 			simpleMem.setBalance(0);
 		}
 		// 检验
-		check(req, bankCard, simpleMem, incomeEntity);
+		check(req, simpleMem, incomeEntity);
 		// 抵扣老balance
 		int oldDeductAmt = deductionOldBalance(req, simpleMem, incomeEntity);
 		// 抵扣新balance
 		int newDeductAmt = deductionNewBalance(req, simpleMem, incomeEntity);
+
 		// 转换成提现记录
 		AccountOwnerCashExamine record = convertAccountOwnerCashExamine(req, bankCard, simpleMem);
 		String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
@@ -162,48 +188,57 @@ public class AccountOwnerCashExamineService {
 		}
 		return surplusBalance;
 	}
-	
-	
-	/**
-	 * 校验
-	 * @param req
-	 * @param bankCard
-	 * @param simpleMem
-	 * @param incomeAmt
-	 */
-	public void check(AccountOwnerCashExamineReqVO req, BankCardDTO bankCard, CashWithdrawalSimpleMemberDTO simpleMem, AccountOwnerIncomeEntity incomeEntity) {
-		LocalDateTime now = LocalDateTime.now();
-		String date = CommonUtils.formatTime(now, CommonUtils.FORMAT_STR_DATE);
-		// 查询今天提现记录数
-		Integer count = accountOwnerCashExamineMapper.getCountByMemNoAndDateTime(req.getMemNo(), date);
-		count = count == null ? 0:count;
-		// 一天最大提现次数
-		int limitSize = req.getLimitSize() == null ? DATE_WITHDRAWAL_MAX:req.getLimitSize();
-		if (count >= limitSize) {
-			throw new WithdrawalTimesLimitException();
-		}
-		// 当前提现金额
-		int amt = StringUtils.isBlank(req.getAmt()) ? 0:Integer.valueOf(req.getAmt());
-		// 最低可提现金额
-		int cashMinAmt = req.getCashMinAmt() == null ? 10:req.getCashMinAmt();
-		if (amt < cashMinAmt) {
-			throw new WithdrawalAmtException("您的提现金额不能小于最低提现金额");
-		}
-		// 老系统可提现金额
-		int balance = 0;
-		if (simpleMem != null && simpleMem.getBalance() != null) {
-			balance = simpleMem.getBalance();
-		}
-		int incomeAmt = 0;
-		if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
-			incomeAmt = incomeEntity.getIncomeAmt();
-		}
-		if (amt > (balance + incomeAmt)) {
-			throw new WithdrawalAmtException("您的提现金额不可大于可提现余额");
-		}
-	}
-	
-	
+
+
+    /**
+     * 会员提现校验
+     *
+     * @param req       请求参数
+     * @param simpleMem 会员信息
+     */
+    public void check(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem, AccountOwnerIncomeEntity incomeEntity) {
+        LocalDateTime now = LocalDateTime.now();
+        String date = CommonUtils.formatTime(now, CommonUtils.FORMAT_STR_DATE);
+        // 查询今天提现记录数
+        Integer count = accountOwnerCashExamineMapper.getCountByMemNoAndDateTime(req.getMemNo(), date);
+        count = count == null ? 0 : count;
+        // 一天最大提现次数
+        int limitSize = req.getLimitSize() == null ? DATE_WITHDRAWAL_MAX : req.getLimitSize();
+        if (count >= limitSize) {
+            throw new WithdrawalTimesLimitException();
+        }
+
+        // 当前提现金额
+        int amt = StringUtils.isBlank(req.getAmt()) ? 0 : Integer.parseInt(req.getAmt());
+        // 最低可提现金额
+        int cashMinAmt = req.getCashMinAmt() == null ? 10 : req.getCashMinAmt();
+        if (amt < cashMinAmt) {
+            throw new WithdrawalAmtException("您的提现金额不能小于最低提现金额");
+        }
+
+        // 老系统可提现金额
+        int balance = 0;
+        if (simpleMem != null && simpleMem.getBalance() != null) {
+            balance = simpleMem.getBalance();
+        }
+        //新系统可提现金额
+        int incomeAmt = 0;
+        if (Objects.nonNull(incomeEntity)) {
+            if (Objects.nonNull(incomeEntity.getIncomeAmt())) {
+                incomeAmt = incomeAmt + incomeEntity.getIncomeAmt();
+            }
+
+            if (Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
+                incomeAmt = incomeAmt + incomeEntity.getSecondaryIncomeAmt();
+            }
+        }
+
+        if (amt > (balance + incomeAmt)) {
+            throw new WithdrawalAmtException("您的提现金额不可大于可提现余额");
+        }
+    }
+
+
 	/**
 	 * 转换成提现记录
 	 * @param req

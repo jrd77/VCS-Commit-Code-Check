@@ -3,6 +3,8 @@ package com.atzuche.order.accountownerincome.mapper;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeWithdrawSplitDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 车主收益提现金额拆分明细
  *
@@ -19,6 +21,14 @@ public interface AccountOwnerIncomeWithdrawSplitDetailMapper {
      * @return AccountOwnerIncomeWithdrawSplitDetailEntity
      */
     AccountOwnerIncomeWithdrawSplitDetailEntity selectByPrimaryKey(Integer id);
+
+    /**
+     * 依据会员号查询
+     *
+     * @param memNo 会员号
+     * @return List<AccountOwnerIncomeWithdrawSplitDetailEntity>
+     */
+    List<AccountOwnerIncomeWithdrawSplitDetailEntity> selectByMemNo(Integer memNo);
 
     /**
      * 新增

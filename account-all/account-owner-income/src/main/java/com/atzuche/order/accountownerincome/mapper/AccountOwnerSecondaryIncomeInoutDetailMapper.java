@@ -3,6 +3,8 @@ package com.atzuche.order.accountownerincome.mapper;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 车主二清收益资金(冻结不可提现部分金额)进出明细
  *
@@ -19,6 +21,15 @@ public interface AccountOwnerSecondaryIncomeInoutDetailMapper {
      * @return AccountOwnerSecondaryIncomeInoutDetailEntity
      */
     AccountOwnerSecondaryIncomeInoutDetailEntity selectByPrimaryKey(Integer id);
+
+
+    /**
+     * 依据车主收益记录ID查询进出明细列表
+     *
+     * @param ownerIncomeId 车主收益记录ID
+     * @return List<AccountOwnerSecondaryIncomeInoutDetailEntity>
+     */
+    List<AccountOwnerSecondaryIncomeInoutDetailEntity> selectByOwnerIncomeId(Integer ownerIncomeId);
 
     /**
      * 新增

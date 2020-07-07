@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.BankCardDTO;
 import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
 import com.atzuche.order.commons.vo.res.account.income.AcctOwnerWithdrawalRuleResVO;
 import org.apache.commons.lang.StringUtils;
@@ -47,19 +48,45 @@ public class CashWithdrawalService {
 	private OwnerGoodsService ownerGoodsService;
 	@Autowired
 	private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
-	
-	/**
-	 * 提现功能
-	 * @param req
-	 */
-	@Transactional(rollbackFor=Exception.class)
-	public void cashWithdrawal(AccountOwnerCashExamineReqVO req) {
-		log.info("提现开始CashWithdrawalService.cashWithdrawal accountOwnerCashExamineReqVO=[{}]",req);
-		// 获取会员信息
-		CashWithdrawalSimpleMemberDTO simpleMem = memProxyService.getSimpleMemberInfo(req.getMemNo());
-		// 提现主逻辑
-		accountOwnerCashExamineService.saveAccountOwnerCashExamine(req, simpleMem);
-	}
+
+    /**
+     * 提现功能
+     *
+     * @param req 请求参数
+     */
+    public void cashWithdrawal(AccountOwnerCashExamineReqVO req) {
+        log.info("提现开始CashWithdrawalService.cashWithdrawal accountOwnerCashExamineReqVO=[{}]", req);
+        // 获取会员信息
+        CashWithdrawalSimpleMemberDTO simpleMem = memProxyService.getSimpleMemberInfo(req.getMemNo());
+        if (Objects.isNull(simpleMem)) {
+            log.info("Not fund member info. memNo:[{}]", req.getMemNo());
+            return;
+        }
+
+        // 调远程获取老系统可提现余额
+        MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
+        if (Objects.nonNull(memBalanceVO) && Objects.nonNull(memBalanceVO.getBalance()) && memBalanceVO.getBalance() > 0) {
+            simpleMem.setBalance(memBalanceVO.getBalance());
+        } else {
+            simpleMem.setBalance(OrderConstant.ZERO);
+        }
+
+        // 获取新订单系统的会员总收益
+        AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
+
+        // 提现校验
+        accountOwnerCashExamineService.check(req, simpleMem, incomeEntity);
+
+        // 根据id获取银行卡信息
+        BankCardDTO bankCard = remoteAccountService.findAccountById(Integer.parseInt(req.getCardId()));
+        if (Objects.isNull(bankCard)) {
+            log.info("Not fund bank card info. cardId:[{}]", req.getCardId());
+            return;
+        }
+
+        // 提现主逻辑
+        accountOwnerCashExamineService.saveAccountOwnerCashExamine(req, simpleMem);
+    }
 	
 	
 	/**
