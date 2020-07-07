@@ -239,12 +239,8 @@ public class SubmitOrderService {
         //6.3主订单状态信息(统计信息)处理
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-
-        boolean replyFlag = null != context.getRenterGoodsDetailDto().getReplyFlag() &&
-                context.getRenterGoodsDetailDto().getReplyFlag() == OrderConstant.YES;
-        LocalDateTime rentTime = orderReqVO.getRentTime();
-
-        if (replyFlag && (context.getRenterGoodsDetailDto().getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= context.getRenterGoodsDetailDto().getAdvanceOrderTime())) {
+        boolean replyFlag = RenterOrderService.isAutoReplyFlag(context.getOrderReqVO().getRentTime(), context.getRenterGoodsDetailDto().getAdvanceOrderTime(), context.getRenterGoodsDetailDto().getReplyFlag());
+        if (replyFlag) {
             context.getRenterGoodsDetailDto().setIsAutoReplayFlag(1);
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
@@ -257,7 +253,7 @@ public class SubmitOrderService {
 
         //6.4 order_flow
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_CONFIRM);
-        if (null != renterGoodsDetailDTO.getReplyFlag() && renterGoodsDetailDTO.getReplyFlag() == OrderConstant.YES) {
+        if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
             orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         }
 
@@ -291,7 +287,7 @@ public class SubmitOrderService {
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
         orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
-        orderResVO.setReplyFlag(context.getRenterGoodsDetailDto().getReplyFlag());
+        orderResVO.setReplyFlag(context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
         return orderResVO;
     }
 
@@ -321,7 +317,7 @@ public class SubmitOrderService {
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
         cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
-        return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getReplyFlag());
+        return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
     }
 
 
