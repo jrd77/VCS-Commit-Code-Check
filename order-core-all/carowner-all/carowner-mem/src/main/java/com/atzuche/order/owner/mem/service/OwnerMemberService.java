@@ -120,4 +120,8 @@ public class OwnerMemberService{
     public OwnerMemberEntity getOwnerNoByMemberNo(String memNo){
         return ownerMemberMapper.getOwnerNoByMemberNo(memNo);
     }
+
+    public OwnerMemberEntity queryOwnerMemberByPhone(String phone) {
+        return ownerMemberMapper.queryOwnerMemberByPhone(phone);
+    }
 }

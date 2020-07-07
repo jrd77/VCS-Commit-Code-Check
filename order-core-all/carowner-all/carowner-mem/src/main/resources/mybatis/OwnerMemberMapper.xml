@@ -214,4 +214,8 @@
         select  <include refid="Base_Column_List"/> from owner_member where  mem_no = #{memNo} and is_delete = 0 limit 1
     </select>
 
+    <select id="queryOwnerMemberByPhone" resultMap="BaseResultMap">
+        select  <include refid="Base_Column_List"/> from owner_member where  phone = #{phone} and is_delete = 0 limit 1
+    </select>
+
 </mapper>

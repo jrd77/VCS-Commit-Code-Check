@@ -38,17 +38,37 @@ public class LianHeMaiTongService {
     public LianHeMaiTongMemberVO getMemberInfo(String phone, String memNo, String platNum) {
         LianHeMaiTongMemberVO lhmtVO = new LianHeMaiTongMemberVO();
         if(memNo!=null && memNo.trim().length()>0){
-            lhmtVO.setOwnerMemNo(memNo);
             OwnerMemberEntity ownerMemberEntity = ownerMemberService.getOwnerNoByMemberNo(memNo);
+            RenterMemberEntity renterMemberEntity = null;
             if(ownerMemberEntity != null){
+                lhmtVO.setOwnerMemNo(memNo);
                 lhmtVO.setOwnerName(ownerMemberEntity.getRealName());
-            }
-            RenterMemberEntity renterMemberEntity = renterMemberService.getRenterMemberByMemberNo(memNo);
-            if(renterMemberEntity != null){
-                lhmtVO.setOwnerName(renterMemberEntity.getRealName());
+                lhmtVO.setOwnerPhone(ownerMemberEntity.getPhone());
+            }else if((renterMemberEntity = renterMemberService.getRenterMemberByMemberNo(memNo))!=null){
+                lhmtVO.setRenterMemNo(renterMemberEntity.getMemNo());
+                lhmtVO.setRenterName(renterMemberEntity.getRealName());
+                lhmtVO.setRenterPhone(ownerMemberEntity.getPhone());
+            }else{
+                LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"会员号信息查询为空");
+                log.error("联合麦通查询异常-会员号查询为空memNo={}",memNo,e);
+                throw e;
             }
         }else if(phone!=null && phone.trim().length()>0){
-
+            OwnerMemberEntity ownerMemberEntity = ownerMemberService.queryOwnerMemberByPhone(phone);
+            RenterMemberEntity renterMemberEntity = null;
+            if(ownerMemberEntity != null){
+                lhmtVO.setOwnerMemNo(memNo);
+                lhmtVO.setOwnerName(ownerMemberEntity.getRealName());
+                lhmtVO.setOwnerPhone(ownerMemberEntity.getPhone());
+            }else if((renterMemberEntity = renterMemberService.getRenterMemberByMemberNo(memNo))!=null){
+                lhmtVO.setRenterMemNo(renterMemberEntity.getMemNo());
+                lhmtVO.setRenterName(renterMemberEntity.getRealName());
+                lhmtVO.setRenterPhone(ownerMemberEntity.getPhone());
+            }else{
+                LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"手机号信息查询为空");
+                log.error("联合麦通查询异常-手机号查询为空phone={}",phone,e);
+                throw e;
+            }
 
         }else if(platNum!=null && platNum.trim().length()>0){
             OwnerGoodsEntity ownerGoodsByPlatNum = ownerGoodsService.getOwnerGoodsByPlatNum(platNum);
