@@ -63,6 +63,9 @@ public class CarDetailDTO {
     @AutoDocProperty("车辆指导价")
     private Integer guidePrice;
 
+    @AutoDocProperty("保费计算用购置价")
+    private Integer carInmsrp;
+
     @AutoDocProperty("驱动方式，1：两驱，2: 四驱")
     private Integer driveType;
     @AutoDocProperty("驱动方式文字释义")
