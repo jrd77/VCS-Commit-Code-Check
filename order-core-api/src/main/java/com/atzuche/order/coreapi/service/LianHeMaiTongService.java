@@ -101,9 +101,9 @@ public class LianHeMaiTongService {
         return null;
     }
 
-    public List<LianHeMaiTongOrderVO> getLianHeMaiTongOrderVO(String memNo,String platNum){
+    public List<LianHeMaiTongOrderVO> getLianHeMaiTongOrderVO(String memNo,Integer memberTag,String platNum){
         if(platNum != null){
-            List<LianHeMaiTongOrderVO> list = ownerGoodsService.getByMemNoAndPlatNum(memNo,platNum);
+            List<LianHeMaiTongOrderVO> list = ownerGoodsService.getByMemNoAndPlatNum(memNo,platNum,memberTag);
 
 
         }else{
