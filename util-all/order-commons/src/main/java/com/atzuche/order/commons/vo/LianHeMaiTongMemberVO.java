@@ -16,7 +16,6 @@ public class LianHeMaiTongMemberVO {
     private String phone;
 
 
-
     @AutoDocProperty("订单列表信息")
     List<LianHeMaiTongOrderVO> lianHeMaiTongOrderVOS;
 }
