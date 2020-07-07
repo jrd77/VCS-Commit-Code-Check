@@ -382,13 +382,23 @@ public class ModifyOwnerAddrService {
         // 还车地址在提交的时候是否已经不允许修改
         boolean isNotAllowModifyReturnAddress = NO.equals(getReturnCarInfoVO.getReturnCarAddressModifiable())
                 && !getReturnCarInfoVO.getCurrentReturnCarAddress();
-        if (isNotAllowModifyGetAddress || isNotAllowModifyReturnAddress) {
-            throw new ModifyOwnerAddrCheckException("510003", "抱歉，当前操作已超时，请重试！");
+        if (StringUtils.isNotBlank(consoleInvoke) && "1".equalsIgnoreCase(consoleInvoke)) {
+        	ModifyOrderOwnerDTO modifyOwner = getReturnCarInfoVO.getModifyOrderOwnerDTO();
+        	if (modifyOwner.getSrvGetFlag() != null && modifyOwner.getSrvGetFlag() == 1 && isNotAllowModifyGetAddress) {
+        		throw new ModifyOwnerAddrCheckException("510003", "抱歉，当前操作已超时，请重试！");
+        	}
+        	if (modifyOwner.getSrvReturnFlag() != null && modifyOwner.getSrvReturnFlag() == 1 && isNotAllowModifyReturnAddress) {
+        		throw new ModifyOwnerAddrCheckException("510003", "抱歉，当前操作已超时，请重试！");
+        	}
+        } else {
+        	if (isNotAllowModifyGetAddress || isNotAllowModifyReturnAddress) {
+                throw new ModifyOwnerAddrCheckException("510003", "抱歉，当前操作已超时，请重试！");
+            }
         }
         Integer beforeChargeAmount = StringUtils.isEmpty(ownerTransAddressReqVO.getChargeAmount()) ? 0 : NumberUtils.toInt(ownerTransAddressReqVO.getChargeAmount());
         Integer nowChargeAmount = StringUtils.isEmpty(getReturnCarInfoVO.getChargeAmount()) ? 0 : Integer.parseInt(getReturnCarInfoVO.getChargeAmount());
         boolean isAmountChange = !beforeChargeAmount.equals(nowChargeAmount);
-        if (isAmountChange) {
+        if (isAmountChange && !(StringUtils.isNotBlank(consoleInvoke) && "1".equalsIgnoreCase(consoleInvoke))) {
             throw new ModifyOwnerAddrCheckException("510001","当前修改地址费用已发生变化，请重试！");
         }
         // 申请修改记录
