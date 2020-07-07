@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
+import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.ownercost.entity.OwnerOrderCostEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderIncrementDetailEntity;
@@ -73,18 +74,18 @@ public class OwnerOrderCalCostService {
             for(OwnerOrderSubsidyDetailEntity s : ownerOrderCostReqDTO.getOwnerOrderSubsidyDetails()) {
                 if(Objects.nonNull(s.getSubsidyAmount())) {
                     subsidyAmt = subsidyAmt + s.getSubsidyAmount();
-                    if(StringUtils.equals(s.getSubsidyCostCode(), RenterCashCodeEnum.RENT_AMT.getCashNo())) {
+                    if(StringUtils.equals(s.getSubsidyCostCode(), OwnerCashCodeEnum.RENT_AMT.getCashNo())) {
                         realRentAmt = realRentAmt + s.getSubsidyAmount();
                     }
                 }
             }
         }
-
+        log.info("租金总费用realRentAmt={},未折扣租金rentAmt={}",realRentAmt,rentAmt);
         //平台服务费
-        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
+        OwnerOrderIncrementDetailEntity serviceExpenseEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO,Math.abs(realRentAmt),ownerOrderCostReqDTO.getServiceRate().intValue());
         int serviceExpense = null == serviceExpenseEntity ? OrderConstant.ZERO : serviceExpenseEntity.getTotalAmount();
         //代管车服务费
-        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(rentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
+        OwnerOrderIncrementDetailEntity proxyServiceExpenseEntity = ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO,Math.abs(realRentAmt),ownerOrderCostReqDTO.getServiceProxyRate().intValue());
         int proxyServiceExpense = null == proxyServiceExpenseEntity ? OrderConstant.ZERO : proxyServiceExpenseEntity.getTotalAmount();
         //GPS服务费
         List<Integer> lsGpsSerialNumber = ListUtil.parse(ownerOrderCostReqDTO.getGpsSerialNumber(),",");

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +67,7 @@ public class PayCallbackService implements OrderPayCallBack {
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
             log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", renterOrderNo);
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+            deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(orderNo));
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
 

@@ -1,30 +1,40 @@
 package com.atzuche.order.coreapi.controller;
 
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.ConfigSDKFactory;
 import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.client.api.ServicePointConfigSDK;
 import com.atzuche.config.client.api.SysConstantSDK;
+import com.atzuche.config.common.api.ConfigContext;
+import com.atzuche.config.common.api.ConfigItemDTO;
 import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.InsuranceConfigEntity;
 import com.atzuche.config.common.entity.ServicePointEntity;
 import com.atzuche.config.common.entity.SysContantEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
+import com.atzuche.order.commons.vo.res.DangerCountRespVO;
 import com.atzuche.order.config.oilpriceconfig.OilAverageCostCacheConfigService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.autoyol.commons.web.ResponseData;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -49,7 +59,12 @@ public class TestController {
     private RenterCommodityService renterCommodityService;
     @Autowired
     private ServicePointConfigSDK servicePointConfigSDK;
-
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
+    private ConfigSDKFactory sdkFactory;
+    
+    
     @GetMapping("/test")
     public String test(){
         CashierDeductDebtReqVO vo = new CashierDeductDebtReqVO();
@@ -115,4 +130,42 @@ public class TestController {
         List<ServicePointEntity> config = servicePointConfigSDK.getConfig(new DefaultConfigContext());
         return config;
     }
+    @GetMapping("/getDangerCount")
+    public void getDangerCount(){
+        String json = restTemplate.getForObject("http://114.55.63.205:8888/AOTU_TEST/AotuInterface/getclaimcount?orderNo=480527810161&plateNum=京C09090&carNo=111", String.class);
+        System.out.println(json);
+        ResponseData responseData = JSON.parseObject(json, ResponseData.class);
+        DangerCountRespVO data = JSON.parseObject(JSON.toJSONString(responseData.getData()), DangerCountRespVO.class);
+        System.out.println(JSON.toJSONString(data));
+
+    }
+    
+    /**
+     * 	刷新保费配置
+          *    测试url
+     *  localhost:1412/config/f5?configName=insurance_config
+     * @return
+     */
+    @GetMapping("/config/f5")
+    public String configRefresh(@RequestParam("configName")String configName){
+    	ConfigContext context = new ConfigContext() {
+			@Override
+			public boolean preConfig() {
+				return false;
+			}
+		};
+		
+		ConfigItemDTO itemDTO = sdkFactory.getConfig(context, configName);
+    	String pre = itemDTO.getConfigValue();
+    	logger.info("pre=" + pre);
+    	
+    	String result =  sdkFactory.restartInit(configName);
+    	
+    	itemDTO = sdkFactory.getConfig(context, configName);
+    	String after = itemDTO.getConfigValue();
+    	logger.info("after=" + after);
+    	
+    	return result;
+    }
+    
 }

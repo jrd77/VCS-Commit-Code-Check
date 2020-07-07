@@ -4,6 +4,7 @@
 package com.atzuche.order.commons.vo.res;
 
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;
@@ -127,4 +128,9 @@ public class OrderRenterCostResVO {
      * 租客租车费用  押金  违章押金  信息
      */
     private RenterCostVO  renterCostVO;
+    /*
+    *
+    * 租客商品信息
+    * */
+    private RenterGoodsDetailDTO renterGoodsDetailDTO;
 }

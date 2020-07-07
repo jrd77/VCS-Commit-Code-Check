@@ -78,6 +78,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -261,10 +262,13 @@ public class SubmitOrderService {
         //6.3主订单状态信息(统计信息)处理
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        if (null == renterGoodsDetailDTO.getReplyFlag() || renterGoodsDetailDTO.getReplyFlag() == OrderConstant.NO) {
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
-        } else {
+        boolean replyFlag = RenterOrderService.isAutoReplyFlag(context.getOrderReqVO().getRentTime(), context.getRenterGoodsDetailDto().getAdvanceOrderTime(), context.getRenterGoodsDetailDto().getReplyFlag());
+        if (replyFlag) {
+            context.getRenterGoodsDetailDto().setIsAutoReplayFlag(1);
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+        } else {
+            context.getRenterGoodsDetailDto().setIsAutoReplayFlag(0);
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
 
@@ -272,7 +276,7 @@ public class SubmitOrderService {
 
         //6.4 order_flow
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_CONFIRM);
-        if (null != renterGoodsDetailDTO.getReplyFlag() && renterGoodsDetailDTO.getReplyFlag() == OrderConstant.YES) {
+        if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
             orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         }
 
@@ -293,7 +297,7 @@ public class SubmitOrderService {
         orderTransferRecordService.saveOrderTransferRecord(submitOrderHandleService.convertToOrderTransferRecordEntity(context, orderNo));
 
         //是自动应答的车辆才能锁库存，其他类型车辆要车主同意时才能锁库存。
-        if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getReplyFlag())) {
+        if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getIsAutoReplayFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(context.getOrderReqVO());
             orderInfoDTO.setOrderNo(orderNo);
             stockService.cutCarStock(orderInfoDTO);
@@ -308,7 +312,7 @@ public class SubmitOrderService {
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
         orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
-        orderResVO.setReplyFlag(context.getRenterGoodsDetailDto().getReplyFlag());
+        orderResVO.setReplyFlag(context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
         return orderResVO;
     }
 
@@ -339,8 +343,8 @@ public class SubmitOrderService {
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
-        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getReplyFlag(), orderReqVO);
-        return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getReplyFlag());
+        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
+        return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
     }
 
 

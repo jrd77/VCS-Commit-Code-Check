@@ -219,6 +219,18 @@ public class RenterGoodsEntity implements Serializable {
 	 * 年检到期日期
 	 */
 	private LocalDate inspectExpire;
+    /**
+     * 租客提前下单时间（小时）
+     */
+    private Integer advanceOrderTime;
+    /**
+     * 出险次数
+     */
+    private Integer dangerCount;
+    /**
+     * 保险出险导致次年保费上涨的收费
+     */
+    private Integer premiumMoney;
 	/**
 	 * 最新公里数
 	 */

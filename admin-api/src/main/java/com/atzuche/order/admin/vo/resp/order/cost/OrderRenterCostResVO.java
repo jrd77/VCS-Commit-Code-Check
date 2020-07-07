@@ -94,6 +94,9 @@ public class OrderRenterCostResVO {
 	@AutoDocProperty(value="加油服务费用")  ///
 	private String addOilSrvAmt;
 
+    @AutoDocProperty(value = "保险出险导致次年保费上涨的收费")
+    public String premiumMoney;
+
 	//--------------------------------------------
 	@AutoDocProperty(value="优惠抵扣")
 	private String deductionAmount;

@@ -376,6 +376,7 @@ public class RenterCostFacadeService {
             logger.error("订单状态信息不存在orderNo={}",orderNo);
             throw new OrderNotFoundException(orderNo);
         }
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
         List<RenterOrderCostDetailEntity> renterOrderCostDetailEntityList = orderCostDetailService.getRenterOrderCostDetailList(orderNo,renterOrderNo);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(orderNo, renterOrderNo);
         RenterFineVO renterFineVO = getRenterFineDetail(orderNo,renterOrderNo,memNo);
@@ -406,6 +407,7 @@ public class RenterCostFacadeService {
         baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         baseCostDTO.tyreInsurAmt =  abs(RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         baseCostDTO.driverInsurAmt =  abs(RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null?renterGoodsDetailDTO.getPremiumMoney():null;
         rentCarCostDTO.baseCostDTO = baseCostDTO;
         //1.2、优惠券抵扣
         CouponDeductionDTO couponDeductionDTO = new CouponDeductionDTO();

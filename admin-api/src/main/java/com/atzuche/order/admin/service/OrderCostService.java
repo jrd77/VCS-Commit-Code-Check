@@ -13,6 +13,7 @@ import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.CostStatUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -1164,8 +1165,10 @@ public class OrderCostService {
         putRenterOrderCostDetail(realVo,data);
         //优惠抵扣  优惠抵扣 券，凹凸币，钱包   钱包抵扣
         putRenterOrderDeduct(realVo,data,renterOrderDTO,orderDTO.getMemNoRenter());
-        //长租折扣 TODO
+        //长租折扣
         longRentDeduct(realVo,data);
+        //长租出险
+        longRentDanger(realVo,data);
 
         //租车押金和违章押金   车辆押金  违章押金
         putRenterOrderDeposit(realVo,data,costVo);
@@ -1194,6 +1197,14 @@ public class OrderCostService {
         //rentFeeBase基础费用
         putRentFeeBase(realVo,data);
         return realVo;
+    }
+
+    private void longRentDanger(OrderRenterCostResVO realVo, com.atzuche.order.commons.vo.res.OrderRenterCostResVO data) {
+        RenterGoodsDetailDTO renterGoodsDetailDTO = data.getRenterGoodsDetailDTO();
+        if(renterGoodsDetailDTO!= null){
+            Integer premiumMoney = renterGoodsDetailDTO.getPremiumMoney();
+            realVo.setPremiumMoney(premiumMoney==null?"0":String.valueOf(premiumMoney));
+        }
     }
 
     private void subsidyLongRent(OrderRenterCostResVO realVo,com.atzuche.order.commons.vo.res.OrderRenterCostResVO data){

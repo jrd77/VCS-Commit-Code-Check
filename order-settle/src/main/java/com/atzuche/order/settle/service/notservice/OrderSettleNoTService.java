@@ -849,9 +849,10 @@ public class OrderSettleNoTService {
         settleOrdersAccount.setOrderStatusDTO(orderStatusDTO);
         this.saveOrderStatusInfo(settleOrdersAccount);
         log.info("OrderSettleService settleOrdersDefinition settleOrdersAccount two [{}]", GsonUtils.toJson(settleOrdersAccount));
-        //16 退优惠卷 凹凸币(跟租客结算走)
-        this.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
-        log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
+        
+        //16 退优惠卷 凹凸币(跟租客结算走)  去掉 200701
+//        this.settleUndoCoupon(settleOrders.getOrderNo(),settleOrders.getRentCosts().getRenterOrderSubsidyDetails());
+//        log.info("OrderSettleService settleUndoCoupon settleUndoCoupon one [{}]", GsonUtils.toJson(settleOrdersAccount));
 
         //更新应扣account_renter_cost_settle yingkou_amt   200407
 //        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();  // rentCostPayAmt在抵扣欠款的过程中发生了变更。

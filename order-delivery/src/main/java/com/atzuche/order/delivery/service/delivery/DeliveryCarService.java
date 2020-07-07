@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.service.delivery;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
@@ -21,6 +22,8 @@ import com.atzuche.order.delivery.utils.DateUtils;
 import com.atzuche.order.delivery.vo.delivery.*;
 import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +56,8 @@ public class DeliveryCarService {
     CodeUtils codeUtils;
     @Autowired
     OrderDeliveryFlowService deliveryFlowService;
+    @Autowired
+    OrderStatusService orderStatusService;
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
@@ -496,7 +501,11 @@ public class DeliveryCarService {
      * @param changeOrderInfoDTO
      */
     public void changeRenYunFlowOrderInfo(ChangeOrderInfoDTO changeOrderInfoDTO) {
-    	deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+        //增加参数（是否支付完车辆押金）
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(changeOrderInfoDTO.getOrderNo());
+        log.info("changeRenYunFlowOrderInfo-查询订单状态orderStatusEntity={}", JSON.toJSONString(orderStatusEntity));
+        changeOrderInfoDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
+        deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
     }
 
 }

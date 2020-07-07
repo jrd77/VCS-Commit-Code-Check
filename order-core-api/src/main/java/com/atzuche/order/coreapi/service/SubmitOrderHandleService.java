@@ -57,6 +57,8 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -149,13 +151,13 @@ public class SubmitOrderHandleService {
                 context.getOwnerMemberDto().getMemNo(),
                 context.getOrderReqVO().getCarNo());
         // 主订单处理(订单:order、状态:order_status、统计:order_source_stat等)
-        boolean replyFlag = null != context.getRenterGoodsDetailDto().getReplyFlag() &&
-                context.getRenterGoodsDetailDto().getReplyFlag() == OrderConstant.YES;
+
+        boolean replyFlag = RenterOrderService.isAutoReplyFlag(context.getOrderReqVO().getRentTime(), context.getRenterGoodsDetailDto().getAdvanceOrderTime(), context.getRenterGoodsDetailDto().getReplyFlag());
         ParentOrderDTO parentOrderDTO = buildParentOrderDTO(
                 baseReqDTO.getOrderNo(),
                 context.getRiskAuditId(),
                 replyFlag,
-                context.getOrderReqVO());
+                context.getOrderReqVO(),context.getRenterGoodsDetailDto());
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
         // 订单流程处理(orderFlow)
         orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
@@ -168,6 +170,7 @@ public class SubmitOrderHandleService {
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
         return parentOrderDTO.getOrderStatusDTO().getStatus();
     }
+
 
     /**
      * 对象转换
@@ -187,7 +190,13 @@ public class SubmitOrderHandleService {
         OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
         orderTransferRecordEntity.setCarNo(renterGoodsDetailDto.getCarNo() == null ? null : String.valueOf(renterGoodsDetailDto.getCarNo()));
         orderTransferRecordEntity.setCarPlateNum(renterGoodsDetailDto.getCarPlateNum());
-        orderTransferRecordEntity.setOperator(OrderConstant.SYSTEM_OPERATOR);
+
+        String specialConsole = reqContext.getOrderReqVO().getSpecialConsole();
+        if("1".equals(specialConsole)){
+            orderTransferRecordEntity.setOperator(reqContext.getOrderReqVO().getOperator());
+        }else{
+            orderTransferRecordEntity.setOperator( OrderConstant.SYSTEM_OPERATOR);
+        }
         RenterMemberDTO renterMemberDto = reqContext.getRenterMemberDto();
         if (renterMemberDto != null) {
             orderTransferRecordEntity.setMemNo(renterMemberDto.getMemNo());
@@ -270,6 +279,7 @@ public class SubmitOrderHandleService {
                 Integer.valueOf(orderReqVO.getSpecialConsole()));
         orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
         orderSourceStatDTO.setLongRentCouponCode(orderReqVO.getLongOwnerCouponNo());
+        orderSourceStatDTO.setOilType(orderReqVO.getOilType());
         logger.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
     }
@@ -285,7 +295,7 @@ public class SubmitOrderHandleService {
      * @return ParentOrderDTO
      */
     public ParentOrderDTO buildParentOrderDTO(String orderNo, String riskAuditId, boolean replyFlag,
-                                              OrderReqVO orderReqVO) {
+                                              OrderReqVO orderReqVO,RenterGoodsDetailDTO renterGoodsDetailDto) {
         ParentOrderDTO parentOrderDTO = new ParentOrderDTO();
         OrderDTO orderDTO = buildOrderDTO(orderNo, riskAuditId, orderReqVO);
         OrderSourceStatDTO orderSourceStatDTO = buildOrderSourceStatDTO(orderNo, orderReqVO);
@@ -294,16 +304,18 @@ public class SubmitOrderHandleService {
         orderStatusDTO.setOrderNo(orderNo);
         if (replyFlag) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            renterGoodsDetailDto.setIsAutoReplayFlag(0);
         }
-
         parentOrderDTO.setOrderDTO(orderDTO);
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
         parentOrderDTO.setOrderSourceStatDTO(orderSourceStatDTO);
         return parentOrderDTO;
 
     }
+
 
 
     /**
@@ -425,6 +437,7 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setCategory(Integer.valueOf(reqContext.getOrderReqVO().getOrderCategory()));
 
         ownerOrderReqDTO.setReplyFlag(reqContext.getOwnerGoodsDetailDto().getReplyFlag());
+        ownerOrderReqDTO.setAutoReplyFlag(RenterOrderService.isAutoReplyFlag(reqContext.getOrderReqVO().getRentTime(),reqContext.getRenterGoodsDetailDto().getAdvanceOrderTime(),reqContext.getOwnerGoodsDetailDto().getReplyFlag()));
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());
