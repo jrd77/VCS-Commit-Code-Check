@@ -575,4 +575,8 @@
         limit 1
     </select>
 
+    <select id="getByMemNoAndPlatNum" resultType="com.atzuche.order.commons.vo.LianHeMaiTongOrderVO">
+
+    </select>
+
 </mapper>

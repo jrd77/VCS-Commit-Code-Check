@@ -8,18 +8,13 @@ import java.util.List;
 @Data
 public class LianHeMaiTongMemberVO {
 
-    @AutoDocProperty("车主姓名")
-    private String ownerName;
-    @AutoDocProperty("车主会员号")
-    private String ownerMemNo;
-    @AutoDocProperty("车主手机号")
-    private String ownerPhone;
-    @AutoDocProperty("租客姓名")
-    private String renterName;
-    @AutoDocProperty("租客会员号")
-    private String renterMemNo;
-    @AutoDocProperty("租客手机号")
-    private String renterPhone;
+    @AutoDocProperty("姓名")
+    private String name;
+    @AutoDocProperty("会员号")
+    private String memNo;
+    @AutoDocProperty("手机号")
+    private String phone;
+
 
 
     @AutoDocProperty("订单列表信息")
