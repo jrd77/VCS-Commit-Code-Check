@@ -270,7 +270,7 @@ public class RenterOrderDeliveryModeService {
 			return null;
 		}
         log.info("config-从城市配置中获取区间配置,cityCode=[{}]", transSimpleMode.getCityCode());
-        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(),Integer.valueOf(transSimpleMode.getCityCode()));
+        CityEntity configByCityCode = cityConfigSDK.getCityByCityCode(Integer.valueOf(transSimpleMode.getCityCode()));
         log.info("config-从城市配置中获取区间配置,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
         RenterOrderDeliveryMode mode = new RenterOrderDeliveryMode();
         BeanUtils.copyProperties(configByCityCode, mode);

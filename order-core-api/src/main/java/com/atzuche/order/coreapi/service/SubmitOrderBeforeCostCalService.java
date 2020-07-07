@@ -401,7 +401,7 @@ public class SubmitOrderBeforeCostCalService {
         	return sectionDeliveryVO;
         }
     	LOGGER.info("config-从城市配置中获取区间配置,cityCode=[{}]", orderReqVO.getCityCode());
-        CityEntity configByCityCode = cityConfigSDK.getConfigByCityCode(new DefaultConfigContext(),Integer.valueOf(orderReqVO.getCityCode()));
+        CityEntity configByCityCode = cityConfigSDK.getCityByCityCode(Integer.valueOf(orderReqVO.getCityCode()));
         LOGGER.info("config-从城市配置中获取区间配置,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
         RenterOrderDeliveryMode mode = new RenterOrderDeliveryMode();
         BeanUtils.copyProperties(configByCityCode, mode);
