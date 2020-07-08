@@ -1,4 +1,5 @@
 package com.atzuche.order.owner.commodity.mapper;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import com.atzuche.order.commons.vo.LianHeMaiTongOrderVO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 
@@ -38,5 +39,5 @@ public interface OwnerGoodsMapper{
 
     OwnerGoodsEntity getOwnerGoodsByPlatNum(@Param("platNum")String platNum);
 
-    List<LianHeMaiTongOrderVO> getByMemNoAndPlatNum(@Param("memNo")String memNo, @Param("platNum")String platNum);
+    LianHeMaiTongOrderDTO getByMemNoAndPlatNum(@Param("memNo")String memNo, @Param("platNum")String platNum);
 }

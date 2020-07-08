@@ -1,9 +1,13 @@
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
+import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.exceptions.LianHeMaiTongMemberException;
 import com.atzuche.order.commons.vo.LianHeMaiTongMemberVO;
 import com.atzuche.order.commons.vo.LianHeMaiTongOrderVO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
@@ -18,7 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,6 +41,8 @@ public class LianHeMaiTongService {
     private OrderStatusService orderStatusService;
     @Autowired
     private OrderSourceStatService orderSourceStatService;
+    @Autowired
+    private RenterOrderDeliveryService renterOrderDeliveryService;
 
     public LianHeMaiTongMemberVO getMemberInfo(String phone, String memNo, String platNum) {
         LianHeMaiTongMemberVO lhmtVO = new LianHeMaiTongMemberVO();
@@ -103,12 +111,25 @@ public class LianHeMaiTongService {
 
     public List<LianHeMaiTongOrderVO> getLianHeMaiTongOrderVO(String memNo,Integer memberTag,String platNum){
         if(platNum != null){
-            List<LianHeMaiTongOrderVO> list = ownerGoodsService.getByMemNoAndPlatNum(memNo,platNum,memberTag);
-
+            LianHeMaiTongOrderDTO lianHeMaiTongOrderDTO = ownerGoodsService.getByMemNoAndPlatNum(memNo,platNum,memberTag);
+            List<RenterOrderDeliveryEntity> renterOrderDeliveryList = renterOrderDeliveryService.selectByRenterOrderNo(lianHeMaiTongOrderDTO.getRenterOrderNo());
+            boolean isGetCar = isGetReturnCarService(renterOrderDeliveryList, DeliveryOrderTypeEnum.GET_CAR);
+            boolean isReturnCar = isGetReturnCarService(renterOrderDeliveryList, DeliveryOrderTypeEnum.RETURN_CAR);
 
         }else{
 
         }
         return null;
+    }
+
+
+    public boolean isGetReturnCarService(List<RenterOrderDeliveryEntity> list, DeliveryOrderTypeEnum deliveryOrderTypeEnum){
+        Optional<RenterOrderDeliveryEntity> first = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
+                .filter(x -> deliveryOrderTypeEnum.getCode() == x.getType() && 1 == x.getIsNotifyRenyun())
+                .findFirst();
+        if(first.isPresent()){
+            return true;
+        }
+        return false;
     }
 }

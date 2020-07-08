@@ -1,6 +1,7 @@
 package com.atzuche.order.owner.commodity.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.commons.vo.LianHeMaiTongOrderVO;
@@ -144,7 +145,7 @@ public class OwnerGoodsService{
         return ownerGoodsMapper.getOwnerGoodsByPlatNum(platNum);
     }
 
-    public List<LianHeMaiTongOrderVO> getByMemNoAndPlatNum(String memNo, String platNum,int memTag) {
+    public LianHeMaiTongOrderDTO getByMemNoAndPlatNum(String memNo, String platNum, int memTag) {
         return ownerGoodsMapper.getByMemNoAndPlatNum(memNo,platNum);
     }
 }
