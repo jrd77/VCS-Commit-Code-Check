@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.service;
 
+import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,19 +74,17 @@ public class CashWithdrawalService {
 
         // 获取新订单系统的会员总收益
         AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
-
-        // 提现校验
+        //校验
         accountOwnerCashExamineService.check(req, simpleMem, incomeEntity);
-
         // 根据id获取银行卡信息
         BankCardDTO bankCard = remoteAccountService.findAccountById(Integer.parseInt(req.getCardId()));
         if (Objects.isNull(bankCard)) {
             log.info("Not fund bank card info. cardId:[{}]", req.getCardId());
             return;
         }
-
         // 提现主逻辑
-        accountOwnerCashExamineService.saveAccountOwnerCashExamine(req, simpleMem);
+        //accountOwnerCashExamineService.saveAccountOwnerCashExamine(req, simpleMem);
+        accountOwnerCashExamineService.memberWithdrawalHandle(req, simpleMem, incomeEntity, bankCard);
     }
 	
 	
