@@ -13,6 +13,5 @@ public class OrderOilRequestVO {
     @NotBlank(message = "订单号不能为空")
     private String orderNo;
     @AutoDocProperty(value = "photoType不能为空")
-    @NotBlank(message = "photoType不能为空")
     private String type;
 }
