@@ -34,6 +34,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.DeductContextDTO;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.entity.dto.cost.CreateRenterOrderDataReqDTO;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderCarDepositResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderIllegalResVO;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
@@ -114,6 +115,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setRenterMemberRightDTOList(renterMember.getRenterMemberRightDTOList());
         renterOrderReqVO.setCommUseDriverList(renterMember.getCommUseDriverList());
         renterOrderReqVO.setReplyFlag(goodsDetail.getReplyFlag());
+        renterOrderReqVO.setAutoReplyFlag(RenterOrderService.isAutoReplyFlag(reqContext.getOrderReqVO().getRentTime(),goodsDetail.getAdvanceOrderTime(),goodsDetail.getReplyFlag()));
         renterOrderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         renterOrderReqVO.setDriverScore(renterMember.getDriverScore());
         logger.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
@@ -715,6 +717,7 @@ public class OrderCommonConver {
         orderCostGetReturnCarCostReqDTO.setIsPackageOrder(StringUtils.equals("2", context.getOrderReqVO().getOrderCategory()));
         orderCostGetReturnCarCostReqDTO.setIsGetCarCost(null != context.getOrderReqVO().getSrvGetFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvGetFlag());
         orderCostGetReturnCarCostReqDTO.setIsReturnCarCost(null != context.getOrderReqVO().getSrvReturnFlag() && OrderConstant.YES == context.getOrderReqVO().getSrvReturnFlag());
+        orderCostGetReturnCarCostReqDTO.setDistributionMode(context.getOrderReqVO().getDistributionMode());
         logger.info("Init OrderCostGetReturnCarCostReqDTO.result is,orderCostGetReturnCarCostReqDTO:[{}]", JSON.toJSONString(orderCostGetReturnCarCostReqDTO));
         return orderCostGetReturnCarCostReqDTO;
     }
@@ -928,8 +931,8 @@ public class OrderCommonConver {
         record.setExpRevertTime(orderReqVO.getRevertTime());
         record.setGoodsCode(orderReqVO.getCarNo());
         record.setGoodsType(String.valueOf(OrderConstant.ONE));
-        record.setAgreeFlag(null == context.getRenterGoodsDetailDto().getReplyFlag() ? OrderConstant.NO :
-                context.getRenterGoodsDetailDto().getReplyFlag());
+        record.setAgreeFlag(null == context.getRenterGoodsDetailDto().getIsAutoReplayFlag() ? OrderConstant.NO :
+                context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
         record.setReqAcceptTime(record.getAgreeFlag() == OrderConstant.NO ? null : LocalDateTime.now());
         record.setIsUseCoin(orderReqVO.getUseAutoCoin());
         record.setIsUseWallet(orderReqVO.getUseBal());

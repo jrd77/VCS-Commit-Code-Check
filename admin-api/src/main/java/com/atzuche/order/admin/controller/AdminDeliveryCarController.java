@@ -6,6 +6,7 @@ import com.atzuche.order.admin.service.DeliveryRemoteService;
 import com.atzuche.order.admin.service.log.AdminLogService;
 import com.atzuche.order.admin.util.CompareBeanUtils;
 import com.atzuche.order.commons.exceptions.DeliveryOrderException;
+import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarRepVO;
 import com.atzuche.order.commons.vo.delivery.DeliveryCarVO;
 import com.atzuche.order.commons.vo.delivery.OwnerGetAndReturnCarDTO;
@@ -57,6 +58,10 @@ public class AdminDeliveryCarController extends BaseController {
         try {
             DeliveryCarVO deliveryCarRepVO = deliveryCarInfoService.findDeliveryListByOrderNo(deliveryCarDTO);
             if (Objects.nonNull(deliveryCarRepVO)) {
+            	RenterOwnerSummarySectionDeliveryVO sectionDelivery = deliveryCarRepVO.getSectionDelivery();
+            	if (sectionDelivery != null) {
+            		deliveryCarRepVO.setDistributionMode(sectionDelivery.getDistributionMode());
+            	}
                 return ResponseData.success(deliveryCarRepVO);
             }
             return ResponseData.success();
