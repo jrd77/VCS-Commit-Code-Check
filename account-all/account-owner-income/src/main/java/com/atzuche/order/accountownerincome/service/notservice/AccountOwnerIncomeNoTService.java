@@ -83,7 +83,7 @@ public class AccountOwnerIncomeNoTService {
 
     /**
      * 更新车主收益(提现)
-     * @param accountOwnerIncomeDetail
+     * @param accountOwnerIncomeEntity
      */
     public void updateOwnerIncomeAmtForCashWith(AccountOwnerIncomeEntity accountOwnerIncomeEntity) {
         if(accountOwnerIncomeEntity == null){

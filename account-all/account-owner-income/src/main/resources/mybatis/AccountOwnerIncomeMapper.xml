@@ -8,6 +8,7 @@
         <result property="memNo" column="mem_no"/>
         <result property="incomeAmt" column="income_amt"/>
         <result property="secondaryIncomeAmt" column="secondary_income_amt"/>
+        <result property="secondaryFreezeIncomeAmt" column="secondary_freeze_income_amt"/>
         <result property="version" column="version"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
@@ -16,6 +17,7 @@
         `mem_no`,
         `income_amt`,
         `secondary_income_amt`,
+        `secondary_freeze_income_amt`,
         `version`,
         `create_time`
 	</sql>
@@ -30,6 +32,7 @@
             <if test="memNo != null">`mem_no`, </if>
             <if test="incomeAmt != null">`income_amt`, </if>
             <if test="secondaryIncomeAmt != null">`secondary_income_amt`, </if>
+            <if test="secondaryFreezeIncomeAmt != null">`secondary_freeze_income_amt`, </if>
             <if test="version != null">`version`, </if>
             <if test="createTime != null">`create_time` </if>
         </trim>
@@ -37,6 +40,7 @@
             <if test="memNo != null">#{memNo},  </if>
             <if test="incomeAmt != null">#{incomeAmt},  </if>
             <if test="secondaryIncomeAmt != null">#{secondaryIncomeAmt}, </if>
+            <if test="secondaryFreezeIncomeAmt != null">`secondary_freeze_income_amt` = #{secondaryFreezeIncomeAmt}, </if>
             <if test="version != null">#{version},  </if>
             <if test="createTime != null">#{createTime} </if>
         </trim>
@@ -50,7 +54,8 @@
 				`mem_no` = #{memNo},
 				`income_amt` = #{incomeAmt},
                 `secondary_income_amt` = #{secondaryIncomeAmt},
-                 version = version + 1
+                `secondary_freeze_income_amt` = #{secondaryFreezeIncomeAmt},
+                version = version + 1
 		    </set>
 		where id = #{id} and version = #{version}
     </update>
@@ -58,10 +63,12 @@
     <select id="selectByMemNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_income where mem_no = #{memNo} limit 1
     </select>
+
     <select id="selectByMemNoList" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_income where mem_no in
         <foreach collection="memNoList" index="index" item="memNo" open="(" separator="," close=")">
             #{memNo}
         </foreach>
     </select>
+
 </mapper>
