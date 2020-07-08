@@ -12,9 +12,9 @@ public class LianHeMaiTongOrderVO {
     @AutoDocProperty("订单状态")
     private String orderStatus;
     @AutoDocProperty("订单开始时间")
-    private String rentTime;
+    private String expRentTime;
     @AutoDocProperty("订单结束时间")
-    private String reverrTime;
+    private String expRevertTime;
     @AutoDocProperty("是否取还车")
     private String isGetReturnCar;
     @AutoDocProperty("预计提前取车时间")

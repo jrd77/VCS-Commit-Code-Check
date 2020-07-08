@@ -109,5 +109,6 @@ public class LianHeMaiTongService {
         }else{
 
         }
+        return null;
     }
 }
