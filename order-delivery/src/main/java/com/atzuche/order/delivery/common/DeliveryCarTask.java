@@ -19,7 +19,9 @@ import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.RenterOrderCostEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostService;
@@ -66,6 +68,9 @@ public class DeliveryCarTask {
     private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private OrderStatusService orderStatusService;
+
     /**
      * 添加订单到仁云流程系统
      */
@@ -210,6 +215,9 @@ public class DeliveryCarTask {
 
         Double oilPriceByCityCodeAndType = deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(orderEntity.getCityCode()), renterGoodsDetailDTO.getCarEngineType());
         renYunFlowOrderDTO.setOilPrice(oilPriceByCityCodeAndType==null?"0":String.valueOf(oilPriceByCityCodeAndType));
+
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renYunFlowOrderDTO.getOrdernumber());
+        renYunFlowOrderDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
         return renYunFlowOrderDTO;
     }
 
