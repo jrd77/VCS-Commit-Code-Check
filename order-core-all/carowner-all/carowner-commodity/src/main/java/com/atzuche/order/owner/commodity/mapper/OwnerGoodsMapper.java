@@ -39,5 +39,4 @@ public interface OwnerGoodsMapper{
 
     OwnerGoodsEntity getOwnerGoodsByPlatNum(@Param("platNum")String platNum);
 
-    LianHeMaiTongOrderDTO getByMemNoAndPlatNum(@Param("memNo")String memNo, @Param("platNum")String platNum);
 }

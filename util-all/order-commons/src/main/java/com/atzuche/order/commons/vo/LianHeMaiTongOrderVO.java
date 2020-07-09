@@ -7,16 +7,18 @@ import lombok.Data;
 public class LianHeMaiTongOrderVO {
     @AutoDocProperty("订单号")
     private String orderNo;
-    @AutoDocProperty("订单类型")
+    @AutoDocProperty("订单类型 1:普通,2:套餐,3:长租")
     private String category;
-    @AutoDocProperty("订单状态")
+    @AutoDocProperty("订单状态 1,待确认 4,待支付 8,待调度  16,待取车 32,待还车 64,待结算 128,待违章结算 256,待理赔处理 512,完成 0结束")
     private String orderStatus;
     @AutoDocProperty("订单开始时间")
     private String expRentTime;
     @AutoDocProperty("订单结束时间")
     private String expRevertTime;
-    @AutoDocProperty("是否取还车")
-    private String isGetReturnCar;
+    @AutoDocProperty("是否取车 true：是， false：否")
+    private Boolean isGetCar;
+    @AutoDocProperty("是否还车 true：是， false：否")
+    private Boolean isGetReturnCar;
     @AutoDocProperty("预计提前取车时间")
     private String showRentTime;
     @AutoDocProperty("预计延后还车时间")

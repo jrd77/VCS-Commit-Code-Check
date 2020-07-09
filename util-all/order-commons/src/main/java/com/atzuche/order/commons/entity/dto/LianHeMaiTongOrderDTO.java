@@ -10,7 +10,7 @@ public class LianHeMaiTongOrderDTO {
     private String renterOrderNo;
     private String ownerOrderNo;
     @AutoDocProperty("订单类型")
-    private Integer category;
+    private String category;
     @AutoDocProperty("订单状态")
     private Integer orderStatus;
     @AutoDocProperty("订单开始时间")

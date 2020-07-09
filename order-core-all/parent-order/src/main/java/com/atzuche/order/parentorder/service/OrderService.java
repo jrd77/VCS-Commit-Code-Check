@@ -2,6 +2,7 @@ package com.atzuche.order.parentorder.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -114,5 +115,9 @@ public class OrderService {
     public List<OrderEntity> getOrderByRenterMemNo(String renterMemNo) {
         List<OrderEntity> orderEntityList = orderMapper.getOrderByRenterMemNo(renterMemNo);
         return orderEntityList;
+    }
+
+    public List<LianHeMaiTongOrderDTO> getByMemNoAndPlatNum(String memNo, String platNum) {
+        return orderMapper.getByMemNoAndPlatNum(memNo,platNum);
     }
 }

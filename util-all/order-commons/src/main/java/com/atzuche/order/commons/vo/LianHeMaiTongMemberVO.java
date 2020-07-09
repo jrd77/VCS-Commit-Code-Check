@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.vo;
 
+import com.autoyol.commons.utils.Page;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 
@@ -14,9 +15,7 @@ public class LianHeMaiTongMemberVO {
     private String memNo;
     @AutoDocProperty("手机号")
     private String phone;
-    @AutoDocProperty("会员标志 1：车主，2：租客")
-    private boolean memberTag;
 
     @AutoDocProperty("订单列表信息")
-    List<LianHeMaiTongOrderVO> lianHeMaiTongOrderVOS;
+    Page<LianHeMaiTongOrderVO> lianHeMaiTongOrderVOS;
 }

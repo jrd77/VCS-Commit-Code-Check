@@ -145,7 +145,4 @@ public class OwnerGoodsService{
         return ownerGoodsMapper.getOwnerGoodsByPlatNum(platNum);
     }
 
-    public LianHeMaiTongOrderDTO getByMemNoAndPlatNum(String memNo, String platNum, int memTag) {
-        return ownerGoodsMapper.getByMemNoAndPlatNum(memNo,platNum);
-    }
 }

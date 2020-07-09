@@ -521,4 +521,7 @@
     <select id="queryByOrderNoAndPlatNum" resultMap="BaseResultMap">
         select * from renter_goods where order_no = #{orderNo} and car_plate_num = #{platNum} and is_delete = 0 order by id desc limit 1
     </select>
+    <select id="getByMemNo" resultType="com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO">
+
+    </select>
 </mapper>
