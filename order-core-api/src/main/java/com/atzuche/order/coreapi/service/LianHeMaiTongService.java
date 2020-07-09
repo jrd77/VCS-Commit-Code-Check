@@ -137,7 +137,7 @@ public class LianHeMaiTongService {
         String platNum = lianHeMaiTongMemberReqVO.getPlatNum();
         Integer pageNum = lianHeMaiTongMemberReqVO.getPageNum();
         Integer pageSize = lianHeMaiTongMemberReqVO.getPageSize();
-        Page pageRes = new Page();
+
         List<LianHeMaiTongOrderVO> list = new ArrayList<>();
         PageHelper.startPage(pageNum,pageSize);
         List<LianHeMaiTongOrderDTO> lianHeMaiTongOrderDTOS = orderService.getByMemNoAndPlatNum(memNo,platNum);
@@ -171,7 +171,8 @@ public class LianHeMaiTongService {
             vo.setIsGetReturnCar(isReturnCar);
             list.add(vo);
         });
-        pageRes.setList(pageList);
+        Page<LianHeMaiTongOrderVO> pageRes = new Page();
+        pageRes.setList(list);
         pageRes.setTotal(pageInfo.getTotal());
         return pageRes;
     }
