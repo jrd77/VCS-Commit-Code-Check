@@ -116,6 +116,8 @@ public class CashierService {
     private BaseProducer baseProducer;
     @Autowired
     private CashierShishouService cashierShishouService;
+    @Autowired
+    private MemberSecondSettleService memberSecondSettleService;
     
     /**  *************************************** 租车费用 start****************************************************/
 
@@ -625,7 +627,11 @@ public class CashierService {
     public AdjustOwnerIncomeResVO examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         AdjustOwnerIncomeResVO vo = new  AdjustOwnerIncomeResVO();
         BeanUtils.copyProperties(accountOwnerIncomeExamineOpReq,vo);
-        int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
+
+        boolean isSecondFlag =
+                memberSecondSettleService.judgeIsSecond(Integer.parseInt(accountOwnerIncomeExamineOpReq.getMemNo()),
+                accountOwnerIncomeExamineOpReq.getOrderNo());
+        int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq, isSecondFlag);
         vo.setAccountOwnerIncomeDetailId(id);
         return vo;
     }
