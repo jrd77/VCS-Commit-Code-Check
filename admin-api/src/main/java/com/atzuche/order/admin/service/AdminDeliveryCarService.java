@@ -141,6 +141,7 @@ public class AdminDeliveryCarService {
         modifyOrderReqVO.setConsoleFlag(true);
         modifyOrderReqVO.setOperator(AdminUserUtil.getAdminUser().getAuthName());
         modifyOrderReqVO.setSrvReturnFlag(deliveryCarVO.getIsReturnCar());
+        modifyOrderReqVO.setDistributionMode(deliveryCarVO.getDistributionMode());
         return modifyOrderReqVO;
     }
 

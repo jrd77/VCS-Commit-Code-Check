@@ -68,6 +68,10 @@
         <result column="address_range" jdbcType="LONGVARCHAR" property="addressRange"/>
         <result column="free_address_range" jdbcType="LONGVARCHAR" property="freeAddressRange"/>
         <result column="ota_address_range" jdbcType="LONGVARCHAR" property="otaAddressRange"/>
+        <result column="rent_before_minutes" jdbcType="INTEGER" property="rentBeforeMinutes"/>
+        <result column="rent_after_minutes" jdbcType="INTEGER" property="rentAfterMinutes"/>
+        <result column="revert_before_minutes" jdbcType="INTEGER" property="revertBeforeMinutes"/>
+        <result column="revert_after_minutes" jdbcType="INTEGER" property="revertAfterMinutes"/>
     </resultMap>
     <select id="findAll" resultMap="base">
         SELECT
@@ -83,7 +87,29 @@
         is_limit, first_letter, is_distribute, level, peak_time_slot, before_trans_time_span,
         unservice_begin_time, unservice_end_time, delivery_service_cost, package_delivery_service_cost,
         peak_starts_with, peak_not_starts_with, is_free_package, city_center_address, is_ofd_scooter,
-        address_range, free_address_range, ota_address_range
+        address_range, free_address_range, ota_address_range,
+        rent_before_minutes,rent_after_minutes,revert_before_minutes,revert_after_minutes
         FROM city
+    </select>
+    
+    <select id="getCityByCode" resultMap="base" parameterType="Integer">
+        SELECT
+        id, code, name, detail, lat, lon, telPrefix, platePrefix, type, isSupport, is_open,
+        create_date, calculate_flag, trusteeship_no_hour, trusteeship_hour, srv_get_cost,
+        srv_return_cost, order_time_set, rent_time_set, min_price, float_percent, fall_percent,
+        revert_st_interval, revert_service_max, rent_st_interval, rent_service_max, bg_url,
+        description, support_one_key, create_time, update_time, creator, updator, del_flag,
+        income_float_percent, income_fall_percent, allow_transaction, is_dispatching, dispatching_begin_time,
+        dispatching_end_time, min_subsidy_per_day, max_subsidy_per_day, max_subsidy_per_order,
+        is_cpic_coupon, before_time, cpic_before_time_work, cpic_before_time_free, address_range_version,
+        address_range_description, is_quick_pay, full_letter, is_hot_city, center_address,
+        is_limit, first_letter, is_distribute, level, peak_time_slot, before_trans_time_span,
+        unservice_begin_time, unservice_end_time, delivery_service_cost, package_delivery_service_cost,
+        peak_starts_with, peak_not_starts_with, is_free_package, city_center_address, is_ofd_scooter,
+        address_range, free_address_range, ota_address_range,
+        rent_before_minutes,rent_after_minutes,revert_before_minutes,revert_after_minutes
+        FROM city 
+        where code=#{cityCode} 
+        limit 1
     </select>
 </mapper>

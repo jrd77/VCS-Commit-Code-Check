@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo.delivery;
 
 
+import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
 import lombok.ToString;
@@ -34,7 +35,10 @@ public class DeliveryCarVO {
 
     @AutoDocProperty("油耗总刻度")
     private String maxOilNumber;
-
+    @AutoDocProperty(value = "这个参数是修改delivery/update接口的时候使用作为传参，配送模式：0-区间配送，1-精准配送")
+    private Integer distributionMode;
+    @AutoDocProperty("区间配送信息")
+    private RenterOwnerSummarySectionDeliveryVO sectionDelivery;
     @AutoDocProperty("取车虚拟地址")
     private String getCarShowAddr;
     @AutoDocProperty("还车虚拟地址")

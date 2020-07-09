@@ -4,6 +4,8 @@ import lombok.Data;
 
 import java.util.List;
 
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
+
 @Data
 public class OwnerOrderDetailRespDTO {
     public OrderDTO order;
@@ -23,4 +25,6 @@ public class OwnerOrderDetailRespDTO {
     public OwnerOrderCostDTO ownerOrderCostDTO;
     public List<AccountOwnerIncomeExamineDTO> accountOwnerIncomeExamineDTOS;
     public List<OwnerOrderIncrementDetailDTO> ownerOrderIncrementDetailDTOS;
+    // 区间配送信息
+    public SectionDeliveryVO sectionDelivery;
 }

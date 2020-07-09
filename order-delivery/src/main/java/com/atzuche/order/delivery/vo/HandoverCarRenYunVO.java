@@ -43,6 +43,8 @@ public class HandoverCarRenYunVO implements Serializable{
      */
     private String headPhone;
 
+    private String handleTime;
+
     /**
      * 对应流程系统步骤，第一步传1，以此类推
      */

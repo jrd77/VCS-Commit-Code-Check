@@ -6,6 +6,8 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -64,7 +66,46 @@ public class ConfigSDKFactory implements ConfigService {
             return itemDTO;
         }
     }
-
+    
+    
+    /**
+     * 重新，按configName来刷新  insurance_config
+     */
+    public String restartInit(String configName){
+    	if(StringUtils.isBlank(configName)) {
+    		return "fail";
+    	}
+    	
+    	if(!inited){
+    		long start = +System.currentTimeMillis();
+    		logger.info("***********初始化"+start);
+            init();
+            long end = +System.currentTimeMillis();
+            logger.info("***********初始化"+end + "时间:"+(end - start));
+        }
+    	
+    	String flag = "success";
+    	//对key的验证，只有存在的则覆盖。
+    	if(proConfigValues.get(configName) != null) {
+            ConfigItemDTO configItemDTO = getConfig(configName,false);
+            proConfigValues.put(configName,configItemDTO);
+            flag += "-pro";
+    	}else {
+    		logger.info("pro configName=[{}] no exists,init fail",configName);
+    		flag += "-proX";
+    	}
+    	
+    	if(preConfigValues.get(configName) != null) {
+            ConfigItemDTO preConfigItemDTO = getConfig(configName,true);
+            preConfigValues.put(configName,preConfigItemDTO);
+            flag += "-pre";
+    	}else {
+    		logger.info("pre configName=[{}] no exists,init fail",configName);
+    		flag += "-preX";
+    	}           
+        return flag;
+    }
+    
 
     public void init(){
         List<String> configNames = getAllConfigNames();

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +69,6 @@ public class PayCallbackService implements OrderPayCallBack {
             deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
-
     }
 
     /**

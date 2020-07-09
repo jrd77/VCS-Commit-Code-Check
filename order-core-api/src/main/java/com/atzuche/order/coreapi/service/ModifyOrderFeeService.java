@@ -176,6 +176,8 @@ public class ModifyOrderFeeService {
 			totalRentCarFee += (modifyOrderCostVO.getReturnBlockedRaiseAmt() == null ? 0:modifyOrderCostVO.getReturnBlockedRaiseAmt());
 			totalRentCarFee += (modifyOrderCostVO.getTyreInsurAmt() == null ? 0:modifyOrderCostVO.getTyreInsurAmt());
 			totalRentCarFee += (modifyOrderCostVO.getDriverInsurAmt() == null ? 0:modifyOrderCostVO.getDriverInsurAmt());
+			totalRentCarFee += (modifyOrderCostVO.getAccurateGetSrvAmt() == null ? 0:modifyOrderCostVO.getAccurateGetSrvAmt());
+			totalRentCarFee += (modifyOrderCostVO.getAccurateReturnSrvAmt() == null ? 0:modifyOrderCostVO.getAccurateReturnSrvAmt());
 		}
 		ModifyOrderDeductVO modifyOrderDeductVO = updateModifyOrderFeeVO.getModifyOrderDeductVO();
 		if (modifyOrderDeductVO != null) {
@@ -351,6 +353,10 @@ public class ModifyOrderFeeService {
 		Integer tyreInsurAmt = getCostAmtByCode(costList, RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES.getCashNo());
 		// 驾乘无忧保障费
 		Integer driverInsurAmt = getCostAmtByCode(costList, RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES.getCashNo());
+		// 精准取车服务费
+		Integer accurateGetSrvAmt = getCostAmtByCode(costList, RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo());
+		// 精准还车服务费
+		Integer accurateReturnSrvAmt = getCostAmtByCode(costList, RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo()) + getSubsidyAmtByCode(subsidyList, RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo());
 		// 封装费用对象
 		ModifyOrderCostVO modifyOrderCostVO = new ModifyOrderCostVO();
 		modifyOrderCostVO.setAbatementAmt(abatementAmt);
@@ -364,6 +370,8 @@ public class ModifyOrderFeeService {
 		modifyOrderCostVO.setTotalDriverFee(totalDriverFee);
 		modifyOrderCostVO.setTyreInsurAmt(tyreInsurAmt);
 		modifyOrderCostVO.setDriverInsurAmt(driverInsurAmt);
+		modifyOrderCostVO.setAccurateGetSrvAmt(accurateGetSrvAmt);
+		modifyOrderCostVO.setAccurateReturnSrvAmt(accurateReturnSrvAmt);
 		return modifyOrderCostVO;
 	}
 	
