@@ -128,7 +128,7 @@ public class LianHeMaiTongService {
             throw e;
         }
         Page<LianHeMaiTongOrderVO> lianHeMaiTongOrderVO = getLianHeMaiTongOrderVO(lianHeMaiTongMemberReqVO);
-        lhmtVO.setLianHeMaiTongOrderVOS(lianHeMaiTongOrderVO);
+        lhmtVO.setPage(lianHeMaiTongOrderVO);
         return lhmtVO;
     }
 

@@ -21,7 +21,7 @@ public class LianHeMaiTongController {
     @Autowired
     private LianHeMaiTongService lianHeMaiTongService;
 
-    @AutoDocMethod(description = "会员信息查询", value = "会员信息查询", response = LianHeMaiTongMemberVO.class)
+    @AutoDocMethod(description = "联合麦通接口文档会员信息查询", value = "联合麦通接口文档会员信息查询", response = LianHeMaiTongMemberVO.class)
     @RequestMapping("/getMemberInfo")
     public ResponseData<LianHeMaiTongMemberVO> getMemberInfo(LianHeMaiTongMemberReqVO lianHeMaiTongMemberReqVO){
         LianHeMaiTongMemberVO lianHeMaiTongMemberVO = lianHeMaiTongService.getMemberInfo(lianHeMaiTongMemberReqVO);

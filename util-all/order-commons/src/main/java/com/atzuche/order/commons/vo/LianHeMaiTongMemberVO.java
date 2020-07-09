@@ -17,5 +17,5 @@ public class LianHeMaiTongMemberVO {
     private String phone;
 
     @AutoDocProperty("订单列表信息")
-    Page<LianHeMaiTongOrderVO> lianHeMaiTongOrderVOS;
+    Page<LianHeMaiTongOrderVO> page;
 }
