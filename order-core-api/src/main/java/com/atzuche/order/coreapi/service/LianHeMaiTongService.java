@@ -203,7 +203,7 @@ public class LianHeMaiTongService {
      **/
     public MemberAuditResultResVO getRenterMemberFromRemote(MemberAuditResultReqVO memberAuditResultReqVO){
         ResponseData<MemberAuditResultResVO> responseObject = null;
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取会员号");
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单号获取订单审核信息");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"riskCheckServiceFeignService.auditResult");
             log.info("Feign 开始获取订单审核信息,memberAuditResultReqVO={}", JSON.toJSONString(memberAuditResultReqVO));
