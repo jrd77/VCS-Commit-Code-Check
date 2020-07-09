@@ -15,6 +15,7 @@ import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.HolidayTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.wallet.WalletProxyService;
@@ -66,6 +67,7 @@ public class AdminPreOrderController {
 
     @Autowired
     private AutoCoinProxyService coinProxyService;
+    
 
     @AutoDocVersion(version = "下单前确定页面")
     @AutoDocGroup(group = "下单前确定页面")
@@ -190,6 +192,12 @@ public class AdminPreOrderController {
         responseVO.setGetCarCouponList(memAvailableCouponVO.getGetCarCouponList());
         responseVO.setCarOwnerCouponDetailVOList(memAvailableCouponVO.getCarOwnerCouponDetailVOList());
         responseVO.setCountDays(memAvailableCouponVO.getCountDays());
+        // 获取精准达服务费配置
+        AccurateGetReturnSrvVO accurateGetReturnSrvVO = adminOrderService.getAccurateGetReturnSrvAmt();
+        if (accurateGetReturnSrvVO != null) {
+        	responseVO.setAccurateGetSrvAmt(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
+        	responseVO.setAccurateReturnSrvAmt(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
         return ResponseData.success(responseVO);
 
     }

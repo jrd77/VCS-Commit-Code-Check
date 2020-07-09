@@ -1,9 +1,10 @@
 package com.atzuche.config.server.controller;
 
 import com.atzuche.config.common.api.ConfigItemDTO;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.server.service.CityService;
 import com.atzuche.config.server.service.ConfigRegisterFactory;
 import com.autoyol.commons.web.ResponseData;
-import com.ctrip.framework.apollo.spi.ConfigFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,8 @@ public class ConfigController {
 
     @Autowired
     private ConfigRegisterFactory configFactory;
+    @Autowired
+    private CityService cityService;
 
      @GetMapping("/config/get")
      public ResponseData<ConfigItemDTO> getConfigItem(@RequestParam("configName") String configName,
@@ -41,5 +44,13 @@ public class ConfigController {
          List<String> configNames = configFactory.getAllConfigNames();
          return ResponseData.success(configNames);
      }
-
+     
+     
+     @GetMapping("/config/city/getbycode")
+     public ResponseData<CityEntity> getCityByCode(@RequestParam("cityCode") Integer cityCode,
+                                                      HttpServletRequest request,
+                                                      HttpServletResponse response)throws IOException{
+    	 CityEntity cityEntity = cityService.getCityByCode(cityCode);
+         return ResponseData.success(cityEntity);
+     }
 }
