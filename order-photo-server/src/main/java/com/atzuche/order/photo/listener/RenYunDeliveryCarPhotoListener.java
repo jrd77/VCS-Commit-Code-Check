@@ -30,7 +30,7 @@ import java.util.Objects;
 public class RenYunDeliveryCarPhotoListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RenYunDeliveryCarPhotoListener.class);
-    private static final String REN_YUN_DELIVERY_CAR_PHOTO = "ren_yun_delivery_car_photo_queue2";
+    private static final String REN_YUN_DELIVERY_CAR_PHOTO = "ren_yun_delivery_car_photo_queue1";
 
     @Autowired
     OrderPhotoService orderPhotoService;
