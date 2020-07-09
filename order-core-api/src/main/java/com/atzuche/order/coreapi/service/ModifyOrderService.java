@@ -6,6 +6,7 @@ import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
@@ -16,6 +17,8 @@ import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.coreapi.service.remote.UniqueOrderNoProxyService;
 import com.atzuche.order.coreapi.utils.ModifyOrderUtils;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.delivery.vo.delivery.OrderDeliveryDTO;
@@ -137,6 +140,11 @@ public class ModifyOrderService {
 	private LongRentCostHandleService longRentCostHandleService;
 	@Autowired
 	private OrderSourceStatService orderSourceStatService;
+	@Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
+	@Autowired
+	private SubmitOrderService submitOrderService;
+	
 	/**
 	 * 修改订单主逻辑（含换车）
 	 * @param modifyOrderReq
@@ -233,6 +241,8 @@ public class ModifyOrderService {
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
 		// 保存配送订单信息
 		saveRenterDelivery(modifyOrderDTO);
+		// 保存区间配送信息
+		saveSectionDelivery(modifyOrderDTO);
 		// 修改后处理方法
 		modifyPostProcess(modifyOrderDTO, renterOrderNew, initRenterOrder, supplementAmt, renterOrderCostRespDTO.getRenterOrderSubsidyDetailDTOList(), needSupplement);
 		// 使用车主券
@@ -632,7 +642,12 @@ public class ModifyOrderService {
         if (osse != null) {
         	modifyOrderDTO.setLongCouponCode(osse.getLongRentCouponCode());
         }
-		// 设置租客子单号
+        RenterOrderDeliveryMode mode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+		if (modifyOrderReq.getDistributionMode() == null && mode != null) {
+			modifyOrderDTO.setDistributionMode(mode.getDistributionMode());
+		}
+		initRenterOrder.setDistributionMode(mode == null ? null:mode.getDistributionMode());
+        // 设置租客子单号
 		modifyOrderDTO.setRenterOrderNo(renterOrderNo);
 		// 设置管理后台修改原因
 		modifyOrderDTO.setChangeReason(modifyOrderReq.getModifyReason());
@@ -1502,6 +1517,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
 		renterOrderReqVO.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderReqVO.setDriverScore(renterMemberDTO.getDriverScore());
+		renterOrderReqVO.setDistributionMode(modifyOrderDTO.getDistributionMode());
 		return renterOrderReqVO;
 	}
 	
@@ -1645,6 +1661,24 @@ public class ModifyOrderService {
 		}
 		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;
+	}
+	
+	
+	/**
+	 * 保存区间配送信息
+	 * @param modifyOrderDTO
+	 */
+	public void saveSectionDelivery(ModifyOrderDTO modifyOrderDTO) {
+		Integer distributionMode = modifyOrderDTO.getDistributionMode();
+		if (distributionMode == null) {
+			return;
+		}
+		OrderReqVO orderReqVO = new OrderReqVO();
+		orderReqVO.setDistributionMode(distributionMode);
+		orderReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
+		orderReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
+		orderReqVO.setCityCode(modifyOrderDTO.getCityCode());
+		submitOrderService.saveSectionDelivery(orderReqVO, modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo());
 	}
 	
 }

@@ -223,6 +223,9 @@ public class OrderReqVO extends BaseVO {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	
+	@AutoDocProperty(value = "配送模式：0-区间配送，1-精准配送")
+    private Integer distributionMode;
 
     public LocalDateTime getReqTime() {
         return reqTime;
@@ -702,6 +705,14 @@ public class OrderReqVO extends BaseVO {
 
 	public void setDriverInsurFlag(Integer driverInsurFlag) {
 		this.driverInsurFlag = driverInsurFlag;
+	}
+
+	public Integer getDistributionMode() {
+		return distributionMode;
+	}
+
+	public void setDistributionMode(Integer distributionMode) {
+		this.distributionMode = distributionMode;
 	}
     
 }

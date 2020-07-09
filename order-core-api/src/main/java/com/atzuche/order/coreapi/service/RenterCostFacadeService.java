@@ -180,6 +180,8 @@ public class RenterCostFacadeService {
         basicCostDetailVO.setExtraDriverInsuranceAmt(-RenterOrderCostDetailUtils.getExtraDriverInsureAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setTyreInsurAmt(-RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setDriverInsurAmt(-RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateGetSrvAmt(-RenterOrderCostDetailUtils.getAccurateGetSrvAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateReturnSrvAmt(-RenterOrderCostDetailUtils.getAccurateReturnSrvAmt(renterOrderCostDetailEntityList));
         //取送车费用
         RenterDeliveryFeeDetailVO deliveryFeeDetailVO = getRenterDeliveryFeeDetail(renterOrderCostDetailEntityList);
         basicCostDetailVO.setDeliveryFeeDetail(deliveryFeeDetailVO);
