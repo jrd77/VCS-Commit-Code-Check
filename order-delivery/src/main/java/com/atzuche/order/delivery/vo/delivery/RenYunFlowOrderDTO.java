@@ -377,6 +377,11 @@ public class RenYunFlowOrderDTO implements Serializable {
      * 车辆注册号
      */
     private String carRegNo;
+
+    /*
+     * 是否支付车辆押金
+     * */
+    private String isPayDeposit;
     
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
         if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {

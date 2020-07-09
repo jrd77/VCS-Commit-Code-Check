@@ -696,6 +696,7 @@ public class OrderSettleNewService {
             orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
             String abatementInsure = Objects.nonNull(entity.getComprehensiveEnsureAmount())?String.valueOf(entity.getComprehensiveEnsureAmount()):"0";
             orderSettlementMq.setAbatementInsure(abatementInsure);
+            orderSettlementMq.setYingkouAmt(entity.getYingkouAmt());
         }
         int subsidyPlamtAmt=0;
         int subsidyOwnerAmt=0;
