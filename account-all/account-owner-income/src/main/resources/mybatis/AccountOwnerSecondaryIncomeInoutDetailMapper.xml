@@ -5,6 +5,7 @@
 
     <resultMap type="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity" id="BaseResultMap">
         <result property="id" column="id"/>
+        <result property="memNo" column="mem_no"/>
         <result property="ownerIncomeId" column="owner_income_id"/>
         <result property="incomeAmtBefore" column="income_amt_before"/>
         <result property="inOutAmt" column="in_out_amt"/>
@@ -19,6 +20,7 @@
 
 	<sql id="Base_Column_List">
         `id`,
+        `mem_no`,
         `owner_income_id`,
         `income_amt_before`,
         `in_out_amt`,
@@ -42,6 +44,7 @@
 
 	<insert id="insert" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_secondary_income_inout_detail (
+            `mem_no`,
             `owner_income_id`,
             `income_amt_before`,
             `in_out_amt`,
@@ -54,6 +57,7 @@
         )
 		values
 		(
+            #{memNo},
             #{ownerIncomeId},
             #{incomeAmtBefore},
             #{inOutAmt},
@@ -69,6 +73,7 @@
 	<insert id="insertSelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into account_owner_secondary_income_inout_detail
             <trim prefix="(" suffix=")" suffixOverrides="," >
+				<if test="memNo != null">`mem_no`, </if>
 				<if test="ownerIncomeId != null">`owner_income_id`, </if>
 				<if test="incomeAmtBefore != null">`income_amt_before`, </if>
 				<if test="inOutAmt != null">`in_out_amt`, </if>
@@ -80,6 +85,7 @@
 				<if test="isDelete != null">`is_delete` </if>
 	        </trim>
             <trim prefix="values (" suffix=")" suffixOverrides="," >
+				<if test="memNo != null">#{memNo},  </if>
 				<if test="ownerIncomeId != null">#{ownerIncomeId},  </if>
 				<if test="incomeAmtBefore != null">#{incomeAmtBefore},  </if>
 				<if test="inOutAmt != null">#{inOutAmt},  </if>
@@ -96,6 +102,7 @@
 	<update id="updateByPrimaryKeySelective" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity">
 		update account_owner_secondary_income_inout_detail 
 		    <set>
+				<if test="memNo != null">`mem_no` = #{memNo}, </if>
 				<if test="ownerIncomeId != null">`owner_income_id` = #{ownerIncomeId}, </if>
 				<if test="incomeAmtBefore != null">`income_amt_before` = #{incomeAmtBefore}, </if>
 				<if test="inOutAmt != null">`in_out_amt` = #{inOutAmt}, </if>
@@ -112,8 +119,9 @@
 	<update id="updateByPrimaryKey" parameterType="com.atzuche.order.accountownerincome.entity.AccountOwnerSecondaryIncomeInoutDetailEntity">
 		update account_owner_secondary_income_inout_detail 
 		    <set>
-				`owner_income_id` = #{ownerIncomeId}, 		
-				`income_amt_before` = #{incomeAmtBefore}, 		
+				`mem_no` = #{memNo},
+				`owner_income_id` = #{ownerIncomeId},
+				`income_amt_before` = #{incomeAmtBefore},
 				`in_out_amt` = #{inOutAmt}, 		
 				`income_amt_after` = #{incomeAmtAfter}, 		
 				`create_time` = #{createTime}, 		

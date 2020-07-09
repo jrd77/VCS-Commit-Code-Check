@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 /**
  * 车主二清收益资金(冻结不可提现部分金额)进出明细
- * 
+ *
  * @author pengcheng.fu
  * @date 2020-07-07 13:44:52
  */
@@ -22,6 +22,11 @@ public class AccountOwnerSecondaryIncomeInoutDetailEntity implements Serializabl
      * 主键
      */
     private Integer id;
+
+    /**
+     * 会员号
+     */
+    private String memNo;
 
     /**
      * 车主收益主键:account_owner_income.id
