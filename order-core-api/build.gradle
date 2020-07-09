@@ -83,6 +83,6 @@ dependencies {
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     compile('com.autoyol.cardistance:car-distance:0.0.4-20190613-SNAPSHOT')
-
+    compile 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.13'
 
 }

@@ -348,7 +348,6 @@
                 AND rm.`mem_no` = #{memNo}
             </otherwise>
         </choose>
-        ORDER BY oo.id DESC LIMIT 1;
     </select>
 
 </mapper>

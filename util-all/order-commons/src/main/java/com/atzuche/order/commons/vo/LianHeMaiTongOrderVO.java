@@ -25,12 +25,12 @@ public class LianHeMaiTongOrderVO {
     private String showRevertTime;
     @AutoDocProperty("交易请求时间")
     private String reqTime;
-    @AutoDocProperty("一审结果")
-    private String firstAuditStatus;
-    @AutoDocProperty("二审结果")
-    private String secondAuditStatus;
-    @AutoDocProperty("GPS审核结果")
-    private String gpsAuditStatus;
+    @AutoDocProperty("一审审核结果 -1待审核，1 审核通过 0 审核不通过 2 免审")
+    private Integer firstAuditStatus;
+    @AutoDocProperty("二审审核状态 -1待审核，1 审核通过 0 审核不通过 2 免审")
+    private Integer secondAuditStatus;
+    @AutoDocProperty("gps审核结果 -1待审核 ,1 正常 0 不正常 2 不正常-未维修")
+    private Integer gpsAuditStatus;
     @AutoDocProperty("车牌号")
     private String carPlateNum;
     @AutoDocProperty("车型")
