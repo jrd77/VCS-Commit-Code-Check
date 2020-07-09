@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @ToString
 public class OrderPhotoEntity {
 	private String id;
-	private Integer photoType;
+	private String photoType;
 	private String path;
 	private String userType;
 	private String orderNo;
