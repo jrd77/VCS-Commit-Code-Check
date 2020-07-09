@@ -24,6 +24,8 @@ public class OrderPhotoDTO implements Serializable {
 	private String createTime;
 	@AutoDocProperty(value = "操作人")
 	private String operator;
+	private Integer serialNumber;
+	private Integer photoType;
 
 	
 
