@@ -85,7 +85,7 @@ public class OrderPhotoController{
     public ResponseData<OrderPhotoTypeResponseVO> listContainsOils(@Valid @RequestBody OrderOilRequestVO orderRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
         String orderNo = orderRequestVO.getOrderNo();
-        List<OrderPhotoDTO> orderPhotoDTOS = orderPhotoService.queryGetSrvCarList(orderNo, orderRequestVO.getType());
+        List<OrderPhotoDTO> orderPhotoDTOS = orderPhotoService.queryGetSrvCarList(orderNo, orderRequestVO.getType() == null ? null : orderRequestVO.getType());
         OrderPhotoTypeResponseVO orderPhotoTypeResponseVO = new OrderPhotoTypeResponseVO();
         orderPhotoTypeResponseVO.setGetPhotoList(orderPhotoDTOS);
         return ResponseData.success(orderPhotoTypeResponseVO);
