@@ -142,6 +142,15 @@ public class CityEntity {
     private String otaAddressRange;
 
     private Integer enableMiniTwoLevelCity;
+    
+    private Integer rentBeforeMinutes;
+
+    private Integer rentAfterMinutes;
+
+    private Integer revertBeforeMinutes;
+
+    private Integer revertAfterMinutes;
+
 
     public Integer getEnableMiniTwoLevelCity() {
         return enableMiniTwoLevelCity;
@@ -699,76 +708,69 @@ public class CityEntity {
         isLimit = limit;
     }
 
-    @Override
-    public String toString() {
-        return "CityEntity{" +
-                "id=" + id +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", detail='" + detail + '\'' +
-                ", lat='" + lat + '\'' +
-                ", lon='" + lon + '\'' +
-                ", telprefix='" + telprefix + '\'' +
-                ", plateprefix='" + plateprefix + '\'' +
-                ", type='" + type + '\'' +
-                ", issupport='" + issupport + '\'' +
-                ", isOpen='" + isOpen + '\'' +
-                ", createDate=" + createDate +
-                ", calculateFlag=" + calculateFlag +
-                ", trusteeshipNoHour=" + trusteeshipNoHour +
-                ", trusteeshipHour=" + trusteeshipHour +
-                ", srvGetCost=" + srvGetCost +
-                ", srvReturnCost=" + srvReturnCost +
-                ", orderTimeSet='" + orderTimeSet + '\'' +
-                ", rentTimeSet='" + rentTimeSet + '\'' +
-                ", minPrice=" + minPrice +
-                ", floatPercent=" + floatPercent +
-                ", fallPercent=" + fallPercent +
-                ", revertStInterval=" + revertStInterval +
-                ", revertServiceMax=" + revertServiceMax +
-                ", rentStInterval=" + rentStInterval +
-                ", rentServiceMax=" + rentServiceMax +
-                ", bgUrl='" + bgUrl + '\'' +
-                ", description='" + description + '\'' +
-                ", supportOneKey=" + supportOneKey +
-                ", incomeFloatPercent=" + incomeFloatPercent +
-                ", incomeFallPercent=" + incomeFallPercent +
-                ", allowTransaction=" + allowTransaction +
-                ", isDispatching=" + isDispatching +
-                ", dispatchingBeginTime=" + dispatchingBeginTime +
-                ", dispatchingEndTime=" + dispatchingEndTime +
-                ", minSubsidyPerDay=" + minSubsidyPerDay +
-                ", maxSubsidyPerDay=" + maxSubsidyPerDay +
-                ", maxSubsidyPerOrder=" + maxSubsidyPerOrder +
-                ", isCpicCoupon=" + isCpicCoupon +
-                ", beforeTime=" + beforeTime +
-                ", cpicBeforeTimeWork=" + cpicBeforeTimeWork +
-                ", cpicBeforeTimeFree=" + cpicBeforeTimeFree +
-                ", addressRangeVersion=" + addressRangeVersion +
-                ", addressRangeDescription='" + addressRangeDescription + '\'' +
-                ", isQuickPay=" + isQuickPay +
-                ", fullLetter='" + fullLetter + '\'' +
-                ", isHotCity=" + isHotCity +
-                ", centerAddress='" + centerAddress + '\'' +
-                ", isLimit=" + isLimit +
-                ", firstLetter='" + firstLetter + '\'' +
-                ", isDistribute=" + isDistribute +
-                ", level=" + level +
-                ", peakTimeSlot='" + peakTimeSlot + '\'' +
-                ", beforeTransTimeSpan=" + beforeTransTimeSpan +
-                ", unserviceBeginTime=" + unserviceBeginTime +
-                ", unserviceEndTime=" + unserviceEndTime +
-                ", deliveryServiceCost=" + deliveryServiceCost +
-                ", packageDeliveryServiceCost=" + packageDeliveryServiceCost +
-                ", peakStartsWith='" + peakStartsWith + '\'' +
-                ", peakNotStartsWith='" + peakNotStartsWith + '\'' +
-                ", isFreePackage=" + isFreePackage +
-                ", cityCenterAddress='" + cityCenterAddress + '\'' +
-                ", isOfdScooter=" + isOfdScooter +
-                ", addressRange='" + addressRange + '\'' +
-                ", freeAddressRange='" + freeAddressRange + '\'' +
-                ", otaAddressRange='" + otaAddressRange + '\'' +
-                ", enableMiniTwoLevelCity=" + enableMiniTwoLevelCity +
-                '}';
-    }
+    public Integer getRentBeforeMinutes() {
+		return rentBeforeMinutes;
+	}
+
+	public void setRentBeforeMinutes(Integer rentBeforeMinutes) {
+		this.rentBeforeMinutes = rentBeforeMinutes;
+	}
+
+	public Integer getRentAfterMinutes() {
+		return rentAfterMinutes;
+	}
+
+	public void setRentAfterMinutes(Integer rentAfterMinutes) {
+		this.rentAfterMinutes = rentAfterMinutes;
+	}
+
+	public Integer getRevertBeforeMinutes() {
+		return revertBeforeMinutes;
+	}
+
+	public void setRevertBeforeMinutes(Integer revertBeforeMinutes) {
+		this.revertBeforeMinutes = revertBeforeMinutes;
+	}
+
+	public Integer getRevertAfterMinutes() {
+		return revertAfterMinutes;
+	}
+
+	public void setRevertAfterMinutes(Integer revertAfterMinutes) {
+		this.revertAfterMinutes = revertAfterMinutes;
+	}
+
+	@Override
+	public String toString() {
+		return "CityEntity [id=" + id + ", code=" + code + ", name=" + name + ", detail=" + detail + ", lat=" + lat
+				+ ", lon=" + lon + ", telprefix=" + telprefix + ", plateprefix=" + plateprefix + ", type=" + type
+				+ ", issupport=" + issupport + ", isOpen=" + isOpen + ", createDate=" + createDate + ", calculateFlag="
+				+ calculateFlag + ", trusteeshipNoHour=" + trusteeshipNoHour + ", trusteeshipHour=" + trusteeshipHour
+				+ ", srvGetCost=" + srvGetCost + ", srvReturnCost=" + srvReturnCost + ", orderTimeSet=" + orderTimeSet
+				+ ", rentTimeSet=" + rentTimeSet + ", minPrice=" + minPrice + ", floatPercent=" + floatPercent
+				+ ", fallPercent=" + fallPercent + ", revertStInterval=" + revertStInterval + ", revertServiceMax="
+				+ revertServiceMax + ", rentStInterval=" + rentStInterval + ", rentServiceMax=" + rentServiceMax
+				+ ", bgUrl=" + bgUrl + ", description=" + description + ", supportOneKey=" + supportOneKey
+				+ ", incomeFloatPercent=" + incomeFloatPercent + ", incomeFallPercent=" + incomeFallPercent
+				+ ", allowTransaction=" + allowTransaction + ", isDispatching=" + isDispatching
+				+ ", dispatchingBeginTime=" + dispatchingBeginTime + ", dispatchingEndTime=" + dispatchingEndTime
+				+ ", minSubsidyPerDay=" + minSubsidyPerDay + ", maxSubsidyPerDay=" + maxSubsidyPerDay
+				+ ", maxSubsidyPerOrder=" + maxSubsidyPerOrder + ", isCpicCoupon=" + isCpicCoupon + ", beforeTime="
+				+ beforeTime + ", cpicBeforeTimeWork=" + cpicBeforeTimeWork + ", cpicBeforeTimeFree="
+				+ cpicBeforeTimeFree + ", addressRangeVersion=" + addressRangeVersion + ", addressRangeDescription="
+				+ addressRangeDescription + ", isQuickPay=" + isQuickPay + ", fullLetter=" + fullLetter + ", isHotCity="
+				+ isHotCity + ", centerAddress=" + centerAddress + ", isLimit=" + isLimit + ", firstLetter="
+				+ firstLetter + ", isDistribute=" + isDistribute + ", level=" + level + ", peakTimeSlot=" + peakTimeSlot
+				+ ", beforeTransTimeSpan=" + beforeTransTimeSpan + ", unserviceBeginTime=" + unserviceBeginTime
+				+ ", unserviceEndTime=" + unserviceEndTime + ", deliveryServiceCost=" + deliveryServiceCost
+				+ ", packageDeliveryServiceCost=" + packageDeliveryServiceCost + ", peakStartsWith=" + peakStartsWith
+				+ ", peakNotStartsWith=" + peakNotStartsWith + ", isFreePackage=" + isFreePackage
+				+ ", cityCenterAddress=" + cityCenterAddress + ", isOfdScooter=" + isOfdScooter + ", addressRange="
+				+ addressRange + ", freeAddressRange=" + freeAddressRange + ", otaAddressRange=" + otaAddressRange
+				+ ", enableMiniTwoLevelCity=" + enableMiniTwoLevelCity + ", rentBeforeMinutes=" + rentBeforeMinutes
+				+ ", rentAfterMinutes=" + rentAfterMinutes + ", revertBeforeMinutes=" + revertBeforeMinutes
+				+ ", revertAfterMinutes=" + revertAfterMinutes + "]";
+	}
+
+	
 }

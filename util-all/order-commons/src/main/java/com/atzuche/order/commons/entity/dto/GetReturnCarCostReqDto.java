@@ -73,5 +73,10 @@ public class GetReturnCarCostReqDto {
      * 是否计算还车费用
      */
     private Boolean isReturnCarCost;
+    
+    /**
+	 * 配送模式：0-区间配送，1-精准配送
+	 */
+    private Integer distributionMode;
 
 }

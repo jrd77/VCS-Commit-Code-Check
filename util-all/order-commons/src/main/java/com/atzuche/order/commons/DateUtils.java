@@ -18,6 +18,7 @@ public class DateUtils {
     public static final String DATE_DEFAUTE1 = "yyyy-MM-dd HH:mm:ss";
     public static final String fmt_yyyyMMdd = "yyyy-MM-dd";
     public static final String fmt_next_yyyyMMdd = "yyyy/MM/dd";
+    public static final String FORMAT_STR_RENYUN = "yyyy-MM-dd HH:mm";
     public static long  START_TIME = 20191001000000L;
     public static long  END_TIME = 20191007235959L;
 
