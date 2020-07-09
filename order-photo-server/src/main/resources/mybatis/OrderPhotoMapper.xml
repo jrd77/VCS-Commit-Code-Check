@@ -5,7 +5,7 @@
 	<select id="queryGetSrvCarList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator,serial_number as serialNumber FROM order_car_condition_photo
 		where order_no=#{orderNo}
-		<if test="photoType != null and photoType != ''">
+		<if test="type != null and type != ''">
 			and photo_type=#{type}
 		</if>
 
