@@ -3,6 +3,7 @@ package com.atzuche.order.open.service;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.rentercost.*;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
@@ -191,5 +192,12 @@ public interface FeignOrderCostService {
      */
     @PostMapping("/order/renter/cost/updatePlatFormToOwnerListByOrderNo")
 	ResponseData<?> updatePlatFormToOwnerListByOrderNo(@RequestBody PlatformToOwnerSubsidyReqVO req);
+    
+    /**
+     * 获取精准达费用配置
+     * @return ResponseData
+     */
+    @GetMapping("/order/admin/getAccurateGetReturnSrvAmt")
+    public ResponseData<AccurateGetReturnSrvVO> getAccurateGetReturnSrvAmt();
 
 }

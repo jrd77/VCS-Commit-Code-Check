@@ -151,8 +151,8 @@ public class SubmitOrderHandleService {
                 context.getOwnerMemberDto().getMemNo(),
                 context.getOrderReqVO().getCarNo());
         // 主订单处理(订单:order、状态:order_status、统计:order_source_stat等)
-        boolean replyFlag = null != context.getRenterGoodsDetailDto().getReplyFlag() &&
-                context.getRenterGoodsDetailDto().getReplyFlag() == OrderConstant.YES;
+
+        boolean replyFlag = RenterOrderService.isAutoReplyFlag(context.getOrderReqVO().getRentTime(), context.getRenterGoodsDetailDto().getAdvanceOrderTime(), context.getRenterGoodsDetailDto().getReplyFlag());
         ParentOrderDTO parentOrderDTO = buildParentOrderDTO(
                 baseReqDTO.getOrderNo(),
                 context.getRiskAuditId(),
@@ -170,6 +170,7 @@ public class SubmitOrderHandleService {
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
         return parentOrderDTO.getOrderStatusDTO().getStatus();
     }
+
 
     /**
      * 对象转换
@@ -301,9 +302,7 @@ public class SubmitOrderHandleService {
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        LocalDateTime rentTime = orderReqVO.getRentTime();
-
-        if (replyFlag && (renterGoodsDetailDto.getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= renterGoodsDetailDto.getAdvanceOrderTime())) {
+        if (replyFlag) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
             renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
@@ -438,6 +437,7 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setCategory(Integer.valueOf(reqContext.getOrderReqVO().getOrderCategory()));
 
         ownerOrderReqDTO.setReplyFlag(reqContext.getOwnerGoodsDetailDto().getReplyFlag());
+        ownerOrderReqDTO.setAutoReplyFlag(RenterOrderService.isAutoReplyFlag(reqContext.getOrderReqVO().getRentTime(),reqContext.getRenterGoodsDetailDto().getAdvanceOrderTime(),reqContext.getOwnerGoodsDetailDto().getReplyFlag()));
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());

@@ -1,18 +1,29 @@
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.config.client.api.CityConfigSDK;
+import com.atzuche.config.client.api.DefaultConfigContext;
+import com.atzuche.config.client.api.SysConfigSDK;
+import com.atzuche.config.common.entity.CityEntity;
+import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.OrderReqContext;
+import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.SectionParamDTO;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
 import com.atzuche.order.commons.vo.res.NormalOrderCostCalculateResVO;
 import com.atzuche.order.commons.vo.res.RenterCostDetailVO;
 import com.atzuche.order.commons.vo.res.RenterDeliveryFeeDetailVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.commons.vo.res.coupon.DisCoupon;
 import com.atzuche.order.commons.vo.res.coupon.OwnerDisCoupon;
 import com.atzuche.order.commons.vo.res.order.*;
@@ -20,6 +31,7 @@ import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.submit.filter.cost.LongOrderCostFilterChain;
 import com.atzuche.order.coreapi.submit.filter.cost.LongSubmitOrderBeforeCostFilterChain;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.service.OrderService;
@@ -51,6 +63,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +106,10 @@ public class SubmitOrderBeforeCostCalService {
     private SubmitOrderInitContextService submitOrderInitContextService;
     @Autowired
     private LongSubmitOrderBeforeCostFilterChain longSubmitOrderBeforeCostFilterChain;
+    @Autowired
+    private CityConfigSDK cityConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
 
 
 
@@ -350,5 +367,103 @@ public class SubmitOrderBeforeCostCalService {
         }
 
         return null;
+    }
+    
+    
+    /**
+     * 获取区间配送信息
+     * @param orderReqVO
+     * @return SectionDeliveryVO
+     */
+    public SectionDeliveryVO getSectionDelivery(OrderReqVO orderReqVO) {
+    	if (orderReqVO == null) {
+    		return null;
+    	}
+    	// 是否使用取车服务:0.否 1.是
+    	Integer srvGetFlag = orderReqVO.getSrvGetFlag() == null ? 0:orderReqVO.getSrvGetFlag();
+    	// 是否使用还车服务:0.否 1.是
+    	Integer srvReturnFlag = orderReqVO.getSrvReturnFlag() == null ? 0:orderReqVO.getSrvReturnFlag();
+    	if (srvGetFlag.intValue() == 0 && srvReturnFlag.intValue() == 0) {
+    		// 未使用取还车服务不需要计算
+    		return null;
+    	}
+    	SectionDeliveryVO sectionDeliveryVO = new SectionDeliveryVO();
+    	// 配送模式：0-区间配送，1-精准配送
+        Integer distributionMode = orderReqVO.getDistributionMode() == null ? 0:orderReqVO.getDistributionMode();
+        sectionDeliveryVO.setDistributionMode(distributionMode);
+        AccurateGetReturnSrvVO accurateGetReturnSrvVO = getAccurateGetReturnSrvVO();
+        if (accurateGetReturnSrvVO != null) {
+        	sectionDeliveryVO.setAccurateGetSrvUnit(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
+        	sectionDeliveryVO.setAccurateReturnSrvUnit(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
+    	if (distributionMode.intValue() == 1) {
+        	// 精准配送
+        	return sectionDeliveryVO;
+        }
+    	LOGGER.info("config-从城市配置中获取区间配置,cityCode=[{}]", orderReqVO.getCityCode());
+        CityEntity configByCityCode = cityConfigSDK.getCityByCityCode(Integer.valueOf(orderReqVO.getCityCode()));
+        LOGGER.info("config-从城市配置中获取区间配置,configByCityCode=[{}]", JSON.toJSONString(configByCityCode));
+        RenterOrderDeliveryMode mode = new RenterOrderDeliveryMode();
+        BeanUtils.copyProperties(configByCityCode, mode);
+        SectionParamDTO sectionParam = getSectionParamDTO(orderReqVO.getRentTime(), orderReqVO.getRevertTime(), mode);
+    	sectionDeliveryVO = SectionDeliveryUtils.getRenterSectionDeliveryVO(sectionParam, DateUtils.DATE_DEFAUTE1);
+    	if (sectionDeliveryVO == null) {
+    		return null;
+    	}
+    	sectionDeliveryVO.setDistributionMode(distributionMode);
+    	if (accurateGetReturnSrvVO != null) {
+        	sectionDeliveryVO.setAccurateGetSrvUnit(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
+        	sectionDeliveryVO.setAccurateReturnSrvUnit(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
+    	if (srvGetFlag.intValue() == 0) {
+    		sectionDeliveryVO.setRentTimeEnd(null);
+    		sectionDeliveryVO.setRentTimeStart(null);
+    	}
+    	if (srvReturnFlag.intValue() == 0) {
+    		sectionDeliveryVO.setRevertTimeEnd(null);
+    		sectionDeliveryVO.setRevertTimeStart(null);
+    	}
+        return sectionDeliveryVO;
+    }
+    
+    /**
+     * 数据转换
+     * @param rentTime
+     * @param revertTime
+     * @param mode
+     * @return SectionParamDTO
+     */
+    public SectionParamDTO getSectionParamDTO(LocalDateTime rentTime, LocalDateTime revertTime, RenterOrderDeliveryMode mode) {
+    	SectionParamDTO sectionParamDTO = new SectionParamDTO();
+    	sectionParamDTO.setRentAfterMinutes(mode.getRentAfterMinutes());
+    	sectionParamDTO.setRentBeforeMinutes(mode.getRentBeforeMinutes());
+    	sectionParamDTO.setRentTime(rentTime);
+    	sectionParamDTO.setRevertAfterMinutes(mode.getRevertAfterMinutes());
+    	sectionParamDTO.setRevertBeforeMinutes(mode.getRevertBeforeMinutes());
+    	sectionParamDTO.setRevertTime(revertTime);
+    	return sectionParamDTO;
+    }
+    
+    /**
+     * 获取准时达服务单价
+     * @return AccurateGetReturnSrvVO
+     */
+    public AccurateGetReturnSrvVO getAccurateGetReturnSrvVO() {
+    	AccurateGetReturnSrvVO accurateGetReturnSrvVO = new AccurateGetReturnSrvVO();
+    	List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+        LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        accurateGetReturnSrvVO.setAccurateGetSrvAmt(getAccurateCost);
+        accurateGetReturnSrvVO.setAccurateReturnSrvAmt(returnAccurateCost);
+        return accurateGetReturnSrvVO;
     }
 }

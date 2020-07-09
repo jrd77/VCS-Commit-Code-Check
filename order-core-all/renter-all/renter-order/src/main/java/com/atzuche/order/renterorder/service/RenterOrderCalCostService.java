@@ -148,7 +148,13 @@ public class RenterOrderCalCostService {
         	detailList.add(driverInsurAmtEntity);
             LOGGER.info("获取驾乘无忧保障费-driverInsurAmt=[{}]", driverInsurAmtEntity.getTotalAmount());
         }
-
+        
+        // 获取精准配送取送车服务费
+        List<RenterOrderCostDetailEntity> accurateCostList = renterOrderCostCombineService.getAccurateSrvFee(renterOrderCostReqDTO.getGetReturnCarCostReqDto());
+        if (accurateCostList != null && !accurateCostList.isEmpty()) {
+        	detailList.addAll(accurateCostList);
+        }
+        
         //获取附加驾驶人保险金额
         RenterOrderCostDetailEntity extraDriverInsureAmtEntity = renterOrderCostCombineService.getExtraDriverInsureAmtEntity(renterOrderCostReqDTO.getExtraDriverDTO());
         List<RenterOrderSubsidyDetailDTO> totalAmountSubsidy = subsidyOutGroup.get(RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo());
