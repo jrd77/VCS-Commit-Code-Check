@@ -114,10 +114,12 @@ public class DeliveryOrderService {
         	// 非虚拟地址
         	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
         	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
+        	deliveryCarVO.setUseVirtualAddrFlag(0);
         } else {
         	// 虚拟地址
         	deliveryCarVO.setGetCarShowAddr(carInfo.getCarShowAddr());
         	deliveryCarVO.setReturnCarShowAddr(carInfo.getCarShowAddr());
+        	deliveryCarVO.setUseVirtualAddrFlag(1);
         }
         return deliveryCarVO;
     }

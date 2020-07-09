@@ -261,6 +261,11 @@ public class ModifyOwnerAddrService {
     		renterOrderDeliveryEntity.setOwnerGetReturnAddr(ownerTransAddressReqVO.getGetCarAddressText());
     		renterOrderDeliveryEntity.setOwnerGetReturnAddrLat(ownerTransAddressReqVO.getSrvGetLat());
     		renterOrderDeliveryEntity.setOwnerGetReturnAddrLon(ownerTransAddressReqVO.getSrvGetLon());
+    		if (modifyOwner.getSrvGetFlag() == null || modifyOwner.getSrvGetFlag() == 0) {
+    			renterOrderDeliveryEntity.setRenterGetReturnAddr(ownerTransAddressReqVO.getGetCarAddressText());
+        		renterOrderDeliveryEntity.setRenterGetReturnAddrLat(ownerTransAddressReqVO.getSrvGetLat());
+        		renterOrderDeliveryEntity.setRenterGetReturnAddrLon(ownerTransAddressReqVO.getSrvGetLon());
+    		}
     		renterOrderDeliveryService.updateByPrimaryKeySelective(renterOrderDeliveryEntity);
     	}
     	if (srvReturnDelivery != null) {
@@ -269,6 +274,11 @@ public class ModifyOwnerAddrService {
     		renterOrderDeliveryEntity.setOwnerGetReturnAddr(ownerTransAddressReqVO.getReturnCarAddressText());
     		renterOrderDeliveryEntity.setOwnerGetReturnAddrLat(ownerTransAddressReqVO.getSrvReturnLat());
     		renterOrderDeliveryEntity.setOwnerGetReturnAddrLon(ownerTransAddressReqVO.getSrvReturnLon());
+    		if (modifyOwner.getSrvReturnFlag() == null || modifyOwner.getSrvReturnFlag() == 0) {
+    			renterOrderDeliveryEntity.setRenterGetReturnAddr(ownerTransAddressReqVO.getReturnCarAddressText());
+        		renterOrderDeliveryEntity.setRenterGetReturnAddrLat(ownerTransAddressReqVO.getSrvReturnLat());
+        		renterOrderDeliveryEntity.setRenterGetReturnAddrLon(ownerTransAddressReqVO.getSrvReturnLon());
+    		}
     		renterOrderDeliveryService.updateByPrimaryKeySelective(renterOrderDeliveryEntity);
     	}
     	// 保存车主修改地址罚金
