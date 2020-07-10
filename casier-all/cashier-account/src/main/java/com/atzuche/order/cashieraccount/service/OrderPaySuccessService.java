@@ -13,10 +13,15 @@ import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.utils.GsonUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,12 @@ public class OrderPaySuccessService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private OrderFlowService orderFlowService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
+	@Autowired
+	private RenterOrderService renterOrderService;
+	@Autowired
+	private OwnerOrderService ownerOrderService;
 
 	/**
      * 订单流程 数据更新
@@ -47,19 +58,31 @@ public class OrderPaySuccessService {
         		callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
         	}else {
         		// 加锁
-            	orderStatusService.getOrderStatusForUpdate(vo.getOrderNo());
+        		OrderStatusEntity orderStatus = orderStatusService.getOrderStatusForUpdate(vo.getOrderNo());
+        		if (orderStatus != null && orderStatus.getStatus() != null && 
+        				OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus().intValue()) {
+        			return;
+        		}
+            	// 获取车主子订单状态
+            	OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(vo.getOrderNo());
+            	int ownerStatus = ownerOrder.getOwnerStatus() == null ? 0:ownerOrder.getOwnerStatus();
 	            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
 	            BeanUtils.copyProperties(vo,orderStatusDTO);
 	            //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
 	            if(isChangeOrderStatus(orderStatusDTO)){
-	                orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
-	                vo.setIsGetCar(YesNoEnum.YES);
-	                //记录订单流程
-	                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+	            	if (ownerStatus > OrderStatusEnum.TO_CONFIRM.getStatus()) {
+	            		orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
+		                vo.setIsGetCar(YesNoEnum.YES);
+		                //记录订单流程
+		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+	            	}
+	                // 更新租客之订单状态
+	                renterOrderService.updateRenterStatusByRenterOrderNo(vo.getRenterOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
 	            }
 	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-	            
+	            log.info("押金支付发送给任云orderStatusDTO={}",orderStatusDTO);
+                deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(vo.getOrderNo()));
 	            //更新配送 订单补付等信息 只有订单状态为已支付
 	            //callback
 	            if(isGetCar(vo)){

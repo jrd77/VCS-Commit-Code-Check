@@ -109,6 +109,8 @@ public class OwnerRefuseOrderService {
         boolean isConsoleInvoke =
                 StringUtils.equals(dispatcherReason.getCode(),DispatcherReasonEnum.timeout.getCode()) || (null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke());
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
+        // 加锁
+		OrderStatusEntity orderStatusEntity = orderStatusService.getOrderStatusForUpdate(reqVO.getOrderNo());
         //判断是都进入调度
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(reqVO.getOrderNo());
@@ -120,7 +122,7 @@ public class OwnerRefuseOrderService {
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         //获取订单状态信息
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(reqVO.getOrderNo());
+        //OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(reqVO.getOrderNo());
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(reqVO.getOrderNo(),
                 renterOrderEntity.getRenterOrderNo());
@@ -153,6 +155,8 @@ public class OwnerRefuseOrderService {
             //不进调度
             orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
             renterOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), RenterChildStatusEnum.END.getCode());
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
@@ -190,6 +194,8 @@ public class OwnerRefuseOrderService {
                 OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         //取消信息处理(order_cancel_reason)
         OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(reqVO.getOrderNo(),
                 renterOrderEntity.getRenterOrderNo(),

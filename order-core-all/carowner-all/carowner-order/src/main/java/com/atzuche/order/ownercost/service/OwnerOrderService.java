@@ -163,4 +163,8 @@ public class OwnerOrderService {
     public List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(String ownerOrderNo,String ownerMemNo) {
         return ownerOrderMapper.queryByOwnerOrderNoAndMemNo(ownerOrderNo,ownerMemNo);
     }
+    
+    public int updateOwnerStatusByOwnerOrderNo(String ownerOrderNo,int ownerStatus) {
+    	return ownerOrderMapper.updateOwnerStatusByOwnerOrderNo(ownerOrderNo, ownerStatus);
+    }
 }
