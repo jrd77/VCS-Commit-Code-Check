@@ -79,7 +79,7 @@ public class CommonUtils {
 	
 	private static final int CARPURCHASEPRICE_150000 = 150000;
 	private static final int CARPURCHASEPRICE_200000 = 200000;
-	private static final int CARPURCHASEPRICE_300000 = 300000;
+	private static final int CARPURCHASEPRICE_300000 = 400000;
 	
     /**
                * 初始化补充保障服务费单价配置
