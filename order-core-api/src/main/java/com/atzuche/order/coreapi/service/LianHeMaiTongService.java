@@ -4,35 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
-import com.atzuche.order.commons.enums.CategoryEnum;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.ErrorCode;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.exceptions.LianHeMaiTongMemberException;
-import com.atzuche.order.commons.vo.LianHeMaiTongMemberReqVO;
-import com.atzuche.order.commons.vo.LianHeMaiTongMemberVO;
 import com.atzuche.order.commons.vo.LianHeMaiTongOrderVO;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
-import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
-import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
-import com.atzuche.order.owner.mem.entity.OwnerMemberEntity;
-import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.parentorder.service.OrderSourceStatService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentermem.entity.RenterMemberEntity;
-import com.atzuche.order.rentermem.service.RenterMemberService;
-import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.riskCheckService.api.RiskCheckServiceFeignService;
 import com.autoyol.riskCheckService.api.VO.MemberAuditResultReqVO;
 import com.autoyol.riskCheckService.api.VO.MemberAuditResultResVO;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +27,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class LianHeMaiTongService {
-    @Autowired
-    private OwnerGoodsService ownerGoodsService;
-    @Autowired
-    private OwnerMemberService ownerMemberService;
-    @Autowired
-    private RenterMemberService renterMemberService;
+
     @Autowired
     private OrderService orderService;
     @Autowired
