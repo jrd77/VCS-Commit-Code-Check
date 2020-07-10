@@ -117,7 +117,7 @@ public class OrderService {
         return orderEntityList;
     }
 
-    public List<LianHeMaiTongOrderDTO> getByMemNoAndPlatNum(String memNo, String platNum) {
-        return orderMapper.getByMemNoAndPlatNum(memNo,platNum);
+    public List<LianHeMaiTongOrderDTO> getOrderByMemNo(String memNo) {
+        return orderMapper.getOrderByMemNo(memNo);
     }
 }

@@ -70,5 +70,5 @@ public interface OrderMapper {
 
     List<OrderEntity> getOrderByRenterMemNo(@Param("renterMemNo")String renterMemNo);
 
-    List<LianHeMaiTongOrderDTO> getByMemNoAndPlatNum(@Param("memNo")String memNo, @Param("platNum")String platNum);
+    List<LianHeMaiTongOrderDTO> getOrderByMemNo(@Param("memNo")String memNo);
 }

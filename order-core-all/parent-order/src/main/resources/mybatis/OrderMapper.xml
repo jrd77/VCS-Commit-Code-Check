@@ -305,7 +305,7 @@
         select  <include refid="Base_Column_List" /> from `order`  where mem_no_renter =#{renterMemNo} and is_delete = 0 order by id desc
     </select>
 
-    <select id="getByMemNoAndPlatNum" resultType="com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO">
+    <select id="getOrderByMemNo" resultType="com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO">
         SELECT
             o.order_no AS orderNo,
             oo.renter_order_no AS renterOrderNo,
@@ -337,17 +337,9 @@
         INNER JOIN `renter_order_cost` roc ON ro.renter_order_no = roc.`renter_order_no`
         INNER JOIN owner_goods og ON oo.`owner_order_no` = og.`owner_order_no`
         WHERE oo.is_effective = 1
-        <choose>
-            <when test="platNum !=null and platNum.trim()!=''">
-                AND om.`mem_no` = #{memNo}
-                <if test="platNum!=null and platNum.trim()!=''">
-                    AND og.car_plate_num = #{platNum}
-                </if>
-            </when>
-            <otherwise>
-                AND rm.`mem_no` = #{memNo}
-            </otherwise>
-        </choose>
+        AND (rm.`mem_no` = #{memNo} OR om.`mem_no` = #{memNo})
+        order by o.id desc
+        limit 100
     </select>
 
 </mapper>

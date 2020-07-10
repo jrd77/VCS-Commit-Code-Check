@@ -58,92 +58,21 @@ public class LianHeMaiTongService {
     @Autowired
     private RiskCheckServiceFeignService riskCheckServiceFeignService;
 
-    public LianHeMaiTongMemberVO getMemberInfo(LianHeMaiTongMemberReqVO lianHeMaiTongMemberReqVO) {
-        String memNo = lianHeMaiTongMemberReqVO.getMemNo();
-        String phone = lianHeMaiTongMemberReqVO.getPhone();
-        String platNum = lianHeMaiTongMemberReqVO.getPlatNum();
-        LianHeMaiTongMemberVO lhmtVO = new LianHeMaiTongMemberVO();
 
-        if(memNo!=null && memNo.trim().length()>0){
-           /* OwnerMemberEntity ownerMemberEntity = ownerMemberService.getOwnerNoByMemberNo(memNo);
-            RenterMemberEntity renterMemberEntity = null;
-            if(ownerMemberEntity != null){
-                lhmtVO.setMemNo(memNo);
-                lhmtVO.setName(ownerMemberEntity.getRealName());
-                lhmtVO.setPhone(ownerMemberEntity.getPhone());
-                memberTag =2;
-            }else*/
-            RenterMemberEntity renterMemberEntity = renterMemberService.getRenterMemberByMemberNo(memNo);
-            if(renterMemberEntity !=null){
-                lhmtVO.setMemNo(renterMemberEntity.getMemNo());
-                lhmtVO.setName(renterMemberEntity.getRealName());
-                lhmtVO.setPhone(renterMemberEntity.getPhone());
-            }else{
-                LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"会员号信息查询为空");
-                log.error("联合麦通查询异常-会员号查询为空memNo={}",memNo,e);
-                throw e;
-            }
-        }else if(phone!=null && phone.trim().length()>0){
-            /*OwnerMemberEntity ownerMemberEntity = ownerMemberService.queryOwnerMemberByPhone(phone);
 
-            if(ownerMemberEntity != null){
-                lhmtVO.setMemNo(memNo);
-                lhmtVO.setName(ownerMemberEntity.getRealName());
-                lhmtVO.setPhone(ownerMemberEntity.getPhone());
-                memberTag =2;
-            }else*/
-            RenterMemberEntity renterMemberEntity = renterMemberService.getRenterMemberByMemberNo(memNo);
-            if(renterMemberEntity != null){
-                lhmtVO.setMemNo(renterMemberEntity.getMemNo());
-                lhmtVO.setName(renterMemberEntity.getRealName());
-                lhmtVO.setPhone(renterMemberEntity.getPhone());
-            }else{
-                LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"手机号信息查询为空");
-                log.error("联合麦通查询异常-手机号查询为空phone={}",phone,e);
-                throw e;
-            }
-        }else if(platNum!=null && platNum.trim().length()>0){
-            OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByPlatNum(platNum);
-            if(ownerGoodsEntity != null){
-                String orderNo = ownerGoodsEntity.getOrderNo();
-                String ownerOrderNo = ownerGoodsEntity.getOwnerOrderNo();
-                OwnerMemberEntity ownerMemberEntity = ownerMemberService.queryOwnerInfoByOrderNoAndOwnerNo(orderNo, ownerOrderNo);
-                if(ownerMemberEntity != null){
-                    lhmtVO.setMemNo(memNo);
-                    lhmtVO.setName(ownerMemberEntity.getRealName());
-                    lhmtVO.setPhone(ownerMemberEntity.getPhone());
-                }else{
-                    LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"车牌号找不到对应的用户信息");
-                    log.error("联合麦通查询异常-车牌号获取车主会员信息为空platNum={}",platNum,e);
-                    throw e;
-                }
-            }else{
-                LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"获取不到车辆信息");
-                log.error("联合麦通查询异常-车牌号获取车获取不到车辆信息platNum={}",platNum,e);
-                throw e;
-            }
-        }else{
-            LianHeMaiTongMemberException e = new LianHeMaiTongMemberException(ErrorCode.LHMT_QUERY_ERROR.getCode(),"至少输入一个参数条件");
-            log.error("联合麦通查询异常",e);
+    public List<LianHeMaiTongOrderVO> getOrderListByMemberNo(String memNo) {
+        try{
+            List<LianHeMaiTongOrderVO> lianHeMaiTongOrderVO = getLianHeMaiTongOrderVO(memNo);
+            return lianHeMaiTongOrderVO;
+        }catch (Exception e){
+            log.error("联合麦通查询异常-会员号查询为空memNo={}",memNo,e);
             throw e;
         }
-        Page<LianHeMaiTongOrderVO> lianHeMaiTongOrderVO = getLianHeMaiTongOrderVO(lianHeMaiTongMemberReqVO);
-        lhmtVO.setPage(lianHeMaiTongOrderVO);
-        return lhmtVO;
     }
-
-    public Page<LianHeMaiTongOrderVO> getLianHeMaiTongOrderVO(LianHeMaiTongMemberReqVO lianHeMaiTongMemberReqVO){
-        String memNo = lianHeMaiTongMemberReqVO.getMemNo();
-        String platNum = lianHeMaiTongMemberReqVO.getPlatNum();
-        Integer pageNum = lianHeMaiTongMemberReqVO.getPageNum();
-        Integer pageSize = lianHeMaiTongMemberReqVO.getPageSize();
-
+    public List<LianHeMaiTongOrderVO> getLianHeMaiTongOrderVO(String memNo){
         List<LianHeMaiTongOrderVO> list = new ArrayList<>();
-        PageHelper.startPage(pageNum,pageSize);
-        List<LianHeMaiTongOrderDTO> lianHeMaiTongOrderDTOS = orderService.getByMemNoAndPlatNum(memNo,platNum);
-        PageInfo<LianHeMaiTongOrderDTO> pageInfo = new PageInfo<>(lianHeMaiTongOrderDTOS);
-        List<LianHeMaiTongOrderDTO> pageList = pageInfo.getList();
-        pageList.stream().forEach(x->{
+        List<LianHeMaiTongOrderDTO> lianHeMaiTongOrderDTOS = orderService.getOrderByMemNo(memNo);
+        lianHeMaiTongOrderDTOS.stream().forEach(x->{
             LianHeMaiTongOrderVO vo = new LianHeMaiTongOrderVO();
             boolean isGetCar = false;
             boolean isReturnCar = false;
@@ -167,14 +96,12 @@ public class LianHeMaiTongService {
                 log.error("获取风控审核数据异常",e);
             }
             BeanUtils.copyProperties(x,vo);
-            vo.setIsGetReturnCar(isGetCar);
-            vo.setIsGetReturnCar(isReturnCar);
+            vo.setIsGetCar(isGetCar);
+            vo.setIsReturnCar(isReturnCar);
+            vo.setRentAmt(x.getRentAmt()==null?null:String.valueOf(x.getRentAmt()));
             list.add(vo);
         });
-        Page<LianHeMaiTongOrderVO> pageRes = new Page();
-        pageRes.setList(list);
-        pageRes.setTotal(pageInfo.getTotal());
-        return pageRes;
+        return list;
     }
 
     /*
