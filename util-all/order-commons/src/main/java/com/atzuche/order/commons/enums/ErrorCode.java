@@ -142,6 +142,10 @@ public enum ErrorCode {
     COMMERCIAL_INSURANCE_AUDIT_FAIL("60046","操作失败，当前车辆长租接单商业险审核未通过/过期"),
     SERVICE_NOT_OPEN("988888","当前城市还未开放服务哦，我们会尽快开放哒~!"),
 
+
+    SECONDARY_MQ_AMOUNT_DISCREPANCY("910000","提现金额不一致"),
+    SECONDARY_MQ_NOTFOUND_CASHEXAMINE("910001","未找到提现记录"),
+    SECONDARY_MQ_NOTFOUND_OWNER_INCOME("910002","未找到车主收益记录"),
     ;
 
     private String code;

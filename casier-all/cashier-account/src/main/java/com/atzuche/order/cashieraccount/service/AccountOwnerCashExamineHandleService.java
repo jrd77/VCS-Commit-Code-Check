@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
@@ -167,4 +168,30 @@ public class AccountOwnerCashExamineHandleService {
         return null;
     }
 
+
+    /**
+     * 依据流水号和会员号获取对应的提现记录
+     *
+     * @param serialNumber 流水号
+     * @param memNo        会员号
+     * @return AccountOwnerCashExamine 提现记录
+     */
+    public AccountOwnerCashExamine selectBySerialNumberAndMemNo(String serialNumber, String memNo) {
+        return accountOwnerCashExamineMapper.selectBySerialNumberAndMemNo(serialNumber, memNo);
+    }
+
+    /**
+     * 更新提现记录
+     *
+     * @param record 数据
+     * @return int 成功记录数
+     */
+    public int updateAccountOwnerCashExamine(AccountOwnerCashExamine record) {
+        log.info("Update account owner cash examine. record:[{}]", JSON.toJSONString(record));
+        if (Objects.isNull(record)) {
+            log.info("Update account owner cash examine. data is empty!");
+            return OrderConstant.ZERO;
+        }
+        return accountOwnerCashExamineMapper.updateByPrimaryKeySelective(record);
+    }
 }

@@ -60,12 +60,12 @@ public class AccountOwnerIncomeNoTService {
     }
 
     public AccountOwnerIncomeEntity getOwnerIncomeByMemNO(String memNo) {
-        Assert.notNull(memNo, ErrorCode.PARAMETER_ERROR.getText());
         AccountOwnerIncomeEntity accountOwnerIncome = accountOwnerIncomeMapper.selectByMemNo(memNo);
         if (Objects.isNull(accountOwnerIncome) || Objects.isNull(accountOwnerIncome.getId())) {
             accountOwnerIncome = new AccountOwnerIncomeEntity();
             accountOwnerIncome.setIncomeAmt(OrderConstant.ZERO);
-            accountOwnerIncome.setSecondaryIncomeAmt(OrderConstant.ZERO);
+            accountOwnerIncome.setSecondaryIncomeAmt(NumberUtils.INTEGER_ZERO);
+            accountOwnerIncome.setSecondaryFreezeIncomeAmt(NumberUtils.INTEGER_ZERO);
         }
         return accountOwnerIncome;
     }
