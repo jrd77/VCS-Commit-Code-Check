@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
@@ -80,7 +81,22 @@ public class OrderWzSettleSupplementHandleService {
                         PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
                                 buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
                         payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
-                        accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
+                        int renterWzDepositDetailId =
+                                accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
+
+                        // 添加结算明细
+                        AccountRenterWzDepositCostSettleDetailEntity settleDetail =
+                                new AccountRenterWzDepositCostSettleDetailEntity();
+                        settleDetail.setOrderNo(settleOrders.getOrderNo());
+                        settleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
+                        settleDetail.setMemNo(settleOrders.getRenterMemNo());
+                        settleDetail.setWzAmt(Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
+                        settleDetail.setPrice(Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
+                        settleDetail.setCostCode(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getCashNo());
+                        settleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getTxt());
+                        settleDetail.setType(10);
+                        settleDetail.setUniqueNo(String.valueOf(renterWzDepositDetailId));
+                        cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(settleDetail);
                     }
                 });
             }
@@ -92,8 +108,8 @@ public class OrderWzSettleSupplementHandleService {
      * 处理未支付的补付记录
      *
      * @param entityList 订单补付记录
-     * @param debtList   押金抵扣记录
-     * @param deductList 转款欠款记录
+     * @param debtList   转款欠款记录
+     * @param deductList 押金抵扣记录
      * @param settleOrdersAccount 结算信息
      */
     public int handleSupplementDetail(List<OrderSupplementDetailEntity> entityList,
