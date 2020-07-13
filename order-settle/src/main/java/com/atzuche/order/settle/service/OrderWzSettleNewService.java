@@ -1,5 +1,17 @@
 package com.atzuche.order.settle.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdetain.service.notservice.AccountRenterDetainDetailNoTService;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostEntity;
@@ -8,6 +20,7 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -18,7 +31,9 @@ import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -38,18 +53,8 @@ import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderWzSettlementMq;
 import com.dianping.cat.Cat;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -80,6 +85,8 @@ public class OrderWzSettleNewService {
     private RenterMemberService renterMemberService;
 	@Autowired
     private OrderSettleHandleService orderSettleHandleService;
+	@Autowired
+	private OrderSourceStatService orderSourceStatService;
 
 
     // 违章押金
@@ -352,14 +359,34 @@ public class OrderWzSettleNewService {
 	 * 
 	 * @param orderNo
 	 */
-	public void sendOrderWzSettleSuccessMq(String orderNo,String renterMemNo,String ownerMemNo) {
+	public void sendOrderWzSettleSuccessMq(String orderNo,String renterMemNo,String ownerMemNo,RenterOrderEntity renterOrder) {
 		log.info("sendOrderWzSettleSuccessMq start [{}]", orderNo);
 		OrderWzSettlementMq orderSettlementMq = new OrderWzSettlementMq();
+		// 获取订单来源信息
+        OrderSourceStatEntity osse = orderSourceStatService.selectByOrderNo(orderNo);
+        
 		orderSettlementMq.setStatus(0);
 		orderSettlementMq.setOrderNo(orderNo);
+		
+		if(renterOrder != null) {
+			//开始时间和结束时间
+			orderSettlementMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(renterOrder.getExpRentTime()));
+			orderSettlementMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(renterOrder.getExpRevertTime()));
+			//carNo
+			orderSettlementMq.setCarNo(Integer.valueOf(renterOrder.getGoodsCode()));
+		}
+		
 		//新增参数车主号，租客号。
 		orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
 		orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
+		
+		if(osse != null) {
+			orderSettlementMq.setBusinessParentType(osse.getBusinessParentType());
+			orderSettlementMq.setBusinessChildType(osse.getBusinessChildType());
+			orderSettlementMq.setPlatformParentType(osse.getPlatformParentType());
+			orderSettlementMq.setPlatformChildType(osse.getPlatformChildType());
+		}
+		
 		OrderMessage orderMessage = OrderMessage.builder().build();
 		orderMessage.setMessage(orderSettlementMq);
 		

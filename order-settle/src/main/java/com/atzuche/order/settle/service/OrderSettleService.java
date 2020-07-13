@@ -587,7 +587,7 @@ public class OrderSettleService{
             // 调远程抵扣老系统车主欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
             
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             
             //记录分流标识(已车主的会员号为准。) 200616
             memberSecondSettleService.initDepositMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));
@@ -613,7 +613,7 @@ public class OrderSettleService{
                 
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();

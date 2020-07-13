@@ -228,6 +228,11 @@ public class ModifyOrderRabbitMQService {
 	        if (renterGoodsDetailDTO != null) {
 	        	mq.setCarNo(renterGoodsDetailDTO.getCarNo());
 	        }
+	        //发送换车的车主的会员号
+	        if(modifyOrderDTO.getOwnerMemberDTO() != null) {
+	        	mq.setOwnerMemNo(Integer.valueOf(modifyOrderDTO.getOwnerMemberDTO().getMemNo()));
+	        }
+	        
 	        log.info("ModifyOrderRabbitMQService.sendOrderChangeCarMq mqparam=[{}]", JSON.toJSONString(mq));
 			OrderMessage orderMessage = OrderMessage.builder().build();
 	        orderMessage.setMessage(mq);

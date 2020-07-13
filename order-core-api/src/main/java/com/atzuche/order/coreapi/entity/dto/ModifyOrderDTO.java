@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.entity.dto;
 
 import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
@@ -181,4 +182,10 @@ public class ModifyOrderDTO {
 	 * 是否超级权限，可以跳过校验：0-否，1-是
 	 */
 	private Integer superPowerFlag;
+	
+	/**
+     * 车主会员信息
+     */
+    private OwnerMemberDTO ownerMemberDTO;
+    
 }
