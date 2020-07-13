@@ -342,4 +342,5 @@ public class AccountOwnerCashExamineService {
         record.setRequestBatchCode(uuid);
         return record;
     }
+
 }

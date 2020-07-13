@@ -444,4 +444,15 @@
     WHERE mem_no=#{memNo} AND DATE_FORMAT(create_time,'%Y-%m-%d')=#{date}
     AND is_delete = 0
   </select>
+
+  <select id="selectBySerialNumberAndMemNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            account_owner_cash_examine
+        where
+            serial_number = #{serialNumber}
+            and mem_no = #{memNo}
+        limit 1
+  </select>
 </mapper>

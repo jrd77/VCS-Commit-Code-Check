@@ -1,8 +1,10 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
+import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
 import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.cashieraccount.service.remote.AutoSecondOpenRemoteService;
@@ -98,7 +100,6 @@ public class AccountOwnerCashExamineHandleService {
             entity.setId(income.getId());
             entity.setIncomeAmt(incomeAmt);
             accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
-
             return record.getId();
         } else {
             log.info("新交易提现金额入库(非二清)提现金额为零!");
@@ -121,14 +122,7 @@ public class AccountOwnerCashExamineHandleService {
                                                    int secondaryWithdrawableCash,
                                                    String serialNumber, String dynamicCode) {
         if (secondaryWithdrawableCash > OrderConstant.ZERO) {
-            record.setId(null);
-            record.setSerialNumber(serialNumber);
-            record.setBalanceFlag(OrderConstant.ONE);
-            record.setSecondCleanFlag(OrderConstant.ONE);
-            record.setAmt(secondaryWithdrawableCash);
-            accountOwnerCashExamineMapper.insertSelective(record);
-
-            // 更新新交易车主收益信息
+            // 计算并校验收益余额
             int secondaryIncomeAmt = 0;
             if (Objects.nonNull(income) && Objects.nonNull(income.getSecondaryIncomeAmt())) {
                 secondaryIncomeAmt = income.getSecondaryIncomeAmt();
@@ -137,10 +131,14 @@ public class AccountOwnerCashExamineHandleService {
             if (secondaryIncomeAmt < 0) {
                 throw new WithdrawalBalanceNotEnoughException();
             }
-            AccountOwnerIncomeEntity entity = new AccountOwnerIncomeEntity();
-            entity.setId(income.getId());
-            entity.setSecondaryIncomeAmt(secondaryIncomeAmt);
-            accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
+
+            // 新增提现记录
+            record.setId(null);
+            record.setSerialNumber(serialNumber);
+            record.setBalanceFlag(OrderConstant.ONE);
+            record.setSecondCleanFlag(OrderConstant.ONE);
+            record.setAmt(secondaryWithdrawableCash);
+            accountOwnerCashExamineMapper.insertSelective(record);
 
             // 调用远程方法提现
             WithdrawalsReqVO reqVO = new WithdrawalsReqVO();
@@ -156,12 +154,44 @@ public class AccountOwnerCashExamineHandleService {
                 cashExamine.setId(record.getId());
                 cashExamine.setStatus(12);
                 accountOwnerCashExamineMapper.updateByPrimaryKeySelective(cashExamine);
+
+                // 更新新交易车主收益信息
+                income.setSecondaryIncomeAmt(secondaryIncomeAmt);
+                accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
+                return record.getId();
+            } else {
+                throw new WithdrawalAmtException("新交易提现金额入库(二清)提现失败");
             }
-            return record.getId();
         } else {
             log.info("新交易提现金额入库(二清)提现金额为零!");
         }
         return null;
     }
 
+
+    /**
+     * 依据流水号和会员号获取对应的提现记录
+     *
+     * @param serialNumber 流水号
+     * @param memNo        会员号
+     * @return AccountOwnerCashExamine 提现记录
+     */
+    public AccountOwnerCashExamine selectBySerialNumberAndMemNo(String serialNumber, String memNo) {
+        return accountOwnerCashExamineMapper.selectBySerialNumberAndMemNo(serialNumber, memNo);
+    }
+
+    /**
+     * 更新提现记录
+     *
+     * @param record 数据
+     * @return int 成功记录数
+     */
+    public int updateAccountOwnerCashExamine(AccountOwnerCashExamine record) {
+        log.info("Update account owner cash examine. record:[{}]", JSON.toJSONString(record));
+        if (Objects.isNull(record)) {
+            log.info("Update account owner cash examine. data is empty!");
+            return OrderConstant.ZERO;
+        }
+        return accountOwnerCashExamineMapper.updateByPrimaryKeySelective(record);
+    }
 }

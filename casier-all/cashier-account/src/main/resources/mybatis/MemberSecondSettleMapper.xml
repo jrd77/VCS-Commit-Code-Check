@@ -22,5 +22,18 @@
     <select id="getMemberSecondSettleEntityNumber" resultType="java.lang.Integer">
          select count(id) from member_second_settle where order_no = #{orderNo} and settle_type = #{settleType}
     </select>
+
+
+    <select id="selectByCondition" resultType="java.lang.Integer">
+         select
+            count(id)
+        from
+            member_second_settle
+        where
+            `mem_no` = #{memNo}
+             and `order_no` = #{orderNo}
+             and `settle_type` = #{settleType}
+             and `is_second_flow` = #{isSecondFlow}
+    </select>
     
 </mapper>

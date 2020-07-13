@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.atzuche.order.cashieraccount.service.MemberSecondSettleService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,8 @@ public class AddIncomeService {
 	private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
 	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
+    @Autowired
+    private MemberSecondSettleService memberSecondSettleService;
 	
 	private static final Integer RENTER_MEM_TYPE = 0;
 	
@@ -256,7 +259,10 @@ public class AddIncomeService {
 			accountOwnerIncomeDetail.setIncomeExamineId(addIncomeExamine.getId());
 			accountOwnerIncomeDetail.setCostCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getCashNo());
 			accountOwnerIncomeDetail.setCostDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getTxt());
-			accountOwnerIncomeNoTService.updateTotalIncomeAndSaveDetail(accountOwnerIncomeDetail);
+
+            boolean isSecondFlag =
+                    memberSecondSettleService.judgeIsSecond(addIncomeExamine.getMemNo(), addIncomeExamine.getOrderNo());
+			accountOwnerIncomeNoTService.updateTotalIncomeAndSaveDetail(accountOwnerIncomeDetail, isSecondFlag);
 		}
 		if (oldRealDebtAmt > 0) {
 			// 调远程抵扣
