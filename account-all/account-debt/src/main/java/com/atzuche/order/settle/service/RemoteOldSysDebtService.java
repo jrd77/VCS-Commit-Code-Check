@@ -118,33 +118,4 @@ public class RemoteOldSysDebtService {
         
         return debtDetailVO;
     }
-
-
-    public Page queryList(MemberDebtListReqDTO req) {
-        ResponseData<Page> responseData = null;
-        log.info("Feign 获取欠款用户,MemberDebtListReqDTO={}",req);
-        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "钱包服务");
-        Page data;
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"RemoteOldSysDebtService.queryList");
-            Cat.logEvent(CatConstants.FEIGN_PARAM, GsonUtils.toJson(req));
-            String s = GsonUtils.toJson(req);
-            MemberDebtListReqDTO memberDebtListReqDTO = GsonUtils.convertObj(s, MemberDebtListReqDTO.class);
-            log.info("远程调用欠款用户入参"+GsonUtils.toJson(memberDebtListReqDTO));
-            responseData = debtFeignService.queryList(memberDebtListReqDTO);
-            log.info("远程调用欠款用户出参"+GsonUtils.toJson(responseData));
-            ResponseCheckUtil.checkResponse(responseData);
-            t.setStatus(Transaction.SUCCESS);
-            data = responseData.getData();
-        }catch (Exception e){
-            log.error("Feign 获取用户的欠款失败,ResponseData={},MemberDebtListReqDTO={}",GsonUtils.toJson(responseData),GsonUtils.toJson(req),e);
-            Cat.logError("Feign 获取用户的欠款失败",e);
-            t.setStatus(e);
-            throw e;
-        }finally {
-            t.complete();
-        }
-        return data;
-    }
-
 }

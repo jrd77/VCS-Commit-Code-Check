@@ -107,42 +107,6 @@ public class CashWithdrawalController {
 
     	return ResponseData.success(debtDetailVO);
     }
-	@PostMapping("/debt/queryList")
-	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req, BindingResult bindingResult) {
-		log.info("查询会员欠款入参[{}]",req);
-		BindingResultUtil.checkBindingResult(bindingResult);
-		Page page = remoteOldSysDebtService.queryList(req);
-		log.info("获取欠款用户出参page=[{}]",page);
-		List<MemberDebtListReqDTO> list = page.getList();
-		String jsonString = JSON.toJSONString(list);
-		List<MemberDebtListReqDTO> memberDebtListReqDTOS = JSONArray.parseArray(jsonString, MemberDebtListReqDTO.class);
-		log.info("获取欠款用户出参list=[{}]",list);
-		if(CollectionUtils.isNotEmpty(list)){
-			List<MemberDebtListResDTO> memberDebtListResDTOList = new ArrayList<>();
-			for (MemberDebtListReqDTO memberDebtListReqDTO : memberDebtListReqDTOS) {
-				MemberDebtListResDTO memberDebtListResDTO = new MemberDebtListResDTO();
-				DebtDetailVO debtDetailVO = accountDebtService.getTotalNewDebtAndOldDebtAmt(memberDebtListReqDTO.getMemNo());
-				if(debtDetailVO != null) {
-					debtDetailVO.setNoPaySupplementAmt(orderSupplementDetailService.getSumNoPaySupplementAmt(memberDebtListReqDTO.getMemNo()));
-					//4小时
-					Integer sum = cashierRefundApplyNoTService.getCashierRefundApplyByTimeForPreAuthSum(memberDebtListReqDTO.getMemNo());
-					debtDetailVO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt().intValue() + Math.abs(sum));
-				}
-				memberDebtListResDTO.setMemNo(memberDebtListReqDTO.getMemNo());
-				memberDebtListResDTO.setMobile(memberDebtListReqDTO.getMobile());
-				memberDebtListResDTO.setRealName(memberDebtListReqDTO.getRealName());
-				memberDebtListResDTO.setHistoryDebtAmt(debtDetailVO.getOrderDebtAmt());
-				memberDebtListResDTO.setNoPaySupplementAmt(debtDetailVO.getNoPaySupplementAmt());
-				memberDebtListResDTO.setOrderDebtAmt(debtDetailVO.getOrderDebtAmt());
-				memberDebtListResDTOList.add(memberDebtListResDTO);
-			}
-			page.setList(memberDebtListResDTOList);
-		}
-		log.info("查询会员欠款出参[{}]",GsonUtils.toJson(page));
-		return ResponseData.success(page);
-	}
-
-
 	/**
 	 * 车主车载押金抵扣记录
 	 * @param memNo

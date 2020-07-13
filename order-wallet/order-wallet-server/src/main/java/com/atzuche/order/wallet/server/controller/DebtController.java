@@ -64,15 +64,4 @@ public class DebtController {
     	DebtDetailVO debtDetailVO = debtService.getDebtDetailVO(memNo);
         return ResponseData.success(debtDetailVO);
     }
-
-    /**
-     * 返回有欠款的用户
-     * @param req
-     * @return
-     */
-    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
-    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req){
-        Page<MemberDebtListReqDTO> debtByMemberNoList = debtService.findDebtByMemberNoList(req);
-        return ResponseData.success(debtByMemberNoList);
-    }
 }

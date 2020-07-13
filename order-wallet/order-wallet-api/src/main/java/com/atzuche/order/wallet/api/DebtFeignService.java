@@ -42,11 +42,4 @@ public interface DebtFeignService {
     @RequestMapping(value = "debt/detail",method = RequestMethod.GET)
     public ResponseData<DebtDetailVO> getDebtDetailVO(@RequestParam("memNo")String memNo);
 
-    /**
-     * 返回有欠款的用户
-     * @param req
-     * @return
-     */
-    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
-    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req);
 }

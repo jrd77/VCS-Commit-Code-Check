@@ -29,9 +29,4 @@ public interface TransSupplementDetailMapper {
     List<DepositDebtVO> listRentDepositDebt(@Param("memNo") String memNo);
     
     List<DepositDebtVO> listIllegalDepositDebt(@Param("memNo") String memNo);
-
-    List<MemberDebtListReqDTO> findDebtByMemberNoList(MemberDebtListReqDTO req);
-
-    List<MemberDebtListReqDTO> findMemberList(MemberDebtListReqDTO req);
-    long countTotal(MemberDebtListReqDTO req);
 }
