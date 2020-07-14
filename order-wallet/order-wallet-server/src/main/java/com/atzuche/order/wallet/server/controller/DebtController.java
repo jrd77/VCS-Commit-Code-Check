@@ -4,6 +4,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.DebtDetailVO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.atzuche.order.wallet.api.DeductDebtVO;
 import com.atzuche.order.wallet.api.MemDebtVO;
 import com.atzuche.order.wallet.server.service.DebtService;
@@ -67,11 +68,11 @@ public class DebtController {
 
     /**
      * 查询用户欠款订单
-     * @param memNo
+     * @param reqVO
      * @return
      */
-    @RequestMapping(value = "debt/selectMemberOrderDebtList",method = RequestMethod.GET)
-    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(@RequestParam("memNo")String memNo){
-        return debtService.selectMemberOrderDebtList(memNo);
+    @RequestMapping(value = "debt/selectMemberOrderDebtList",method = RequestMethod.POST)
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(@RequestBody SearchMemberOrderDebtListReqVO reqVO){
+        return debtService.selectMemberOrderDebtList(reqVO);
     }
 }

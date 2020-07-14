@@ -1,6 +1,7 @@
 package com.atzuche.order.settle.service.notservice;
 
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.exception.AccountDeductDebtDBException;
 import com.atzuche.order.settle.exception.AccountInsertDebtDBException;
@@ -207,7 +208,7 @@ public class AccountDebtDetailNoTService {
         return accountDebtDetailTodos;
     }
 
-    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(String memNo) {
-        return accountDebtDetailMapper.selectMemberOrderDebtList(memNo);
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(SearchMemberOrderDebtListReqVO req) {
+        return accountDebtDetailMapper.selectMemberOrderDebtList(req);
     }
 }

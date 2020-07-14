@@ -2,6 +2,7 @@ package com.atzuche.order.wallet.server.service;
 
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
 import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
@@ -161,11 +162,11 @@ public class DebtService {
 
     /**
      * 查询用户欠款订单
-     * @param memNo
+     * @param reqVO
      * @return
      */
-    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(String memNo){
-        return transSupplementDetailMapper.selectMemberOrderDebtList(memNo);
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(SearchMemberOrderDebtListReqVO reqVO){
+        return transSupplementDetailMapper.selectMemberOrderDebtList(reqVO);
     }
 
 }

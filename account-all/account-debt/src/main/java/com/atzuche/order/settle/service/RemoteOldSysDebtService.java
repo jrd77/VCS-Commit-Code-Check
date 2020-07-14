@@ -3,6 +3,7 @@ package com.atzuche.order.settle.service;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.atzuche.order.wallet.api.DebtFeignService;
 import com.atzuche.order.wallet.api.DeductDebtVO;
@@ -122,10 +123,10 @@ public class RemoteOldSysDebtService {
 
     /**
      * 返回老订单的欠款
-     * @param memNo
+     * @param req
      * @return
      */
-    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(@RequestParam("memNo")String memNo){
-        return debtFeignService.selectMemberOrderDebtList(memNo);
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(SearchMemberOrderDebtListReqVO req){
+        return debtFeignService.selectMemberOrderDebtList(req);
     }
 }
