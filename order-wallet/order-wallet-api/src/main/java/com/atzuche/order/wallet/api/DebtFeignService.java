@@ -1,6 +1,7 @@
 package com.atzuche.order.wallet.api;
 
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,8 +33,8 @@ public interface DebtFeignService {
      */
     @RequestMapping(value = "debt/deduct",method = RequestMethod.POST)
     public ResponseData deductBalance(@Valid @RequestBody DeductDebtVO deductDebtVO);
-    
-    
+
+
     /**
      * 返回用户名下的欠款(区分历史欠款和订单欠款)
      * @param memNo
@@ -44,10 +45,10 @@ public interface DebtFeignService {
 
     /**
      * 查询用户欠款订单
-     * @param memNo
+     * @param reqVO
      * @return
      */
-    @RequestMapping(value = "debt/selectMemberOrderDebtList",method = RequestMethod.GET)
-    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(@RequestParam("memNo")String memNo);
+    @RequestMapping(value = "debt/selectMemberOrderDebtList",method = RequestMethod.POST)
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(SearchMemberOrderDebtListReqVO reqVO);
 
 }

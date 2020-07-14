@@ -6,6 +6,8 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
+import com.atzuche.order.commons.vo.req.Page;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.atzuche.order.coreapi.entity.vo.OwnerGpsDeductVO;
 import com.atzuche.order.coreapi.service.CashWithdrawalService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
@@ -121,16 +123,21 @@ public class CashWithdrawalController {
     	return ResponseData.success(list);
     }
 	@PostMapping("/debt/queryDebtOrderList")
-	public List<MemberOrderDebtDTO> queryDebtOrderList(@RequestParam(value="memNo",required = true) String memNo){
+	public ResponseData<?> queryDebtOrderList(@RequestBody SearchMemberOrderDebtListReqVO req){
 		List<MemberOrderDebtDTO> memberOrderDebtList = new ArrayList<>();
-		List<MemberOrderDebtDTO> memberNewOrderDebtList = accountDebtDetailNoTService.selectMemberOrderDebtList(memNo);
-		List<MemberOrderDebtDTO> memberOldOrderDebtList = remoteOldSysDebtService.selectMemberOrderDebtList(memNo);
+		List<MemberOrderDebtDTO> memberNewOrderDebtList = accountDebtDetailNoTService.selectMemberOrderDebtList(req);
+		List<MemberOrderDebtDTO> memberOldOrderDebtList = remoteOldSysDebtService.selectMemberOrderDebtList(req);
 		if(!CollectionUtils.isEmpty(memberNewOrderDebtList)){
 			memberOrderDebtList.addAll(memberNewOrderDebtList);
 		}
 		if(!CollectionUtils.isEmpty(memberOldOrderDebtList)){
 			memberOrderDebtList.addAll(memberOldOrderDebtList);
 		}
-		return memberOrderDebtList;
-	}
+		Page page = new Page();
+		page.setTotal(memberOrderDebtList.size());
+		page.setList(memberOrderDebtList);
+		page.setPageNum(req.getPageNum());
+		page.setPageSize(req.getPageSize());
+		return ResponseData.success(page);
+}
 }

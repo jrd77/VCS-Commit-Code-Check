@@ -16,4 +16,8 @@ public class MemberOrderDebtDTO implements Serializable {
     private String orderEndTime;
     @AutoDocProperty("订单欠款金额")
     private Integer debtAmt;
+    @AutoDocProperty("订单类型 0老订单，1新订单")
+    private Integer orderType;
+    @AutoDocProperty("新订单类型 1:普通,2:套餐,3:长租',")
+    private Integer category;
 }
