@@ -1,20 +1,17 @@
 package com.atzuche.order.wallet.server.service;
 
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.wallet.server.entity.BalanceEntity;
 import com.atzuche.order.wallet.server.entity.DepositDebtVO;
 import com.atzuche.order.wallet.server.entity.TransSupplementDetailEntity;
 import com.atzuche.order.wallet.server.mapper.MemberMapper;
 import com.atzuche.order.wallet.server.mapper.TransSupplementDetailMapper;
-import com.autoyol.commons.utils.Page;
-import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -161,4 +158,14 @@ public class DebtService {
         debtDetailVO.setOrderDebtAmt(orderDebtAmt);
         return debtDetailVO;
     }
+
+    /**
+     * 查询用户欠款订单
+     * @param memNo
+     * @return
+     */
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(String memNo){
+        return transSupplementDetailMapper.selectMemberOrderDebtList(memNo);
+    }
+
 }

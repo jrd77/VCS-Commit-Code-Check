@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service.notservice;
 
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.settle.entity.AccountDebtReceivableaDetailEntity;
 import com.atzuche.order.settle.exception.AccountDeductDebtDBException;
 import com.atzuche.order.settle.exception.AccountInsertDebtDBException;
@@ -204,5 +205,9 @@ public class AccountDebtDetailNoTService {
         accountDeductDebt.setAmt(accountDeductDebt.getAmt() - accountDeductDebt.getRealAmt());
         accountDeductDebt.setAccountDebtReceivableaDetails(accountDebtReceivableaDetails);
         return accountDebtDetailTodos;
+    }
+
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(String memNo) {
+        return accountDebtDetailMapper.selectMemberOrderDebtList(memNo);
     }
 }

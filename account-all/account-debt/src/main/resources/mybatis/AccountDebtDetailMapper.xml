@@ -144,6 +144,20 @@
         select <include refid="Base_Column_List" /> from account_debt_detail where mem_no = #{memNo} and order_no = #{orderNo} 
         and <![CDATA[ order_debt_amt + repaid_debt_amt <>0 ]]>
     </select>
-    
-    
+    <select id="selectMemberOrderDebtList" resultType="com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO">
+        SELECT
+        `order`.`exp_rent_time` AS orderStartTime,
+        `order`.`exp_revert_time` AS orderEndTime,
+        `order`.`create_time` AS createOrderTime,
+        `order`.`order_no` AS orderNo,
+        abs( ad.current_debt_amt ) AS debtAmt
+        FROM
+        `order_center`.`account_debt_detail` AS ad
+        LEFT JOIN `order_center`.`order` ON ad.order_no = `order`.order_no
+        WHERE
+        <![CDATA[ order_debt_amt + repaid_debt_amt <>0 ]]>
+        and ad.is_delete=0
+    </select>
+
+
 </mapper>

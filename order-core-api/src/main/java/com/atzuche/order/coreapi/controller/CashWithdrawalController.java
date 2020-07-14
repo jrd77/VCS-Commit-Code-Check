@@ -1,12 +1,9 @@
 package com.atzuche.order.coreapi.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
-import com.atzuche.order.commons.entity.dto.MemberDebtListResDTO;
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.coreapi.entity.vo.OwnerGpsDeductVO;
@@ -14,13 +11,13 @@ import com.atzuche.order.coreapi.service.CashWithdrawalService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.service.AccountDebtService;
 import com.atzuche.order.settle.service.RemoteOldSysDebtService;
+import com.atzuche.order.settle.service.notservice.AccountDebtDetailNoTService;
 import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.autoyol.commons.utils.GsonUtils;
-import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +39,10 @@ public class CashWithdrawalController {
     private CashierRefundApplyNoTService cashierRefundApplyNoTService;
 
 	@Autowired
+	private AccountDebtDetailNoTService accountDebtDetailNoTService;
+	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
+
 
 	/**
 	 * 提现
@@ -119,5 +119,18 @@ public class CashWithdrawalController {
 		log.info("获取车主车载押金抵扣记录 memNo=[{}],carNo=[{}]", memNo,carNo);
 		List<OwnerGpsDeductVO> list = cashWithdrawalService.listOwnerGpsDeduct(memNo, carNo);
     	return ResponseData.success(list);
-    } 
+    }
+	@PostMapping("/debt/queryDebtOrderList")
+	public List<MemberOrderDebtDTO> queryDebtOrderList(@RequestParam(value="memNo",required = true) String memNo){
+		List<MemberOrderDebtDTO> memberOrderDebtList = new ArrayList<>();
+		List<MemberOrderDebtDTO> memberNewOrderDebtList = accountDebtDetailNoTService.selectMemberOrderDebtList(memNo);
+		List<MemberOrderDebtDTO> memberOldOrderDebtList = remoteOldSysDebtService.selectMemberOrderDebtList(memNo);
+		if(!CollectionUtils.isEmpty(memberNewOrderDebtList)){
+			memberOrderDebtList.addAll(memberNewOrderDebtList);
+		}
+		if(!CollectionUtils.isEmpty(memberOldOrderDebtList)){
+			memberOrderDebtList.addAll(memberOldOrderDebtList);
+		}
+		return memberOrderDebtList;
+	}
 }

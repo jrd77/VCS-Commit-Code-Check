@@ -416,4 +416,33 @@
 	 AND tp.`trans_type`='03'
 	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
   </select>
+  <select id="selectMemberOrderDebtList" resultType="com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO">
+     SELECT
+            trans.rent_time as orderStartTime,
+            trans.revert_time as orderEndTime,
+            trans.req_time as createOrderTime,
+            trans.order_no as orderNo,
+            tsd.amt as debtAmt
+          FROM
+              trans_supplement_detail as tsd
+                        left join trans on tsd.order_no=trans.order_no
+          WHERE
+              pid IN (
+                          SELECT
+                              pid
+                          FROM
+                              `atzuchedb`.trans_supplement_detail
+                          WHERE
+                              mem_no=#{memNo}
+                              AND tsd.cash_type = 3
+                              AND tsd.op_status = 1
+                              AND tsd.pay_flag IN ( 1, 4, 5 )
+                              AND tsd.is_delete = 0
+              )
+              AND tsd.op_status = 1
+              AND tsd.pay_flag IN ( 1, 4, 5 )
+              AND tsd.is_delete = 0
+  </select>
+
+
 </mapper>

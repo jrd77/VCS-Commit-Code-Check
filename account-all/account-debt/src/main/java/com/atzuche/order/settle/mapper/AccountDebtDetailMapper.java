@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.mapper;
 
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.settle.entity.AccountDebtDetailEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,5 +28,6 @@ public interface AccountDebtDetailMapper{
     List<AccountDebtDetailEntity> listAccountDebtDetailEntity(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
     
     List<AccountDebtDetailEntity> getDebtListByOrderNo(@Param("orderNo") String orderNo,@Param("memNo") String memNo);
-    
+
+    List<MemberOrderDebtDTO> selectMemberOrderDebtList(@Param("memNo") String memNo);
 }

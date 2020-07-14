@@ -2,13 +2,11 @@ package com.atzuche.order.settle.service;
 
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.wallet.api.DebtDetailVO;
 import com.atzuche.order.wallet.api.DebtFeignService;
 import com.atzuche.order.wallet.api.DeductDebtVO;
 import com.atzuche.order.wallet.api.MemDebtVO;
-import com.autoyol.commons.utils.GsonUtils;
-import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -16,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -117,5 +118,14 @@ public class RemoteOldSysDebtService {
         }   
         
         return debtDetailVO;
+    }
+
+    /**
+     * 返回老订单的欠款
+     * @param memNo
+     * @return
+     */
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(@RequestParam("memNo")String memNo){
+        return debtFeignService.selectMemberOrderDebtList(memNo);
     }
 }
