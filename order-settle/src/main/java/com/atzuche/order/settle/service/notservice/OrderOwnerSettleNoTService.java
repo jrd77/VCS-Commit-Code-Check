@@ -216,7 +216,9 @@ public class OrderOwnerSettleNoTService {
 //        int rentAmt=settleOrders.getRenterOrderCost();
         
         log.info("计算车主服务费，基于租客租金费用rentAmt=[{}]",rentAmt);
-        
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
+
         //代管车服务费比例 商品
         Double proxyProportionDou= ownerGoodsDetail.getServiceProxyRate();
         if(proxyProportionDou==null){
@@ -224,12 +226,11 @@ public class OrderOwnerSettleNoTService {
         }
         
         int proxyProportion = proxyProportionDou.intValue();
-        OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt,proxyProportion);
+        OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
         if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
         	ownerIncomeAmt += -proxyExpense.getTotalAmount();
         }
         //3 获取车主补贴明细列表
-        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         if (ownerOrderSubsidyDetail != null) {
             ownerIncomeAmt += ownerOrderSubsidyDetail.stream().mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount).sum();
         }
@@ -237,7 +238,7 @@ public class OrderOwnerSettleNoTService {
         //2 车主端平台服务费
         //服务费比例 商品
         //获取租金补贴部分
-        int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
+
         Double serviceRate = ownerGoodsDetail.getServiceRate();
         if(serviceRate==null){
             serviceRate = Double.valueOf(0.0);
