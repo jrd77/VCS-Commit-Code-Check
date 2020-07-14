@@ -22,4 +22,6 @@ public interface AccountOwnerCostSettleDetailMapper{
     List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(@Param("orderNo") String orderNo,@Param("memNo")String memNo);
     
     List<AccountOwnerCostSettleDetailEntity> listOwnerSettleCostBySourceCode(@Param("orderNoList") List<String> orderNoList,@Param("memNo") String memNo,@Param("sourceCode") String sourceCode);
+
+    List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetailsByOrderNo(String orderNo);
 }
