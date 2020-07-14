@@ -127,6 +127,12 @@ public class AdminModifyOrderFeeVO {
     
     @AutoDocProperty(value = "驾乘无忧保障服务费")
     private Integer driverInsurAmt;
+    
+    @AutoDocProperty(value = "精准取车服务费")
+    private Integer accurateGetSrvAmt;
+    
+    @AutoDocProperty(value = "精准还车服务费")
+    private Integer accurateReturnSrvAmt;
 
     public Integer getRentAmt() {
         return minusFee(rentAmt);
@@ -206,6 +212,14 @@ public class AdminModifyOrderFeeVO {
     
     public Integer getDriverInsurAmt() {
         return minusFee(driverInsurAmt);
+    }
+    
+    public Integer getAccurateGetSrvAmt() {
+        return minusFee(accurateGetSrvAmt);
+    }
+    
+    public Integer getAccurateReturnSrvAmt() {
+        return minusFee(accurateReturnSrvAmt);
     }
     
 }

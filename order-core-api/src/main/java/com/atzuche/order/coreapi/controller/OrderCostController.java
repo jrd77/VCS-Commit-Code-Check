@@ -47,6 +47,8 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +92,9 @@ public class OrderCostController {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 	@Autowired
 	private OrderCostAggregateService orderCostAggregateService;
+
+	@Autowired
+	private OrderSettleService orderSettleService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -175,7 +180,7 @@ public class OrderCostController {
 		 }
 		 String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 
-		 int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo,renterOrderNo,memNo);
+		 //int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo,renterOrderNo,memNo);
 		 int totalFineAmt = facadeService.getTotalFine(orderNo,renterOrderNo,memNo);
 
 		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
@@ -217,7 +222,9 @@ public class OrderCostController {
 
         RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
-		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
+        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderEntity.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
+		shortDetail.setTotalRentCostAmt(renterCostVO.getRenterCostFeeYingshou());
 		shortDetail.setTotalFineAmt(-totalFineAmt);
 		shortDetail.setYingFuDeposit(-depositEntity.getYingfuDepositAmt());
 		shortDetail.setShiFuDeposit(depositEntity.getShifuDepositAmt());

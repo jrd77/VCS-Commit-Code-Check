@@ -71,4 +71,8 @@ public class OrderCostGetReturnCarCostReqDTO {
      * 租金+保险+不计免赔+手续费（不需要传递）
      */
     private Integer sumJudgeFreeFee;
+    /**
+	 * 配送模式：0-区间配送，1-精准配送
+	 */
+    private Integer distributionMode;
 }
