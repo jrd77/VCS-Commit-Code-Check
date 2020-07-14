@@ -48,7 +48,9 @@ public class OrderSettleTest {
 		//52125202200299
 		//orderSettle.settleWzOrder("52125202200299");
 		//61175312200299
-		orderSettle.settleWzOrder("61175312200299");
+//		orderSettle.settleWzOrder("61175312200299");
+		//77867231400299
+		orderSettle.settleWzOrder("77867231400299");
 	}
 
 	@Test

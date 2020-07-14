@@ -199,11 +199,12 @@ public class OrderOwnerSettleNewService {
 //    		oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
 //    		rentOilAmt = Double.valueOf(oilDifferenceCrash).intValue();
 //    	}
-    			
+    	
         //车主交接车油费
         int ownerOilAmt = settleOrdersDefinition.getAccountOwnerCostSettleDetails().stream().filter(obj ->{
             return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo().equals(obj.getSourceCode());
         }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
+        
         //平台补贴油费
         int platFormAmt =0;
         //避免重复计算。
