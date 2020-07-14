@@ -5,10 +5,15 @@ import java.util.List;
 import java.util.Objects;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.transport.service.GetReturnCarCostService;
 import com.atzuche.order.transport.vo.GetReturnResponseVO;
+import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -81,6 +86,8 @@ public class DeliveryCarInfoService {
     private Integer configHours;
     @Autowired
     RenterOrderService renterOrderService;
+    @Autowired
+    private OrderStatusService orderStatusService;
 
     /**
      * 获取配送相关信息（待优化）
@@ -245,8 +252,7 @@ public class DeliveryCarInfoService {
         int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
         //车主取送信息
         ownerGetAndReturnCarDTO = deliveryCarInfoPriceService.createOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO, ownerHandoverCarInfoEntities,carEngineType,cityCode,2,oilTotalCalibration);
-        int overMileageAmt = getDeliveryCarOverMileageAmt(renterOrderDelivery,ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
-        ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(overMileageAmt)));
+
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDO = OwnerGetAndReturnCarDTO.builder().build();
         BeanUtils.copyProperties(ownerGetAndReturnCarDTO,ownerGetAndReturnCarDO);
         //租客取送信息
@@ -262,15 +268,8 @@ public class DeliveryCarInfoService {
         int renterOverMileageAmt = getDeliveryCarOverMileageAmt(renterOrderDelivery,getAndReturnCarDTO, renterGoodsDetailDTO);
         getAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(renterOverMileageAmt)));
         BeanUtils.copyProperties(getAndReturnCarDTO, renterGetAndReturnCarDTO);
-        //车主平台加油服务费carOwnerOilCrash
-        try {
-            int platFormOilServiceCharge = -deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(oilTotalCalibration,renterGoodsDetailDTO.getOrderNo());
-            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(platFormOilServiceCharge+ "元");
-        } catch (Exception e) {
-            log.info("获取平台加邮费出错,ownerGetAndReturnCarDTO:[]", JSONObject.toJSONString(ownerGetAndReturnCarDTO));
-            ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
-        }
-        renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
+
+        //renterGetAndReturnCarDTO.setCarOwnerOilCrash(renterGetAndReturnCarDTO.getOilDifferenceCrash());
         String oilDifferenceCrashs = ownerGetAndReturnCarDTO.getOilDifferenceCrash();
         try {
             ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(String.valueOf(Integer.valueOf(oilDifferenceCrashs.contains("元") ? oilDifferenceCrashs.replace("元", "") : oilDifferenceCrashs) + Integer.valueOf(ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().contains("元") ? ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge().replace("元", "") : ownerGetAndReturnCarDTO.getPlatFormOilServiceCharge())));
@@ -280,8 +279,50 @@ public class DeliveryCarInfoService {
         }
         if (isEscrowCar) {
             ownerGetAndReturnCarDTO.setCarOilDifferenceCrash(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
-            ownerGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOwnerAllOilCrash());
+            //ownerGetAndReturnCarDTO.setCarOwnerOilCrash(ownerGetAndReturnCarDTO.getCarOwnerAllOilCrash());
         }
+
+        //需求变更 http://jira.autozuche.com/browse/BASIC-1180
+        ownerGetAndReturnCarDTO.setCarOwnerType(renterGoodsDetailDTO.getCarOwnerType());
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renterGoodsDetailDTO.getOrderNo());
+        if(orderStatusEntity!=null && orderStatusEntity.getCarDepositSettleStatus()== SettleStatusEnum.SETTLED.getCode()){//已结算
+            ownerGetAndReturnCarDTO.setCarOilDifferenceCrash();
+            ownerGetAndReturnCarDTO.setCarOilServiceCharge();
+            ownerGetAndReturnCarDTO.setCarOwnerOilCrash();
+            ownerGetAndReturnCarDTO.setGetReturnCarOilSubsidy();
+            ownerGetAndReturnCarDTO.setProxyOverKNCrash();
+
+            if(ownerGetAndReturnCarDTO.getCarOwnerType()!=null && (ownerGetAndReturnCarDTO.getCarOwnerType().equals(CarOwnerTypeEnum.DZTGC.getCode())
+                    || ownerGetAndReturnCarDTO.getCarOwnerType().equals(CarOwnerTypeEnum.DGCL.getCode()))){//短租脱管车或者代官车
+
+            }else{
+
+            }
+
+            //超里程费用
+            ownerGetAndReturnCarDTO.setOverKNCrash("0");
+        }else{
+            ownerGetAndReturnCarDTO.setCarOilDifferenceCrash();
+            ownerGetAndReturnCarDTO.setCarOilServiceCharge();
+            ownerGetAndReturnCarDTO.setCarOwnerOilCrash();
+            ownerGetAndReturnCarDTO.setGetReturnCarOilSubsidy();
+            ownerGetAndReturnCarDTO.setProxyOverKNCrash();
+
+            //超里程费用
+            int overMileageAmt = getDeliveryCarOverMileageAmt(renterOrderDelivery,ownerGetAndReturnCarDTO, renterGoodsDetailDTO);
+            ownerGetAndReturnCarDTO.setOverKNCrash(String.valueOf(Math.abs(overMileageAmt)));
+            //车主平台加油服务费carOwnerOilCrash
+            try {
+                int platFormOilServiceCharge = -deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(oilTotalCalibration,renterGoodsDetailDTO.getOrderNo());
+                ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge(String.valueOf(platFormOilServiceCharge));
+            } catch (Exception e) {
+                log.info("获取平台加邮费出错,ownerGetAndReturnCarDTO:[]", JSONObject.toJSONString(ownerGetAndReturnCarDTO));
+                ownerGetAndReturnCarDTO.setPlatFormOilServiceCharge("0");
+            }
+        }
+
+
+
         deliveryCarVO.setOwnerGetAndReturnCarDTO(ownerGetAndReturnCarDTO);
         deliveryCarVO.setRenterGetAndReturnCarDTO(renterGetAndReturnCarDTO);
         return deliveryCarVO;
