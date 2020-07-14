@@ -90,7 +90,7 @@ public class OrderWzSettleSupplementHandleService {
                         settleDetail.setOrderNo(settleOrders.getOrderNo());
                         settleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
                         settleDetail.setMemNo(settleOrders.getRenterMemNo());
-                        settleDetail.setWzAmt(Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
+                        settleDetail.setWzAmt(-Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
                         settleDetail.setPrice(Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
                         settleDetail.setCostCode(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getCashNo());
                         settleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getTxt());
