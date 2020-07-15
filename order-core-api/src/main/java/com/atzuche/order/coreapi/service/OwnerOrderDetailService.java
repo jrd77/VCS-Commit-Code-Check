@@ -130,7 +130,7 @@ public class OwnerOrderDetailService {
         List<OwnerOrderIncrementDetailEntity> collect = Optional.of(ownerOrderIncrementDetailList)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode()))
+                .filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode()) || OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode()))
                 .collect(Collectors.toList());
         Integer serviceAmt = 0;
         if(collect != null && collect.size()>=1){
