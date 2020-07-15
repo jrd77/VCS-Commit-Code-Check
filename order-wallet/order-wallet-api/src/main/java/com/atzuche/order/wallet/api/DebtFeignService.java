@@ -1,7 +1,7 @@
 package com.atzuche.order.wallet.api;
 
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
-import com.autoyol.commons.utils.Page;
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -32,8 +33,8 @@ public interface DebtFeignService {
      */
     @RequestMapping(value = "debt/deduct",method = RequestMethod.POST)
     public ResponseData deductBalance(@Valid @RequestBody DeductDebtVO deductDebtVO);
-    
-    
+
+
     /**
      * 返回用户名下的欠款(区分历史欠款和订单欠款)
      * @param memNo
@@ -43,10 +44,11 @@ public interface DebtFeignService {
     public ResponseData<DebtDetailVO> getDebtDetailVO(@RequestParam("memNo")String memNo);
 
     /**
-     * 返回有欠款的用户
-     * @param req
+     * 查询用户欠款订单
+     * @param reqVO
      * @return
      */
-    @RequestMapping(value = "debt/queryNoList",method = RequestMethod.POST)
-    public ResponseData<Page> queryList(@RequestBody MemberDebtListReqDTO req);
+    @RequestMapping(value = "debt/selectMemberOrderDebtList",method = RequestMethod.POST)
+    public List<MemberOrderDebtDTO> selectMemberOrderDebtList(SearchMemberOrderDebtListReqVO reqVO);
+
 }
