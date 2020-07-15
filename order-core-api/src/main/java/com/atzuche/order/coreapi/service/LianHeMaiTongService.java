@@ -75,7 +75,7 @@ public class LianHeMaiTongService {
             BeanUtils.copyProperties(x,vo);
             vo.setIsGetCar(isGetCar);
             vo.setIsReturnCar(isReturnCar);
-            vo.setRentAmt(x.getRentAmt()==null?null:String.valueOf(x.getRentAmt()));
+            vo.setRentAmt(x.getRentAmt()==null?"0":String.valueOf(Math.abs(x.getRentAmt())));
             list.add(vo);
         });
         return list;
