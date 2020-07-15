@@ -11,7 +11,8 @@ import java.util.List;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/31 5:20 下午
  **/
-@FeignClient(name="config-service")
+//@FeignClient(name="config-service")
+@FeignClient(url = "http://localhost:1388" ,name="config-service")  //本地测试
 public interface ConfigFeignService {
 
     @GetMapping("/config/get")

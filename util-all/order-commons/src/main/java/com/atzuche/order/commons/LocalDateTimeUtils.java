@@ -421,8 +421,11 @@ public class LocalDateTimeUtils {
         return localDate.format(formatter);
     }
     
+    /**
+     * yyyy-MM-dd HH:mm:ss 
+     */
     public static String dateToStringDefault(Date date) {
-    	LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    	LocalDateTime localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_PATTERN);
         return localDate.format(formatter);
     }

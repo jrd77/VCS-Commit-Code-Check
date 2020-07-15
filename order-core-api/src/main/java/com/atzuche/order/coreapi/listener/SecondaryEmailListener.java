@@ -8,6 +8,9 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +41,7 @@ import com.dianping.cat.message.Transaction;
  */
 @Component
 public class SecondaryEmailListener {
-	private static final Logger logger = LoggerFactory.getLogger(WzSettleSuccessListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecondaryEmailListener.class);
 
 	private static final String CREATE_ORDER_QUEUE = "action.order.secondary.settlement.noOpenVir.createOrder.queue";
 	private static final String CHANGE_CAR_QUEUE = "action.order.secondary.settlement.noOpenVir.changeCar.queue";
@@ -55,7 +58,10 @@ public class SecondaryEmailListener {
     OwnerMemberService ownerMemberService;
 	
     //下单，换车，结算+违章结算
-	@RabbitListener(queues = CREATE_ORDER_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+//	@RabbitListener(queues = CREATE_ORDER_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = CREATE_ORDER_QUEUE, durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.create")
+    },containerFactory = "orderRabbitListenerContainerFactory")
 	public void processCreateOrder(Message message) {
 		//接收消息转换为对象
 		OrderSecondOpenEntity record = new OrderSecondOpenEntity();
@@ -96,7 +102,10 @@ public class SecondaryEmailListener {
 		logger.info("secondaryEmailListener process end ");
 	}
 	
-	@RabbitListener(queues = CHANGE_CAR_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+//	@RabbitListener(queues = CHANGE_CAR_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = CHANGE_CAR_QUEUE, durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.changeCar")
+    },containerFactory = "orderRabbitListenerContainerFactory")
 	public void processChangeCar(Message message) {
 		//接收消息转换为对象
 		OrderSecondOpenEntity record = new OrderSecondOpenEntity();
@@ -137,7 +146,10 @@ public class SecondaryEmailListener {
 		logger.info("secondaryEmailListener process end ");
 	}
 	
-	@RabbitListener(queues = SETTLE_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+//	@RabbitListener(queues = SETTLE_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = SETTLE_QUEUE, durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.settlement.success")
+    },containerFactory = "orderRabbitListenerContainerFactory")
 	public void processSettle(Message message) {
 		//接收消息转换为对象
 		OrderSecondOpenEntity record = new OrderSecondOpenEntity();
@@ -179,7 +191,10 @@ public class SecondaryEmailListener {
 	}
 	
 	
-	@RabbitListener(queues = WZ_SETTLE_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+//	@RabbitListener(queues = WZ_SETTLE_QUEUE, containerFactory = "rabbitListenerContainerFactory")
+    @RabbitListener(bindings = {@QueueBinding(value = @Queue(value = WZ_SETTLE_QUEUE, durable = "true"),
+            exchange = @Exchange(value = "auto-order-action", durable = "true", type = "topic"), key = "action.order.wz.settlement.success")
+    },containerFactory = "orderRabbitListenerContainerFactory")
 	public void process(Message message) {
 		//接收消息转换为对象
 		OrderSecondOpenEntity record = new OrderSecondOpenEntity();

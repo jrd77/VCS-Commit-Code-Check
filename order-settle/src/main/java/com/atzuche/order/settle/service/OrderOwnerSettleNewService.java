@@ -166,7 +166,8 @@ public class OrderOwnerSettleNewService {
      * @param settleOrdersAccount
      */
     public void insertOwnerIncomeExamine(SettleOrdersAccount settleOrdersAccount) {
-        if(settleOrdersAccount.getOwnerCostSurplusAmt()>0){
+    	//收益为0的情况，也需要记录下来。
+        if(settleOrdersAccount.getOwnerCostSurplusAmt() >= 0){
             AccountOwnerIncomeExamineReqVO accountOwnerIncomeExamine = new AccountOwnerIncomeExamineReqVO();
             BeanUtils.copyProperties(settleOrdersAccount,accountOwnerIncomeExamine);
             accountOwnerIncomeExamine.setMemNo(settleOrdersAccount.getOwnerMemNo());
