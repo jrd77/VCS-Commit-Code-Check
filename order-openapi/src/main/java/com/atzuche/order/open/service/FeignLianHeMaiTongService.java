@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name="order-center-api",url="http://localhost:1412/")
+@FeignClient(name="order-center-api")
 public interface FeignLianHeMaiTongService {
 
     @RequestMapping("/lianHeMaiTong/getOrderListByMemberNo")
