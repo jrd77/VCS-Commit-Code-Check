@@ -37,7 +37,7 @@ public class OrderSettleTest {
 //		orderSettle.settleOrder("28261181200299");
 		
 		// 57912231400299
-		orderSettle.settleOrder("29933292500299");
+		orderSettle.settleOrder("75901261700299");
 	}
 	
 	@Test
