@@ -1,7 +1,5 @@
 package com.atzuche.order.admin.controller;
 
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
-import com.atzuche.order.commons.entity.dto.MemberDebtListResDTO;
 import com.atzuche.order.open.service.FeignCashWithdrawalService;
 import com.autoyol.commons.utils.Page;
 import com.autoyol.commons.web.ResponseData;
@@ -26,12 +24,7 @@ public class AdminMemberController {
     private FeignCashWithdrawalService feignCashWithdrawalService;
 
 
-	@AutoDocMethod(description = "会员欠款查看", value = "会员欠款查看", response = MemberDebtListResDTO.class)
-	@PostMapping("/member/mmeberDebt")
-	public ResponseData walletBalance(@RequestBody MemberDebtListReqDTO req) {
-        ResponseData<Page> pageResponseData = feignCashWithdrawalService.queryList(req);
-        return pageResponseData;
-	}
+
 
 
 
