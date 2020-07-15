@@ -407,7 +407,7 @@ public class RenterCostFacadeService {
         baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         baseCostDTO.tyreInsurAmt =  abs(RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         baseCostDTO.driverInsurAmt =  abs(RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
-        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null?renterGoodsDetailDTO.getPremiumMoney():null;
+        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null?renterGoodsDetailDTO.getPremiumMoney():0;
         rentCarCostDTO.baseCostDTO = baseCostDTO;
         //1.2、优惠券抵扣
         CouponDeductionDTO couponDeductionDTO = new CouponDeductionDTO();
