@@ -154,7 +154,7 @@ public class OwnerOrderDetailService {
        }*/
         ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
         serviceDetailDTO.setCarType(CarOwnerTypeEnum.getNameByCode(ownerGoodsDetail.getCarOwnerType()));
-        serviceDetailDTO.setServiceRate(ownerGoodsDetail.getServiceRate());
+        serviceDetailDTO.setServiceRate(ownerGoodsDetail.getUseServiceRate());
         //serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
         serviceDetailDTO.setServiceAmt(serviceAmt);
         return serviceDetailDTO;
