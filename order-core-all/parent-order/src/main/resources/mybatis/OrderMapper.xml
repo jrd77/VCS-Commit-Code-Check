@@ -339,7 +339,7 @@
         WHERE oo.is_effective = 1
         AND (rm.`mem_no` = #{memNo} OR om.`mem_no` = #{memNo})
         order by o.id desc
-        limit 100
+        limit 200
     </select>
 
 </mapper>
