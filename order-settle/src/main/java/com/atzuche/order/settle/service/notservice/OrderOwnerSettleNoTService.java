@@ -854,9 +854,8 @@ public class OrderOwnerSettleNoTService {
           settleOrdersDefinition.setOwnerSubsidyAmt(ownerSubsidyAmt);
       }
       // 3 计算车主、租客交接车油费差
-      if(!com.autoyol.platformcost.CommonUtils.isEscrowCar(settleOrders.getOwnerCosts().getCarOwnerType())) {
-    	  orderOwnerSettleNewService.addPlatFormAmtSeparateOwner(settleOrdersDefinition,settleOrders);
-      }
+      orderOwnerSettleNewService.addPlatFormAmtSeparateOwner(settleOrdersDefinition,settleOrders);
+      
       
       //4 平台收益总账
       List<AccountPlatformProfitDetailEntity> accountPlatformProfitDetails = settleOrdersDefinition.getAccountPlatformProfitDetails();
