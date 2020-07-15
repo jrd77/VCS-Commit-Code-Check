@@ -64,7 +64,7 @@ public class OrderWzSettleService {
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
             // 调远程抵扣老系统历史欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getTotalWzDebtAmt());
-            orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
+            orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             
             //记录分流标识(已车主的会员号为准。) 200616
             memberSecondSettleService.initDepositWzMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));

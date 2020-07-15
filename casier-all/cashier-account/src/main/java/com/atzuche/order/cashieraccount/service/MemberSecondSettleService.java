@@ -46,6 +46,8 @@ public class MemberSecondSettleService {
                 BaseOutJB out = autoPayGatewaySecondaryService.checkMemberTestConfig(String.valueOf(memNo));
                 if (out != null) {
                     record.setIsSecondFlow(Integer.valueOf(String.valueOf(out.getData())));
+                } else {
+                	record.setIsSecondFlow(0);
                 }
             } catch (Exception e) {
                 log.error("checkMemberTestConfig error:", e);
@@ -69,6 +71,8 @@ public class MemberSecondSettleService {
                 BaseOutJB out = autoPayGatewaySecondaryService.checkMemberTestConfig(String.valueOf(memNo));
                 if (out != null) {
                     record.setIsSecondFlow(Integer.valueOf(String.valueOf(out.getData())));
+                } else {
+                	record.setIsSecondFlow(0);
                 }
             } catch (Exception e) {
                 log.error("wz checkMemberTestConfig error:", e);
@@ -97,5 +101,4 @@ public class MemberSecondSettleService {
                 OrderConstant.YES);
         return Objects.nonNull(result) && result > OrderConstant.ZERO;
     }
-
 }

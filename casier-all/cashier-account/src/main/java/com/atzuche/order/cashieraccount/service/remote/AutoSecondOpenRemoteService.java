@@ -1,21 +1,27 @@
 package com.atzuche.order.cashieraccount.service.remote;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.cashieraccount.config.CommonConfig;
-import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
-import com.atzuche.order.cashieraccount.vo.req.WithdrawalsReqVO;
-import com.atzuche.order.commons.CatConstants;
-import com.autoyol.commons.web.ResponseData;
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Transaction;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.cashieraccount.config.CommonConfig;
+import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
+import com.atzuche.order.cashieraccount.vo.req.OwnerOpenReqVO;
+import com.atzuche.order.cashieraccount.vo.req.WithdrawalsReqVO;
+import com.atzuche.order.cashieraccount.vo.res.OpenInfoStatusVO;
+import com.atzuche.order.commons.CatConstants;
+import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.commons.web.ResponseData;
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Transaction;
+
+import ch.qos.logback.classic.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author pengcheng.fu
@@ -57,6 +63,47 @@ public class AutoSecondOpenRemoteService {
             t.complete();
         }
     }
+    
+    
+    /**
+     * 验证车主是否开户
+     * @param memNo
+     * @return
+     */
+    public boolean checkOwnerIsOpenVir(String memNo) {
+        Transaction t = Cat.newTransaction(CatConstants.URL_CALL, "二清项目应用层服务");
+        try {
+            Cat.logEvent("URL.Api", "/second/open/person/owner/getOpenInfo");
+            Cat.logEvent(CatConstants.URL_PARAM, memNo);
+            
+            OwnerOpenReqVO reqVo = new OwnerOpenReqVO();
+            reqVo.setMemNo(memNo);
+            ResponseEntity<OpenInfoStatusVO> responseEntity = restTemplate.postForEntity(commonConfig.secondOpenUrl + "second/open/person/owner/getOpenInfo", reqVo, OpenInfoStatusVO.class);
 
+            t.setStatus(Transaction.SUCCESS);
+            
+            if (responseEntity == null || responseEntity.getBody() == null) {
+            	log.info("postForEntity null,params memNo=[{}]",memNo);
+                return false;
+            }else {
+            	OpenInfoStatusVO statusVo = responseEntity.getBody();
+            	log.info("postForEntity ok,result=[{}],params memNo=[{}]",GsonUtils.toJson(statusVo),memNo);
+            	//开户状态 0：未完成 1：完成
+            	if(statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 1) {
+            		return true;
+            	}else {
+            		return false;
+            	}
+            }
+      
+        } catch (Exception e) {
+            t.setStatus(e);
+            Cat.logError("Invoke /second/open/person/owner/getOpenInfo err.", e);
+            log.error("Invoke /second/open/person/owner/getOpenInfo err.", e);
+            throw new WithdrawalAmtException("上海银行获取是否开户失败");
+        } finally {
+            t.complete();
+        }
+    }
 
 }
