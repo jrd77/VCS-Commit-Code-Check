@@ -3,11 +3,13 @@ package com.atzuche.order.coreapi.listener;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.coreapi.entity.mq.OwnerIncomeAmtNoticeMq;
+import com.atzuche.order.coreapi.service.mq.SecondaryOwnerIncomeToAccountNoticeHandleService;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +24,9 @@ import org.springframework.stereotype.Component;
 @RabbitListener(queues = "auto.send.owner.income.toAccount.notice.queue", containerFactory = "rabbitListenerContainerFactory")
 public class SecondaryOwnerIncomeToAccountNoticeListener {
 
+    @Autowired
+    private SecondaryOwnerIncomeToAccountNoticeHandleService secondaryOwnerIncomeToAccountNoticeHandleService;
+
     @RabbitHandler
     public void noticeHandle(String message) {
         log.info("Owner income to account notice. context is, message:[{}]", message);
@@ -31,8 +36,7 @@ public class SecondaryOwnerIncomeToAccountNoticeListener {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "SecondaryOwnerIncomeToAccountNoticeListener.noticeHandle");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, message);
             OwnerIncomeAmtNoticeMq noticeMq = JSON.parseObject(message, OwnerIncomeAmtNoticeMq.class);
-
-
+            secondaryOwnerIncomeToAccountNoticeHandleService.process(noticeMq);
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             t.setStatus(e);
