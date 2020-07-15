@@ -109,15 +109,15 @@ public class DeliveryOrderService {
         RenterOwnerSummarySectionDeliveryVO summary = getRenterOwnerSummarySectionDeliveryVO(renterOrderEntity, deliveryCarVO);
         deliveryCarVO.setSectionDelivery(summary);
         // 获取商品信息
-        RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-        if (carInfo.getCarAddrIndex() == null || carInfo.getCarAddrIndex().intValue() == 0) {
+        //RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex().intValue() == 0) {
         	// 非虚拟地址
         	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
         	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
         } else {
         	// 虚拟地址
-        	deliveryCarVO.setGetCarShowAddr(carInfo.getCarShowAddr());
-        	deliveryCarVO.setReturnCarShowAddr(carInfo.getCarShowAddr());
+        	deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+        	deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
         }
         return deliveryCarVO;
     }
