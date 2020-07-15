@@ -91,7 +91,8 @@ public class SecondaryOwnerWithdrawalsNoticeHandleService {
         }
         record.setErrTxt(noticeMq.getTranStatus());
         record.setErrCode(noticeMq.getTranMeg());
-        accountOwnerCashExamineHandleService.updateAccountOwnerCashExamine(record);
+        int result = accountOwnerCashExamineHandleService.updateAccountOwnerCashExamine(record);
+        log.info("result:[{}]", result);
     }
 
 }
