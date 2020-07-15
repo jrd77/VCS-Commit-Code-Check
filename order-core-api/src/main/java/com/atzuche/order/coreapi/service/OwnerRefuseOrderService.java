@@ -253,6 +253,8 @@ public class OwnerRefuseOrderService {
         record.setReqAcceptTime(LocalDateTime.now());
         record.setAgreeFlag(OwnerAgreeTypeEnum.REFUSE.getCode());
         renterOrderService.updateRenterOrderInfo(record);
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
         //更新车主拒单理由
         ownerOrderService.updateDispatchReasonByOrderNo(orderNo, DispatcherReasonEnum.owner_refuse);
@@ -267,6 +269,9 @@ public class OwnerRefuseOrderService {
         orderCancelReasonEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
         orderCancelReasonEntity.setCancelReqTime(LocalDateTime.now());
         orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
+        
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
 
         //撤销优惠券

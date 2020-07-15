@@ -128,11 +128,15 @@ public class PlatformCancelOrderHandleService {
             orderStatusDTO.setIsDispatch(OrderConstant.NO);
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.NOT_DISPATCH.getCode());
             renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         }
         //订单状态变更处理
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(orderNo, OwnerChildStatusEnum.END.getCode());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         //取消信息处理(order_cancel_reason)
         OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(orderNo,
                 cancelReasonEnum.getCode()+":"+cancelReasonEnum.getName());

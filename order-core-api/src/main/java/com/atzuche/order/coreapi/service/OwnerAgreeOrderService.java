@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.atzuche.order.coreapi.filter.StockFilter;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.OrderPayStatusEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.OwnerAgreeTypeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
@@ -29,6 +32,7 @@ import com.atzuche.order.commons.vo.req.AgreeOrderReqVO;
 import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -90,6 +94,8 @@ public class OwnerAgreeOrderService {
     private CashierPayService cashierPayService;
     @Autowired
     private OrderSourceStatService orderSourceStatService;
+    @Autowired
+    private DeliveryCarService deliveryCarService;
 
 
     /**
@@ -108,16 +114,31 @@ public class OwnerAgreeOrderService {
         OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo(), ownerOrderEntity);
         stockService.cutCarStock(orderInfoDTO);
 
-
+        // 加锁
+     	OrderStatusEntity orderStatusEntity = orderStatusService.getOrderStatusForUpdate(reqVO.getOrderNo());
+     	//以参数的为准。
+        Integer rentCarPayStatus = orderStatusEntity.getRentCarPayStatus();
+        Integer depositPayStatus = orderStatusEntity.getDepositPayStatus();
+        Integer wzPayStatus = orderStatusEntity.getWzPayStatus();
+        OrderStatusEnum orderStatusEnum = OrderStatusEnum.TO_PAY;
+        if((Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus)&&
+            ( Objects.nonNull(depositPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == depositPayStatus )&&
+            (Objects.nonNull(wzPayStatus)  && OrderPayStatusEnum.PAYED.getStatus() == wzPayStatus)) {
+        	// 已支付到待取车
+        	orderStatusEnum = OrderStatusEnum.TO_GET_CAR;
+        }
         //变更订单状态
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
-        orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
+        orderStatusDTO.setStatus(orderStatusEnum.getStatus());
         orderStatusDTO.setUpdateOp(reqVO.getOperatorName());
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
+        
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
 
         //添加order_flow记录
-        orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), OrderStatusEnum.TO_PAY);
+        orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), orderStatusEnum);
         //更新租客订单车主同意信息
         RenterOrderEntity renterOrderEntity =
                 renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
@@ -127,7 +148,7 @@ public class OwnerAgreeOrderService {
         record.setReqAcceptTime(LocalDateTime.now());
         record.setAgreeFlag(OwnerAgreeTypeEnum.ARGEE.getCode());
         renterOrderService.updateRenterOrderInfo(record);
-
+        
         //自动拒绝时间相交的订单
         agreeOrderConflictInfoHandle(reqVO.getOrderNo(), String.valueOf(orderInfoDTO.getCarNo()),
                 renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
@@ -136,6 +157,10 @@ public class OwnerAgreeOrderService {
         orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo());
         orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
         
+        if (Objects.nonNull(rentCarPayStatus) && OrderPayStatusEnum.PAYED.getStatus() == rentCarPayStatus) {
+        	// 现在车主接单和租客支付分离，需要车主同意并且已支付租车费用才发送仁云
+            deliveryCarService.sendDataMessageToRenYun(renterOrderEntity.getRenterOrderNo());
+        }
         //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
        OrderPaySignReqVO vo = null;
        try {
