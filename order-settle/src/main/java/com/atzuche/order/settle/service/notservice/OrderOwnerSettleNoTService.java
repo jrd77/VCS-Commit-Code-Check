@@ -138,7 +138,7 @@ public class OrderOwnerSettleNoTService {
 	
 	public void settleOrderFirstSeparateOwner(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
         //3 查询所有车主费用明细 TODO 暂不支持 多个车主
-        this.getOwnerCostSettleDetail(settleOrders);
+        this.getOwnerCostSettleDetail(settleOrders,"settle");//pre 预算 settle 结算
         Cat.logEvent("getOwnerCostSettleDetail",GsonUtils.toJson(settleOrders));
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
@@ -186,8 +186,9 @@ public class OrderOwnerSettleNoTService {
 	/**
      * 查询车主费用明细
      * @param settleOrders
+     * //preOrSettle  -> pre 预算  ,settle 结算
      */
-    public void getOwnerCostSettleDetail(SettleOrders settleOrders) {
+    public void getOwnerCostSettleDetail(SettleOrders settleOrders,String preOrSettle) {
         OwnerCosts ownerCosts = new OwnerCosts();
         // 车主收益
         int ownerIncomeAmt = 0;
@@ -226,13 +227,17 @@ public class OrderOwnerSettleNoTService {
         }
         int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
-
-
-        Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x)).findFirst();
-        if(proxyServiceAmt.isPresent()){
-            Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
-            ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+        if("pre".equals(preOrSettle)){
+            Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                    .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x)).findFirst();
+            if(proxyServiceAmt.isPresent()){
+                Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
+                ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+            }
+        }else if("settle".equals(preOrSettle)){
+            if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
+                ownerIncomeAmt += -proxyExpense.getTotalAmount();
+            }
         }
 
         //3 获取车主补贴明细列表
@@ -249,18 +254,19 @@ public class OrderOwnerSettleNoTService {
         }
         int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt+rentAmtSubsidy,serviceProportion);
-        if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
-        	ownerIncomeAmt += -serviceExpense.getTotalAmount();
+
+        if("pre".equals(preOrSettle)){//预算
+            Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                    .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x)).findFirst();
+            if(platformServiceAmt.isPresent()){
+                Integer totalAmount = platformServiceAmt.get().getTotalAmount();
+                ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+            }
+        }else if("settle".equals(preOrSettle)){//结算
+            if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
+                ownerIncomeAmt += -serviceExpense.getTotalAmount();
+            }
         }
-        Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x)).findFirst();
-        if(platformServiceAmt.isPresent()){
-            Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
-            ownerIncomeAmt += totalAmount ==null?0:totalAmount;
-        }
-
-
-
         //5 获取车主增值服务费用列表
 
         if (ownerOrderIncrementDetail != null) {
