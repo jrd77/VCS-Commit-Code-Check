@@ -13,7 +13,6 @@ import lombok.ToString;
  *
  */
 @Data
-@ToString
 public class OrderSecondOpenEntity implements Serializable{
 	/**
 	 * 
@@ -84,6 +83,13 @@ public class OrderSecondOpenEntity implements Serializable{
 	 * 扩展字段5
 	 */
 	private String ext5;
+	
+	@Override
+	public String toString() {
+		return carNo + "\t" + plateNum + "\t"
+				+ carOwnerType + "\t" + ownerPhone + "\t" + orderNo + "\t" + rentTime
+				+ "\t" + revertTime + "\t" + savePoint + "\t" + ownerNo;
+	}
 	
 	
 }

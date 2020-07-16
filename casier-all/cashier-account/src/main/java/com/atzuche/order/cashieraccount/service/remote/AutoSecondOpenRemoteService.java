@@ -1,5 +1,7 @@
 package com.atzuche.order.cashieraccount.service.remote;
 
+import java.lang.reflect.Type;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,8 @@ import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
 import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
@@ -78,15 +82,19 @@ public class AutoSecondOpenRemoteService {
             
             OwnerOpenReqVO reqVo = new OwnerOpenReqVO();
             reqVo.setMemNo(memNo);
-            ResponseEntity<OpenInfoStatusVO> responseEntity = restTemplate.postForEntity(commonConfig.secondOpenUrl + "second/open/person/owner/getOpenInfo", reqVo, OpenInfoStatusVO.class);
-
+            String json = restTemplate.postForObject(commonConfig.secondOpenUrl + "second/open/person/owner/getOpenInfo", reqVo, String.class);
+            
             t.setStatus(Transaction.SUCCESS);
             
-            if (responseEntity == null || responseEntity.getBody() == null) {
+            //定义类型
+            Type type = new TypeToken<ResponseData<OpenInfoStatusVO>>() {}.getType();
+            ResponseData<OpenInfoStatusVO> responseEntity = new Gson().fromJson(json, type);
+            
+            if (responseEntity == null || responseEntity.getData() == null) {
             	log.info("postForEntity null,params memNo=[{}]",memNo);
                 return false;
             }else {
-            	OpenInfoStatusVO statusVo = responseEntity.getBody();
+            	OpenInfoStatusVO statusVo = responseEntity.getData();
             	log.info("postForEntity ok,result=[{}],params memNo=[{}]",GsonUtils.toJson(statusVo),memNo);
             	//开户状态 0：未完成 1：完成
             	if(statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 1) {

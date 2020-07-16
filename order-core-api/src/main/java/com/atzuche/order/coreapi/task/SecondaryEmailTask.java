@@ -73,6 +73,7 @@ public class SecondaryEmailTask extends IJobHandler {
             //组装内容
             List<OrderSecondOpenEntity> list = orderSecondOpenService.query();
             if(list != null && list.size() > 0) {
+            	content.append("车辆号\t车牌\t车辆类型\t手机号码\t订单号\t起租时间\t还车时间\t触发点\t车主会员号\n");
             	//获取文本字符串
             	list.stream().forEach(x -> get(x,content));
 	            //发送邮件
