@@ -292,11 +292,14 @@ public class OrderOwnerSettleNoTService {
         }
         //7 获取车主油费 //（不含超里程）
         DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(settleOrders.getOrderNo(),ownerGoodsDetail.getCarEngineType());
+        log.info("oil-start--getOwnerCostSettleDetail.deliveryOilCostVO={}",JSON.toJSONString(deliveryOilCostVO));
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostVO.getOwnerGetAndReturnCarDTO();
         if (ownerGetAndReturnCarDTO != null) {
         	int oilDifferenceCrash = StringUtils.isBlank(ownerGetAndReturnCarDTO.getOilDifferenceCrash()) ? 0:Integer.valueOf(ownerGetAndReturnCarDTO.getOilDifferenceCrash());
         	ownerIncomeAmt += oilDifferenceCrash;
+        	log.info("oil-start-getOwnerCostSettleDetail.deliveryOilCostVO.oilDifferenceCrash={}",ownerIncomeAmt);
         }
+        log.info("oil-start-getOwnerCostSettleDetail.deliveryOilCostVO.oilDifferenceCrash={},deliveryOilCostVO={}",ownerIncomeAmt,JSON.toJSONString(deliveryOilCostVO));
         //8 管理后台补贴 （租客车主共用表 ，会员号区分车主/租客）
         List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
         if (orderConsoleSubsidyDetails != null) {
@@ -498,7 +501,9 @@ public class OrderOwnerSettleNoTService {
         }
         //1.6 获取车主油费
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = ownerCosts.getOwnerGetAndReturnCarDTO();
+        log.info("oil-start-ownerGetAndReturnCarDTO={}",JSON.toJSONString(ownerGetAndReturnCarDTO));
         if(Objects.nonNull(ownerGetAndReturnCarDTO) && !StringUtil.isBlank(ownerGetAndReturnCarDTO.getOilDifferenceCrash())){
+            log.info("oil-start-ownerGetAndReturnCarDTO.getOilDifferenceCrash()={}",JSON.toJSONString(ownerGetAndReturnCarDTO.getOilDifferenceCrash()));
         	 //油费  油量差价
             String carOilDifferenceCrash = ownerGetAndReturnCarDTO.getOilDifferenceCrash();
         	if(com.autoyol.platformcost.CommonUtils.isEscrowCar(ownerCosts.getCarOwnerType())) {
@@ -511,7 +516,7 @@ public class OrderOwnerSettleNoTService {
 	            //取正数
 	            entity.setAmt(Integer.valueOf(carOilDifferenceCrash)); //已经是正数
 	            settleOrdersDefinition.addPlatformProfit(entity);
-	            
+                log.info("oil-start-settleOrdersDefinition={}",JSON.toJSONString(settleOrdersDefinition));
         	}else {
 	            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
 	            BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
@@ -523,6 +528,7 @@ public class OrderOwnerSettleNoTService {
 	            accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
 	            accountOwnerCostSettleDetail.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
 	            accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
+                log.info("oil-start-accountOwnerCostSettleDetails={}",JSON.toJSONString(accountOwnerCostSettleDetails));
         	}
         	
             //超里程  -->1.13
