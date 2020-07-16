@@ -81,6 +81,8 @@ public class CommonUtils {
 	private static final int CARPURCHASEPRICE_200000 = 200000;
 	private static final int CARPURCHASEPRICE_300000 = 400000;
 	
+	public static final int CAR_LEVEL_SPORTS_CAR = 22;
+	
     /**
                * 初始化补充保障服务费单价配置
      */
@@ -635,7 +637,7 @@ public class CommonUtils {
 	 * @param labelIds 车辆标签
 	 * @return Double
 	 */
-	public static Double getEasyCoefficient(List<String> labelIds) {
+	public static Double getEasyCoefficient(List<String> labelIds, Integer carLevel) {
 		Double easyCoefficient = EASYCOEFFICIENT_INIT;
 		if (labelIds == null || labelIds.isEmpty()) {
 			return EASYCOEFFICIENT_INIT;
@@ -646,6 +648,10 @@ public class CommonUtils {
 				easyCoefficient = EASYCOEFFICIENT_NOVICE;
 				break;
 			}
+		}
+		if (carLevel != null && carLevel.intValue() == CAR_LEVEL_SPORTS_CAR) {
+			// 跑车
+			easyCoefficient = EASYCOEFFICIENT_NOVICE;
 		}
 		return easyCoefficient;
 	}

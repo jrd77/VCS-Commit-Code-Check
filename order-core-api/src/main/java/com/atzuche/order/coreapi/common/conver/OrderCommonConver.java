@@ -118,6 +118,7 @@ public class OrderCommonConver {
         renterOrderReqVO.setAutoReplyFlag(RenterOrderService.isAutoReplyFlag(reqContext.getOrderReqVO().getRentTime(),goodsDetail.getAdvanceOrderTime(),goodsDetail.getReplyFlag()));
         renterOrderReqVO.setOrderCategory(orderReqVO.getOrderCategory());
         renterOrderReqVO.setDriverScore(renterMember.getDriverScore());
+        renterOrderReqVO.setCarLevel(goodsDetail.getCarLevel());
         logger.info("Build renter order reqVO,result is ,renterOrderReqVO:[{}]",
                 JSON.toJSONString(renterOrderReqVO));
         return renterOrderReqVO;

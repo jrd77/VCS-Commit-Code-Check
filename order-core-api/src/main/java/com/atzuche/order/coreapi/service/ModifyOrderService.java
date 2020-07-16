@@ -1519,6 +1519,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderReqVO.setDriverScore(renterMemberDTO.getDriverScore());
 		renterOrderReqVO.setDistributionMode(modifyOrderDTO.getDistributionMode());
+		renterOrderReqVO.setCarLevel(renterGoodsDetailDTO.getCarLevel());
 		return renterOrderReqVO;
 	}
 	

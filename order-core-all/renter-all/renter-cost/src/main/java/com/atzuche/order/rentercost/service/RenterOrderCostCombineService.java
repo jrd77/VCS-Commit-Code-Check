@@ -345,7 +345,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -387,7 +387,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(abatementAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(abatementAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(abatementAmtDTO.getCarLabelIds(), abatementAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(abatementAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -429,7 +429,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -471,15 +471,15 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		// 车辆座位数
 		int seatNum = insurAmtDTO.getSeatNum() == null ? 0:insurAmtDTO.getSeatNum().intValue();
 		Integer driverPrice = null;
-		if (seatNum == 5) {
+		if (seatNum == 5 || seatNum == 2 || seatNum == 4) {
 			driverPrice = driverFiveSeatsPrice;
-		} else if (seatNum == 7) {
+		} else if (seatNum == 7 || seatNum == 6) {
 			driverPrice = driverSevenSeatsPrice;
 		}
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 

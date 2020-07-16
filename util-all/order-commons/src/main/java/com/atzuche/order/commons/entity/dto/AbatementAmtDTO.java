@@ -45,4 +45,8 @@ public class AbatementAmtDTO {
 	 * 驾驶行为评分
 	 */
 	private String driverScore;
+	/**
+	 * 车辆等级
+	 */
+	private Integer carLevel;
 }
