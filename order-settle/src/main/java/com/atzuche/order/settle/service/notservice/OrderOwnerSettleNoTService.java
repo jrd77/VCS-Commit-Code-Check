@@ -5,6 +5,7 @@ package com.atzuche.order.settle.service.notservice;
 
 import java.util.*;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,12 +230,15 @@ public class OrderOwnerSettleNoTService {
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
         if("pre".equals(preOrSettle)){
             Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                    .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x)).findFirst();
+                    .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
+            log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyServiceAmt));
             if(proxyServiceAmt.isPresent()){
                 Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
                 ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+                proxyExpense.setTotalAmount(-totalAmount);
             }
         }else if("settle".equals(preOrSettle)){
+            log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyExpense));
             if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -proxyExpense.getTotalAmount();
             }
@@ -257,14 +261,18 @@ public class OrderOwnerSettleNoTService {
 
         if("pre".equals(preOrSettle)){//预算取表数据
             Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                    .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x)).findFirst();
+                    .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
+            log.info("平台服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(platformServiceAmt));
             if(platformServiceAmt.isPresent()){
                 Integer totalAmount = platformServiceAmt.get().getTotalAmount();
                 ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+                serviceExpense.setTotalAmount(-totalAmount);
             }
         }else if("settle".equals(preOrSettle)){//结算实时算
+            log.info("平台服务费，结算获取服务费platformServiceAmt={}", JSON.toJSONString(serviceExpense));
             if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -serviceExpense.getTotalAmount();
+
             }
         }
         //5 获取车主增值服务费用列表
