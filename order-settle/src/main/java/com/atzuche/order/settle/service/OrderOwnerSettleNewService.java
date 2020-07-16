@@ -206,7 +206,10 @@ public class OrderOwnerSettleNewService {
         }).mapToInt(AccountOwnerCostSettleDetailEntity::getAmt).sum();
         
         //平台补贴油费
-        int platFormAmt =0;
+        int platFormAmt = settleOrdersDefinition.getAccountPlatformProfitDetails().stream().filter(obj ->{
+            return OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST_PROXY.getCashNo().equals(obj.getSourceCode());
+        }).mapToInt(AccountPlatformProfitDetailEntity::getAmt).sum();
+        
         //避免重复计算。
 //        if(!CollectionUtils.isEmpty(settleOrdersDefinition.getAccountPlatformSubsidyDetails())){
 //            platFormAmt = settleOrdersDefinition.getAccountPlatformSubsidyDetails().stream().filter(obj ->{
