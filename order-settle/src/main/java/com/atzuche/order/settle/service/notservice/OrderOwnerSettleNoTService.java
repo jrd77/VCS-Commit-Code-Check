@@ -517,18 +517,19 @@ public class OrderOwnerSettleNoTService {
 	            entity.setAmt(Integer.valueOf(carOilDifferenceCrash)); //已经是正数
 	            settleOrdersDefinition.addPlatformProfit(entity);
                 log.info("oil-start-settleOrdersDefinition={}",JSON.toJSONString(settleOrdersDefinition));
-        	}
-            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
-            BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
-            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo());
-            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getTxt());
+        	}else {
+	            AccountOwnerCostSettleDetailEntity accountOwnerCostSettleDetail = new AccountOwnerCostSettleDetailEntity();
+	            BeanUtils.copyProperties(ownerGetAndReturnCarDTO,accountOwnerCostSettleDetail);
+	            accountOwnerCostSettleDetail.setSourceCode(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getCashNo());
+	            accountOwnerCostSettleDetail.setSourceDetail(OwnerCashCodeEnum.ACCOUNT_OWNER_SETTLE_OIL_COST.getTxt());
 
-            accountOwnerCostSettleDetail.setAmt(Integer.valueOf(carOilDifferenceCrash));
-            accountOwnerCostSettleDetail.setMemNo(settleOrders.getOwnerMemNo());
-            accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
-            accountOwnerCostSettleDetail.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
-            accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
-            log.info("oil-start-accountOwnerCostSettleDetails={}",JSON.toJSONString(accountOwnerCostSettleDetails));
+	            accountOwnerCostSettleDetail.setAmt(Integer.valueOf(carOilDifferenceCrash));
+	            accountOwnerCostSettleDetail.setMemNo(settleOrders.getOwnerMemNo());
+	            accountOwnerCostSettleDetail.setOrderNo(settleOrders.getOrderNo());
+	            accountOwnerCostSettleDetail.setOwnerOrderNo(settleOrders.getOwnerOrderNo());
+	            accountOwnerCostSettleDetails.add(accountOwnerCostSettleDetail);
+                log.info("oil-start-accountOwnerCostSettleDetails={}",JSON.toJSONString(accountOwnerCostSettleDetails));
+        	}
 
             //超里程  -->1.13
             
