@@ -736,6 +736,7 @@ public class ModifyOrderService {
 		if (StringUtils.isBlank(modifyOrderReq.getPlatformCouponId())) {
 			modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
 		}
+		modifyOrderDTO.setInitDeliveryMode(mode);
 		modifyOrderDTO.setChangeItemList(ModifyOrderUtils.listOrderChangeItemDTO(renterOrderNo, initRenterOrder, modifyOrderReq, orderCouponList, deliveryMap));
 		return modifyOrderDTO;
 	}
@@ -1678,7 +1679,20 @@ public class ModifyOrderService {
 		orderReqVO.setSrvGetFlag(modifyOrderDTO.getSrvGetFlag());
 		orderReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
 		orderReqVO.setCityCode(modifyOrderDTO.getCityCode());
-		submitOrderService.saveSectionDelivery(orderReqVO, modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo());
+		RenterOrderDeliveryMode mode = modifyOrderDTO.getInitDeliveryMode();
+		if (mode != null) {
+			List<String> changeItemList = modifyOrderConfirmService.listChangeCode(modifyOrderDTO.getChangeItemList());
+			if (changeItemList != null && changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())) {
+				mode.setRenterProposalGetTime(null);
+				mode.setOwnerProposalGetTime(null);
+			}
+			if (changeItemList != null && changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+				mode.setRenterProposalReturnTime(null);
+				mode.setOwnerProposalReturnTime(null);
+			}
+			
+		}
+		submitOrderService.saveSectionDelivery(orderReqVO, modifyOrderDTO.getOrderNo(), modifyOrderDTO.getRenterOrderNo(),mode);
 	}
 	
 }
