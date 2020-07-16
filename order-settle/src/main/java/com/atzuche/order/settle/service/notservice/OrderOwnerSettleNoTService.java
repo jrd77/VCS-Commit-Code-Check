@@ -255,14 +255,14 @@ public class OrderOwnerSettleNoTService {
         int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt+rentAmtSubsidy,serviceProportion);
 
-        if("pre".equals(preOrSettle)){//预算
+        if("pre".equals(preOrSettle)){//预算取表数据
             Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
                     .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x)).findFirst();
             if(platformServiceAmt.isPresent()){
                 Integer totalAmount = platformServiceAmt.get().getTotalAmount();
                 ownerIncomeAmt += totalAmount ==null?0:totalAmount;
             }
-        }else if("settle".equals(preOrSettle)){//结算
+        }else if("settle".equals(preOrSettle)){//结算实时算
             if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -serviceExpense.getTotalAmount();
             }
