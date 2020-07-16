@@ -21,30 +21,30 @@ import org.springframework.stereotype.Component;
  * @author pengcheng.fu
  * @date 2020/7/9 15:34
  */
-//@Component
-//@Slf4j
-//@RabbitListener(queues = "auto.send.withdrawals.notice.queue", containerFactory = "rabbitListenerContainerFactory")
-//public class SecondaryOwnerWithdrawalsNoticeListener {
-//
-//    @Autowired
-//    private SecondaryOwnerWithdrawalsNoticeHandleService secondaryOwnerWithdrawalsNoticeHandleService;
-//
-//    @RabbitHandler
-//    public void noticeHandle(String message) {
-//        log.info("Owner withdrawals notice. context is, message:[{}]", message);
-//        Transaction t = Cat.newTransaction(CatConstants.RABBIT_MQ_CALL, "上海银行二清提现操作结果通知处理MQ");
-//        try {
-//            Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "SecondaryOwnerWithdrawalsNoticeListener.noticeHandle");
-//            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, message);
-//            WithdrawalsNoticeMq noticeMq = JSON.parseObject(message, WithdrawalsNoticeMq.class);
-//            secondaryOwnerWithdrawalsNoticeHandleService.process(noticeMq);
-//            t.setStatus(Transaction.SUCCESS);
-//        } catch (Exception e) {
-//            t.setStatus(e);
-//            log.error("Owner withdrawals notice. handle err. message:[{}]", message, e);
-//            Cat.logError("Owner withdrawals notice. handle err. message:" + message, e);
-//        } finally {
-//            t.complete();
-//        }
-//    }
-//}
+@Component
+@Slf4j
+@RabbitListener(queues = "auto.send.withdrawals.notice.queue", containerFactory = "rabbitListenerContainerFactory")
+public class SecondaryOwnerWithdrawalsNoticeListener {
+
+    @Autowired
+    private SecondaryOwnerWithdrawalsNoticeHandleService secondaryOwnerWithdrawalsNoticeHandleService;
+
+    @RabbitHandler
+    public void noticeHandle(String message) {
+        log.info("Owner withdrawals notice. context is, message:[{}]", message);
+        Transaction t = Cat.newTransaction(CatConstants.RABBIT_MQ_CALL, "上海银行二清提现操作结果通知处理MQ");
+        try {
+            Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "SecondaryOwnerWithdrawalsNoticeListener.noticeHandle");
+            Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, message);
+            WithdrawalsNoticeMq noticeMq = JSON.parseObject(message, WithdrawalsNoticeMq.class);
+            secondaryOwnerWithdrawalsNoticeHandleService.process(noticeMq);
+            t.setStatus(Transaction.SUCCESS);
+        } catch (Exception e) {
+            t.setStatus(e);
+            log.error("Owner withdrawals notice. handle err. message:[{}]", message, e);
+            Cat.logError("Owner withdrawals notice. handle err. message:" + message, e);
+        } finally {
+            t.complete();
+        }
+    }
+}

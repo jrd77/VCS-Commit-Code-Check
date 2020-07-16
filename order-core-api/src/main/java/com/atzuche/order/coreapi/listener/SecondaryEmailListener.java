@@ -268,10 +268,7 @@ public class SecondaryEmailListener {
 		}
 		
 		//对数据的处理。
-//		boolean isOpenVir = autoSecondOpenRemoteService.checkOwnerIsOpenVir(record.getOwnerNo());
-		
-		//仅仅测试
-		boolean isOpenVir = false;
+		boolean isOpenVir = autoSecondOpenRemoteService.checkOwnerIsOpenVir(record.getOwnerNo());
 		int isOpenVirInt = isOpenVir?1:0;
 		record.setIsOpenVir(isOpenVirInt);
 		orderSecondOpenService.insert(record);
