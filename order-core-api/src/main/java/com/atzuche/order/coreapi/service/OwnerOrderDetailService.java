@@ -130,7 +130,7 @@ public class OwnerOrderDetailService {
         List<OwnerOrderIncrementDetailEntity> collect = Optional.of(ownerOrderIncrementDetailList)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode()))
+                .filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode()) || OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode()))
                 .collect(Collectors.toList());
         Integer serviceAmt = 0;
         if(collect != null && collect.size()>=1){
@@ -154,7 +154,7 @@ public class OwnerOrderDetailService {
        }*/
         ServiceDetailDTO serviceDetailDTO = new ServiceDetailDTO();
         serviceDetailDTO.setCarType(CarOwnerTypeEnum.getNameByCode(ownerGoodsDetail.getCarOwnerType()));
-        serviceDetailDTO.setServiceRate(ownerGoodsDetail.getServiceRate());
+        serviceDetailDTO.setServiceRate(ownerGoodsDetail.getUseServiceRate());
         //serviceDetailDTO.setServiceAmt(proxyExpenseTotalAmount + serviceExpenseTotalAmount);
         serviceDetailDTO.setServiceAmt(serviceAmt);
         return serviceDetailDTO;
