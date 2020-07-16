@@ -719,6 +719,7 @@ public class ModifyOrderService {
 				modifyOrderDTO.setDistributionMode(mode.getDistributionMode());
 			}
 			initRenterOrder.setDistributionMode(mode == null ? null:mode.getDistributionMode());
+			modifyOrderDTO.setInitDeliveryMode(mode);
 		}
 		// 获取修改前租客使用的优惠券列表
 		List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(initRenterOrder.getRenterOrderNo());
@@ -742,7 +743,6 @@ public class ModifyOrderService {
 		if (StringUtils.isBlank(modifyOrderReq.getPlatformCouponId())) {
 			modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
 		}
-		modifyOrderDTO.setInitDeliveryMode(mode);
 		modifyOrderDTO.setChangeItemList(ModifyOrderUtils.listOrderChangeItemDTO(renterOrderNo, initRenterOrder, modifyOrderReq, orderCouponList, deliveryMap));
 		return modifyOrderDTO;
 	}
