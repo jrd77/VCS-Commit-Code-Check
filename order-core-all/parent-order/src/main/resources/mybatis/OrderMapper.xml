@@ -315,7 +315,7 @@
         o.exp_rent_time AS expRentTime,
         o.exp_revert_time  AS expRevertTime,
         o.req_time AS reqTime,
-        o.rent_city AS rentCity,
+        o.city_name AS rentCity,
         oo.show_rent_time AS showRentTime,
         oo.show_revert_time AS showRevertTime,
         oss.category AS category,
