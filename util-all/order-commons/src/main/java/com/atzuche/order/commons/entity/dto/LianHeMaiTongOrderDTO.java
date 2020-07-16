@@ -27,7 +27,7 @@ public class LianHeMaiTongOrderDTO {
     private String carPlateNum;
     @AutoDocProperty("车型")
     private String carTypeTxt;
-    @AutoDocProperty("取车城市")
+    @AutoDocProperty("下单城市")
     private String rentCity;
     @AutoDocProperty("租客租金")
     private Integer rentAmt;
