@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.config;
 
+import com.atzuche.order.coreapi.common.RabbitConstants;
 import com.atzuche.order.coreapi.enums.RabbitMqEnums;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -258,5 +259,80 @@ public class RabbitConfiguration {
 	public Binding orderWzSettlementFailBind() {
 		return BindingBuilder.bind(orderWzSettlementFailQueue()).to(orderWzSettlementFailExchange()).with(RabbitMqEnums.ORDER_WZ_SETTLEMENT_FAIL.getRoutingKey());
 	}
+
+
+
+    /**
+     * 配置交换机实例
+     *
+     * @return DirectExchange
+     */
+    @Bean
+    public DirectExchange directExchange() {
+        return new DirectExchange(RabbitConstants.SEND_SECONDARY_NOTICE_EXCHANGE);
+    }
+
+    /**
+     * 配置队列实例(影像资料审核)
+     *
+     * @return Queue
+     */
+    @Bean
+    public Queue impactDataAuditNoticeQueue() {
+        return new Queue(RabbitConstants.SEND_IMPACT_DATA_AUDIT_NOTICE_QUEUE);
+    }
+
+    /**
+     * 将队列绑定到交换机上，并设置消息分发的路由键
+     *
+     * @return Binding
+     */
+    @Bean
+    public Binding impactDataAuditNoticeBinding() {
+        //链式写法: 用指定的路由键将队列绑定到交换机
+        return BindingBuilder.bind(impactDataAuditNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_IMPACT_DATA_AUDIT_NOTICE_ROUTEKEY);
+    }
+
+    /**
+     * 配置队列实例(提现结果通知)
+     *
+     * @return Queue
+     */
+    @Bean
+    public Queue withdrawalsNoticeQueue() {
+        return new Queue(RabbitConstants.SEND_WITHDRAWALS_NOTICE_QUEUE);
+    }
+
+    /**
+     * 将队列绑定到交换机上，并设置消息分发的路由键
+     *
+     * @return Binding
+     */
+    @Bean
+    public Binding withdrawalsNoticeBinding() {
+        //链式写法: 用指定的路由键将队列绑定到交换机
+        return BindingBuilder.bind(withdrawalsNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_WITHDRAWALS_NOTICE_ROUTEKEY);
+    }
+
+    /**
+     * 配置队列实例(收益到账通知)
+     *
+     * @return Queue
+     */
+    @Bean
+    public Queue incomeToAccountNoticeQueue() {
+        return new Queue(RabbitConstants.SEND_INCOMEAMT_TOACCOUNT_NOTICE_QUEUE);
+    }
+
+    /**
+     * 将队列绑定到交换机上，并设置消息分发的路由键
+     *
+     * @return Binding
+     */
+    @Bean
+    public Binding incomeToAccountNoticeBinding() {
+        //链式写法: 用指定的路由键将队列绑定到交换机
+        return BindingBuilder.bind(incomeToAccountNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_INCOMEAMT_TOACCOUNT_NOTICE_ROUTEKEY);
+    }
 
 }
