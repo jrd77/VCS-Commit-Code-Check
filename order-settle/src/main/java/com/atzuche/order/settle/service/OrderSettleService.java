@@ -487,7 +487,7 @@ public class OrderSettleService{
     }
     
     /**
-     * 获取租客预结算数据 huangjing
+     * 获取车主预结算数据 huangjing
      * @param orderNo
      */
     public OwnerCosts preOwnerSettleOrder(String orderNo,String ownerOrderNo) {
@@ -496,7 +496,7 @@ public class OrderSettleService{
 //        orderSettleNoTService.getRenterCostSettleDetailSimpleForOwnerPlatformSrvFee(settleOrders);
         
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
-    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders,"pre");//pre  预算
 
     	//车主预计收益 200214
     	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
