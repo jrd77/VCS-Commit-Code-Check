@@ -303,7 +303,7 @@ public class DeliveryCarInfoService {
                 int oilDiffAmt = carOwnerOil.getAmt() != null ? carOwnerOil.getAmt() : 0;
                 int oilServiceAmt = carOilServiceCharge.getAmt() != null ? carOilServiceCharge.getAmt() : 0;
                 //超里程
-                ownerGetAndReturnCarDTO.setProxyOverKNCrash(proxyOverKN.getAmt()!=null?String.valueOf(proxyOverKN.getAmt()):null);
+                ownerGetAndReturnCarDTO.setProxyOverKNCrash(proxyOverKN.getAmt()!=null?String.valueOf(proxyOverKN.getAmt()):"0");
                 //车主总油费
                 ownerGetAndReturnCarDTO.setCarOwnerOilCrash(String.valueOf(oilDiffAmt + oilServiceAmt));
                 //平台加油服务费
@@ -320,7 +320,7 @@ public class DeliveryCarInfoService {
                 int oilDiffAmt = proxyOil.getAmt() != null ? proxyOil.getAmt() : 0;
                 int oilServiceAmt = carOilServiceCharge.getAmt() != null ? carOilServiceCharge.getAmt() : 0;
                 //超里程费用
-                ownerGetAndReturnCarDTO.setOverKNCrash(proxyOverKNC.getAmt()!=null?String.valueOf(proxyOverKNC.getAmt()):null);
+                ownerGetAndReturnCarDTO.setOverKNCrash(proxyOverKNC.getAmt()!=null?String.valueOf(proxyOverKNC.getAmt()):"0");
                 //车主总油费
                 ownerGetAndReturnCarDTO.setCarOwnerAllOilCrash(String.valueOf(oilDiffAmt + oilServiceAmt));
                 //平台加油服务费
