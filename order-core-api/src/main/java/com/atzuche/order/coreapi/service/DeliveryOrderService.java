@@ -100,26 +100,26 @@ public class DeliveryOrderService {
         String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
         ownerGetAndReturnCarDTO.setDayKM(daykM);
         ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()) + "L");
-        boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
+        //boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
         int carType = renterGoodsDetailDTO.getCarType();
         int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
-        DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, isEscrowCar, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
+        DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
         deliveryCarVO.setMaxOilNumber(String.valueOf(oilTotalCalibration));
         // 获取区间配送信息
         RenterOwnerSummarySectionDeliveryVO summary = getRenterOwnerSummarySectionDeliveryVO(renterOrderEntity, deliveryCarVO);
         deliveryCarVO.setSectionDelivery(summary);
         // 获取商品信息
-        RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-        if (carInfo.getCarAddrIndex() == null || carInfo.getCarAddrIndex().intValue() == 0) {
+        //RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex().intValue() == 0) {
         	// 非虚拟地址
         	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
         	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
-        	deliveryCarVO.setUseVirtualAddrFlag(0);
+            deliveryCarVO.setUseVirtualAddrFlag(0);
         } else {
         	// 虚拟地址
-        	deliveryCarVO.setGetCarShowAddr(carInfo.getCarShowAddr());
-        	deliveryCarVO.setReturnCarShowAddr(carInfo.getCarShowAddr());
-        	deliveryCarVO.setUseVirtualAddrFlag(1);
+        	deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+        	deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+            deliveryCarVO.setUseVirtualAddrFlag(1);
         }
         return deliveryCarVO;
     }

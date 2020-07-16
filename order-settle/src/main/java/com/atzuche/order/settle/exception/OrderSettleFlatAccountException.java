@@ -7,6 +7,6 @@ import lombok.Data;
 public class OrderSettleFlatAccountException extends OrderException {
 
     public OrderSettleFlatAccountException() {
-        super(ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getCode(), ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getCode());
+        super(ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getCode(), ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getText());
     }
 }
