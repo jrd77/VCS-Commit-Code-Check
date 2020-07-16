@@ -218,18 +218,23 @@ public class OrderOwnerSettleNoTService {
         log.info("计算车主服务费，基于租客租金费用rentAmt=[{}]",rentAmt);
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
-
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
         //代管车服务费比例 商品
         Double proxyProportionDou= ownerGoodsDetail.getServiceProxyRate();
         if(proxyProportionDou==null){
             proxyProportionDou = Double.valueOf(0.0);
         }
-        
         int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
-        if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
-        	ownerIncomeAmt += -proxyExpense.getTotalAmount();
+
+
+        Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x)).findFirst();
+        if(proxyServiceAmt.isPresent()){
+            Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
+            ownerIncomeAmt += totalAmount ==null?0:totalAmount;
         }
+
         //3 获取车主补贴明细列表
         if (ownerOrderSubsidyDetail != null) {
             ownerIncomeAmt += ownerOrderSubsidyDetail.stream().mapToInt(OwnerOrderSubsidyDetailEntity::getSubsidyAmount).sum();
@@ -238,7 +243,6 @@ public class OrderOwnerSettleNoTService {
         //2 车主端平台服务费
         //服务费比例 商品
         //获取租金补贴部分
-
         Double serviceRate = ownerGoodsDetail.getServiceRate();
         if(serviceRate==null){
             serviceRate = Double.valueOf(0.0);
@@ -248,11 +252,17 @@ public class OrderOwnerSettleNoTService {
         if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
         	ownerIncomeAmt += -serviceExpense.getTotalAmount();
         }
-        
-        
+        Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x)).findFirst();
+        if(platformServiceAmt.isPresent()){
+            Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
+            ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+        }
+
+
 
         //5 获取车主增值服务费用列表
-        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+
         if (ownerOrderIncrementDetail != null) {
         	ownerIncomeAmt += ownerOrderIncrementDetail.stream().filter(incr -> {return !OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(incr.getCostCode()) &&
                     ! OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(incr.getCostCode()) && 
