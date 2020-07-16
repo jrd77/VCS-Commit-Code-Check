@@ -268,30 +268,10 @@ public class RabbitConfiguration {
      * @return DirectExchange
      */
     @Bean
-    public DirectExchange directExchange() {
+    public DirectExchange secondaryDirectExchange() {
         return new DirectExchange(RabbitConstants.SEND_SECONDARY_NOTICE_EXCHANGE);
     }
 
-    /**
-     * 配置队列实例(影像资料审核)
-     *
-     * @return Queue
-     */
-    @Bean
-    public Queue impactDataAuditNoticeQueue() {
-        return new Queue(RabbitConstants.SEND_IMPACT_DATA_AUDIT_NOTICE_QUEUE);
-    }
-
-    /**
-     * 将队列绑定到交换机上，并设置消息分发的路由键
-     *
-     * @return Binding
-     */
-    @Bean
-    public Binding impactDataAuditNoticeBinding() {
-        //链式写法: 用指定的路由键将队列绑定到交换机
-        return BindingBuilder.bind(impactDataAuditNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_IMPACT_DATA_AUDIT_NOTICE_ROUTEKEY);
-    }
 
     /**
      * 配置队列实例(提现结果通知)
@@ -311,7 +291,7 @@ public class RabbitConfiguration {
     @Bean
     public Binding withdrawalsNoticeBinding() {
         //链式写法: 用指定的路由键将队列绑定到交换机
-        return BindingBuilder.bind(withdrawalsNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_WITHDRAWALS_NOTICE_ROUTEKEY);
+        return BindingBuilder.bind(withdrawalsNoticeQueue()).to(secondaryDirectExchange()).with(RabbitConstants.SEND_WITHDRAWALS_NOTICE_ROUTEKEY);
     }
 
     /**
@@ -332,7 +312,7 @@ public class RabbitConfiguration {
     @Bean
     public Binding incomeToAccountNoticeBinding() {
         //链式写法: 用指定的路由键将队列绑定到交换机
-        return BindingBuilder.bind(incomeToAccountNoticeQueue()).to(directExchange()).with(RabbitConstants.SEND_INCOMEAMT_TOACCOUNT_NOTICE_ROUTEKEY);
+        return BindingBuilder.bind(incomeToAccountNoticeQueue()).to(secondaryDirectExchange()).with(RabbitConstants.SEND_INCOMEAMT_TOACCOUNT_NOTICE_ROUTEKEY);
     }
 
 }
