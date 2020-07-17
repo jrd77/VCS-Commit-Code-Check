@@ -667,18 +667,19 @@ public class RenterFeeCalculatorUtils {
 			throw new RenterFeeCostException(ExceptionCodeEnum.COUNT_RENT_DAY_EXCEPTION);
 		}
 		// 计算单价
-		Integer unitInsurance = getUnitInsurance(guidPrice, insuranceConfigs);
-		if (unitInsurance == null) {
+		Integer unitOrigInsurance = getUnitInsurance(guidPrice, insuranceConfigs);
+		if (unitOrigInsurance == null) {
 			throw new RenterFeeCostException(ExceptionCodeEnum.INSURE_UNIT_PRICE_EXCEPTION);
 		}
 		// 经过系数后的单价
-		unitInsurance = (int) Math.ceil(unitInsurance*coefficient*easyCoefficient*driverCoefficient);
+		int unitInsurance = (int) Math.ceil(unitOrigInsurance*coefficient*easyCoefficient*driverCoefficient);
 		// 总价
 		Integer totalInsurAmt = (int) Math.ceil(unitInsurance*insurDays);
 		FeeResult feeResult = new FeeResult();
 		feeResult.setTotalFee(totalInsurAmt);
 		feeResult.setUnitCount(insurDays);
 		feeResult.setUnitPrice(unitInsurance);
+        feeResult.setUnitOrigPrice(unitOrigInsurance);
 		return feeResult;
 	}
 	
@@ -773,7 +774,7 @@ public class RenterFeeCalculatorUtils {
 			Integer unitPrice = (int) Math.ceil(curPrice*coefficient*easyCoefficient*driverCoefficient);
 			Double unitCount = curDays;
 			Integer totalFee = (int) Math.ceil(unitPrice*unitCount);
-			FeeResult feeResult = new FeeResult(unitPrice, unitCount, totalFee);
+			FeeResult feeResult = new FeeResult(unitPrice, unitCount, totalFee,curPrice);
 			feeResultList.add(feeResult);
 		}
 		return feeResultList;

@@ -10,6 +10,8 @@ public class FeeResult {
 	private Double unitCount;
 	// 总价
 	private Integer totalFee;
+    //原始单价
+	private Integer unitOrigPrice;
 	
 	public FeeResult() {}
 	
@@ -18,7 +20,15 @@ public class FeeResult {
 		this.unitCount = unitCount;
 		this.totalFee = totalFee;
 	}
-	public Integer getUnitPrice() {
+
+    public FeeResult(Integer unitPrice, Double unitCount, Integer totalFee, Integer unitOrigPrice) {
+        this.unitPrice = unitPrice;
+        this.unitCount = unitCount;
+        this.totalFee = totalFee;
+        this.unitOrigPrice = unitOrigPrice;
+    }
+
+    public Integer getUnitPrice() {
 		return unitPrice;
 	}
 	public void setUnitPrice(Integer unitPrice) {
@@ -36,5 +46,12 @@ public class FeeResult {
 	public void setTotalFee(Integer totalFee) {
 		this.totalFee = totalFee;
 	}
-	
+
+    public Integer getUnitOrigPrice() {
+        return unitOrigPrice;
+    }
+
+    public void setUnitOrigPrice(Integer unitOrigPrice) {
+        this.unitOrigPrice = unitOrigPrice;
+    }
 }
