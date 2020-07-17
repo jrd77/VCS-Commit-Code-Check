@@ -76,7 +76,8 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createOp,jdbcType=VARCHAR}, 
       #{updateOp,jdbcType=VARCHAR}, #{isDelete,jdbcType=TINYINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine" >
+  <insert id="insertSelective" parameterType="com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine"
+          keyColumn="id" keyProperty="id" useGeneratedKeys="true">
     insert into account_owner_cash_examine
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
