@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
-import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamineHandleLogEntity;
 import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.cashieraccount.service.remote.AutoSecondOpenRemoteService;

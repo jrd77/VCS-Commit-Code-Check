@@ -1,17 +1,5 @@
 package com.atzuche.order.cashieraccount.service.remote;
 
-import java.lang.reflect.Type;
-
-import javax.annotation.Resource;
-
-import com.atzuche.order.commons.ResponseCheckUtil;
-import com.atzuche.order.commons.exceptions.RemoteCallException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.cashieraccount.config.CommonConfig;
 import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
@@ -25,9 +13,15 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.lang.reflect.Type;
 
 /**
  * @author pengcheng.fu
