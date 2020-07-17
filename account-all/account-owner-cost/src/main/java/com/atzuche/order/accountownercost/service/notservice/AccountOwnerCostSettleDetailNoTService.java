@@ -72,6 +72,16 @@ public class AccountOwnerCostSettleDetailNoTService {
     public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo,String memNo) {
         return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo,memNo);
     }
+
+    /**
+     * 根据订单号 查询 车主费用结算明细
+     * @param orderNo
+     * @return
+     */
+    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetailsByOrderNo(String orderNo) {
+        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetailsByOrderNo(orderNo);
+    }
+
     
     /**
      * 获取车主结算费用通过费用编码

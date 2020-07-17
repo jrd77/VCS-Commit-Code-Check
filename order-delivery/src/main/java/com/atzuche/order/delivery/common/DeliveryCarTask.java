@@ -36,6 +36,7 @@ import com.atzuche.order.rentercost.service.RenterOrderCostService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 
+import com.autoyol.car.api.model.enums.EngineTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -237,6 +238,8 @@ public class DeliveryCarTask {
 
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(renYunFlowOrderDTO.getOrdernumber());
         renYunFlowOrderDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
+
+        renYunFlowOrderDTO.setEngineType(EngineTypeEnum.getName(renterGoodsDetailDTO.getCarEngineType()));
         return renYunFlowOrderDTO;
     }
     
