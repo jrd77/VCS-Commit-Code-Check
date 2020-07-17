@@ -6,6 +6,7 @@ import com.atzuche.order.car.CarDetailDTO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.enums.CarUseTypeEnum;
 import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.car.api.model.enums.OwnerTypeEnum;
@@ -45,6 +46,10 @@ public class CarController {
         carBusiness.setGps(ownerGoodsDetailDTO.getGpsSerialNumber());
         carBusiness.setDayMileage(ownerGoodsDetailDTO.getCarDayMileage());
         carBusiness.setEngineNum(ownerGoodsDetailDTO.getEngineNum());
+        if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getCarUseType())){
+            carBusiness.setUseType(ownerGoodsDetailDTO.getCarUseType());
+            carBusiness.setUseTypeTxt(CarUseTypeEnum.getNameByCode(ownerGoodsDetailDTO.getCarUseType()));
+        }
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getCarOwnerType())){
             carBusiness.setOwnerType(ownerGoodsDetailDTO.getCarOwnerType());
             carBusiness.setOwnerTypeTxt(OwnerTypeEnum.getRemark(ownerGoodsDetailDTO.getCarOwnerType()));
