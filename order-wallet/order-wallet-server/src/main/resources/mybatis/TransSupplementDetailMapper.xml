@@ -441,10 +441,10 @@
                             <if test="orderNo != null">
                               AND order_no=#{orderNo}
                             </if>
-                              AND tsd.cash_type = 3
-                              AND tsd.op_status = 1
-                              AND tsd.pay_flag IN ( 1, 4, 5 )
-                              AND tsd.is_delete = 0
+                              AND cash_type = 3
+                              AND op_status = 1
+                              AND pay_flag IN ( 1, 4, 5 )
+                              AND is_delete = 0
               )
               AND tsd.op_status = 1
               AND tsd.pay_flag IN ( 1, 4, 5 )
