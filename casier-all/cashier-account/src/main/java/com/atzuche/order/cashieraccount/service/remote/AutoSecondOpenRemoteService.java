@@ -4,6 +4,8 @@ import java.lang.reflect.Type;
 
 import javax.annotation.Resource;
 
+import com.atzuche.order.commons.ResponseCheckUtil;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,26 +53,30 @@ public class AutoSecondOpenRemoteService {
 
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(commonConfig.secondOpenUrl + "api/second/open/withdrawal/cashOut",
                     reqVO, String.class);
-
             Cat.logEvent(CatConstants.URL_RESULT, responseEntity.getBody());
-            t.setStatus(Transaction.SUCCESS);
+
+            ResponseData responseData;
             if (StringUtils.isBlank(responseEntity.getBody())) {
-                return ResponseData.error();
+                responseData = ResponseData.error();
+            } else {
+                responseData = JSON.parseObject(responseEntity.getBody(), ResponseData.class);
             }
-            return JSON.parseObject(responseEntity.getBody(), ResponseData.class);
+            t.setStatus(Transaction.SUCCESS);
+            return responseData;
         } catch (Exception e) {
             t.setStatus(e);
             Cat.logError("Invoke /api/second/open/withdrawal/cashOut err.", e);
             log.error("Invoke /api/second/open/withdrawal/cashOut err.", e);
-            throw new WithdrawalAmtException("上海银行提现失败");
+            throw new WithdrawalAmtException("上海银行提现接口异常");
         } finally {
             t.complete();
         }
     }
-    
-    
+
+
     /**
      * 验证车主是否开户
+     *
      * @param memNo
      * @return
      */
@@ -79,31 +85,32 @@ public class AutoSecondOpenRemoteService {
         try {
             Cat.logEvent("URL.Api", "/second/open/person/owner/getOpenInfo");
             Cat.logEvent(CatConstants.URL_PARAM, memNo);
-            
+
             OwnerOpenReqVO reqVo = new OwnerOpenReqVO();
             reqVo.setMemNo(memNo);
             String json = restTemplate.postForObject(commonConfig.secondOpenUrl + "second/open/person/owner/getOpenInfo", reqVo, String.class);
-            
+
             t.setStatus(Transaction.SUCCESS);
-            
+
             //定义类型
-            Type type = new TypeToken<ResponseData<OpenInfoStatusVO>>() {}.getType();
+            Type type = new TypeToken<ResponseData<OpenInfoStatusVO>>() {
+            }.getType();
             ResponseData<OpenInfoStatusVO> responseEntity = new Gson().fromJson(json, type);
-            
+
             if (responseEntity == null || responseEntity.getData() == null) {
-            	log.info("postForEntity null,params memNo=[{}]",memNo);
+                log.info("postForEntity null,params memNo=[{}]", memNo);
                 return false;
-            }else {
-            	OpenInfoStatusVO statusVo = responseEntity.getData();
-            	log.info("postForEntity ok,result=[{}],params memNo=[{}]",GsonUtils.toJson(statusVo),memNo);
-            	//开户状态 0：未完成 1：完成
-            	if(statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 1) {
-            		return true;
-            	}else {
-            		return false;
-            	}
+            } else {
+                OpenInfoStatusVO statusVo = responseEntity.getData();
+                log.info("postForEntity ok,result=[{}],params memNo=[{}]", GsonUtils.toJson(statusVo), memNo);
+                //开户状态 0：未完成 1：完成
+                if (statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-      
+
         } catch (Exception e) {
             t.setStatus(e);
             Cat.logError("Invoke /second/open/person/owner/getOpenInfo err.", e);

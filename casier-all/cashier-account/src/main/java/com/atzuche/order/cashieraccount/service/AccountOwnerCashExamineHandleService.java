@@ -4,12 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
-import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
+import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamineHandleLogEntity;
 import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.cashieraccount.service.remote.AutoSecondOpenRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.WithdrawalsReqVO;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,10 @@ public class AccountOwnerCashExamineHandleService {
     @Autowired
     private AutoSecondOpenRemoteService autoSecondOpenRemoteService;
 
+    @Autowired
+    private AccountOwnerCashExamineHandleLogService accountOwnerCashExamineHandleLogService;
+
+
     /**
      * 老交易提现金入库
      *
@@ -53,13 +58,27 @@ public class AccountOwnerCashExamineHandleService {
     public Integer oldWithdrawableCashHandle(AccountOwnerCashExamine record, int oldWithdrawableCash,
                                              String serialNumber) {
         if (oldWithdrawableCash > OrderConstant.ZERO) {
+            // 添加提现记录
             record.setId(null);
             record.setSerialNumber(serialNumber);
             record.setBalanceFlag(OrderConstant.ZERO);
             record.setAmt(oldWithdrawableCash);
             accountOwnerCashExamineMapper.insertSelective(record);
-            // 更新老交易车主收益信息
-            remoteAccountService.deductBalance(String.valueOf(record.getMemNo()), oldWithdrawableCash);
+            // 更新老交易车主收益信息并记录处理结果
+            int handleResult = OrderConstant.ONE;
+            String failCode = "";
+            String failMessage = "";
+            try {
+                remoteAccountService.deductBalance(String.valueOf(record.getMemNo()), oldWithdrawableCash);
+            } catch (RemoteCallException re) {
+                handleResult = OrderConstant.TWO;
+                failCode = re.getErrorCode();
+                failMessage = re.getErrorMsg();
+            } catch (Exception e) {
+                handleResult = OrderConstant.TWO;
+            }
+            accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
+                    failCode, failMessage);
             return record.getId();
         } else {
             log.info("老交易提现金额为零!");
@@ -81,25 +100,32 @@ public class AccountOwnerCashExamineHandleService {
                                              int newWithdrawableCash,
                                              String serialNumber) {
         if (newWithdrawableCash > OrderConstant.ZERO) {
+            // 添加提现记录
             record.setId(null);
             record.setSerialNumber(serialNumber);
             record.setBalanceFlag(OrderConstant.ONE);
             record.setAmt(newWithdrawableCash);
             accountOwnerCashExamineMapper.insertSelective(record);
-            // 更新新交易车主收益信息
-            int incomeAmt = 0;
-            if (Objects.nonNull(income) && Objects.nonNull(income.getIncomeAmt())) {
-                incomeAmt = income.getIncomeAmt();
-            }
-            incomeAmt = incomeAmt - newWithdrawableCash;
-            if (incomeAmt < 0) {
-                throw new WithdrawalBalanceNotEnoughException();
-            }
+            // 更新新交易车主收益信息并记录处理结果
+            int handleResult = OrderConstant.ONE;
+            try {
+                int incomeAmt = 0;
+                if (Objects.nonNull(income) && Objects.nonNull(income.getIncomeAmt())) {
+                    incomeAmt = income.getIncomeAmt();
+                }
+                incomeAmt = incomeAmt - newWithdrawableCash;
+                if (incomeAmt < 0) {
+                    throw new WithdrawalBalanceNotEnoughException();
+                }
 
-            AccountOwnerIncomeEntity entity = new AccountOwnerIncomeEntity();
-            entity.setId(income.getId());
-            entity.setIncomeAmt(incomeAmt);
-            accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
+                AccountOwnerIncomeEntity entity = new AccountOwnerIncomeEntity();
+                entity.setId(income.getId());
+                entity.setIncomeAmt(incomeAmt);
+                accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
+            } catch (Exception e) {
+                handleResult = OrderConstant.TWO;
+            }
+            accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult);
             return record.getId();
         } else {
             log.info("新交易提现金额入库(非二清)提现金额为零!");
@@ -122,17 +148,7 @@ public class AccountOwnerCashExamineHandleService {
                                                    int secondaryWithdrawableCash,
                                                    String serialNumber, String dynamicCode) {
         if (secondaryWithdrawableCash > OrderConstant.ZERO) {
-            // 计算并校验收益余额
-            int secondaryIncomeAmt = 0;
-            if (Objects.nonNull(income) && Objects.nonNull(income.getSecondaryIncomeAmt())) {
-                secondaryIncomeAmt = income.getSecondaryIncomeAmt();
-            }
-            secondaryIncomeAmt = secondaryIncomeAmt - secondaryWithdrawableCash;
-            if (secondaryIncomeAmt < 0) {
-                throw new WithdrawalBalanceNotEnoughException();
-            }
-
-            // 新增提现记录
+            // 添加提现记录
             record.setId(null);
             record.setSerialNumber(serialNumber);
             record.setBalanceFlag(OrderConstant.ONE);
@@ -140,28 +156,45 @@ public class AccountOwnerCashExamineHandleService {
             record.setAmt(secondaryWithdrawableCash);
             accountOwnerCashExamineMapper.insertSelective(record);
 
-            // 调用远程方法提现
-            WithdrawalsReqVO reqVO = new WithdrawalsReqVO();
-            reqVO.setMemNo(String.valueOf(record.getMemNo()));
-            reqVO.setSerialNumber(record.getSerialNumber());
-            reqVO.setBindCardNo(record.getCardNo());
-            reqVO.setAmount(String.valueOf(record.getAmt()));
-            reqVO.setSmsCode(dynamicCode);
-            ResponseData responseData = autoSecondOpenRemoteService.sendWithdrawalRequest(reqVO);
-            if (StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
-                // 受理成功后同步提现记录的状态
-                AccountOwnerCashExamine cashExamine = new AccountOwnerCashExamine();
-                cashExamine.setId(record.getId());
-                cashExamine.setStatus(12);
-                accountOwnerCashExamineMapper.updateByPrimaryKeySelective(cashExamine);
+            // 更新新交易车主收益信息(二清)并记录处理结果
+            int handleResult = OrderConstant.ONE;
+            String failCode = "";
+            String failMessage = "";
+            try {
+                // 调用远程方法提现
+                WithdrawalsReqVO reqVO = new WithdrawalsReqVO();
+                reqVO.setMemNo(String.valueOf(record.getMemNo()));
+                reqVO.setSerialNumber(record.getSerialNumber());
+                reqVO.setBindCardNo(record.getCardNo());
+                reqVO.setAmount(String.valueOf(record.getAmt()));
+                reqVO.setSmsCode(dynamicCode);
+                ResponseData responseData = autoSecondOpenRemoteService.sendWithdrawalRequest(reqVO);
+                if (StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
+                    // 受理成功后同步提现记录的状态
+                    AccountOwnerCashExamine cashExamine = new AccountOwnerCashExamine();
+                    cashExamine.setId(record.getId());
+                    cashExamine.setStatus(12);
+                    accountOwnerCashExamineMapper.updateByPrimaryKeySelective(cashExamine);
 
-                // 更新新交易车主收益信息
-                income.setSecondaryIncomeAmt(secondaryIncomeAmt);
-                accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
-                return record.getId();
-            } else {
-                throw new WithdrawalAmtException("新交易提现金额入库(二清)提现失败");
+                    // 更新新交易车主收益信息
+                    int secondaryIncomeAmt = 0;
+                    if (Objects.nonNull(income) && Objects.nonNull(income.getSecondaryIncomeAmt())) {
+                        secondaryIncomeAmt = income.getSecondaryIncomeAmt();
+                    }
+                    secondaryIncomeAmt = secondaryIncomeAmt - secondaryWithdrawableCash;
+                    income.setSecondaryIncomeAmt(secondaryIncomeAmt);
+                    accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
+                } else {
+                    handleResult = OrderConstant.TWO;
+                    failCode = responseData.getResCode();
+                    failMessage = responseData.getResMsg();
+                }
+            } catch (Exception e) {
+                handleResult = OrderConstant.TWO;
             }
+            accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
+                    failCode, failMessage);
+            return record.getId();
         } else {
             log.info("新交易提现金额入库(二清)提现金额为零!");
         }

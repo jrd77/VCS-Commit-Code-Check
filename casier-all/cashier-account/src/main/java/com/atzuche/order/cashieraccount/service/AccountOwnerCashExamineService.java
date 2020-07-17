@@ -68,7 +68,6 @@ public class AccountOwnerCashExamineService {
      * @param income    新交易会员收益信息
      * @param bankCard  提现银行卡信息
      */
-    @Transactional(rollbackFor = Exception.class)
     public void memberWithdrawalHandle(AccountOwnerCashExamineReqVO req, CashWithdrawalSimpleMemberDTO simpleMem,
                                        AccountOwnerIncomeEntity income, BankCardDTO bankCard) {
         int surplusAmt = Integer.parseInt(req.getAmt());
@@ -93,6 +92,7 @@ public class AccountOwnerCashExamineService {
         if (surplusAmt != OrderConstant.ZERO) {
             throw new WithdrawalBalanceNotEnoughException();
         }
+
         // 提现记录入库操作
         AccountOwnerCashExamine record = convertAccountOwnerCashExamine(req, bankCard, simpleMem);
         String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
