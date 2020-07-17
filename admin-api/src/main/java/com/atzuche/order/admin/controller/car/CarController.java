@@ -8,6 +8,7 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
+import com.autoyol.car.api.model.enums.OwnerTypeEnum;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import com.autoyol.doc.annotation.AutoDocVersion;
@@ -44,6 +45,14 @@ public class CarController {
         carBusiness.setGps(ownerGoodsDetailDTO.getGpsSerialNumber());
         carBusiness.setDayMileage(ownerGoodsDetailDTO.getCarDayMileage());
         carBusiness.setEngineNum(ownerGoodsDetailDTO.getEngineNum());
+        if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getCarOwnerType())){
+            carBusiness.setOwnerType(ownerGoodsDetailDTO.getCarOwnerType());
+            carBusiness.setOwnerTypeTxt(OwnerTypeEnum.getRemark(ownerGoodsDetailDTO.getCarOwnerType()));
+        }
+        if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getLicenseExpire())){
+            String date = LocalDateTimeUtils.formatDateTime(ownerGoodsDetailDTO.getLicenseExpire());
+            carBusiness.setLicenseExpire(date);
+        }
         if(Objects.nonNull(ownerGoodsDetailDTO) && Objects.nonNull(ownerGoodsDetailDTO.getLicenseExpire())){
             String date = LocalDateTimeUtils.formatDateTime(ownerGoodsDetailDTO.getLicenseExpire());
             carBusiness.setLicenseExpire(date);
