@@ -124,7 +124,7 @@ public class AccountOwnerCashExamineService {
         }
         if(Objects.nonNull(newId)) {
             if(StringUtils.isBlank(ids)) {
-                ids = ids + oldId;
+                ids = ids + newId;
             } else {
                 ids = ids + "," + newId;
             }

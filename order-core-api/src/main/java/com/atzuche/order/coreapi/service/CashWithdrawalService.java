@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
 import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
@@ -74,6 +75,7 @@ public class CashWithdrawalService {
 
         // 获取新订单系统的会员总收益
         AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
+        log.info("Old owner income info. incomeEntity:[{}]" , JSON.toJSONString(incomeEntity));
         //校验
         accountOwnerCashExamineService.check(req, simpleMem, incomeEntity);
         // 根据id获取银行卡信息

@@ -118,6 +118,7 @@ public class AccountOwnerCashExamineHandleService {
                     throw new WithdrawalBalanceNotEnoughException();
                 }
                 income.setIncomeAmt(incomeAmt);
+                log.info("A.new owner income info. income:[{}]", JSON.toJSONString(income));
                 accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
             } catch (Exception e) {
                 log.error("AccountOwnerCashExamineHandleService.newWithdrawableCashHandle err.", e);
@@ -181,6 +182,8 @@ public class AccountOwnerCashExamineHandleService {
                     }
                     secondaryIncomeAmt = secondaryIncomeAmt - secondaryWithdrawableCash;
                     income.setSecondaryIncomeAmt(secondaryIncomeAmt);
+
+                    log.info("B.new owner income info. income:[{}]", JSON.toJSONString(income));
                     accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
                 } else {
                     handleResult = OrderConstant.TWO;
