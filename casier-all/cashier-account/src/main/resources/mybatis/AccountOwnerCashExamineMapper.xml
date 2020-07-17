@@ -52,7 +52,7 @@
     delete from account_owner_cash_examine
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine" >
+  <insert id="insert" parameterType="com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
     insert into account_owner_cash_examine (id, amt, bank_name, 
       card_no, serial_number, mem_no, 
       mobile, real_name, card_holder, 
