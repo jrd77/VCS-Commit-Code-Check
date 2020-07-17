@@ -74,6 +74,7 @@ public class AccountOwnerCashExamineHandleService {
                 failCode = re.getErrorCode();
                 failMessage = re.getErrorMsg();
             } catch (Exception e) {
+                log.error("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle err.", e);
                 handleResult = OrderConstant.TWO;
             }
             accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
@@ -122,6 +123,7 @@ public class AccountOwnerCashExamineHandleService {
                 entity.setIncomeAmt(incomeAmt);
                 accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
             } catch (Exception e) {
+                log.error("AccountOwnerCashExamineHandleService.newWithdrawableCashHandle err.", e);
                 handleResult = OrderConstant.TWO;
             }
             accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult);
@@ -189,6 +191,7 @@ public class AccountOwnerCashExamineHandleService {
                     failMessage = responseData.getResMsg();
                 }
             } catch (Exception e) {
+                log.error("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle err.", e);
                 handleResult = OrderConstant.TWO;
             }
             accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
