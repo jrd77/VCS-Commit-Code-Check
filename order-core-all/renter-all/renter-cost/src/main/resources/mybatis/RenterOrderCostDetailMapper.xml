@@ -13,6 +13,7 @@
         <result property="startTime" column="start_time"/>
         <result property="endTime" column="end_time"/>
         <result property="unitPrice" column="unit_price"/>
+        <result property="originalUnitPrice" column="original_unit_price"/>
         <result property="count" column="count"/>
         <result property="totalAmount" column="total_amount"/>
         <result property="deptId" column="dept_id"/>
@@ -37,7 +38,8 @@
 	`cost_desc`, 	
 	`start_time`, 	
 	`end_time`, 	
-	`unit_price`, 	
+	`unit_price`,
+	`original_unit_price`,
 	`count`, 	
 	`total_amount`, 	
 	`dept_id`, 	
@@ -73,7 +75,8 @@
 				`cost_desc`,		
 				`start_time`,		
 				`end_time`,		
-				`unit_price`,		
+				`unit_price`,
+                `original_unit_price`,
 				`count`,		
 				`total_amount`,		
 				`dept_id`,		
@@ -96,8 +99,9 @@
 				#{costDesc}, 		
 				#{startTime}, 		
 				#{endTime}, 		
-				#{unitPrice}, 		
-				#{count}, 		
+				#{unitPrice},
+                #{originalUnitPrice},
+                #{count},
 				#{totalAmount}, 		
 				#{deptId}, 		
 				#{deptName}, 		
@@ -123,6 +127,7 @@
 				<if test="startTime != null">`start_time`, </if>
 				<if test="endTime != null">`end_time`, </if>
 				<if test="unitPrice != null">`unit_price`, </if>
+                <if test="originalUnitPrice != null">`original_unit_price`, </if>
 				<if test="count != null">`count`, </if>
 				<if test="totalAmount != null">`total_amount`, </if>
 				<if test="deptId != null">`dept_id`, </if>
@@ -145,6 +150,7 @@
 				<if test="startTime != null">#{startTime},  </if>
 				<if test="endTime != null">#{endTime},  </if>
 				<if test="unitPrice != null">#{unitPrice},  </if>
+                <if test="originalUnitPrice != null">#{originalUnitPrice},  </if>
 				<if test="count != null">#{count},  </if>
 				<if test="totalAmount != null">#{totalAmount},  </if>
 				<if test="deptId != null">#{deptId},  </if>
@@ -172,6 +178,7 @@
 				<if test="startTime != null">`start_time` = #{startTime}, </if>
 				<if test="endTime != null">`end_time` = #{endTime}, </if>
 				<if test="unitPrice != null">`unit_price` = #{unitPrice}, </if>
+                <if test="originalUnitPrice != null">`original_unit_price` = #{originalUnitPrice}, </if>
 				<if test="count != null">`count` = #{count}, </if>
 				<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
 				<if test="deptId != null">`dept_id` = #{deptId}, </if>
@@ -198,8 +205,9 @@
 				`cost_desc` = #{costDesc}, 		
 				`start_time` = #{startTime}, 		
 				`end_time` = #{endTime}, 		
-				`unit_price` = #{unitPrice}, 		
-				`count` = #{count}, 		
+				`unit_price` = #{unitPrice},
+                `original_unit_price` = #{originalUnitPrice},
+                `count` = #{count},
 				`total_amount` = #{totalAmount}, 		
 				`dept_id` = #{deptId}, 		
 				`dept_name` = #{deptName}, 		
@@ -227,7 +235,8 @@
 				`cost_desc`,		
 				`start_time`,		
 				`end_time`,		
-				`unit_price`,		
+				`unit_price`,
+                `original_unit_price`
 				`count`,		
 				`total_amount`	
 			)
@@ -235,7 +244,7 @@
       <foreach collection="costList" item="cost" separator=",">
       (#{cost.orderNo},#{cost.renterOrderNo},#{cost.memNo},#{cost.costCode},
       #{cost.costDesc},#{cost.startTime},#{cost.endTime},#{cost.unitPrice},
-      #{cost.count},#{cost.totalAmount})
+      #{cost.originalUnitPrice},#{cost.count},#{cost.totalAmount})
       </foreach>
      </insert>
   	
