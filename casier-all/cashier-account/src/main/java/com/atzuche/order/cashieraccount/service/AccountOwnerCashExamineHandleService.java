@@ -117,11 +117,8 @@ public class AccountOwnerCashExamineHandleService {
                 if (incomeAmt < 0) {
                     throw new WithdrawalBalanceNotEnoughException();
                 }
-
-                AccountOwnerIncomeEntity entity = new AccountOwnerIncomeEntity();
-                entity.setId(income.getId());
-                entity.setIncomeAmt(incomeAmt);
-                accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(entity);
+                income.setIncomeAmt(incomeAmt);
+                accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
             } catch (Exception e) {
                 log.error("AccountOwnerCashExamineHandleService.newWithdrawableCashHandle err.", e);
                 handleResult = OrderConstant.TWO;

@@ -118,7 +118,25 @@ public class AccountOwnerCashExamineService {
         splitDetailEntity.setOldTransWithdrawAmt(oldWithdrawableCash);
         splitDetailEntity.setNewTransWithdrawAmt(newWithdrawableCash);
         splitDetailEntity.setSecondaryWithdrawAmt(secondaryWithdrawableCash);
-        splitDetailEntity.setCashExamineIds(oldId + "," + newId + "," + secondaryId);
+        String ids = "";
+        if(Objects.nonNull(oldId)) {
+            ids = ids + oldId;
+        }
+        if(Objects.nonNull(newId)) {
+            if(StringUtils.isBlank(ids)) {
+                ids = ids + oldId;
+            } else {
+                ids = ids + "," + newId;
+            }
+        }
+        if(Objects.nonNull(secondaryId)) {
+            if(StringUtils.isBlank(ids)) {
+                ids = ids + secondaryId;
+            } else {
+                ids = ids + "," + secondaryId;
+            }
+        }
+        splitDetailEntity.setCashExamineIds(ids);
         int result = accountOwnerIncomeWithdrawSplitDetailService.addSecondaryIncomeWithdrawSplitDetail(splitDetailEntity);
     }
 
