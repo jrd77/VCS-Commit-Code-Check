@@ -14,6 +14,14 @@ public class RenterInsureCoefficientReasonVO {
      * 值
      */
     private String value;
+    
+    public RenterInsureCoefficientReasonVO() {}
+
+	public RenterInsureCoefficientReasonVO(String keyCode, String keyName, String value) {
+		this.keyCode = keyCode;
+		this.keyName = keyName;
+		this.value = value;
+	}
 
 	public String getKeyCode() {
 		return keyCode;

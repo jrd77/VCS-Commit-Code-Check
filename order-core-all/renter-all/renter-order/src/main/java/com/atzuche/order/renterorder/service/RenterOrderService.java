@@ -69,6 +69,8 @@ public class RenterOrderService {
     
     @Autowired
     private InsurAbamentDiscountService insurAbamentDiscountService;
+    @Autowired
+    private RenterInsureCoefficientService renterInsureCoefficientService;
 
 
     public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(String orderNo) {
@@ -274,6 +276,8 @@ public class RenterOrderService {
         couponAndAutoCoinResVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
 
         renterOrderResVO.setCouponAndAutoCoinResVO(couponAndAutoCoinResVO);
+        // 保存系数信息
+        renterInsureCoefficientService.saveCombineCoefficient(renterOrderCostReqDTO);
         return renterOrderResVO;
     }
 

@@ -28,6 +28,15 @@ public class RenterInsureCoefficientVO {
      * 系数计算因数列表
      */
     private List<RenterInsureCoefficientReasonVO> reasonList;
+    
+    public RenterInsureCoefficientVO() {}
+
+	public RenterInsureCoefficientVO(String orderNo, String renterOrderNo, Double coefficient, Integer type) {
+		this.orderNo = orderNo;
+		this.renterOrderNo = renterOrderNo;
+		this.coefficient = coefficient;
+		this.type = type;
+	}
 
 	public String getOrderNo() {
 		return orderNo;

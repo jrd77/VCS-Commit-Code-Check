@@ -685,6 +685,21 @@ public class CommonUtils {
 	}
 	
 	/**
+     * 格式化 LocalDate
+     *
+     * @param localDate 将要格式化的日期
+     * @return 例如,  2020-04-03
+     */
+    public static String localDateToString(LocalDate localDate, String formatStr) {
+    	if (localDate == null || StringUtils.isBlank(formatStr)) {
+    		return null;
+    	}
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatStr);
+        return dateTimeFormatter.format(localDate);
+    }
+
+	
+	/**
 	 * 获取平台保证费和补充保障服务费折扣
 	 * @param rentTime 取车时间
 	 * @param revertTime 还车时间
