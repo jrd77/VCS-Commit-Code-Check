@@ -45,8 +45,8 @@ public class AdminOrderCostController {
 
     @AutoDocMethod(description = "计算租客子订单费用-保费弹窗", value = "计算租客子订单费用-保费弹窗", response = BaoFeiInfoVO.class)
     @RequestMapping(value="/getBaoFeiInfo",method = RequestMethod.GET)
-	public ResponseData<BaoFeiInfoVO> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo,@RequestParam("baoFeiType") int baoFeiType){
-        BaoFeiInfoVO baoFeiInfoVO = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo,baoFeiType);
+	public ResponseData<BaoFeiInfoVO> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOrderNo") String renterOrderNo,@RequestParam("baoFeiType") int baoFeiType){
+        BaoFeiInfoVO baoFeiInfoVO = orderCostService.getBaoFeiInfo(orderNo,renterOrderNo,baoFeiType);
         return ResponseData.success(baoFeiInfoVO);
     }
     

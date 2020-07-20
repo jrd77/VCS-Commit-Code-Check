@@ -11,6 +11,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.dto.OtherSubsidyRenyunDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderCostDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
@@ -479,9 +480,9 @@ public class OrderCostController {
 
     @AutoDocMethod(description = "计算租客子订单费用-保费弹窗", value = "计算租客子订单费用-保费弹窗", response = BaoFeiInfoVO.class)
     @RequestMapping(value="/order/renter/cost/getBaoFeiInfo",method = RequestMethod.GET)
-    public ResponseData<List<RenterOrderWzCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo){
-        List<RenterOrderWzCostDetailDTO> renterOrderWzCostDetailDTOS = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
-        return ResponseData.success(renterOrderWzCostDetailDTOS);
+    public ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo){
+        List<RenterOrderCostDetailDTO> renterOrderCostDetailDTOS = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
+        return ResponseData.success(renterOrderCostDetailDTOS);
     }
 
     
