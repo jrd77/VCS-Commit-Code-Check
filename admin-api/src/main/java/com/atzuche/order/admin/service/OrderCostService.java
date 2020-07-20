@@ -8,6 +8,7 @@ import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.CostStatUtils;
@@ -24,7 +25,6 @@ import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
-import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
@@ -34,7 +34,6 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,6 +46,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -1278,5 +1278,35 @@ public class OrderCostService {
             realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(sum));
+    }
+
+    public BaoFeiInfoVO getBaoFeiInfo(String orderNo, String renterOwnerNo,int baoFeiType) {
+        BaoFeiInfoVO baoFeiInfoVO = new BaoFeiInfoVO();
+	    List<RenterOrderCostDetailDTO> baoFeiInfos = remoteFeignService.getBaoFeiInfo(orderNo, renterOwnerNo);
+        List<RenterOrderCostDetailDTO> abatementInsureList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.ABATEMENT_INSURE);
+        List<RenterOrderCostDetailDTO> insureTotalPricesList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        if(baoFeiType == 1){//基础保障费
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = insureTotalPricesList != null ? insureTotalPricesList.get(0) : null;
+            Integer originalUnitPrice = renterOrderCostDetailDTO != null ? renterOrderCostDetailDTO.getOriginalUnitPrice() : 0;
+            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice);
+        }else if(baoFeiType ==2){//补偿保障费
+            abatementInsureList
+        }
+
+
+
+        baoFeiInfoVO.setBaoFeiType(baoFeiType);
+        baoFeiInfoVO.setJiaLinCoefficient();
+        baoFeiInfoVO.setYiChuXianCheCoefficient();
+        baoFeiInfoVO.setJiaShiXingWeiCoefficient();
+        return null;
+    }
+
+    public static List<RenterOrderCostDetailDTO> filterByCashCode(List<RenterOrderCostDetailDTO> costDetailEntityList, RenterCashCodeEnum cashCodeEnum){
+        List<RenterOrderCostDetailDTO> collect = Optional.ofNullable(costDetailEntityList).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> cashCodeEnum.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.toList());
+        return collect;
     }
 }

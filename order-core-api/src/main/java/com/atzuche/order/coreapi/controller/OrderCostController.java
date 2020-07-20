@@ -11,6 +11,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.dto.OtherSubsidyRenyunDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.AccountDepositException;
@@ -35,6 +36,7 @@ import com.atzuche.order.coreapi.service.OrderCostAggregateService;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -51,6 +53,7 @@ import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocMethod;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
@@ -473,5 +476,13 @@ public class OrderCostController {
     	orderCostAggregateService.updateOtherSubsidyRenyunByOrderNo(req);
 		return ResponseData.success();
 	}
+
+    @AutoDocMethod(description = "计算租客子订单费用-保费弹窗", value = "计算租客子订单费用-保费弹窗", response = BaoFeiInfoVO.class)
+    @RequestMapping(value="/order/renter/cost/getBaoFeiInfo",method = RequestMethod.GET)
+    public ResponseData<List<RenterOrderWzCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo){
+        List<RenterOrderWzCostDetailDTO> renterOrderWzCostDetailDTOS = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
+        return ResponseData.success(renterOrderWzCostDetailDTOS);
+    }
+
     
 }

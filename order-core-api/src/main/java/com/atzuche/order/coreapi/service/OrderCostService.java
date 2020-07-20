@@ -22,6 +22,7 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -56,6 +57,7 @@ import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
@@ -69,6 +71,7 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentercost.entity.*;
 import com.atzuche.order.rentercost.service.*;
+import com.atzuche.order.rentercost.utils.RenterOrderCostDetailUtils;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.OwnerCouponLongEntity;
 import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
@@ -153,6 +156,7 @@ public class OrderCostService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private RenterOrderService renterOrderService;
+
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -1125,4 +1129,13 @@ public class OrderCostService {
 		  return renterAndConsoleFineVO;
 	}
 
+    public List<RenterOrderWzCostDetailDTO> getBaoFeiInfo(String orderNo, String renterOwnerNo) {
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.getRenterOrderCostDetailList(orderNo, renterOwnerNo);
+        List<RenterOrderWzCostDetailDTO> collect = Optional.ofNullable(renterOrderCostDetailList).orElseGet(ArrayList::new).stream().map(x -> {
+            RenterOrderWzCostDetailDTO renterOrderWzCostDetailDTO = new RenterOrderWzCostDetailDTO();
+            BeanUtils.copyProperties(x, renterOrderWzCostDetailDTO);
+            return renterOrderWzCostDetailDTO;
+        }).collect(Collectors.toList());
+        return collect;
+    }
 }
