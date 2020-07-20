@@ -138,4 +138,9 @@ public class OwnerGoodsService{
     public List<String> listOrderNoByCarNo(Integer carNo) {
     	return ownerGoodsMapper.listOrderNoByCarNo(carNo);
     }
+
+    public OwnerGoodsEntity getOwnerGoodsByPlatNum(String platNum) {
+        return ownerGoodsMapper.getOwnerGoodsByPlatNum(platNum);
+    }
+
 }

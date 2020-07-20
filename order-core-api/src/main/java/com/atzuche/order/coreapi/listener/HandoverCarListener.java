@@ -49,11 +49,8 @@ public class HandoverCarListener {
                 LOGGER.info("任云返回数据转换出错-------->>>>>>message={}", message);
                 return;
             }
-            String msgId = String.valueOf(handoverCarMap.get("messageId"));
-            String handoverCarMsgId = handoverCarService.getHandoverCarInfoByMsgId(msgId);
-            if (StringUtils.isBlank(handoverCarMsgId)) {
-                handoverCarAsyncEventPublish.push(handoverCarMap);
-            }
+            LOGGER.info("接受仁云交接车进度信息-------->>>>>>handoverCarJson={}", handoverCarJson);
+            handoverCarAsyncEventPublish.push(handoverCarMap);
         } catch (Exception e) {
             LOGGER.error("任云返回数据出错-------->>>>>>message={}", message.toString(), e);
             Cat.logError("任云返回数据出错-------->>>>>>message={}" + message.toString(), e);

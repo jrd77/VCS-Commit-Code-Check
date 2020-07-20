@@ -39,6 +39,12 @@ public class RenterCostDetailVO {
 
     @AutoDocProperty(value = "驾乘无忧保障服务费")
     public Integer driverInsurAmt;
+    
+    @AutoDocProperty(value = "精准取车服务费")
+    private Integer accurateGetSrvAmt;
+    
+    @AutoDocProperty(value = "精准还车服务费")
+    private Integer accurateReturnSrvAmt;
 
     @AutoDocProperty(value = "配送费详情及其总额")
     private RenterDeliveryFeeDetailVO deliveryFeeDetail;
@@ -76,7 +82,9 @@ public class RenterCostDetailVO {
                 +(fee==null?0:fee)
                 +(extraDriverInsuranceAmt==null?0:extraDriverInsuranceAmt)
                 +(tyreInsurAmt==null?0:tyreInsurAmt)
-                +(driverInsurAmt==null?0:driverInsurAmt);
+                +(driverInsurAmt==null?0:driverInsurAmt)
+                +(accurateGetSrvAmt==null?0:accurateGetSrvAmt)
+                +(accurateReturnSrvAmt==null?0:accurateReturnSrvAmt);
         if(deliveryFeeDetail!=null){
             total= total+deliveryFeeDetail.getDeliveryTotal();
         }

@@ -61,7 +61,7 @@ public class OrderActionMqService {
      * @param riskAuditId 风控审核ID
      * @param orderReqVO  下单请求参数
      */
-    public void sendCreateOrderSuccess(String orderNo, String ownerMemNo, String riskAuditId, OrderReqVO orderReqVO) {
+    public void sendCreateOrderSuccess(String orderNo, String ownerMemNo, String riskAuditId, OrderReqVO orderReqVO,Integer isAutoReplayFlag) {
         OrderCreateMq orderCreateMq = new OrderCreateMq();
         orderCreateMq.setOrderNo(orderNo);
         orderCreateMq.setCategory(orderReqVO.getOrderCategory());
@@ -75,7 +75,7 @@ public class OrderActionMqService {
         orderCreateMq.setOwnerMemNo(StringUtils.isNotBlank(ownerMemNo) ? Integer.valueOf(ownerMemNo) : null);
         orderCreateMq.setRiskReqId(riskAuditId);
         orderCreateMq.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));
-
+        orderCreateMq.setIsAutoReply(isAutoReplayFlag);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送下单成功事件.mq:[exchange={},routingKey={}],message=[{}]",

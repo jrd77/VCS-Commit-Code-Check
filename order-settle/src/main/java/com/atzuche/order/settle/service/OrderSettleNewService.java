@@ -505,6 +505,31 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        
+        // 精准取车服务费
+        if(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
+        // 精准还车服务费
+        if(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //2.2 取车运能加价
         if(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -675,6 +700,7 @@ public class OrderSettleNewService {
             orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
             String abatementInsure = Objects.nonNull(entity.getComprehensiveEnsureAmount())?String.valueOf(entity.getComprehensiveEnsureAmount()):"0";
             orderSettlementMq.setAbatementInsure(abatementInsure);
+            orderSettlementMq.setYingkouAmt(entity.getYingkouAmt());
         }
         int subsidyPlamtAmt=0;
         int subsidyOwnerAmt=0;

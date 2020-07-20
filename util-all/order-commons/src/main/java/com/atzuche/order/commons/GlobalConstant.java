@@ -40,6 +40,10 @@ public class GlobalConstant {
     public static final String GET_RETURN_FINE_AMT = "get_return_fine_amt";
     public static final String GET_FINE_AMT = "get_fine_amt";
     public static final String RETURN_FINE_AMT = "return_fine_amt";
+    
+    public static final String GET_RETURN_ACCURATE_SRV = "get_return_accurate_srv";
+    public static final String ACCURATE_GET_SRV_UNIT = "accurate_get_srv_unit";
+    public static final String ACCURATE_RETURN_SRV_UNIT = "accurate_return_srv_unit";
 
     public static final String NEW_ORDER_NO_SUFFIX = "99";
     public static final int NEW_ORDER_NO_LEN = 14;

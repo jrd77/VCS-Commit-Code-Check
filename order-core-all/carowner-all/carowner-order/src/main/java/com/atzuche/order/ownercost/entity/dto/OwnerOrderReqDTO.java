@@ -46,6 +46,11 @@ public class OwnerOrderReqDTO {
      * 应答标识位，0未设置，1已设置
      */
     private Integer replyFlag;
+    /*
+    *
+    * 自动应答标志位 最终值
+    * */
+    private boolean isAutoReplyFlag;
     /**
      * 是否使用特供价 0-否，1-是
      */

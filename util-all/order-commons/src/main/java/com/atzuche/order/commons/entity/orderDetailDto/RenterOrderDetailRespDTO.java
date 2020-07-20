@@ -1,6 +1,8 @@
 package com.atzuche.order.commons.entity.orderDetailDto;
 
 import com.atzuche.order.commons.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
+
 import lombok.Data;
 
 import java.util.List;
@@ -20,4 +22,6 @@ public class RenterOrderDetailRespDTO {
     public List<RenterAdditionalDriverDTO> renterAdditionalDriverList;
     public List<RenterOrderFineDeatailDTO> renterOrderFineDeatailList;
     public List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOS;
+    // 区间配送信息
+    public SectionDeliveryVO sectionDelivery;
 }

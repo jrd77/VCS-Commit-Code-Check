@@ -143,25 +143,7 @@ public class RenterCostFacadeService {
         return totalCost;
     }
 
-    /**
-     * 获得租车的总费用（不包括罚金）
-     * @param orderNo
-     * @param renterOrderNo
-     * @param memNo
-     * @return
-     */
-    public int getTotalRenterCostWithoutFine(String orderNo,String renterOrderNo,String memNo){
-        int totalBsicRentCostAmt = orderCostDetailService.getTotalOrderCostAmt(orderNo,renterOrderNo);
-        int totalSubsidyAmt = subsidyDetailService.getTotalRenterOrderSubsidyAmt(orderNo,renterOrderNo);
-        int totalConsoleSubsidyAmt = consoleSubsidyDetailService.getTotalRenterOrderConsoleSubsidy(orderNo,memNo);
-        int totalConsoleCostAmt = consoleCostDetailService.getTotalOrderConsoleCostAmt(orderNo,memNo);
 
-        int totalCost = totalBsicRentCostAmt +totalSubsidyAmt+totalConsoleSubsidyAmt+totalConsoleCostAmt;
-        logger.info("getTotalRenterCost[orderNo={},renterOrderNo={},memNo={}]==[totalBasicRentCostAmt={},totalSubsidyAmt={},totalConsoleSubsidyAmt={},totalConsoleCostAmt={}]",
-                orderNo,renterOrderNo,memNo,totalBsicRentCostAmt,totalSubsidyAmt,totalConsoleSubsidyAmt,totalConsoleCostAmt);
-        return totalCost;
-    }
-    
     
     ////全费用对象full
     public RenterCostDetailVO getRenterCostFullDetail(String orderNo, String renterOrderNo, String memNo){
@@ -180,6 +162,8 @@ public class RenterCostFacadeService {
         basicCostDetailVO.setExtraDriverInsuranceAmt(-RenterOrderCostDetailUtils.getExtraDriverInsureAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setTyreInsurAmt(-RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setDriverInsurAmt(-RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateGetSrvAmt(-RenterOrderCostDetailUtils.getAccurateGetSrvAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateReturnSrvAmt(-RenterOrderCostDetailUtils.getAccurateReturnSrvAmt(renterOrderCostDetailEntityList));
         //取送车费用
         RenterDeliveryFeeDetailVO deliveryFeeDetailVO = getRenterDeliveryFeeDetail(renterOrderCostDetailEntityList);
         basicCostDetailVO.setDeliveryFeeDetail(deliveryFeeDetailVO);

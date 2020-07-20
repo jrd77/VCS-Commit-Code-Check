@@ -92,4 +92,6 @@ public class PreOrderAdminRequestVO {
 	private Integer tyreInsurFlag;
     @AutoDocProperty(value = "是否购买驾乘无忧保障服务 0-不购买，1-购买")
 	private Integer driverInsurFlag;
+    @AutoDocProperty(value = "配送模式：0-区间配送，1-精准配送")
+    private Integer distributionMode;
 }

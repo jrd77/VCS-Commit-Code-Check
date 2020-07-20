@@ -38,4 +38,9 @@ public class CityService implements ConfigService{
     public String registerName() {
         return CONFIG_NAME;
     }
+    
+    public CityEntity getCityByCode(Integer cityCode) {
+    	return mapper.getCityByCode(cityCode);
+    }
+    
 }

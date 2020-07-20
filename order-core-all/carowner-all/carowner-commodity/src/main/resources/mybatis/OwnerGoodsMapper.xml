@@ -569,4 +569,10 @@
         and is_delete = 0
     </select>
 
+    <select id="getOwnerGoodsByPlatNum" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_goods where car_plate_num = #{platNum}
+        and is_delete = 0
+        limit 1
+    </select>
+
 </mapper>
