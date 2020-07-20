@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeWithdrawSplitDetailEntity;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeWithdrawSplitDetailService;
@@ -366,6 +367,7 @@ public class AccountOwnerCashExamineService {
         record.setStatus(FINALZERO);
         String uuid = UUID.randomUUID().toString().replace("-", "");
         record.setRequestBatchCode(uuid);
+        log.info("AccountOwnerCashExamineService.convertAccountOwnerCashExamine >> record:[{}]", JSON.toJSONString(record));
         return record;
     }
 
