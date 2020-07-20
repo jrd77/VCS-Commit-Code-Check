@@ -159,7 +159,7 @@ public class AccountOwnerCashExamineService {
         if (surplusAmt <= OrderConstant.ZERO || balance <= OrderConstant.ZERO) {
             return OrderConstant.ZERO;
         }
-        return surplusAmt >= balance ? surplusAmt - balance : surplusAmt;
+        return surplusAmt >= balance ? balance : surplusAmt;
     }
 
 
