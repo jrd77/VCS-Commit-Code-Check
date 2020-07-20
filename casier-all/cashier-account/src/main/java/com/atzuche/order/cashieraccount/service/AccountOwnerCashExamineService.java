@@ -10,6 +10,7 @@ import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
 import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
 import com.atzuche.order.cashieraccount.exception.WithdrawalTimesLimitException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
+import com.atzuche.order.commons.ListUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
 import com.atzuche.order.commons.entity.dto.CashWithdrawalSimpleMemberDTO;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -125,25 +127,17 @@ public class AccountOwnerCashExamineService {
         splitDetailEntity.setOldTransWithdrawAmt(oldWithdrawableCash);
         splitDetailEntity.setNewTransWithdrawAmt(newWithdrawableCash);
         splitDetailEntity.setSecondaryWithdrawAmt(secondaryWithdrawableCash);
-        String ids = "";
+        List<Integer> idArray = new ArrayList<>();
         if(Objects.nonNull(oldId)) {
-            ids = ids + oldId;
+            idArray.add(oldId);
         }
         if(Objects.nonNull(newId)) {
-            if(StringUtils.isBlank(ids)) {
-                ids = ids + newId;
-            } else {
-                ids = ids + "," + newId;
-            }
+            idArray.add(newId);
         }
         if(Objects.nonNull(secondaryId)) {
-            if(StringUtils.isBlank(ids)) {
-                ids = ids + secondaryId;
-            } else {
-                ids = ids + "," + secondaryId;
-            }
+            idArray.add(secondaryId);
         }
-        splitDetailEntity.setCashExamineIds(ids);
+        splitDetailEntity.setCashExamineIds(ListUtil.reduce(idArray, ","));
         int result = accountOwnerIncomeWithdrawSplitDetailService.addSecondaryIncomeWithdrawSplitDetail(splitDetailEntity);
     }
 
