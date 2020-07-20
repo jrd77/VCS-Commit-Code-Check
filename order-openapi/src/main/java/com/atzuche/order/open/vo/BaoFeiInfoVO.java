@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class BaoFeiInfoVO {
     @AutoDocProperty("原始单价")
-    private Integer unitOrignPrice;
+    private String unitOrignPrice;
     @AutoDocProperty("保费类型，1：基础保障费，2：补偿保障费")
     private Integer baoFeiType;
     @AutoDocProperty("驾龄系数")

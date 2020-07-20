@@ -205,6 +205,6 @@ public interface FeignOrderCostService {
     public ResponseData<AccurateGetReturnSrvVO> getAccurateGetReturnSrvAmt();
 
     @GetMapping("/order/renter/cost/getBaoFeiInfo")
-    ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(String orderNo, String renterOwnerNo);
+    ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo);
 
 }
