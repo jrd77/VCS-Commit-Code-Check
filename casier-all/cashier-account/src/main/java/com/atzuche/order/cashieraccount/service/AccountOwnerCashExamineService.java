@@ -15,6 +15,7 @@ import com.atzuche.order.commons.entity.dto.CashWithdrawalSimpleMemberDTO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
 import com.atzuche.order.wallet.api.MemBalanceVO;
 import com.autoyol.platformcost.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.UUID;
  * @author seazhao
  */
 @Service
+@Slf4j
 public class AccountOwnerCashExamineService {
 
     @Autowired
@@ -73,6 +75,7 @@ public class AccountOwnerCashExamineService {
         int surplusAmt = Integer.parseInt(req.getAmt());
         // 计算老交易提现金额
         int oldWithdrawableCash = calculateWithdrawableCash(surplusAmt, simpleMem.getBalance());
+        log.info("AccountOwnerCashExamineService.memberWithdrawalHandle >> oldWithdrawableCash:[{}]", oldWithdrawableCash);
         surplusAmt = surplusAmt - oldWithdrawableCash;
 
         int newWithdrawableCash = 0;
@@ -81,14 +84,17 @@ public class AccountOwnerCashExamineService {
             // 计算新交易提现金额(非二清)
             if (Objects.nonNull(income.getIncomeAmt())) {
                 newWithdrawableCash = calculateWithdrawableCash(surplusAmt, income.getIncomeAmt());
+                log.info("AccountOwnerCashExamineService.memberWithdrawalHandle >> newWithdrawableCash:[{}]", newWithdrawableCash);
                 surplusAmt = surplusAmt - newWithdrawableCash;
             }
             // 计算新交易提现金额(二清)
             if (Objects.nonNull(income.getSecondaryIncomeAmt())) {
                 secondaryWithdrawableCash = calculateWithdrawableCash(surplusAmt, income.getSecondaryIncomeAmt());
+                log.info("AccountOwnerCashExamineService.memberWithdrawalHandle >> secondaryWithdrawableCash:[{}]", secondaryWithdrawableCash);
                 surplusAmt = surplusAmt - secondaryWithdrawableCash;
             }
         }
+        log.info("AccountOwnerCashExamineService.memberWithdrawalHandle >> surplusAmt:[{}]", surplusAmt);
         if (surplusAmt != OrderConstant.ZERO) {
             throw new WithdrawalBalanceNotEnoughException();
         }
@@ -148,6 +154,8 @@ public class AccountOwnerCashExamineService {
      * @return int 可提现金额
      */
     private int calculateWithdrawableCash(int surplusAmt, int balance) {
+        log.info("AccountOwnerCashExamineService.calculateWithdrawableCash >> surplusAmt:[{}], balance:[{}]",
+                surplusAmt, balance);
         if (surplusAmt <= OrderConstant.ZERO || balance <= OrderConstant.ZERO) {
             return OrderConstant.ZERO;
         }
