@@ -496,7 +496,7 @@ public class OrderSettleService{
 //        orderSettleNoTService.getRenterCostSettleDetailSimpleForOwnerPlatformSrvFee(settleOrders);
         
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
-    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders);//pre  预算
+    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders,"pre");//pre  预算
 
     	//车主预计收益 200214
     	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();

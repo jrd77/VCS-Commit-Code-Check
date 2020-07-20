@@ -6,6 +6,9 @@ package com.atzuche.order.settle.service.notservice;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
+import com.atzuche.order.accountownercost.util.AccountOwnerCostSettleUtil;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -116,6 +119,8 @@ public class OrderOwnerSettleNoTService {
 	private CashierSettleService cashierSettleService;
     @Autowired
 	private OrderStatusService orderStatusService;
+    @Autowired
+    private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
 	
 	
 	public SettleOrders initSettleOrdersSeparateOwner(String orderNo,SettleOrders settleOrders) {
@@ -144,7 +149,7 @@ public class OrderOwnerSettleNoTService {
 	
 	public void settleOrderFirstSeparateOwner(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
         //3 查询所有车主费用明细 TODO 暂不支持 多个车主
-        this.getOwnerCostSettleDetail(settleOrders);//pre 预算 settle 结算
+        this.getOwnerCostSettleDetail(settleOrders,"settle");//pre 预算 settle 结算
         Cat.logEvent("getOwnerCostSettleDetail",GsonUtils.toJson(settleOrders));
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
@@ -194,8 +199,9 @@ public class OrderOwnerSettleNoTService {
      * @param settleOrders
      * //preOrSettle  -> pre 预算  ,settle 结算
      */
-    public void getOwnerCostSettleDetail(SettleOrders settleOrders) {
+    public void getOwnerCostSettleDetail(SettleOrders settleOrders,String preOrSettle) {
         String orderNo = settleOrders.getOrderNo();
+        String ownerOrderNo = settleOrders.getOwnerOrderNo();
         OwnerCosts ownerCosts = new OwnerCosts();
         // 车主收益
         int ownerIncomeAmt = 0;
@@ -222,7 +228,7 @@ public class OrderOwnerSettleNoTService {
         //计算服务费按照租金来计算。需要提前来计算。
         // 应该从车主那边获取，而不是从租客端获取。  200306
 //        int rentAmt=settleOrders.getRenterOrderCost();
-        
+        OrderStatusEntity orderStatusEntity = null;
         log.info("计算车主服务费，基于租客租金费用rentAmt=[{}]",rentAmt);
         List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo,settleOrders.getOwnerOrderNo());
         int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
@@ -234,17 +240,24 @@ public class OrderOwnerSettleNoTService {
         }
         int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() != orderStatusEntity.getSettleStatus()){
-            Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                    .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
-            log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyServiceAmt));
-            if(proxyServiceAmt.isPresent()){
-                Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
-                ownerIncomeAmt += totalAmount ==null?0:totalAmount;
-                proxyExpense.setTotalAmount(-totalAmount);
+        List<AccountOwnerCostSettleDetailEntity> accountOwnerCostSettleDetailsByOwnerOrderNo = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetailsByOwnerOrderNo(orderNo, ownerOrderNo);
+        if("pre".equals(preOrSettle)){
+            orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+            if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+                int proxyCharge = AccountOwnerCostSettleUtil.getTotalAmtBySourceCode(OwnerCashCodeEnum.PROXY_CHARGE, accountOwnerCostSettleDetailsByOwnerOrderNo);
+                ownerIncomeAmt += proxyCharge;
+                proxyExpense.setTotalAmount(-proxyCharge);
+            }else{//未结算
+                Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                        .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
+                log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyServiceAmt));
+                if(proxyServiceAmt.isPresent()){
+                    Integer totalAmount = proxyServiceAmt.get().getTotalAmount();
+                    ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+                    proxyExpense.setTotalAmount(-totalAmount);
+                }
             }
-        }else if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){
+        }else if("settle".equals(preOrSettle)){
             log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyExpense));
             if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -proxyExpense.getTotalAmount();
@@ -266,16 +279,25 @@ public class OrderOwnerSettleNoTService {
         int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt+rentAmtSubsidy,serviceProportion);
 
-        if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() != orderStatusEntity.getSettleStatus()){//预算取表数据
-            Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
-                    .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
-            log.info("平台服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(platformServiceAmt));
-            if(platformServiceAmt.isPresent()){
-                Integer totalAmount = platformServiceAmt.get().getTotalAmount();
-                ownerIncomeAmt += totalAmount ==null?0:totalAmount;
-                serviceExpense.setTotalAmount(-totalAmount);
+        if("pre".equals(preOrSettle)){//预算取表数据
+            if(orderStatusEntity == null){
+                orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
             }
-        }else if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//结算实时算
+            if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//已结算
+                int serviceCharge = AccountOwnerCostSettleUtil.getTotalAmtBySourceCode(OwnerCashCodeEnum.SERVICE_CHARGE, accountOwnerCostSettleDetailsByOwnerOrderNo);
+                serviceExpense.setTotalAmount(-serviceCharge);
+            }else{//未结算
+                Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
+                        .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
+                log.info("平台服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(platformServiceAmt));
+                if(platformServiceAmt.isPresent()){
+                    Integer totalAmount = platformServiceAmt.get().getTotalAmount();
+                    ownerIncomeAmt += totalAmount ==null?0:totalAmount;
+                    serviceExpense.setTotalAmount(-totalAmount);
+                }
+            }
+
+        }else if("settle".equals(preOrSettle)){//结算实时算
             log.info("平台服务费，结算获取服务费platformServiceAmt={}", JSON.toJSONString(serviceExpense));
             if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -serviceExpense.getTotalAmount();
