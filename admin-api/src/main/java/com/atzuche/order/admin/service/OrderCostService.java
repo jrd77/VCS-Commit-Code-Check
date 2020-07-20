@@ -1302,17 +1302,18 @@ public class OrderCostService {
         if(baoFeiType == 1){//基础保障费
             RenterOrderCostDetailDTO renterOrderCostDetailDTO = insureTotalPricesList != null ? insureTotalPricesList.get(0) : null;
             Integer originalUnitPrice = renterOrderCostDetailDTO != null ? renterOrderCostDetailDTO.getOriginalUnitPrice() : 0;
-            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice);
+            baoFeiInfoVO.setUnitOrignPrice(String.valueOf(originalUnitPrice));
         }else if(baoFeiType ==2){//补偿保障费
-            abatementInsureList
+            List<Integer> collect = Optional.ofNullable(abatementInsureList).orElseGet(ArrayList::new).stream().map(x -> {
+                return x.getOriginalUnitPrice();
+            }).collect(Collectors.toList());
+            String originalUnitPrice = StringUtils.join(collect, ",");
+            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice);
         }
-
-
-
         baoFeiInfoVO.setBaoFeiType(baoFeiType);
-        baoFeiInfoVO.setJiaLinCoefficient();
-        baoFeiInfoVO.setYiChuXianCheCoefficient();
-        baoFeiInfoVO.setJiaShiXingWeiCoefficient();
+        baoFeiInfoVO.setJiaLinCoefficient(0D);
+        baoFeiInfoVO.setYiChuXianCheCoefficient(0D);
+        baoFeiInfoVO.setJiaShiXingWeiCoefficient(0D);
         return null;
     }
 
