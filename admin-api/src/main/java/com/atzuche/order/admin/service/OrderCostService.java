@@ -1294,15 +1294,15 @@ public class OrderCostService {
         realVo.setOwnerLongRentDeductAmt(String.valueOf(sum));
     }
 
-    public BaoFeiInfoVO getBaoFeiInfo(String orderNo, String renterOwnerNo,int baoFeiType) {
+    public BaoFeiInfoVO getBaoFeiInfo(String orderNo, String renterOrderNo,int baoFeiType) {
         BaoFeiInfoVO baoFeiInfoVO = new BaoFeiInfoVO();
-	    List<RenterOrderCostDetailDTO> baoFeiInfos = remoteFeignService.getBaoFeiInfo(orderNo, renterOwnerNo);
+	    List<RenterOrderCostDetailDTO> baoFeiInfos = remoteFeignService.getBaoFeiInfo(orderNo, renterOrderNo);
         List<RenterOrderCostDetailDTO> abatementInsureList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.ABATEMENT_INSURE);
         List<RenterOrderCostDetailDTO> insureTotalPricesList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
         if(baoFeiType == 1){//基础保障费
             RenterOrderCostDetailDTO renterOrderCostDetailDTO = insureTotalPricesList != null ? insureTotalPricesList.get(0) : null;
             Integer originalUnitPrice = renterOrderCostDetailDTO != null ? renterOrderCostDetailDTO.getOriginalUnitPrice() : 0;
-            baoFeiInfoVO.setUnitOrignPrice(String.valueOf(originalUnitPrice));
+            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice!=null?String.valueOf(originalUnitPrice):"0");
         }else if(baoFeiType ==2){//补偿保障费
             List<Integer> collect = Optional.ofNullable(abatementInsureList).orElseGet(ArrayList::new).stream().map(x -> {
                 return x.getOriginalUnitPrice();

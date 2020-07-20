@@ -25,10 +25,7 @@ import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
@@ -1147,12 +1144,12 @@ public class OrderCostService {
 		  return renterAndConsoleFineVO;
 	}
 
-    public List<RenterOrderWzCostDetailDTO> getBaoFeiInfo(String orderNo, String renterOwnerNo) {
+    public List<RenterOrderCostDetailDTO> getBaoFeiInfo(String orderNo, String renterOwnerNo) {
         List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.getRenterOrderCostDetailList(orderNo, renterOwnerNo);
-        List<RenterOrderWzCostDetailDTO> collect = Optional.ofNullable(renterOrderCostDetailList).orElseGet(ArrayList::new).stream().map(x -> {
-            RenterOrderWzCostDetailDTO renterOrderWzCostDetailDTO = new RenterOrderWzCostDetailDTO();
-            BeanUtils.copyProperties(x, renterOrderWzCostDetailDTO);
-            return renterOrderWzCostDetailDTO;
+        List<RenterOrderCostDetailDTO> collect = Optional.ofNullable(renterOrderCostDetailList).orElseGet(ArrayList::new).stream().map(x -> {
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = new RenterOrderCostDetailDTO();
+            BeanUtils.copyProperties(x, renterOrderCostDetailDTO);
+            return renterOrderCostDetailDTO;
         }).collect(Collectors.toList());
         return collect;
     }
