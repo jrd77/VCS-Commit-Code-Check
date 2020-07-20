@@ -989,6 +989,8 @@ public class OrderCostService {
             gps = list.stream().filter(obj ->{
                 return OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(obj.getCostCode());
             }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+
+            ///data
             int serviceAmt = list.stream().filter(obj ->{
                 return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
             }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
