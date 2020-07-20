@@ -3,8 +3,10 @@
  */
 package com.atzuche.order.coreapi.service;
 
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleEntity;
 import com.atzuche.order.accountownercost.service.AccountOwnerCostSettleService;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleNoTService;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
@@ -159,7 +161,7 @@ public class OrderCostService {
     @Autowired
     private RenterOrderService renterOrderService;
     @Autowired
-    private AccountOwnerCostSettleService accountOwnerCostSettleService;
+    private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -537,12 +539,15 @@ public class OrderCostService {
         if(orderStatusEntity != null){
             OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
             BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
-
-            AccountOwnerCostSettleEntity accountOwnerCostSettleEntity = accountOwnerCostSettleService.getsettleAmtByOrderNo(orderNo, ownerOrderNo);
-            AccountOwnerSettleCostDetailResVO accountOwnerSettleCostDetailResVO = new AccountOwnerSettleCostDetailResVO();
-            BeanUtils.copyProperties(accountOwnerCostSettleEntity,accountOwnerSettleCostDetailResVO);
+            List<AccountOwnerCostSettleDetailEntity> OwnerCostSettleDetaillist = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetailsByOwnerOrderNo(orderNo, ownerOrderNo);
+            List<AccountOwnerSettleCostDetailResVO> accountOwnerSettleCostDetailResVOS = new ArrayList<>();
+            Optional.ofNullable(OwnerCostSettleDetaillist).orElseGet(ArrayList::new).stream().forEach(x->{
+                AccountOwnerSettleCostDetailResVO accountOwnerSettleCostDetailResVO = new AccountOwnerSettleCostDetailResVO();
+                BeanUtils.copyProperties(x,accountOwnerSettleCostDetailResVO);
+                accountOwnerSettleCostDetailResVOS.add(accountOwnerSettleCostDetailResVO);
+            });
             resVo.setOrderStatusDTO(orderStatusDTO);
-            resVo.setAccountOwnerSettleCostDetailResVO(accountOwnerSettleCostDetailResVO);
+            resVo.setAccountOwnerSettleCostDetailResVOS(accountOwnerSettleCostDetailResVOS);
         }
         return resVo;
 	}

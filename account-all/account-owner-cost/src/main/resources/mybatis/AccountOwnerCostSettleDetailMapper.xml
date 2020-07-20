@@ -94,4 +94,8 @@
     <select id="getAccountOwnerCostSettleDetailsByOrderNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no = #{orderNo} and is_delete = 0
     </select>
+
+    <select id="getAccountOwnerCostSettleDetailsByOwnerOrderNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from account_owner_cost_settle_detail where order_no = #{orderNo} and owner_order_no=#{ownerOrderNo} and is_delete = 0
+    </select>
 </mapper>

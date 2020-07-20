@@ -28,7 +28,7 @@ public class OrderOwnerCostResVO {
     /*
     * 车主结算费用明细
     * */
-    private AccountOwnerSettleCostDetailResVO accountOwnerSettleCostDetailResVO;
+    private List<AccountOwnerSettleCostDetailResVO> accountOwnerSettleCostDetailResVOS;
 	/**
      * 车主端代管车服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
      */

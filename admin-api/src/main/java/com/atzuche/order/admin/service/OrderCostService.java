@@ -17,12 +17,14 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.enums.CouponTypeEnum;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
@@ -984,21 +986,31 @@ public class OrderCostService {
 	       // 计算 Gps 和平台服务费(直接取表中的记录。根据子订单号来查询。)
 	       //代码重构，是data中获取，而不是重复查询。200306
 	       //之前海豹的代码在controller层重复查询。以重构到service层。
-       	List<OwnerOrderIncrementDetailEntity> list = data.getOwnerOrderIncrementDetail(); // //ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        List<OwnerOrderIncrementDetailEntity> list = data.getOwnerOrderIncrementDetail(); // //ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(ownerCostReqVO.getOrderNo(),ownerCostReqVO.getOwnerOrderNo());
+        OrderStatusDTO orderStatusDTO = data.getOrderStatusDTO();
+        if(orderStatusDTO!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusDTO.getSettleStatus()){
+            List<AccountOwnerSettleCostDetailResVO> accountOwnerSettleCostDetailResVOS = data.getAccountOwnerSettleCostDetailResVOS();
+            int serviceAmt = Optional.ofNullable(accountOwnerSettleCostDetailResVOS).orElseGet(ArrayList::new).stream().filter(obj ->{
+                return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getSourceCode());
+            }).mapToInt(AccountOwnerSettleCostDetailResVO::getAmt).sum();
+            int proxyServiceAmt = Optional.ofNullable(accountOwnerSettleCostDetailResVOS).orElseGet(ArrayList::new).stream().filter(obj ->{
+                return OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(obj.getSourceCode());
+            }).mapToInt(AccountOwnerSettleCostDetailResVO::getAmt).sum();
+            srvFee = serviceAmt + proxyServiceAmt;
+        }else{
+            int serviceAmt = Optional.ofNullable(list).orElseGet(ArrayList::new).stream().filter(obj ->{
+                return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+            int proxyServiceAmt = Optional.ofNullable(list).orElseGet(ArrayList::new).stream().filter(obj ->{
+                return OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(obj.getCostCode());
+            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
+            srvFee = serviceAmt + proxyServiceAmt;
+        }
+
         if(!CollectionUtils.isEmpty(list)){
             gps = list.stream().filter(obj ->{
                 return OwnerCashCodeEnum.GPS_SERVICE_AMT.getCashNo().equals(obj.getCostCode());
             }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-
-            ///data
-            int serviceAmt = list.stream().filter(obj ->{
-                return OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-            int proxyServiceAmt = list.stream().filter(obj ->{
-                return OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(OwnerOrderIncrementDetailEntity::getTotalAmount).sum();
-
-            srvFee = serviceAmt + proxyServiceAmt;
         }
 
         //计算平台加油服务费：(仅仅车主端有)
