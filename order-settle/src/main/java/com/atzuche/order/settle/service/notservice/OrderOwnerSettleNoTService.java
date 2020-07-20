@@ -6,6 +6,9 @@ package com.atzuche.order.settle.service.notservice;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.enums.account.SettleStatusEnum;
+import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +114,8 @@ public class OrderOwnerSettleNoTService {
 	private OwnerGoodsService ownerGoodsService; 
 	@Autowired
 	private CashierSettleService cashierSettleService;
+    @Autowired
+	private OrderStatusService orderStatusService;
 	
 	
 	public SettleOrders initSettleOrdersSeparateOwner(String orderNo,SettleOrders settleOrders) {
@@ -139,7 +144,7 @@ public class OrderOwnerSettleNoTService {
 	
 	public void settleOrderFirstSeparateOwner(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
         //3 查询所有车主费用明细 TODO 暂不支持 多个车主
-        this.getOwnerCostSettleDetail(settleOrders,"settle");//pre 预算 settle 结算
+        this.getOwnerCostSettleDetail(settleOrders);//pre 预算 settle 结算
         Cat.logEvent("getOwnerCostSettleDetail",GsonUtils.toJson(settleOrders));
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
@@ -189,7 +194,8 @@ public class OrderOwnerSettleNoTService {
      * @param settleOrders
      * //preOrSettle  -> pre 预算  ,settle 结算
      */
-    public void getOwnerCostSettleDetail(SettleOrders settleOrders,String preOrSettle) {
+    public void getOwnerCostSettleDetail(SettleOrders settleOrders) {
+        String orderNo = settleOrders.getOrderNo();
         OwnerCosts ownerCosts = new OwnerCosts();
         // 车主收益
         int ownerIncomeAmt = 0;
@@ -202,7 +208,7 @@ public class OrderOwnerSettleNoTService {
         OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(settleOrders.getOwnerOrderNo(),Boolean.TRUE);
         
         //4 获取车主费用列表
-        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetail = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<OwnerOrderPurchaseDetailEntity> ownerOrderPurchaseDetail = ownerOrderPurchaseDetailService.listOwnerOrderPurchaseDetail(orderNo,settleOrders.getOwnerOrderNo());
         int rentAmt = 0;
         if(!CollectionUtils.isEmpty(ownerOrderPurchaseDetail)){
         	ownerIncomeAmt += ownerOrderPurchaseDetail.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
@@ -218,9 +224,9 @@ public class OrderOwnerSettleNoTService {
 //        int rentAmt=settleOrders.getRenterOrderCost();
         
         log.info("计算车主服务费，基于租客租金费用rentAmt=[{}]",rentAmt);
-        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<OwnerOrderSubsidyDetailEntity> ownerOrderSubsidyDetail = ownerOrderSubsidyDetailService.listOwnerOrderSubsidyDetail(orderNo,settleOrders.getOwnerOrderNo());
         int rentAmtSubsidy = Optional.ofNullable(ownerOrderSubsidyDetail).orElseGet(ArrayList::new).stream().filter(x -> OwnerCashCodeEnum.RENT_AMT.getCashNo().equals(x.getSubsidyCostCode())).mapToInt(x -> x.getSubsidyAmount()).sum();
-        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<OwnerOrderIncrementDetailEntity> ownerOrderIncrementDetail = ownerOrderIncrementDetailService.listOwnerOrderIncrementDetail(orderNo,settleOrders.getOwnerOrderNo());
         //代管车服务费比例 商品
         Double proxyProportionDou= ownerGoodsDetail.getServiceProxyRate();
         if(proxyProportionDou==null){
@@ -228,7 +234,8 @@ public class OrderOwnerSettleNoTService {
         }
         int proxyProportion = proxyProportionDou.intValue();
         OwnerOrderPurchaseDetailEntity proxyExpense = ownerOrderCostCombineService.getProxyExpense(costBaseDTO,rentAmt+rentAmtSubsidy,proxyProportion);
-        if("pre".equals(preOrSettle)){
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() != orderStatusEntity.getSettleStatus()){
             Optional<OwnerOrderIncrementDetailEntity> proxyServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
                     .stream().filter(x -> OwnerCashCodeEnum.PROXY_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
             log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyServiceAmt));
@@ -237,7 +244,7 @@ public class OrderOwnerSettleNoTService {
                 ownerIncomeAmt += totalAmount ==null?0:totalAmount;
                 proxyExpense.setTotalAmount(-totalAmount);
             }
-        }else if("settle".equals(preOrSettle)){
+        }else if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){
             log.info("代管车服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(proxyExpense));
             if (proxyExpense != null && proxyExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -proxyExpense.getTotalAmount();
@@ -259,7 +266,7 @@ public class OrderOwnerSettleNoTService {
         int serviceProportion = serviceRate.intValue();
         OwnerOrderPurchaseDetailEntity serviceExpense = ownerOrderCostCombineService.getServiceExpense(costBaseDTO,rentAmt+rentAmtSubsidy,serviceProportion);
 
-        if("pre".equals(preOrSettle)){//预算取表数据
+        if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() != orderStatusEntity.getSettleStatus()){//预算取表数据
             Optional<OwnerOrderIncrementDetailEntity> platformServiceAmt = Optional.ofNullable(ownerOrderIncrementDetail).orElseGet(ArrayList::new)
                     .stream().filter(x -> OwnerCashCodeEnum.SERVICE_CHARGE.getCashNo().equals(x.getCostCode())).findFirst();
             log.info("平台服务费，预算获取服务费platformServiceAmt={}", JSON.toJSONString(platformServiceAmt));
@@ -268,7 +275,7 @@ public class OrderOwnerSettleNoTService {
                 ownerIncomeAmt += totalAmount ==null?0:totalAmount;
                 serviceExpense.setTotalAmount(-totalAmount);
             }
-        }else if("settle".equals(preOrSettle)){//结算实时算
+        }else if(orderStatusEntity!=null && SettleStatusEnum.SETTLED.getCode() == orderStatusEntity.getSettleStatus()){//结算实时算
             log.info("平台服务费，结算获取服务费platformServiceAmt={}", JSON.toJSONString(serviceExpense));
             if (serviceExpense != null && serviceExpense.getTotalAmount() != null) {
                 ownerIncomeAmt += -serviceExpense.getTotalAmount();
@@ -291,7 +298,7 @@ public class OrderOwnerSettleNoTService {
         	ownerIncomeAmt += -gpsCost.stream().mapToInt(OwnerOrderPurchaseDetailEntity::getTotalAmount).sum();
         }
         //7 获取车主油费 //（不含超里程）
-        DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(settleOrders.getOrderNo(),ownerGoodsDetail.getCarEngineType());
+        DeliveryOilCostVO deliveryOilCostVO = deliveryCarInfoPriceService.getOilCostByRenterOrderNo(orderNo,ownerGoodsDetail.getCarEngineType());
         log.info("oil-start--getOwnerCostSettleDetail.deliveryOilCostVO={}",JSON.toJSONString(deliveryOilCostVO));
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = Objects.isNull(deliveryOilCostVO)?null:deliveryOilCostVO.getOwnerGetAndReturnCarDTO();
         if (ownerGetAndReturnCarDTO != null) {
@@ -301,29 +308,29 @@ public class OrderOwnerSettleNoTService {
         }
         log.info("oil-start-getOwnerCostSettleDetail.deliveryOilCostVO.oilDifferenceCrash={},deliveryOilCostVO={}",ownerIncomeAmt,JSON.toJSONString(deliveryOilCostVO));
         //8 管理后台补贴 （租客车主共用表 ，会员号区分车主/租客）
-        List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
+        List<OrderConsoleSubsidyDetailEntity> orderConsoleSubsidyDetails = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo,settleOrders.getOwnerMemNo());
         if (orderConsoleSubsidyDetails != null) {
         	ownerIncomeAmt += orderConsoleSubsidyDetails.stream().mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
         }
         //9 获取全局的车主订单罚金明细（租客车主共用表 ，会员号区分车主/租客）
         //调整为 主订单号+会员号 200305
-        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
+        List<ConsoleOwnerOrderFineDeatailEntity> consoleOwnerOrderFineDeatailEntitys = consoleOwnerOrderFineDeatailService.selectByOrderNo(orderNo,settleOrders.getOwnerMemNo());
         if (consoleOwnerOrderFineDeatailEntitys != null) {
         	ownerIncomeAmt += consoleOwnerOrderFineDeatailEntitys.stream().mapToInt(ConsoleOwnerOrderFineDeatailEntity::getFineAmount).sum();
         }
         //10 车主罚金  调整为 主订单号 + 车主子订单号
         //调整为 主订单号+子订单号 200305
-        List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(settleOrders.getOrderNo(),settleOrders.getOwnerOrderNo());
+        List<OwnerOrderFineDeatailEntity> ownerOrderFineDeatails = ownerOrderFineDeatailService.getOwnerOrderFineDeatailByOrderNo(orderNo,settleOrders.getOwnerOrderNo());
         if (ownerOrderFineDeatails != null) {
         	ownerIncomeAmt += ownerOrderFineDeatails.stream().mapToInt(OwnerOrderFineDeatailEntity::getFineAmount).sum();
         }
         //11后台管理操作费用表（无条件补贴）
-        List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity = orderConsoleCostDetailService.selectByOrderNoAndMemNo(settleOrders.getOrderNo(),settleOrders.getOwnerMemNo());
+        List<OrderConsoleCostDetailEntity> orderConsoleCostDetailEntity = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,settleOrders.getOwnerMemNo());
         if (orderConsoleCostDetailEntity != null) {
         	ownerIncomeAmt += orderConsoleCostDetailEntity.stream().mapToInt(OrderConsoleCostDetailEntity::getSubsidyAmount).sum();
         }
         //12 平台加油服务费
-        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(ownerGoodsDetail.getOilTotalCalibration() == null ? 16 : ownerGoodsDetail.getOilTotalCalibration(),settleOrders.getOrderNo());
+        int ownerPlatFormOilService = deliveryCarInfoPriceService.getOwnerPlatFormOilServiceChargeByOrderNo(ownerGoodsDetail.getOilTotalCalibration() == null ? 16 : ownerGoodsDetail.getOilTotalCalibration(), orderNo);
         ownerIncomeAmt += -ownerPlatFormOilService;
         //13 补充 租客端的超里程，计算给车主。 add 200306 huangjing
         //跟租客有关联的地方（徐开心，之前是根据该方法上部的车主的参数来计算。目前不支持）
@@ -331,7 +338,7 @@ public class OrderOwnerSettleNoTService {
 //    	handoverCarReq.setRenterOrderNo(settleOrders.getRenterOrderNo());
 //        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         //更新方法200608
-        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(settleOrders.getOrderNo());
+        HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(orderNo);
 
 		RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(settleOrders.getRenterOrderNo(),Boolean.TRUE);
 		
