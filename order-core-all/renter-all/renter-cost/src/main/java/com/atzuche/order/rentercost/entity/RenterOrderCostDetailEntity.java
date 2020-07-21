@@ -58,7 +58,7 @@ public class RenterOrderCostDetailEntity implements Serializable {
     /**
      * 原始单价
      */
-    private String originalUnitPrice;
+    private Integer originalUnitPrice;
 
     /**
      * 单价(展示)

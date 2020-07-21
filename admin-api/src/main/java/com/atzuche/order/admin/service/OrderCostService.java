@@ -1301,7 +1301,10 @@ public class OrderCostService {
         List<RenterOrderCostDetailDTO> insureTotalPricesList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
         if(baoFeiType == 1){//基础保障费
             RenterOrderCostDetailDTO renterOrderCostDetailDTO = insureTotalPricesList != null ? insureTotalPricesList.get(0) : null;
-            Integer originalUnitPrice = renterOrderCostDetailDTO != null ? renterOrderCostDetailDTO.getOriginalUnitPrice() : 0;
+            Integer originalUnitPrice = 0;
+            if(renterOrderCostDetailDTO != null){
+                originalUnitPrice = renterOrderCostDetailDTO.getOriginalUnitPrice();
+            }
             baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice!=null?String.valueOf(originalUnitPrice):"0");
         }else if(baoFeiType ==2){//补偿保障费
             List<Integer> collect = Optional.ofNullable(abatementInsureList).orElseGet(ArrayList::new).stream().map(x -> {
@@ -1314,7 +1317,7 @@ public class OrderCostService {
         baoFeiInfoVO.setJiaLinCoefficient(0D);
         baoFeiInfoVO.setYiChuXianCheCoefficient(0D);
         baoFeiInfoVO.setJiaShiXingWeiCoefficient(0D);
-        return null;
+        return baoFeiInfoVO;
     }
 
     public static List<RenterOrderCostDetailDTO> filterByCashCode(List<RenterOrderCostDetailDTO> costDetailEntityList, RenterCashCodeEnum cashCodeEnum){
