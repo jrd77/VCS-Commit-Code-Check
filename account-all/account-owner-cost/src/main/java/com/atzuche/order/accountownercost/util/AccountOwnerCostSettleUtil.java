@@ -30,4 +30,14 @@ public class AccountOwnerCostSettleUtil {
         return new AccountOwnerCostSettleDetailEntity();
     }
 
+
+    public static int getTotalAmtBySourceCode(OwnerCashCodeEnum ownerCashCodeEnum, List<AccountOwnerCostSettleDetailEntity> list){
+        int sum = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> ownerCashCodeEnum.getCashNo().equals(x.getSourceCode()))
+                .mapToInt(x -> x.getAmt()).sum();
+        return sum;
+    }
+
 }
