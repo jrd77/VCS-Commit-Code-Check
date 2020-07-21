@@ -13,6 +13,7 @@ import com.atzuche.order.renterwz.dto.BaseMessageBody;
 import com.atzuche.order.renterwz.vo.OrderInfoForIllegal;
 import com.atzuche.order.renterwz.vo.PhotoPath;
 import com.atzuche.order.renterwz.vo.TransIllegalPhotoBo;
+import com.dianping.cat.Cat;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,33 +100,40 @@ public class TransIllegalSendAliYunMq {
             }
             logger.info("发送违章凭证到仁云流程系统-结束");
         }catch (Exception e){
-            logger.info("发送违章凭证到仁云流程系统，报错：{}",e);
+            logger.info("发送违章凭证到仁云流程系统，报错",e);
         }
     }
 
-    public void sendTrafficViolationMq(List<OrderInfoForIllegal> list){
-        for(OrderInfoForIllegal bo:list) {
-            //记录标示
-            renterOrderWzSettleFlagService.addTransIllegalSettleFlag(bo.getOrderno(),bo.getPlatenum(),1,0,"发送违章订单定时任务");
+    public void sendTrafficViolationMq(List<OrderInfoForIllegal> list) {
+        for (OrderInfoForIllegal bo : list) {
+            try {
+                //记录标示
+                renterOrderWzSettleFlagService.addTransIllegalSettleFlag(bo.getOrderno(), bo.getPlatenum(), 1, 0, "发送违章订单定时任务");
 
-            String msgJson= JsonUtil.toJson(bo);
-            aliyunMnsService.asyncSend̨MessageToQueue(msgJson, queueNameTransIllegal,true, new AsyncCallback<Message>() {
-                @Override
-                public void onSuccess(Message result) {
-                    String messageId=result.getMessageId();
-                    MqSendFeelbackLogEntity log=new MqSendFeelbackLogEntity();
-                    log.setMsgId(messageId);
-                    log.setMsg(msgJson);
-                    log.setCreateTime(new Date());
-                    log.setQueueName(queueNameTransIllegal);
-                    log.setStatus("01");
-                    log.setSendTime(new Date());
-                    mqSendFeelbackLogService.saveMqSendFeelbackLog(log);
-                }
-                @Override
-                public void onFail(Exception ex) {
-                    ex.printStackTrace();
-                }});
+                String msgJson = JsonUtil.toJson(bo);
+                aliyunMnsService.asyncSend̨MessageToQueue(msgJson, queueNameTransIllegal, true, new AsyncCallback<Message>() {
+                    @Override
+                    public void onSuccess(Message result) {
+                        String messageId = result.getMessageId();
+                        MqSendFeelbackLogEntity log = new MqSendFeelbackLogEntity();
+                        log.setMsgId(messageId);
+                        log.setMsg(msgJson);
+                        log.setCreateTime(new Date());
+                        log.setQueueName(queueNameTransIllegal);
+                        log.setStatus("01");
+                        log.setSendTime(new Date());
+                        mqSendFeelbackLogService.saveMqSendFeelbackLog(log);
+                    }
+
+                    @Override
+                    public void onFail(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            } catch (Exception e) {
+                logger.error("发送订单到仁云查询违章信息异常.bo:[{}]", JSON.toJSONString(bo));
+                Cat.logError("发送订单到仁云查询违章信息异常. bo >>> " + JSON.toJSONString(bo), e);
+            }
         }
     }
 
