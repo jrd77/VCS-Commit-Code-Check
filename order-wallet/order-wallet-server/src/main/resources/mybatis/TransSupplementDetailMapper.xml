@@ -406,7 +406,7 @@
 	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
   </select>
 
-  <select id="listIllegalDepositDebt" resultType="com.atzuche.order.wallet.server.entity.DepositDebtVO">
+  <select id="listIllegalDepositDebt" resultType="com.atzuche.order.wallet.server.entity.DepositDebtVO" >
   	SELECT DISTINCT pay_kind as payKind,trans_kind as transKind,trans_type as transType,trans_amt as transAmt FROM trans_pay tp 
 	INNER JOIN trans_free_double tfd ON tp.order_no=tfd.order_no
 	LEFT JOIN trans t ON tp.`order_no` = t.`order_no`
@@ -416,74 +416,40 @@
 	 AND tp.`trans_type`='03'
 	 AND ( tp.trans_status != '00' AND (tp.st IS NULL OR tp.st != '4') )  AND  tp.mem_no = #{memNo}
   </select>
-  <select id="findDebtByMemberNoList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
-    SELECT DISTINCT
-    m.reg_no as memNo,
-    m.mobile as mobile,
-    m.real_name as realName
-    FROM
-    trans_supplement_detail as tsd
-    left join member as m on tsd.mem_no=m.reg_no
-    WHERE
-    cash_type = 3
-    AND pay_flag IN ( 1, 4, 5 )
-    <if test="memNo != null">
-      and m.reg_no = #{memNo}
-    </if>
-    <if test="mobile != null">
-      and m.mobile = #{mobile}
-    </if>
-    <if test="realName != null">
-      and m.real_name like concat('%',#{realName},'%')
-    </if>
-    ORDER BY
-    mem_no desc
-    limit #{pageNum},#{pageSize}
-  </select>
-  <select id="countTotal" resultType="long" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
-      select count(1) from (
-       SELECT DISTINCT
-              m.reg_no as memNo,
-              m.mobile as mobile,
-              m.real_name as realName
+  <select id="selectMemberOrderDebtList" resultType="com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO" parameterType="com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO">
+     SELECT
+            trans.rent_time as orderStartTime,
+            trans.revert_time as orderEndTime,
+            trans.req_time as createOrderTime,
+            trans.order_no as orderNo,
+            tsd.amt as debtAmt,
+            0 as orderType
           FROM
               trans_supplement_detail as tsd
-              left join member as m on tsd.mem_no=m.reg_no
+                        left join trans on tsd.order_no=trans.order_no
           WHERE
-              cash_type = 3
-              AND pay_flag IN ( 1, 4, 5 )
-            <if test="memNo != null">
-              and m.reg_no = #{memNo}
-            </if>
-            <if test="mobile != null">
-              and m.mobile = #{mobile}
-            </if>
-            <if test="realName != null">
-              and m.real_name like concat('%',#{realName},'%')
-            </if>
-      ) as temp
+              pid IN (
+                          SELECT
+                              pid
+                          FROM
+                              `atzuchedb`.trans_supplement_detail
+                          WHERE
+                            1=1
+                            <if test="memNo != null">
+                              AND mem_no=#{memNo}
+                            </if>
+                            <if test="orderNo != null">
+                              AND order_no=#{orderNo}
+                            </if>
+                              AND cash_type = 3
+                              AND op_status = 1
+                              AND pay_flag IN ( 1, 4, 5 )
+                              AND is_delete = 0
+              )
+              AND tsd.op_status = 1
+              AND tsd.pay_flag IN ( 1, 4, 5 )
+              AND tsd.is_delete = 0
   </select>
-  <select id="findMemberList" resultType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO" parameterType="com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO">
-    SELECT DISTINCT
-    m.reg_no as memNo,
-    m.mobile as mobile,
-    m.real_name as realName
-    FROM
-    member as m
-    WHERE
-    1=1
-    <if test="memNo != null">
-      and m.reg_no = #{memNo}
-    </if>
-    <if test="mobile != null">
-      and m.mobile = #{mobile}
-    </if>
-    <if test="realName != null">
-      and m.real_name like concat('%',#{realName},'%')
-    </if>
-    ORDER BY
-    reg_no desc
-    limit #{pageNum},#{pageSize}
-  </select>
+
 
 </mapper>
