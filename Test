@@ -1,6 +1,0 @@
-
-carOilDifferenceCrash;//代管车/短租托管车-油量差价
-carOilServiceCharge;//代管车/短租托管车-加油服务费
-carOwnerOilCrash;//代管车/短租托管车-车主总油费
-proxyOverKNCrash;//代管车/短租托管车-超里程费
-getReturnCarOilSubsidy;//代管车/短租托管车-取还车邮费补贴

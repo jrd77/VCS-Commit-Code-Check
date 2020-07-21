@@ -2,6 +2,7 @@ package com.atzuche.order.rentercommodity.service;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterGoodsDTO;
@@ -131,6 +132,10 @@ public class RenterGoodsService{
 
     public RenterGoodsEntity queryByOrderNoAndPlatNum(String orderNo,String platNum){
         return renterGoodsMapper.queryByOrderNoAndPlatNum(orderNo,platNum);
+    }
+
+    public List<LianHeMaiTongOrderDTO> getByMemNo(String memNo) {
+        return renterGoodsMapper.getByMemNo(memNo);
     }
 
 

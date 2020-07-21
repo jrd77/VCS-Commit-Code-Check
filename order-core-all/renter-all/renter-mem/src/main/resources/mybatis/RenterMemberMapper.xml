@@ -282,5 +282,12 @@
         from renter_member
         where order_no=#{orderNo} and is_delete = 0 limit 1
     </select>
+
+    <select id="getRenterMemberByMemberNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from renter_member
+        where mem_no=#{memNo} and is_delete = 0 limit 1
+    </select>
 </mapper>
 
