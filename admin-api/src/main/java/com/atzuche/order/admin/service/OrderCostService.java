@@ -8,6 +8,7 @@ import com.atzuche.order.admin.vo.req.cost.OwnerCostReqVO;
 import com.atzuche.order.admin.vo.req.cost.RenterCostReqVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderOwnerCostResVO;
 import com.atzuche.order.admin.vo.resp.order.cost.OrderRenterCostResVO;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.CostStatUtils;
@@ -26,7 +27,6 @@ import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
-import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
 import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity;
@@ -36,7 +36,6 @@ import com.atzuche.order.commons.vo.res.rentcosts.RenterOrderSubsidyDetailEntity
 import com.atzuche.order.open.service.FeignOrderCostService;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.commons.web.ResponseData;
-import com.autoyol.doc.annotation.AutoDocProperty;
 import com.autoyol.platformcost.OrderSubsidyDetailUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -49,6 +48,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author jing.huang
@@ -1292,5 +1292,39 @@ public class OrderCostService {
             realVo.setOwnerLongRentDeduct(ownerCouponLongDTO.getDiscountDesc());
         }
         realVo.setOwnerLongRentDeductAmt(String.valueOf(sum));
+    }
+
+    public BaoFeiInfoVO getBaoFeiInfo(String orderNo, String renterOrderNo,int baoFeiType) {
+        BaoFeiInfoVO baoFeiInfoVO = new BaoFeiInfoVO();
+	    List<RenterOrderCostDetailDTO> baoFeiInfos = remoteFeignService.getBaoFeiInfo(orderNo, renterOrderNo);
+        List<RenterOrderCostDetailDTO> abatementInsureList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.ABATEMENT_INSURE);
+        List<RenterOrderCostDetailDTO> insureTotalPricesList = filterByCashCode(baoFeiInfos, RenterCashCodeEnum.INSURE_TOTAL_PRICES);
+        if(baoFeiType == 1){//基础保障费
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = insureTotalPricesList != null ? insureTotalPricesList.get(0) : null;
+            Integer originalUnitPrice = 0;
+            if(renterOrderCostDetailDTO != null){
+                originalUnitPrice = renterOrderCostDetailDTO.getOriginalUnitPrice();
+            }
+            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice!=null?String.valueOf(originalUnitPrice):"0");
+        }else if(baoFeiType ==2){//补偿保障费
+            List<Integer> collect = Optional.ofNullable(abatementInsureList).orElseGet(ArrayList::new).stream().map(x -> {
+                return x.getOriginalUnitPrice();
+            }).collect(Collectors.toList());
+            String originalUnitPrice = StringUtils.join(collect, ",");
+            baoFeiInfoVO.setUnitOrignPrice(originalUnitPrice);
+        }
+        baoFeiInfoVO.setBaoFeiType(baoFeiType);
+        baoFeiInfoVO.setJiaLinCoefficient(0D);
+        baoFeiInfoVO.setYiChuXianCheCoefficient(0D);
+        baoFeiInfoVO.setJiaShiXingWeiCoefficient(0D);
+        return baoFeiInfoVO;
+    }
+
+    public static List<RenterOrderCostDetailDTO> filterByCashCode(List<RenterOrderCostDetailDTO> costDetailEntityList, RenterCashCodeEnum cashCodeEnum){
+        List<RenterOrderCostDetailDTO> collect = Optional.ofNullable(costDetailEntityList).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> cashCodeEnum.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.toList());
+        return collect;
     }
 }
