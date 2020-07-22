@@ -186,31 +186,34 @@ public class AddIncomeService {
 	 * 审核通过
 	 * @param req
 	 */
-	public void passExamine(AddIncomeExamineOptDTO req) {
-		if (req == null || req.getFlag() == null || req.getFlag().intValue() != ExamineStatusEnum.APPROVED.getCode()) {
-			return;
-		}
-		// 根据id获取追加的收益
-		AddIncomeExamine addIncomeExamine = addIncomeExamineService.getAddIncomeExamine(req.getId());
-		if (addIncomeExamine == null) {
-			log.info("审核通过 passExamine AddIncomeExamine获取为空，req=[{}]",req);
-			throw new AddImportExamineException("审核记录不存在");
-		}
-		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
-		if (amt == 0) {
-			log.info("审核通过 passExamine 该条记录收益为0，req=[{}]",req);
-			return;
-		}
-		if (addIncomeExamine.getMemNo() == null) {
-			log.info("审核通过 passExamine 该条记录会员号为空，req=[{}]",req);
-			throw new AddImportExamineException("该条记录会员号为空");
-		}
-		if (amt > 0) {
-			greaterThanZero(addIncomeExamine, req.getOperator());
-		} else if (amt < 0) {
-			lessThanZero(addIncomeExamine);
-		}
-	}
+    public void passExamine(AddIncomeExamineOptDTO req) {
+        if (req == null || req.getFlag() == null || req.getFlag() != ExamineStatusEnum.APPROVED.getCode()) {
+            return;
+        }
+        // 根据id获取追加的收益
+        AddIncomeExamine addIncomeExamine = addIncomeExamineService.getAddIncomeExamine(req.getId());
+        if (addIncomeExamine == null) {
+            log.info("审核通过 passExamine AddIncomeExamine获取为空，req=[{}]", req);
+            throw new AddImportExamineException("审核记录不存在");
+        }
+        int amt = addIncomeExamine.getAmt() == null ? 0 : addIncomeExamine.getAmt();
+        if (amt == 0) {
+            log.info("审核通过 passExamine 该条记录收益为0，req=[{}]", req);
+            return;
+        }
+        if (addIncomeExamine.getMemNo() == null) {
+            log.info("审核通过 passExamine 该条记录会员号为空，req=[{}]", req);
+            throw new AddImportExamineException("该条记录会员号为空");
+        }
+        if (amt > 0) {
+            greaterThanZero(addIncomeExamine, req.getOperator());
+        } else {
+            // todo 有限使用先有收益扣除,剩余进入欠款
+
+            // 产生欠款
+            lessThanZero(addIncomeExamine);
+        }
+    }
 	
 	
 	/**
