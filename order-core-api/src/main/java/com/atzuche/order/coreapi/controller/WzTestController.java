@@ -6,6 +6,7 @@ import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderWzSettleSendMqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -128,7 +129,7 @@ public class WzTestController {
     }
 
     @GetMapping("/wz/settle/sendMq")
-    public String wzSettleSendMq(String orderNo){
+    public String wzSettleSendMq(@RequestParam(value = "orderNo") String orderNo){
         try {
             RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
             orderWzSettleSendMqService.sendOrderWzSettleSuccessToRenYunMq(orderNo, renterOrderEntity.getRenterMemNo());
