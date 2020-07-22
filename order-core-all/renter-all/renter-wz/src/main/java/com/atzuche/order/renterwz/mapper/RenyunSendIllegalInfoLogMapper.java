@@ -66,4 +66,12 @@ public interface RenyunSendIllegalInfoLogMapper{
 	 * @return 唯一码
 	 */
 	String queryWzCodeByOrderNo(@Param("orderNo") String orderNo,@Param("carPlateNum") String carPlateNum);
+
+    /**
+     * 查询任云 唯一码
+     *
+     * @param orderNo 订单号
+     * @return 唯一码
+     */
+    String selectWzcodeByOrderNo(@Param("orderNo") String orderNo);
 }

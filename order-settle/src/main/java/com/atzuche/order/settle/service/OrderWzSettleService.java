@@ -28,6 +28,8 @@ public class OrderWzSettleService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
+	@Autowired
+    private OrderWzSettleSendMqService orderWzSettleSendMqService;
 	
 	public void settleWzOrder(String orderNo) {
 		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
@@ -62,6 +64,8 @@ public class OrderWzSettleService {
             // 调远程抵扣老系统历史欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getTotalWzDebtAmt());
             orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
+            // 违章结算成功通知仁云
+            orderWzSettleSendMqService.sendOrderWzSettleSuccessToRenYunMq(orderNo, settleOrders.getRenterMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,orderNo={},",orderNo, e);
