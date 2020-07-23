@@ -209,6 +209,8 @@ public class AccountOwnerIncomeNoTService {
      * @param isSecondFlag             是否二清订单
      */
     public void updateOwnerIncomeInfo(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail, boolean isSecondFlag) {
+        log.info("AccountOwnerIncomeNoTService.updateOwnerIncomeInfo >> accountOwnerIncomeDetail:[{}], " +
+                "isSecondFlag:[{}]", JSON.toJSONString(accountOwnerIncomeDetail), isSecondFlag);
         // 新增车主收益明细
         accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
         // 更新车主收益金额
@@ -216,4 +218,11 @@ public class AccountOwnerIncomeNoTService {
     }
 
 
+    public int addAccountOwnerIncomeDetail(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail) {
+        if(Objects.isNull(accountOwnerIncomeDetail)) {
+            return OrderConstant.ZERO;
+        }
+        // 新增车主收益明细
+        return accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
+    }
 }
