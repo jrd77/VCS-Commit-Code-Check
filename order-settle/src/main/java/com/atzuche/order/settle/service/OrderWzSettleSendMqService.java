@@ -69,7 +69,11 @@ public class OrderWzSettleSendMqService {
         renyunMq.setWzcode(renyunSendIllegalInfoLogService.getWzCodeByOrderNo(orderNo));
 
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
-        renyunMq.setWzdstate(Objects.nonNull(orderStatusEntity) && orderStatusEntity.getWzRefundStatus() == OrderConstant.YES ? "已退款" : "待退款");
+        if(Objects.nonNull(orderStatusEntity) && orderStatusEntity.getWzSettleStatus() ==OrderConstant.ONE) {
+            renyunMq.setWzdstate("已退款");
+        } else {
+            renyunMq.setWzdstate("退款失败");
+        }
 
         AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
         if(Objects.nonNull(depositEntity)) {
