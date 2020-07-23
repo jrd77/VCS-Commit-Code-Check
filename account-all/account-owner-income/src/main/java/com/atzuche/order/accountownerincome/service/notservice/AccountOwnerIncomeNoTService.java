@@ -72,7 +72,8 @@ public class AccountOwnerIncomeNoTService {
 
     /**
      * 更新车主收益
-     * <p></p>
+     * <p>注:适用于收益/追加收益审核通过累加对应收益</p>
+     * <p>注:二清订单收益进入二清冻结(非实时到账)收益字段</p>
      *
      * @param accountOwnerIncomeDetail 车主收益明细
      * @param isSecondFlag             是否二清订单
@@ -102,6 +103,42 @@ public class AccountOwnerIncomeNoTService {
             log.info("Add secondary income in or out detail. record:[{}]", JSON.toJSONString(record));
             int result = accountOwnerSecondaryIncomeInoutDetailService.addSecondaryIncomeInoutDetail(record);
             log.info("Add secondary income in or out detail. result:[{}]", result);
+        } else {
+            int incomeAmt = accountOwnerIncome.getIncomeAmt() + accountOwnerIncomeDetail.getAmt();
+            if (incomeAmt < OrderConstant.ZERO) {
+                throw new AccountOwnerIncomeExamineException();
+            }
+            accountOwnerIncome.setIncomeAmt(incomeAmt);
+        }
+        int result = accountOwnerIncomeMapper.updateByPrimaryKey(accountOwnerIncome);
+        if (result == OrderConstant.ZERO) {
+            throw new AccountOwnerIncomeExamineException();
+        }
+    }
+
+
+    /**
+     * 更新车主收益(收益抵充)
+     * <p>注:适用于追加收益为负值且审核通过</p>
+     *
+     * @param accountOwnerIncomeDetail 车主收益明细
+     * @param isSecondFlag             是否二清订单
+     */
+    public void updateOwnerIncomeCost(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail, boolean isSecondFlag) {
+        log.info("Update owner income cost info. param is, accountOwnerIncomeDetail:[{}], isSecondFlag:[{}]",
+                JSON.toJSONString(accountOwnerIncomeDetail), isSecondFlag);
+
+        AccountOwnerIncomeEntity accountOwnerIncome = getOwnerIncome(accountOwnerIncomeDetail.getMemNo());
+        log.info("Original owner income cost info. accountOwnerIncome:[{}]", JSON.toJSONString(accountOwnerIncome));
+
+        if (isSecondFlag) {
+            int orgiSecondaryIncomeAmt = Objects.isNull(accountOwnerIncome.getSecondaryIncomeAmt()) ?
+                    OrderConstant.ZERO : accountOwnerIncome.getSecondaryIncomeAmt();
+            int secondaryIncomeAmt = orgiSecondaryIncomeAmt + accountOwnerIncomeDetail.getAmt();
+            if (secondaryIncomeAmt < OrderConstant.ZERO) {
+                throw new AccountOwnerIncomeExamineException();
+            }
+            accountOwnerIncome.setSecondaryIncomeAmt(secondaryIncomeAmt);
         } else {
             int incomeAmt = accountOwnerIncome.getIncomeAmt() + accountOwnerIncomeDetail.getAmt();
             if (incomeAmt < OrderConstant.ZERO) {
@@ -163,4 +200,20 @@ public class AccountOwnerIncomeNoTService {
         }
         return accountOwnerIncomeList;
     }
+
+
+    /**
+     * 车主收益信息变更以及收益明细添加
+     *
+     * @param accountOwnerIncomeDetail 车主收益明细
+     * @param isSecondFlag             是否二清订单
+     */
+    public void updateOwnerIncomeInfo(AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail, boolean isSecondFlag) {
+        // 新增车主收益明细
+        accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
+        // 更新车主收益金额
+        updateOwnerIncomeCost(accountOwnerIncomeDetail, isSecondFlag);
+    }
+
+
 }

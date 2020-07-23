@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeHandleService;
 import com.atzuche.order.cashieraccount.service.MemberSecondSettleService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,8 @@ public class AddIncomeService {
 	private RemoteOldSysDebtService remoteOldSysDebtService;
     @Autowired
     private MemberSecondSettleService memberSecondSettleService;
+    @Autowired
+    private AccountOwnerIncomeHandleService accountOwnerIncomeHandleService;
 	
 	private static final Integer RENTER_MEM_TYPE = 0;
 	
@@ -205,11 +208,14 @@ public class AddIncomeService {
             log.info("审核通过 passExamine 该条记录会员号为空，req=[{}]", req);
             throw new AddImportExamineException("该条记录会员号为空");
         }
+
+        boolean isSecondFlag =
+                memberSecondSettleService.judgeIsSecond(addIncomeExamine.getMemNo(), addIncomeExamine.getOrderNo());
         if (amt > 0) {
-            greaterThanZero(addIncomeExamine, req.getOperator());
+            greaterThanZero(addIncomeExamine, req.getOperator(), isSecondFlag);
         } else {
             // 优先使用先有收益扣除,剩余进入欠款
-            int surplusAddIncomeAmt = incomeCompensate(addIncomeExamine);
+            int surplusAddIncomeAmt = incomeCompensate(addIncomeExamine, isSecondFlag);
             // 产生欠款
             lessThanZero(surplusAddIncomeAmt, addIncomeExamine.getOrderNo(), addIncomeExamine.getMemNo().toString());
         }
@@ -221,7 +227,7 @@ public class AddIncomeService {
 	 * @param addIncomeExamine
 	 * @param operator
 	 */
-	public void greaterThanZero(AddIncomeExamine addIncomeExamine, String operator) {
+	public void greaterThanZero(AddIncomeExamine addIncomeExamine, String operator, boolean isSecondFlag) {
 		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt();
 		if (amt <= 0) {
 			return;
@@ -262,9 +268,6 @@ public class AddIncomeService {
 			accountOwnerIncomeDetail.setIncomeExamineId(addIncomeExamine.getId());
 			accountOwnerIncomeDetail.setCostCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getCashNo());
 			accountOwnerIncomeDetail.setCostDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_INCOME.getTxt());
-
-            boolean isSecondFlag =
-                    memberSecondSettleService.judgeIsSecond(addIncomeExamine.getMemNo(), addIncomeExamine.getOrderNo());
 			accountOwnerIncomeNoTService.updateTotalIncomeAndSaveDetail(accountOwnerIncomeDetail, isSecondFlag);
 		}
 		if (oldRealDebtAmt > 0) {
@@ -301,16 +304,30 @@ public class AddIncomeService {
      * @param addIncomeExamine 追加收益信息
      * @return int 剩余追加收益金额
      */
-    public int incomeCompensate(AddIncomeExamine addIncomeExamine) {
-        int amt = addIncomeExamine.getAmt() == null ? 0 : addIncomeExamine.getAmt();
-        if (amt >= 0) {
-            return amt;
+    public int incomeCompensate(AddIncomeExamine addIncomeExamine, boolean isSecondFlag) {
+        int surplusAddIncomeAmt = addIncomeExamine.getAmt() == null ? 0 : addIncomeExamine.getAmt();
+        if (surplusAddIncomeAmt >= 0) {
+            return surplusAddIncomeAmt;
         }
+        AccountOwnerIncomeDetailEntity incomeDetail = new AccountOwnerIncomeDetailEntity();
+        incomeDetail.setOrderNo(addIncomeExamine.getOrderNo());
+        incomeDetail.setMemNo(addIncomeExamine.getMemNo().toString());
+        incomeDetail.setDetail("追加收益审核通过(负值抵充)");
+        incomeDetail.setTime(LocalDateTime.now());
+        incomeDetail.setType(AccountOwnerIncomeDetailType.INCOME.getType());
+        incomeDetail.setIncomeExamineId(addIncomeExamine.getId());
 
-
-
-
-        return 0;
+        // 老收益抵充处理
+        surplusAddIncomeAmt = accountOwnerIncomeHandleService.oldIncomeCompensateHandle(incomeDetail, surplusAddIncomeAmt);
+        // 新收益抵充处理
+        surplusAddIncomeAmt = accountOwnerIncomeHandleService.newIncomeCompensateHandle(incomeDetail,
+                surplusAddIncomeAmt);
+        // 二清收益抵充处理
+        if (isSecondFlag) {
+            surplusAddIncomeAmt = accountOwnerIncomeHandleService.secondaryIncomeCompensateHandle(incomeDetail,
+                    surplusAddIncomeAmt);
+        }
+        return surplusAddIncomeAmt;
     }
 
 
