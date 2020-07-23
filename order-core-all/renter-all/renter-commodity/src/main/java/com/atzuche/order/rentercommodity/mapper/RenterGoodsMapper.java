@@ -1,4 +1,5 @@
 package com.atzuche.order.rentercommodity.mapper;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
@@ -36,4 +37,6 @@ public interface RenterGoodsMapper{
     RenterGoodsEntity queryInfoByOrderNo(@Param("orderNo")String orderNo);
 
     RenterGoodsEntity queryByOrderNoAndPlatNum(@Param("orderNo")String orderNo, @Param("platNum")String platNum);
+
+    List<LianHeMaiTongOrderDTO> getByMemNo(@Param("memNo")String memNo);
 }

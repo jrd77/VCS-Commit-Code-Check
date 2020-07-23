@@ -4,7 +4,9 @@
 package com.atzuche.order.commons.vo.res;
 
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.atzuche.order.commons.vo.res.ownercosts.*;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity;
@@ -18,6 +20,15 @@ import java.util.List;
  */
 @Data
 public class OrderOwnerCostResVO {
+    /*
+    *
+    * 订单状态
+    * */
+    private OrderStatusDTO orderStatusDTO;
+    /*
+    * 车主结算费用明细
+    * */
+    private List<AccountOwnerSettleCostDetailResVO> accountOwnerSettleCostDetailResVOS;
 	/**
      * 车主端代管车服务费（暂不使用，从增值表中根据主订单号查询，结算实时计算）
      */

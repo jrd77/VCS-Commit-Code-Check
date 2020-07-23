@@ -991,6 +991,7 @@ public class RenterOrderCostCombineService {
 		result.setStartTime(costBaseDTO.getStartTime());
 		result.setEndTime(costBaseDTO.getEndTime());
 		result.setUnitPrice(feeResult.getUnitPrice());
+		result.setOriginalUnitPrice(feeResult.getUnitOrigPrice()==null?0:Integer.valueOf(feeResult.getUnitOrigPrice()));
 		result.setCount(feeResult.getUnitCount());
 		result.setTotalAmount(totalFee);
 		result.setCostCode(renterCashCodeEnum.getCashNo());

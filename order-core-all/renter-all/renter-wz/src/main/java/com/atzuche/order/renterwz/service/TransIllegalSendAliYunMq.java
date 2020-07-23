@@ -100,7 +100,7 @@ public class TransIllegalSendAliYunMq {
             }
             logger.info("发送违章凭证到仁云流程系统-结束");
         }catch (Exception e){
-            logger.info("发送违章凭证到仁云流程系统，报错：{}",e);
+            logger.info("发送违章凭证到仁云流程系统，报错",e);
         }
     }
 

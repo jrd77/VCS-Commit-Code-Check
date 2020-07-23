@@ -1,11 +1,11 @@
 package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.dto.AccountOwnerCashExamineDTO;
-import com.atzuche.order.commons.entity.dto.MemberDebtListReqDTO;
+import com.atzuche.order.commons.entity.dto.MemberOrderDebtDTO;
 import com.atzuche.order.commons.entity.dto.SearchCashWithdrawalReqDTO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.AccountOwnerCashExamineReqVO;
-import com.autoyol.commons.utils.Page;
+import com.atzuche.order.commons.vo.req.SearchMemberOrderDebtListReqVO;
 import com.autoyol.commons.web.ResponseData;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +37,6 @@ public interface FeignCashWithdrawalService {
 	 * @param req
 	 * @return ResponseData<?>
 	 */
-	@PostMapping("/debt/queryList")
-	public ResponseData<Page> queryList(@Valid @RequestBody MemberDebtListReqDTO req);
+	@PostMapping("/debt/queryDebtOrderList")
+	public ResponseData<?> queryDebtOrderList(@RequestBody SearchMemberOrderDebtListReqVO req);
 }
