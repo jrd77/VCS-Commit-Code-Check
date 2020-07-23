@@ -137,8 +137,7 @@ public class AddIncomeService {
 		if (memberCoreInfo == null) {
 			throw new ImportAddIncomeExcelException("第"+(index+1)+"行数据,会员号不正确！");
 		}
-		MemberSimpleDTO memberSimpleDTO = new MemberSimpleDTO(memNo, memberCoreInfo.getRealName(), memberCoreInfo.getMobile());
-		return memberSimpleDTO;
+		return new MemberSimpleDTO(memNo, memberCoreInfo.getRealName(), memberCoreInfo.getMobile());
 	}
 	
 	
@@ -166,7 +165,7 @@ public class AddIncomeService {
 		if (req == null) {
 			return;
 		}
-		int flag = req.getFlag() == null ? 0:req.getFlag().intValue();
+		int flag = req.getFlag() == null ? 0:req.getFlag();
 		if (flag == ExamineStatusEnum.UNDER_REVIEW_EXCEPTION.getCode()) {
 			// 审核中
 			req.setFlag(req.getWaitFlag());
@@ -181,11 +180,12 @@ public class AddIncomeService {
 		// 审核通过
 		passExamine(req);
 	}
-	
-	/**
-	 * 审核通过
-	 * @param req
-	 */
+
+    /**
+     * 追加收益审核通过
+     *
+     * @param req 请求参数
+     */
     public void passExamine(AddIncomeExamineOptDTO req) {
         if (req == null || req.getFlag() == null || req.getFlag() != ExamineStatusEnum.APPROVED.getCode()) {
             return;
@@ -208,10 +208,10 @@ public class AddIncomeService {
         if (amt > 0) {
             greaterThanZero(addIncomeExamine, req.getOperator());
         } else {
-            // todo 有限使用先有收益扣除,剩余进入欠款
-
+            // 优先使用先有收益扣除,剩余进入欠款
+            int surplusAddIncomeAmt = incomeCompensate(addIncomeExamine);
             // 产生欠款
-            lessThanZero(addIncomeExamine);
+            lessThanZero(surplusAddIncomeAmt, addIncomeExamine.getOrderNo(), addIncomeExamine.getMemNo().toString());
         }
     }
 	
@@ -222,7 +222,7 @@ public class AddIncomeService {
 	 * @param operator
 	 */
 	public void greaterThanZero(AddIncomeExamine addIncomeExamine, String operator) {
-		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
+		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt();
 		if (amt <= 0) {
 			return;
 		}
@@ -272,25 +272,46 @@ public class AddIncomeService {
 			remoteOldSysDebtService.deductBalance(addIncomeExamine.getMemNo().toString(), oldRealDebtAmt);
 		}
 	}
-	
-	
-	/**
-	 * 小于零逻辑，产生欠款
-	 * @param addIncomeExamine
-	 */
-	public void lessThanZero(AddIncomeExamine addIncomeExamine) {
-		int amt = addIncomeExamine.getAmt() == null ? 0:addIncomeExamine.getAmt().intValue();
-		if (amt >= 0) {
-			return;
-		}
-		AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
-		accountInsertDebt.setAmt(amt);
-		accountInsertDebt.setMemNo(addIncomeExamine.getMemNo().toString());
-		accountInsertDebt.setOrderNo(addIncomeExamine.getOrderNo());
-		accountInsertDebt.setSourceCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getCashNo());
-		accountInsertDebt.setSourceDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getTxt());
-		accountInsertDebt.setType(2);
-		accountDebtService.insertDebt(accountInsertDebt);
-	}
-	
+
+
+    /**
+     * 小于零逻辑，产生欠款
+     *
+     * @param surplusAddIncomeAmt 剩余追加收益金额
+     * @param orderNo             订单号
+     * @param memNo               会员号
+     */
+    public void lessThanZero(int surplusAddIncomeAmt, String orderNo, String memNo) {
+        if (surplusAddIncomeAmt >= 0) {
+            return;
+        }
+        AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
+        accountInsertDebt.setAmt(surplusAddIncomeAmt);
+        accountInsertDebt.setMemNo(memNo);
+        accountInsertDebt.setOrderNo(orderNo);
+        accountInsertDebt.setSourceCode(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getCashNo());
+        accountInsertDebt.setSourceDetail(RenterCashCodeEnum.ADD_INCOME_PRODUCE_DEBUT.getTxt());
+        accountInsertDebt.setType(2);
+        accountDebtService.insertDebt(accountInsertDebt);
+    }
+
+    /**
+     * 追加收益为负值时,优先使用现有收益抵充
+     *
+     * @param addIncomeExamine 追加收益信息
+     * @return int 剩余追加收益金额
+     */
+    public int incomeCompensate(AddIncomeExamine addIncomeExamine) {
+        int amt = addIncomeExamine.getAmt() == null ? 0 : addIncomeExamine.getAmt();
+        if (amt >= 0) {
+            return amt;
+        }
+
+
+
+
+        return 0;
+    }
+
+
 }
