@@ -6,6 +6,8 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.Assert;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class AccountOwnerIncomeExamineOpDTO {
     /**
      * 车主审核收益ExamineId集合（支持批量审核用）
      */
+    @Valid
     @Size(min = 1,max = 100,message = "必须选择一条记录且不超过100条记录")
     private List<AccountOwnerIncomExamineVO> accountOwnerIncomExamineVOS;
 
@@ -21,7 +24,7 @@ public class AccountOwnerIncomeExamineOpDTO {
      * 审核车主状态类型
      */
     @AutoDocProperty(value = "收益审核状态,1:未审核，2:审核通过,3:审核不通过,4:审核中，待核查（异常）,5:审核中，待核查（测试）,99:其他")
-    @NotBlank(message = "收益审核状态不能为空")
+    @NotNull(message = "收益审核状态不能为空")
     private Integer status;
 
     /**

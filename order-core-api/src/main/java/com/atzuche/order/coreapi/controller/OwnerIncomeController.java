@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -72,7 +73,7 @@ public class OwnerIncomeController {
 
     @AutoDocMethod(value = "车主收益审核", description = "车主收益审核", response = AdjustOwnerIncomeResVO.class)
     @PostMapping("/auditOwnerIncome")
-    public ResponseData<List<AdjustOwnerIncomeResVO>> auditOwnerIncome(@RequestBody @Valid AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO, BindingResult bindingResult){
+    public ResponseData<List<AdjustOwnerIncomeResVO>> auditOwnerIncome(@RequestBody @Validated AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO, BindingResult bindingResult){
         log.info("OwnerIncomeController auditOwnerIncome start param [{}]", GsonUtils.toJson(accountOwnerIncomeExamineOpDTO));
         BindingResultUtil.checkBindingResult(bindingResult);
         List<AdjustOwnerIncomeResVO> resVO = cashierService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpDTO);

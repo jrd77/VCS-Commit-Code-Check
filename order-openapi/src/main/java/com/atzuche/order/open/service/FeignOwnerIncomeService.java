@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 查询车主收益信息
  **/
+//@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
 @FeignClient(name="order-center-api")
 public interface FeignOwnerIncomeService {
 
