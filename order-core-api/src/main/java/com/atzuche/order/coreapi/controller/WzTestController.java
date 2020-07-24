@@ -1,8 +1,12 @@
 package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.coreapi.task.*;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+import com.atzuche.order.settle.service.OrderWzSettleSendMqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +31,11 @@ public class WzTestController {
 
     @Autowired
     private OwnerRejectTask ownerRejectTask;
+
+    @Autowired
+    private OrderWzSettleSendMqService orderWzSettleSendMqService;
+    @Autowired
+    private RenterOrderService renterOrderService;
 
     /**
      * 每天定时查询当前进行中的订单，查询是否有违章记录
@@ -118,4 +127,18 @@ public class WzTestController {
             return "failure";
         }
     }
+
+    @GetMapping("/wz/settle/sendMq")
+    public String wzSettleSendMq(@RequestParam(value = "orderNo") String orderNo){
+        try {
+            RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+            orderWzSettleSendMqService.sendOrderWzSettleSuccessToRenYunMq(orderNo, renterOrderEntity.getRenterMemNo());
+
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failure";
+        }
+    }
+
 }
