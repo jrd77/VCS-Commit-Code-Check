@@ -32,6 +32,9 @@ import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.service.ConsoleRenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.OrderTransferRecordService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +74,10 @@ public class CancelOrderJudgeDutyService {
     private OrderCancelAppealService orderCancelAppealService;
     @Autowired
     private OrderRefundRecordService orderRefundRecordService;
+    @Autowired
+    private RenterOrderService renterOrderService;
+    @Autowired
+    private OrderTransferRecordService orderTransferRecordService;
 
     @Transactional(rollbackFor = Exception.class)
     public JudgeDutyResDTO judgeDuty(Integer wrongdoer, Boolean isDispatch, Boolean isSubsidyFineAmt,
@@ -107,9 +114,14 @@ public class CancelOrderJudgeDutyService {
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.CANCEL_FINE);
                     renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityTwo);
                 }
-
+                
+                // 车主是否同意 0-未处理，1-已同意，2-已拒绝
+                // 获取已同意的租客子单
+        		List<RenterOrderEntity> renterOrderList = renterOrderService.listAgreeRenterOrderByOrderNo(cancelOrderReqDTO.getOrderNo());
+                int agreeFlag = renterOrderList == null || renterOrderList.isEmpty() ? 0:1;
+                int transferCount = orderTransferRecordService.countRealTransferByOrderNo(cancelOrderReqDTO.getOrderNo());
                 //车主收益(来自租客罚金)
-                if (!isSubsidyFineAmt) {
+                if (!isSubsidyFineAmt && (agreeFlag == 1 || transferCount > 0)) {
                     consoleOwnerOrderFineDeatailEntity =
                             consoleOwnerOrderFineDeatailService.fineDataConvert(cancelFineAmt.getCostBaseDTO(), penalty, FineSubsidyCodeEnum.OWNER,
                                     FineSubsidySourceCodeEnum.RENTER, FineTypeCashCodeEnum.CANCEL_FINE);

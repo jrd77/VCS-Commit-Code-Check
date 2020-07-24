@@ -436,6 +436,12 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
+        // 订单状态转换
+        Integer ownerStatus = ownerOrderDTO.getOwnerStatus();
+        if (ownerStatus != null && ownerStatus.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+        	// 车主端订单状态显示待确认
+        	orderDetailRespDTO.orderStatus.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+        }
         return orderDetailRespDTO;
 
     }
@@ -1281,7 +1287,19 @@ public class OrderDetailService {
         orderDetailDTO.rentTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
         orderDetailDTO.revertTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);
         orderDetailDTO.orderNo = orderNo;
-
+        // 处理待接单标识
+        // 获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        // 车主子订单状态
+        int ownerStatus = ownerOrderEntity == null || ownerOrderEntity.getOwnerStatus() == null ? 0:ownerOrderEntity.getOwnerStatus();
+        if ((orderStatusEntity.getStatus() != null && orderStatusEntity.getStatus().intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) 
+        		|| ownerStatus == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+        	// 车主未处理
+        	orderDetailDTO.showConfirmButFlag = 1;
+        } else {
+        	// 车主已处理或当前状态不能处理
+        	orderDetailDTO.showConfirmButFlag = 0;
+        }
 
         //租客历史订单
         List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
@@ -1294,6 +1312,10 @@ public class OrderDetailService {
                 renterOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
                 renterOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 renterOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                // 处理子订单状态
+                Integer renterStatus = x.getRenterStatus() == null ? orderStatusEntity.getStatus():x.getRenterStatus();
+                renterOrderDTO.setRenterStatus(renterStatus);
+                renterOrderDTO.setRenterStatusTxt(OrderStatusEnum.getDescByStatus(renterStatus));
                 RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
                 RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
                 renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
@@ -1313,6 +1335,10 @@ public class OrderDetailService {
                 ownerOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
                 ownerOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 ownerOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                // 处理子订单状态
+                Integer ownerStatusx = x.getOwnerStatus() == null ? orderStatusEntity.getStatus():x.getOwnerStatus();
+                ownerOrderDTO.setOwnerStatus(ownerStatusx);
+                ownerOrderDTO.setOwnerStatusTxt(OrderStatusEnum.getDescByStatus(ownerStatusx));
                 OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
                 OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
                 ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);

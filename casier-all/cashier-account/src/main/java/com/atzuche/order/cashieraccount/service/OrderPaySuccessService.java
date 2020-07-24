@@ -75,6 +75,10 @@ public class OrderPaySuccessService {
 		                vo.setIsGetCar(YesNoEnum.YES);
 		                //记录订单流程
 		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_GET_CAR);
+	            	} else if (ownerStatus == OrderStatusEnum.TO_CONFIRM.getStatus()){
+	            		orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+	            		//记录订单流程
+		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
 	            	}
 	                // 更新租客之订单状态
 	                renterOrderService.updateRenterStatusByRenterOrderNo(vo.getRenterOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());

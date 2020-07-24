@@ -268,7 +268,7 @@ public class SubmitOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
             context.getRenterGoodsDetailDto().setIsAutoReplayFlag(0);
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus()); // 支付接单分离，默认下单待支付
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
 
@@ -276,9 +276,9 @@ public class SubmitOrderService {
 
         //6.4 order_flow
         Integer ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_CONFIRM);
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
-            orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
+            //orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
             ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
         }
 
@@ -316,7 +316,7 @@ public class SubmitOrderService {
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
-        orderResVO.setStatus(String.valueOf(OrderStatusEnum.TO_PAY.getStatus()));
+        orderResVO.setStatus(String.valueOf(orderStatusDTO.getStatus()));
         orderResVO.setReplyFlag(context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
         return orderResVO;
     }
@@ -347,15 +347,9 @@ public class SubmitOrderService {
         saveSectionDelivery(orderReqVO, orderNo, renterOrderNo);
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
-        // 更新租客订单状态
-        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderNo, OrderStatusEnum.TO_PAY.getStatus());
-        // 车主订单状态
-        int ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus() == status ? status:OrderStatusEnum.TO_GET_CAR.getStatus();
-        // 更新车主订单状态
-        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderNo, ownerStatus);
         // 扣减车辆库存
         cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
-        return new OrderResVO(orderNo, String.valueOf(OrderStatusEnum.TO_PAY.getStatus()), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
+        return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
     }
 
 

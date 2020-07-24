@@ -76,6 +76,8 @@ public class OrderDispatchCancelHandleService {
         //添加order_flow
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.from(orderStatusDTO.getStatus()));
         renterOrderService.updateChildStatusByOrderNo(orderNo, RenterChildStatusEnum.END.getCode());
+        // 更新租客子订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
         //判断是否补贴罚金
         CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyResDTO =

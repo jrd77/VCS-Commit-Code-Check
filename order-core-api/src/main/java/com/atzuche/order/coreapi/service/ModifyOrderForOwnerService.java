@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
@@ -530,6 +531,7 @@ public class ModifyOrderForOwnerService {
 			ownerOrderEntityEffective.setMemNo(ownerGoodsDetailDTO.getMemNo());
 			ownerOrderEntityEffective.setGoodsCode(ownerGoodsDetailDTO.getCarNo() == null ? null:String.valueOf(ownerGoodsDetailDTO.getCarNo()));
 			ownerOrderEntityEffective.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+			ownerOrderEntityEffective.setOwnerStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
 		}
 		if (modifyOrderOwnerDTO.getScanCodeFlag() != null && modifyOrderOwnerDTO.getScanCodeFlag()) {
 			// 扫码还车
