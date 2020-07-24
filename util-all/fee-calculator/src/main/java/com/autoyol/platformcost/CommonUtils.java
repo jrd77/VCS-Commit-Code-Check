@@ -26,7 +26,7 @@ public class CommonUtils {
 	public final static double MAX_Mileage=5;//超日限里程最大每天
 	// 默认除法运算精度
 	private static final int DEF_DIV_SCALE = 10;
-	public final static String [] CAR_TYPE={"20","25","30","35"};//代管车  托管车
+	public final static String [] CAR_TYPE={"30","35"};//代管车  托管车   "20","25",
 	/**
                * 最小距离处理
      */
@@ -79,7 +79,7 @@ public class CommonUtils {
 	
 	private static final int CARPURCHASEPRICE_150000 = 150000;
 	private static final int CARPURCHASEPRICE_200000 = 200000;
-	private static final int CARPURCHASEPRICE_300000 = 300000;
+	private static final int CARPURCHASEPRICE_300000 = 400000;
 	
     /**
                * 初始化补充保障服务费单价配置

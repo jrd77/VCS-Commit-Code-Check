@@ -13,7 +13,7 @@ public enum RenterCashCodeEnum {
 	
 	//第一区域块 看第4位，从1开始。  后4位从0001开始
 	RENT_AMT("11110001","租金"),
-	INSURE_TOTAL_PRICES("11110002","平台保障费"),
+	INSURE_TOTAL_PRICES("11110002","平台/基础保障费"),
 	ABATEMENT_INSURE("11110003","补充保障服务费"),
 	FEE("11110004","平台手续费"),
 	SRV_GET_COST("11110005","取车费用"),
@@ -88,7 +88,7 @@ public enum RenterCashCodeEnum {
     CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT("11130015","取消违章押金退还"),
     CANCEL_RENT_COST_TO_RETURN_AMT("11130017","取消租车费用退还"),
     ACCOUNT_RENTER_DETAIN_CAR_AMT("11130018","暂扣租车费用"),
-    PAY_DEBT_COST_TO_HISTORY_AMT("11130019","支付欠款抵扣订单欠款"),
+    PAY_DEBT_COST_TO_HISTORY_AMT("11130036","支付欠款抵扣订单欠款"),
     
     ///// 暂扣的考虑以下的费用编码。
     ACCOUNT_RENTER_RENT_COST("11130019","租车费用"),
@@ -105,10 +105,10 @@ public enum RenterCashCodeEnum {
     CANCEL_ACCOUNT_WZ_DEPOSIT_DETAIN_CAR_AMT("11130027","取消暂扣违章押金"),
     SETTLE_WZ_DEPOSIT_TO_WZ_COST("11130028","违章押金转违章费用"),
     
-    SETTLE_RENT_COST_TO_OLD_HISTORY_AMT("11130029","租车费用转老系统历史欠款"),
+    SETTLE_RENT_COST_TO_OLD_HISTORY_AMT("11130035","租车费用转老系统历史欠款"),
     SETTLE_DEPOSIT_TO_OLD_HISTORY_AMT("11130030","车辆押金转老系统历史欠款"),
-    SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT("11130031","违章押金转老系统历史欠款"),
-    SETTLE_OWNER_INCOME_TO_OLD_HISTORY_AMT("21130030","车主收益转老系统历史欠款"),
+    SETTLE_WZ_DEPOSIT_TO_OLD_HISTORY_AMT("11130034","违章押金转老系统历史欠款"),
+    SETTLE_OWNER_INCOME_TO_OLD_HISTORY_AMT("21130015","车主收益转老系统历史欠款"),
 
     ACCOUNT_RENTER_RENT_COST_AGAIN("21130022","补付租车费用"),
     ACCOUNT_CONSOLE_RENTER_SUBSIDY_COST("21130023","管理后台补贴"),

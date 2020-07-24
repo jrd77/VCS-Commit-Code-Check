@@ -318,9 +318,9 @@ public class ModifyOrderForOwnerService {
 		// 获取车主还车费用
 		OwnerOrderIncrementDetailEntity srvReturnFeeEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvReturnFlag());
 		// 平台服务费比例
-		//Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
+		Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
 		// 代管车服务费比例
-		//Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
+		Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
 
 
         Double useServiceRate = ownerGoodsDetailDTO.getUseServiceRate();
@@ -351,7 +351,12 @@ public class ModifyOrderForOwnerService {
                     .mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount)
                     .sum();
             log.info("长租-修改订单-获取租金补贴金额subsidyRentAmt={}",subsidyRentAmt);
-            OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount+(-subsidyRentAmt), useServiceRate.intValue());
+            OwnerOrderIncrementDetailEntity serviceFeeEntity = null;
+            if(serviceProxyRate != null){//代管
+                serviceFeeEntity= ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO, purchaseAmount + (-subsidyRentAmt), useServiceRate.intValue());
+            }else{
+                serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount+(-subsidyRentAmt), useServiceRate.intValue());
+            }
             if (serviceFeeEntity != null) {
                 incrementList.add(serviceFeeEntity);
             }

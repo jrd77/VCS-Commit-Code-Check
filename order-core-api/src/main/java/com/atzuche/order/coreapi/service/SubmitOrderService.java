@@ -307,12 +307,13 @@ public class SubmitOrderService {
         
         // 保存车辆停运费信息
         submitOrderHandleService.saveOrderStopFreightInfo(orderNo, ownerGoodsDetailDTO);
-        // 保存区间配送信息
-        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo);
+        
         // 更新租客订单状态
         renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderNo, OrderStatusEnum.TO_PAY.getStatus());
         // 更新车主订单状态
         ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderNo, ownerStatus);
+        // 保存区间配送信息
+        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo, null);
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);
@@ -344,7 +345,7 @@ public class SubmitOrderService {
         // 数据落库(主订单、租客订单、车主订单、押金(违章押金、车辆押金)、违章信息初始化、还车记录初始化等)
         int status = submitOrderHandleService.save(context, orderCostContext);
         // 保存区间配送信息
-        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo);
+        saveSectionDelivery(orderReqVO, orderNo, renterOrderNo, null);
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
@@ -575,7 +576,7 @@ public class SubmitOrderService {
      * @param orderNo
      * @param renterOrderNo
      */
-    public void saveSectionDelivery(OrderReqVO orderReqVO, String orderNo, String renterOrderNo) {
+    public void saveSectionDelivery(OrderReqVO orderReqVO, String orderNo, String renterOrderNo, RenterOrderDeliveryMode initMode) {
     	if (orderReqVO == null) {
     		return;
     	}
@@ -612,6 +613,12 @@ public class SubmitOrderService {
         mode.setAccurateGetSrvUnit(getAccurateCost);
         mode.setAccurateReturnSrvUnit(returnAccurateCost);
         mode.setDistributionMode(distributionMode);
+        if (initMode != null) {
+        	mode.setRenterProposalGetTime(initMode.getRenterProposalGetTime());
+        	mode.setOwnerProposalGetTime(initMode.getOwnerProposalGetTime());
+        	mode.setRenterProposalReturnTime(initMode.getRenterProposalReturnTime());
+        	mode.setOwnerProposalReturnTime(initMode.getOwnerProposalReturnTime());
+        }
         renterOrderDeliveryModeService.saveRenterOrderDeliveryMode(mode);
     }
 

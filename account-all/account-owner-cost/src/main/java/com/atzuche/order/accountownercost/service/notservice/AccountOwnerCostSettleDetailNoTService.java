@@ -4,6 +4,7 @@ import com.atzuche.order.accountownercost.exception.AccountOwnerCostSettleExcept
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.mapper.AccountOwnerCostSettleDetailMapper;
 import com.atzuche.order.accountownercost.vo.req.AccountOwnerCostSettleDetailReqVO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,16 @@ public class AccountOwnerCostSettleDetailNoTService {
     public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetails(String orderNo,String memNo) {
         return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetails(orderNo,memNo);
     }
+
+    /**
+     * 根据订单号 查询 车主费用结算明细
+     * @param orderNo
+     * @return
+     */
+    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetailsByOrderNo(String orderNo) {
+        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetailsByOrderNo(orderNo);
+    }
+
     
     /**
      * 获取车主结算费用通过费用编码
@@ -82,5 +93,9 @@ public class AccountOwnerCostSettleDetailNoTService {
      */
     public List<AccountOwnerCostSettleDetailEntity> listOwnerSettleCostBySourceCode(List<String> orderNoList,String memNo,String sourceCode) {
     	return accountOwnerCostSettleDetailMapper.listOwnerSettleCostBySourceCode(orderNoList, memNo, sourceCode);
+    }
+
+    public List<AccountOwnerCostSettleDetailEntity> getAccountOwnerCostSettleDetailsByOwnerOrderNo(String orderNo, String ownerOrderNo){
+        return accountOwnerCostSettleDetailMapper.getAccountOwnerCostSettleDetailsByOwnerOrderNo(orderNo,ownerOrderNo);
     }
 }

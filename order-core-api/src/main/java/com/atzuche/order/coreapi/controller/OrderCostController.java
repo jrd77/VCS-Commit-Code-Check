@@ -11,6 +11,8 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.ExtraDriverDTO;
 import com.atzuche.order.commons.entity.dto.OtherSubsidyRenyunDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderCostDetailDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.exceptions.AccountDepositException;
@@ -35,6 +37,7 @@ import com.atzuche.order.coreapi.service.OrderCostAggregateService;
 import com.atzuche.order.coreapi.service.OrderCostService;
 import com.atzuche.order.coreapi.service.OwnerCostFacadeService;
 import com.atzuche.order.coreapi.service.RenterCostFacadeService;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.open.vo.RenterCostShortDetailVO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
@@ -47,8 +50,11 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
+import com.atzuche.order.settle.service.OrderSettleService;
+import com.atzuche.order.settle.vo.req.RentCosts;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocMethod;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
@@ -90,6 +96,9 @@ public class OrderCostController {
 	private RenterOrderCostCombineService renterOrderCostCombineService;
 	@Autowired
 	private OrderCostAggregateService orderCostAggregateService;
+
+	@Autowired
+	private OrderSettleService orderSettleService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -175,7 +184,7 @@ public class OrderCostController {
 		 }
 		 String renterOrderNo = renterOrderEntity.getRenterOrderNo();
 
-		 int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo,renterOrderNo,memNo);
+		 //int totalRentCostAmtWithoutFine = facadeService.getTotalRenterCostWithoutFine(orderNo,renterOrderNo,memNo);
 		 int totalFineAmt = facadeService.getTotalFine(orderNo,renterOrderNo,memNo);
 
 		AccountRenterDepositEntity depositEntity = cashierQueryService.getTotalToPayDepositAmt(orderNo);
@@ -217,7 +226,9 @@ public class OrderCostController {
 
         RenterCostShortDetailVO shortDetail = new RenterCostShortDetailVO();
 
-		shortDetail.setTotalRentCostAmt(-totalRentCostAmtWithoutFine);
+        RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo,renterOrderNo);
+        RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo,renterOrderNo,renterOrderEntity.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
+		shortDetail.setTotalRentCostAmt(renterCostVO.getRenterCostFeeYingshou());
 		shortDetail.setTotalFineAmt(-totalFineAmt);
 		shortDetail.setYingFuDeposit(-depositEntity.getYingfuDepositAmt());
 		shortDetail.setShiFuDeposit(depositEntity.getShifuDepositAmt());
@@ -466,5 +477,13 @@ public class OrderCostController {
     	orderCostAggregateService.updateOtherSubsidyRenyunByOrderNo(req);
 		return ResponseData.success();
 	}
+
+    @AutoDocMethod(description = "计算租客子订单费用-保费弹窗", value = "计算租客子订单费用-保费弹窗", response = BaoFeiInfoVO.class)
+    @RequestMapping(value="/order/renter/cost/getBaoFeiInfo",method = RequestMethod.GET)
+    public ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo){
+        List<RenterOrderCostDetailDTO> renterOrderCostDetailDTOS = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
+        return ResponseData.success(renterOrderCostDetailDTOS);
+    }
+
     
 }

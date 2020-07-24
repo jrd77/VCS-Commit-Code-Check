@@ -264,7 +264,7 @@ public class OrderWzSettleNoTService {
             AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrders,entity);
             entity.setMemNo(settleOrders.getRenterMemNo());
-            entity.setWzAmt(-amt);
+            entity.setWzAmt(-Math.abs(amt));
             entity.setCostCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(debtDetailId));

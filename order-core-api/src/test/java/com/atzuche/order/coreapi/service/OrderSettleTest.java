@@ -37,7 +37,7 @@ public class OrderSettleTest {
 //		orderSettle.settleOrder("28261181200299");
 		
 		// 57912231400299
-		orderSettle.settleOrder("29933292500299");
+		orderSettle.settleOrder("75901261700299");
 	}
 	
 	@Test
@@ -48,7 +48,9 @@ public class OrderSettleTest {
 		//52125202200299
 		//orderSettle.settleWzOrder("52125202200299");
 		//61175312200299
-		orderSettle.settleWzOrder("61175312200299");
+//		orderSettle.settleWzOrder("61175312200299");
+		//77867231400299
+		orderSettle.settleWzOrder("77867231400299");
 	}
 
 	@Test

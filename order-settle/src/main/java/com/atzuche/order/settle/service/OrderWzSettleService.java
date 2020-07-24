@@ -28,6 +28,8 @@ public class OrderWzSettleService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
+	@Autowired
+    private OrderWzSettleSendMqService orderWzSettleSendMqService;
 	
 	public void settleWzOrder(String orderNo) {
 		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
@@ -41,11 +43,12 @@ public class OrderWzSettleService {
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
 
             // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-            boolean checkFlag = orderWzSettleNewService.check(settleOrders.getRenterOrder());
-            if(!checkFlag) {
-            	log.info("提前终止结算，当前违章结算状态不符合。orderNo [{}]",orderNo);
-    			return;
-    		}
+//            boolean checkFlag = orderWzSettleNewService.check(settleOrders.getRenterOrder());
+            orderWzSettleNewService.check(settleOrders.getRenterOrder());
+//            if(!checkFlag) {
+//            	log.info("提前终止结算，当前违章结算状态不符合。orderNo [{}]",orderNo);
+//    			return;
+//    		}
             
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             log.info("OrderSettleService settleOrderFirst start [{}]",GsonUtils.toJson(settleOrders));
@@ -61,18 +64,22 @@ public class OrderWzSettleService {
             // 调远程抵扣老系统历史欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getTotalWzDebtAmt());
             orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
+            // 违章结算成功通知仁云
+            orderWzSettleSendMqService.sendOrderWzSettleSuccessToRenYunMq(orderNo, settleOrders.getRenterMemNo());
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,orderNo={},",orderNo, e);
             //结算失败，更新结算标识字段。 违章押金结算失败
             OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
-            if(null != entity && entity.getIsDetainWz() != OrderConstant.YES) {
+//            if(null != entity && entity.getIsDetainWz() != OrderConstant.YES) {
                 OrderStatusEntity record = new OrderStatusEntity();
                 record.setId(entity.getId());
                 record.setWzSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
                 record.setWzSettleTime(LocalDateTime.now());
+                //记录结算消息，错误码
+                record.setSettleMsg(record.getSettleMsg()+"wz:"+e.getMessage());
                 orderStatusService.updateByPrimaryKeySelective(record);
-            }
+//            }
             orderWzSettleNewService.sendOrderWzSettleFailMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo());
             t.setStatus(e);
             Cat.logError("结算失败.orderNo="+orderNo,e);
