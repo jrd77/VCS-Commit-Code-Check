@@ -1,6 +1,7 @@
 package com.atzuche.order.commons.vo.res.console;
 
 import com.atzuche.order.commons.entity.dto.WzDepositMsgDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountRenterDepositDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
@@ -38,7 +39,10 @@ public class ConsoleOrderWzDetailQueryResVO {
      */
     private RenterOrderDTO renterOrderDTO;
 
-
-
+    /*
+    * 车辆押金
+    *
+    * */
+    private AccountRenterDepositDetailDTO accountRenterDepositDetailDTO;
 
 }

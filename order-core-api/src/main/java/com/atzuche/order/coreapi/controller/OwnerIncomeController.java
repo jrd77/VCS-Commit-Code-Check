@@ -11,6 +11,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.vo.res.account.income.*;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -71,10 +73,11 @@ public class OwnerIncomeController {
 
     @AutoDocMethod(value = "车主收益审核", description = "车主收益审核", response = AdjustOwnerIncomeResVO.class)
     @PostMapping("/auditOwnerIncome")
-    public ResponseData<AdjustOwnerIncomeResVO> auditOwnerIncome(@RequestBody AccountOwnerIncomeExamineOpReqVO vo){
-        log.info("OwnerIncomeController auditOwnerIncome start param [{}]", GsonUtils.toJson(vo));
-        AdjustOwnerIncomeResVO resVO = cashierService.examineOwnerIncomeExamine(vo);
-        log.info("OwnerIncomeController auditOwnerIncome end param [{}]",GsonUtils.toJson(vo));
+    public ResponseData<List<AdjustOwnerIncomeResVO>> auditOwnerIncome(@RequestBody @Validated AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO, BindingResult bindingResult){
+        log.info("OwnerIncomeController auditOwnerIncome start param [{}]", GsonUtils.toJson(accountOwnerIncomeExamineOpDTO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        List<AdjustOwnerIncomeResVO> resVO = cashierService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpDTO);
+        log.info("OwnerIncomeController auditOwnerIncome end param [{}]",GsonUtils.toJson(accountOwnerIncomeExamineOpDTO));
         return ResponseData.success(resVO);
     }
 

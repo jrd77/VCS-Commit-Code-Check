@@ -12,6 +12,7 @@ import com.autoyol.commons.web.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -46,7 +47,8 @@ public class AccountOwnerIncomeService{
     /**
      * 收益审核通过 更新车主收益信息
      */
-    public int examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
+    @Transactional
+    public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
         //1参数校验
         Assert.notNull(accountOwnerIncomeExamineOpReq, ErrorCode.PARAMETER_ERROR.getText());
         accountOwnerIncomeExamineOpReq.check();
@@ -58,9 +60,7 @@ public class AccountOwnerIncomeService{
             AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = accountOwnerIncomeDetailNoTService.insertAccountOwnerIncomeDetail(accountOwnerIncomeExamineOpReq);
             //3.2 更新车主收益总和
             accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetail);
-            return accountOwnerIncomeDetail.getId();
         }
-        return 0;
     }
 
     /**
