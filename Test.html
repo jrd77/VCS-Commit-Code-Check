@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>haha</title>
+</head>
+<body>
+</body>
+<script>
+
+    function jisuanFour(){
+
+        var n = 1;
+        var benjin = 100;
+        var dingtoujine = 10;
+        var nianhuashouyi = parseFloat(12)/100;
+        var yuezhichu = 5000;
+
+        var a1 = dingtoujine * 12 *(1+nianhuashouyi);
+
+        do{
+            var b = a1 * Math.pow(1 + nianhuashouyi, n);
+            var c = (b - a1)/(nianhuashouyi);
+            console.log("b:"+b);
+            console.log("c:"+c);
+
+            var d = benjin * Math.pow(1 + nianhuashouyi, n);
+            console.log("d:"+d);
+            var sum = c + d;
+            var yueSum = sum * nianhuashouyi / 12;
+            if(yueSum>yuezhichu){
+                console.log(yueSum);
+                console.log(n);
+                return false;
+            }
+            n++;
+        }
+        while(n>0)
+
+
+    }
+</script>
+</html>
+
+
