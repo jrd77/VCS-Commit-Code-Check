@@ -61,7 +61,13 @@ public class OrderRemarkLogService {
 
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
-
+    public  void saveRemarkLog(OrderRemarkLogEntity orderRemarkLogEntity){
+        //保存操作日志
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkLogEntity.setCreateOp(userName);
+        orderRemarkLogEntity.setUpdateOp(userName);
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+    }
 
     /**
      * 查询备注日志列表
@@ -82,6 +88,7 @@ public class OrderRemarkLogService {
         if(!CollectionUtils.isEmpty(remarkList)) {
             remarkList.forEach(remarkLogEntity -> {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
+                orderRemarkLogListResponseVO.setRemarkId(remarkLogEntity.getRemarkId());
                 orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
                 orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
                 orderRemarkLogListResponseVO.setOperateTypeText(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));

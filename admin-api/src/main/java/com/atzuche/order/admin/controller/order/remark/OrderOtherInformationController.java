@@ -7,14 +7,16 @@ import com.atzuche.order.admin.constant.description.DescriptionConstant;
 import com.atzuche.order.admin.controller.BaseController;
 import com.atzuche.order.admin.description.LogDescription;
 import com.atzuche.order.admin.dto.remark.OrderRiskStatusRequestDTO;
+import com.atzuche.order.admin.entity.OrderRemarkEntity;
+import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
+import com.atzuche.order.admin.enums.remark.OperateTypeEnum;
+import com.atzuche.order.admin.enums.remark.RemarkTypeEnum;
 import com.atzuche.order.admin.exception.remark.OrderRemarkException;
 import com.atzuche.order.admin.service.OperatorLogService;
 import com.atzuche.order.admin.service.RemoteFeignService;
+import com.atzuche.order.admin.service.remark.OrderRemarkLogService;
 import com.atzuche.order.admin.service.remark.OrderRemarkService;
-import com.atzuche.order.admin.vo.req.remark.OrderCarServiceRemarkRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRemarkRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRentCityRequestVO;
-import com.atzuche.order.admin.vo.req.remark.OrderRiskStatusRequestVO;
+import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.OrderOtherInformationResponseVO;
 import com.atzuche.order.admin.vo.resp.remark.OrderRemarkResponseVO;
 import com.atzuche.order.commons.entity.dto.RentCityAndRiskAccidentReqDTO;
@@ -66,6 +68,8 @@ public class OrderOtherInformationController extends BaseController{
     RemoteFeignService remoteFeignService;
     @Autowired
     private OperatorLogService operatorLogService;
+    @Autowired
+    private OrderRemarkLogService orderRemarkLogService;
 
 	@AutoDocMethod(description = "修改租车城市", value = "修改租车城市", response = ResponseData.class)
     @RequestMapping(value = "/rent/city/update", method = RequestMethod.PUT)
@@ -140,10 +144,28 @@ public class OrderOtherInformationController extends BaseController{
         validateParameter(bindingResult);
         try{
             logger.info(LogDescription.getLogDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE, DescriptionConstant.INPUT_TEXT),orderCarServiceRemarkRequestVO.toString());
+
             OrderRemarkRequestVO orderRemarkRequestVO = new OrderRemarkRequestVO();
             orderRemarkRequestVO.setOrderNo(orderCarServiceRemarkRequestVO.getOrderNo());
             OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
-            orderRemarkService.updateCarServiceRemarkByOrderNo(orderCarServiceRemarkRequestVO);
+            OperateTypeEnum operateType = OperateTypeEnum.ADD;
+            if(orderRemarkResponseVO != null){
+                operateType = OperateTypeEnum.UPDATE;
+            }
+            //记录备注
+            Integer remarkId = orderRemarkService.updateCarServiceRemarkByOrderNo(orderCarServiceRemarkRequestVO, orderRemarkResponseVO);
+            //保存操作日志
+            OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
+            orderRemarkLogEntity.setOperateType(operateType.getType());
+            orderRemarkLogEntity.setRemarkHistory(orderRemarkResponseVO.getRemarkContent());
+            orderRemarkLogEntity.setOrderNo(orderCarServiceRemarkRequestVO.getOrderNo());
+            orderRemarkLogEntity.setRemarkType(RemarkTypeEnum.CAR_SERVICE.getType());
+            //orderRemarkLogEntity.setNumber(orderRemarkResponseVO.getNumber());
+            orderRemarkLogEntity.setDepartmentId(orderRemarkResponseVO.getDepartmentId());
+            orderRemarkLogEntity.setRemarkContent(orderCarServiceRemarkRequestVO.getRemarkContent());
+            orderRemarkLogEntity.setRemarkId(String.valueOf(remarkId));
+            orderRemarkLogService.saveRemarkLog(orderRemarkLogEntity);
+
             // 保存操作日志
             operatorLogService.saveUpdateGetReturnCarRemarkLog(orderCarServiceRemarkRequestVO, orderRemarkResponseVO);
             CatLogRecord.successLog(LogDescription.getCatDescription(DescriptionConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE, DescriptionConstant.SUCCESS_TEXT), UrlConstant.CONSOLE_ORDER_OTHER_INFORMATION_CAR_SERVICE_UPDATE,  orderCarServiceRemarkRequestVO);

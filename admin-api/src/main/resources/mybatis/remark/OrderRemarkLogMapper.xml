@@ -6,6 +6,7 @@
 
 
 	<resultMap id="orderRemarkLogInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkLogEntity" >
+        <result property="remarkId" column="remark_id"/>
 		<result property="remarkType" column="remark_type"/>
 		<result property="remarkContent" column="remark"/>
 		<result property="remarkHistory" column="remark_history"/>
@@ -64,6 +65,7 @@
 
 	<select id="selectRemarkLogList" resultMap="orderRemarkLogInformationMap">
 		select
+        remark_id,
 		`number`,
 		remark_type,
 		remark,

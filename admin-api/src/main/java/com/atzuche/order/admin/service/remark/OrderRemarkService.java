@@ -2,6 +2,7 @@ package com.atzuche.order.admin.service.remark;
 
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
+import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.*;
 import com.atzuche.order.admin.enums.remark.*;
@@ -108,15 +109,26 @@ public class OrderRemarkService {
      * 修改取送车备注remark_type=12，取送车备注一直累加,读取时取最新一条
      * @param orderCarServiceRemarkUpdateRequestVO
      */
-    public void updateCarServiceRemarkByOrderNo(OrderCarServiceRemarkRequestVO orderCarServiceRemarkUpdateRequestVO){
+    public Integer updateCarServiceRemarkByOrderNo(OrderCarServiceRemarkRequestVO orderCarServiceRemarkUpdateRequestVO, OrderRemarkResponseVO orderRemarkResponseVO){
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
-        BeanUtils.copyProperties(orderCarServiceRemarkUpdateRequestVO,orderRemarkEntity);
+
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         orderRemarkEntity.setUpdateOp(userName);
         orderRemarkEntity.setCreateOp(userName);
         orderRemarkEntity.setRemarkType(RemarkTypeEnum.CAR_SERVICE.getType());
-        orderRemarkMapper.addOrderRemark(orderRemarkEntity);
+        orderRemarkEntity.setOrderNo(orderCarServiceRemarkUpdateRequestVO.getOrderNo());
+        orderRemarkEntity.setRemarkContent(orderCarServiceRemarkUpdateRequestVO.getRemarkContent());
+        if(orderRemarkResponseVO != null){
+            orderRemarkEntity.setRemarkId(orderRemarkResponseVO.getRemarkId());
+            orderRemarkMapper.updateRemarkById(orderRemarkEntity);
+            return orderRemarkResponseVO.getId();
+        }else{
+            orderRemarkMapper.addOrderRemark(orderRemarkEntity);
+            return orderRemarkEntity.getId();
+        }
     }
+
+
 
 
     /**
@@ -172,6 +184,7 @@ public class OrderRemarkService {
         OrderRemarkEntity orderRemarkEntity = orderRemarkMapper.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
         if(!ObjectUtils.isEmpty(orderRemarkEntity)){
             BeanUtils.copyProperties(orderRemarkEntity, orderRemarkResponseVO);
+
         }
         return orderRemarkResponseVO;
     }
