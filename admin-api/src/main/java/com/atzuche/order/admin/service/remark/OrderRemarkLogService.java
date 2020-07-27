@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service.remark;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.dto.remark.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
@@ -66,6 +67,7 @@ public class OrderRemarkLogService {
         String userName = AdminUserUtil.getAdminUser().getAuthName();
         orderRemarkLogEntity.setCreateOp(userName);
         orderRemarkLogEntity.setUpdateOp(userName);
+        logger.info("orderRemarkLogEntity={}", JSON.toJSONString(orderRemarkLogEntity));
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
@@ -88,7 +90,7 @@ public class OrderRemarkLogService {
         if(!CollectionUtils.isEmpty(remarkList)) {
             remarkList.forEach(remarkLogEntity -> {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
-                orderRemarkLogListResponseVO.setRemarkId(remarkLogEntity.getRemarkId());
+                orderRemarkLogListResponseVO.setRemarkId(remarkLogEntity.getRemarkId()!=null?String.valueOf(remarkLogEntity.getRemarkId()):"");
                 orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
                 orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
                 orderRemarkLogListResponseVO.setOperateTypeText(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));

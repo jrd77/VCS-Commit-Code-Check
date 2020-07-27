@@ -40,7 +40,7 @@
 		values
 		(
 			#{orderNo},
-			#{remarkId},
+			#{remarkId,jdbcType=INTEGER},
 			#{number},
 			#{remarkType},
 			#{remarkContent},

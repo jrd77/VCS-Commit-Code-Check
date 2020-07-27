@@ -163,7 +163,7 @@ public class OrderOtherInformationController extends BaseController{
             //orderRemarkLogEntity.setNumber(orderRemarkResponseVO.getNumber());
             orderRemarkLogEntity.setDepartmentId(orderRemarkResponseVO.getDepartmentId());
             orderRemarkLogEntity.setRemarkContent(orderCarServiceRemarkRequestVO.getRemarkContent());
-            orderRemarkLogEntity.setRemarkId(String.valueOf(remarkId));
+            orderRemarkLogEntity.setRemarkId(remarkId);
             orderRemarkLogService.saveRemarkLog(orderRemarkLogEntity);
 
             // 保存操作日志
