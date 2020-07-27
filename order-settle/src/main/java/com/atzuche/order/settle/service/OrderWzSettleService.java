@@ -30,8 +30,10 @@ public class OrderWzSettleService {
 	@Autowired
 	private RemoteOldSysDebtService remoteOldSysDebtService;
 	@Autowired
+    private OrderWzSettleSendMqService orderWzSettleSendMqService;
+	@Autowired
 	private MemberSecondSettleService memberSecondSettleService;
-	
+
 	
 	public void settleWzOrder(String orderNo) {
 		log.info("OrderWzSettleService settleOrder orderNo [{}]",orderNo);
@@ -65,11 +67,15 @@ public class OrderWzSettleService {
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
             // 调远程抵扣老系统历史欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getRenterMemNo(), settleOrders.getTotalWzDebtAmt());
+
             orderWzSettleNewService.sendOrderWzSettleSuccessMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             
+            // 违章结算成功通知仁云
+            orderWzSettleSendMqService.sendOrderWzSettleSuccessToRenYunMq(orderNo, settleOrders.getRenterMemNo());
+
             //记录分流标识(已车主的会员号为准。) 200616
             memberSecondSettleService.initDepositWzMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));
-            
+
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderWzSettleService settleOrder,orderNo={},",orderNo, e);

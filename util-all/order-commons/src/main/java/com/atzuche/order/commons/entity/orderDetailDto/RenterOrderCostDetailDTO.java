@@ -49,6 +49,10 @@ public class RenterOrderCostDetailDTO implements Serializable {
          * 单价
          */
         private Integer unitPrice;
+        /**
+         * 原始单价
+         */
+        private Integer originalUnitPrice;
     	/**
          * 份数
          */

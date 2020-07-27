@@ -1,8 +1,12 @@
 package com.atzuche.order.cashieraccount.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomExamineVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -624,16 +628,39 @@ public class CashierService {
     /**
      * 收益审核通过 更新车主收益信息
      */
-    public AdjustOwnerIncomeResVO examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
-        AdjustOwnerIncomeResVO vo = new  AdjustOwnerIncomeResVO();
-        BeanUtils.copyProperties(accountOwnerIncomeExamineOpReq,vo);
+    public List<AdjustOwnerIncomeResVO> examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO){
+        List<AdjustOwnerIncomeResVO> adjustOwnerIncomeResVOS = new ArrayList<>();
+        List<AccountOwnerIncomExamineVO> accountOwnerIncomExamineVOS = accountOwnerIncomeExamineOpDTO.getAccountOwnerIncomExamineVOS();
+        AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq = null;
+        for(AccountOwnerIncomExamineVO accountOwnerIncomExamineVO : accountOwnerIncomExamineVOS){
+            Integer examineId = accountOwnerIncomExamineVO.getAccountOwnerIncomeExamineId();
+            try{
+                accountOwnerIncomeExamineOpReq = new AccountOwnerIncomeExamineOpReqVO();
+                accountOwnerIncomeExamineOpReq.setOrderNo(accountOwnerIncomExamineVO.getOrderNo());
+                accountOwnerIncomeExamineOpReq.setMemNo(accountOwnerIncomExamineVO.getMemNo());
+                accountOwnerIncomeExamineOpReq.setStatus(accountOwnerIncomeExamineOpDTO.getStatus());
+                accountOwnerIncomeExamineOpReq.setUpdateOp(accountOwnerIncomeExamineOpDTO.getUpdateOp());
+                accountOwnerIncomeExamineOpReq.setOpName(accountOwnerIncomeExamineOpDTO.getOpName());
+                accountOwnerIncomeExamineOpReq.setAccountOwnerIncomeExamineId(examineId);
+                
+                boolean isSecondFlag =
+                        memberSecondSettleService.judgeIsSecond(Integer.parseInt(accountOwnerIncomeExamineOpReq.getMemNo()),
+                        accountOwnerIncomeExamineOpReq.getOrderNo());
+                int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq,isSecondFlag);
 
-        boolean isSecondFlag =
-                memberSecondSettleService.judgeIsSecond(Integer.parseInt(accountOwnerIncomeExamineOpReq.getMemNo()),
-                accountOwnerIncomeExamineOpReq.getOrderNo());
-        int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq, isSecondFlag);
-        vo.setAccountOwnerIncomeDetailId(id);
-        return vo;
+                AdjustOwnerIncomeResVO adjustOwnerIncomeResVO = new AdjustOwnerIncomeResVO();
+                adjustOwnerIncomeResVO.setMemNo(accountOwnerIncomExamineVO.getMemNo());
+                adjustOwnerIncomeResVO.setOrderNo(accountOwnerIncomExamineVO.getOrderNo());
+                adjustOwnerIncomeResVO.setExamineId(examineId);
+                ///
+                adjustOwnerIncomeResVO.setAccountOwnerIncomeDetailId(id);
+                
+                adjustOwnerIncomeResVOS.add(adjustOwnerIncomeResVO);
+            }catch (Exception e){
+                log.error("本条订单收益审核失败accountOwnerIncomeExamineOpReq={}", JSON.toJSONString(accountOwnerIncomeExamineOpReq),e);
+            }
+        }
+        return adjustOwnerIncomeResVOS;
     }
 
     /**

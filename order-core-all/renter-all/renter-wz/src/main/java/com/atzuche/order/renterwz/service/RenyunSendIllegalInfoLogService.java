@@ -29,4 +29,8 @@ public class RenyunSendIllegalInfoLogService {
     public String queryWzCodeByOrderNo(String orderNo, String carPlateNum) {
         return renyunSendIllegalInfoLogMapper.queryWzCodeByOrderNo(orderNo,carPlateNum);
     }
+
+    public String getWzCodeByOrderNo(String orderNo) {
+        return renyunSendIllegalInfoLogMapper.selectWzcodeByOrderNo(orderNo);
+    }
 }
