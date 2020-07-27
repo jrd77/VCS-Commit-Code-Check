@@ -118,13 +118,13 @@ public class OrderRemarkService {
         orderRemarkEntity.setRemarkType(RemarkTypeEnum.CAR_SERVICE.getType());
         orderRemarkEntity.setOrderNo(orderCarServiceRemarkUpdateRequestVO.getOrderNo());
         orderRemarkEntity.setRemarkContent(orderCarServiceRemarkUpdateRequestVO.getRemarkContent());
-        if(orderRemarkResponseVO != null){
-            orderRemarkEntity.setRemarkId(orderRemarkResponseVO.getRemarkId());
+        if(orderRemarkResponseVO != null && orderRemarkResponseVO.getId()!=null){
+            orderRemarkEntity.setRemarkId(String.valueOf(orderRemarkResponseVO.getId()));
             orderRemarkMapper.updateRemarkById(orderRemarkEntity);
             return orderRemarkResponseVO.getId();
         }else{
             orderRemarkMapper.addOrderRemark(orderRemarkEntity);
-            return orderRemarkEntity.getId();
+            return Integer.valueOf(orderRemarkEntity.getRemarkId());
         }
     }
 

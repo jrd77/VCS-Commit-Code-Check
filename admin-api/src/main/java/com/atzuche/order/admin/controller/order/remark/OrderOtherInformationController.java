@@ -149,7 +149,7 @@ public class OrderOtherInformationController extends BaseController{
             orderRemarkRequestVO.setOrderNo(orderCarServiceRemarkRequestVO.getOrderNo());
             OrderRemarkResponseVO orderRemarkResponseVO = orderRemarkService.getOrderCarServiceRemarkInformation(orderRemarkRequestVO);
             OperateTypeEnum operateType = OperateTypeEnum.ADD;
-            if(orderRemarkResponseVO != null){
+            if(orderRemarkResponseVO != null && orderRemarkResponseVO.getId()!=null){
                 operateType = OperateTypeEnum.UPDATE;
             }
             //记录备注
