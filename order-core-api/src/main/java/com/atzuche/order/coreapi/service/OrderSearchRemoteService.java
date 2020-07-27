@@ -335,7 +335,7 @@ public class OrderSearchRemoteService {
         confs = this.filterQueryDayConf(confs);
         Set<Integer> days = confs.stream().map(WzQueryDayConfEntity::getIllegalQueryDay).collect(Collectors.toSet());
         //节假日
-        days.add(30);
+        //days.add(30);
         List<ViolateBO> violates = new ArrayList<>();
         for (Integer day : days) {
             List<ViolateBO> violateBos = violatePendingOrderByDay(day);
@@ -377,17 +377,17 @@ public class OrderSearchRemoteService {
             violateList.addAll(festivalViolates);
         }
         //非节假日订单
-        for (WzQueryDayConfEntity conf : confs) {
+        //for (WzQueryDayConfEntity conf : confs) {
             /*and (a.rent_time &gt; #{festivalEndTime} or a.`revert_time` &lt; #{festivalStartTime})*/
             List<ViolateBO> temp = violates
                     .stream()
-                    .filter(dto -> String.valueOf(conf.getCityCode()).equals(dto.getCity()))
+                    //.filter(dto -> String.valueOf(conf.getCityCode()).equals(dto.getCity()))
                     .filter(dto -> dto.getRentTime().isAfter(FESTIVAL_END_TIME) || dto.getRevertTime().isBefore(FESTIVAL_START_TIME))
                     .collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(temp)){
                 violateList.addAll(temp);
             }
-        }
+        //}
         return violateList.stream().map(this::convertTo).collect(Collectors.toList());
     }
 
