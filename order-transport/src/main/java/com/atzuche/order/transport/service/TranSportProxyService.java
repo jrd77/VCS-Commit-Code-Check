@@ -215,7 +215,7 @@ public class TranSportProxyService {
             ResponseCheckUtil.checkResponse(responseData);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
-            if (Objects.isNull(responseData) || ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
+            if (Objects.nonNull(responseData) && ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
                 return responseData.getData().getHumanFee().intValue();
             }else {
                 return getReturnOverTransportFee;
