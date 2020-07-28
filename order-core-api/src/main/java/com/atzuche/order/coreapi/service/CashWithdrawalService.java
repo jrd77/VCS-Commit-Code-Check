@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.cashieraccount.exception.WithdrawalAmtException;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
 import com.atzuche.order.commons.vo.req.income.AcctOwnerWithdrawalRuleReqVO;
@@ -38,18 +39,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CashWithdrawalService {
 
-	@Autowired
-	private AccountOwnerCashExamineService accountOwnerCashExamineService;
-	@Autowired
-	private MemProxyService memProxyService;
-	@Autowired
-	private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
-	@Autowired
-	private RemoteAccountService remoteAccountService;
-	@Autowired
-	private OwnerGoodsService ownerGoodsService;
-	@Autowired
-	private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
+    @Autowired
+    private AccountOwnerCashExamineService accountOwnerCashExamineService;
+    @Autowired
+    private MemProxyService memProxyService;
+    @Autowired
+    private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
+    @Autowired
+    private RemoteAccountService remoteAccountService;
+    @Autowired
+    private OwnerGoodsService ownerGoodsService;
+    @Autowired
+    private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
 
     /**
      * 提现功能
@@ -75,7 +76,7 @@ public class CashWithdrawalService {
 
         // 获取新订单系统的会员总收益
         AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncome(req.getMemNo());
-        log.info("Old owner income info. incomeEntity:[{}]" , JSON.toJSONString(incomeEntity));
+        log.info("Old owner income info. incomeEntity:[{}]", JSON.toJSONString(incomeEntity));
         //校验
         accountOwnerCashExamineService.check(req, simpleMem, incomeEntity);
         // 根据id获取银行卡信息
@@ -88,81 +89,107 @@ public class CashWithdrawalService {
         //accountOwnerCashExamineService.saveAccountOwnerCashExamine(req, simpleMem);
         accountOwnerCashExamineService.memberWithdrawalHandle(req, simpleMem, incomeEntity, bankCard);
     }
-	
-	
-	/**
-	 * 获取新提现列表根据会员号
-	 * @param req
-	 * @return List<AccountOwnerCashExamine>
-	 */
-	public List<AccountOwnerCashExamine> listCashWithdrawal(SearchCashWithdrawalReqDTO req) {
-		log.info("获取新提现列表根据会员号CashWithdrawalService.listCashWithdrawal searchCashWithdrawalReqDTO=[{}]",req);
-		Integer memNo = StringUtils.isBlank(req.getMemNo()) ? null:Integer.valueOf(req.getMemNo());
-		return accountOwnerCashExamineService.listAccountOwnerCashExamineByMemNo(memNo);
-	}
-	
-	
-	/**
-	 * 获取可提现金额
-	 * @param req
-	 * @return Integer
-	 */
-	public Integer getBalance(SearchCashWithdrawalReqDTO req) {
-		log.info("获取可提现金额CashWithdrawalService.getBalance searchCashWithdrawalReqDTO=[{}]",req);
-		// 调远程获取老系统可提现余额
-		MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
-		// 获取新订单系统的会员总收益
-		AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncomeByMemNO(req.getMemNo());
-		int balance = 0;
-		if (memBalanceVO != null && memBalanceVO.getBalance() != null && memBalanceVO.getBalance() > 0) {
-			balance += memBalanceVO.getBalance();
-		}
-		if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
-			balance += incomeEntity.getIncomeAmt();
-		}
+
+
+    /**
+     * 获取新提现列表根据会员号
+     *
+     * @param req
+     * @return List<AccountOwnerCashExamine>
+     */
+    public List<AccountOwnerCashExamine> listCashWithdrawal(SearchCashWithdrawalReqDTO req) {
+        log.info("获取新提现列表根据会员号CashWithdrawalService.listCashWithdrawal searchCashWithdrawalReqDTO=[{}]", req);
+        Integer memNo = StringUtils.isBlank(req.getMemNo()) ? null : Integer.valueOf(req.getMemNo());
+        return accountOwnerCashExamineService.listAccountOwnerCashExamineByMemNo(memNo);
+    }
+
+
+    /**
+     * 获取可提现金额
+     *
+     * @param req
+     * @return Integer
+     */
+    public Integer getBalance(SearchCashWithdrawalReqDTO req) {
+        log.info("获取可提现金额CashWithdrawalService.getBalance searchCashWithdrawalReqDTO=[{}]", req);
+        // 调远程获取老系统可提现余额
+        MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
+        // 获取新订单系统的会员总收益
+        AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncomeByMemNO(req.getMemNo());
+        int balance = 0;
+        if (memBalanceVO != null && memBalanceVO.getBalance() != null && memBalanceVO.getBalance() > 0) {
+            balance += memBalanceVO.getBalance();
+        }
+        if (incomeEntity != null && incomeEntity.getIncomeAmt() != null) {
+            balance += incomeEntity.getIncomeAmt();
+        }
         if (Objects.nonNull(incomeEntity) && Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
             balance += incomeEntity.getSecondaryIncomeAmt();
         }
-		return balance;
-	}
-	
-	
-	/**
-	 * 获取车主gps押金抵扣记录
-	 * @param memNo
-	 * @param carNo
-	 * @return List<OwnerGpsDeductVO>
-	 */
-	public List<OwnerGpsDeductVO> listOwnerGpsDeduct(String memNo, Integer carNo) {
-		List<String> orderNoList = ownerGoodsService.listOrderNoByCarNo(carNo);
-		if (orderNoList == null || orderNoList.isEmpty()) {
-			return null;
-		}
-		List<AccountOwnerCostSettleDetailEntity> ownerCostSettleList = accountOwnerCostSettleDetailNoTService.listOwnerSettleCostBySourceCode(orderNoList, memNo, OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getCashNo());
-		if (ownerCostSettleList == null || ownerCostSettleList.isEmpty()) {
-			return null;
-		}
-		List<OwnerGpsDeductVO> list = new ArrayList<OwnerGpsDeductVO>();
-		for (AccountOwnerCostSettleDetailEntity ocs:ownerCostSettleList) {
-			OwnerGpsDeductVO ownerGpsDeductVO = new OwnerGpsDeductVO();
-			ownerGpsDeductVO.setDeposit(ocs.getAmt() == null?null:String.valueOf(ocs.getAmt()));
-			ownerGpsDeductVO.setGpsDepositTxt("GPS押金");
-			ownerGpsDeductVO.setIsEnterTransFlag("1");
-			ownerGpsDeductVO.setOrderNo(ocs.getOrderNo());
-			ownerGpsDeductVO.setSettleDate(CommonUtils.formatTime(ocs.getCreateTime(), "yyyy.MM.dd"));
-			list.add(ownerGpsDeductVO);
-		}
-		return list;
-	}
+        return balance;
+    }
 
 
+    /**
+     * 获取车主gps押金抵扣记录
+     *
+     * @param memNo
+     * @param carNo
+     * @return List<OwnerGpsDeductVO>
+     */
+    public List<OwnerGpsDeductVO> listOwnerGpsDeduct(String memNo, Integer carNo) {
+        List<String> orderNoList = ownerGoodsService.listOrderNoByCarNo(carNo);
+        if (orderNoList == null || orderNoList.isEmpty()) {
+            return null;
+        }
+        List<AccountOwnerCostSettleDetailEntity> ownerCostSettleList = accountOwnerCostSettleDetailNoTService.listOwnerSettleCostBySourceCode(orderNoList, memNo, OwnerCashCodeEnum.HW_DEPOSIT_DEBT.getCashNo());
+        if (ownerCostSettleList == null || ownerCostSettleList.isEmpty()) {
+            return null;
+        }
+        List<OwnerGpsDeductVO> list = new ArrayList<OwnerGpsDeductVO>();
+        for (AccountOwnerCostSettleDetailEntity ocs : ownerCostSettleList) {
+            OwnerGpsDeductVO ownerGpsDeductVO = new OwnerGpsDeductVO();
+            ownerGpsDeductVO.setDeposit(ocs.getAmt() == null ? null : String.valueOf(ocs.getAmt()));
+            ownerGpsDeductVO.setGpsDepositTxt("GPS押金");
+            ownerGpsDeductVO.setIsEnterTransFlag("1");
+            ownerGpsDeductVO.setOrderNo(ocs.getOrderNo());
+            ownerGpsDeductVO.setSettleDate(CommonUtils.formatTime(ocs.getCreateTime(), "yyyy.MM.dd"));
+            list.add(ownerGpsDeductVO);
+        }
+        return list;
+    }
 
-	public AcctOwnerWithdrawalRuleResVO getWithdrawalRule(AcctOwnerWithdrawalRuleReqVO req) {
+
+    public AcctOwnerWithdrawalRuleResVO getWithdrawalRule(AcctOwnerWithdrawalRuleReqVO req) {
         // 调远程获取老系统可提现余额
         MemBalanceVO memBalanceVO = remoteAccountService.getMemBalance(req.getMemNo());
+
+        int oldIncomeAmt = 0;
+        if (Objects.nonNull(memBalanceVO) && Objects.nonNull(memBalanceVO.getBalance())) {
+            oldIncomeAmt = memBalanceVO.getBalance();
+        }
+
+        // 获取新订单系统的会员总收益
+        AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeNoTService.getOwnerIncomeByMemNO(req.getMemNo());
+        int newIncomeAmt = 0;
+        int secondaryIncomeAmt = 0;
+        if (Objects.nonNull(incomeEntity)) {
+            if(Objects.nonNull(incomeEntity.getIncomeAmt())) {
+                newIncomeAmt = incomeEntity.getIncomeAmt();
+            }
+
+            if(Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
+                secondaryIncomeAmt = incomeEntity.getSecondaryIncomeAmt();
+            }
+        }
+
+        if(oldIncomeAmt + newIncomeAmt + secondaryIncomeAmt < Integer.parseInt(req.getAmt())) {
+            throw new WithdrawalAmtException("您的提现金额不可大于可提现余额");
+        }
+
         AcctOwnerWithdrawalRuleResVO resVO = new AcctOwnerWithdrawalRuleResVO();
         //优先提现老系统收益金额
-        if(Objects.isNull(memBalanceVO) || Objects.isNull(memBalanceVO.getBalance()) || memBalanceVO.getBalance() < Integer.parseInt(req.getAmt())) {
+        if (oldIncomeAmt + newIncomeAmt < Integer.parseInt(req.getAmt())) {
             resVO.setIsContainSecondary(String.valueOf(OrderConstant.YES));
         } else {
             resVO.setIsContainSecondary(String.valueOf(OrderConstant.NO));
