@@ -361,6 +361,9 @@ public class OrderDetailService {
         if (renterOrderEntity != null) {
         	SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
         	orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
+        	// 获取区间配送信息
+            SectionDeliveryVO ownerSectionDeliveryVO = renterOrderDeliveryModeService.getOwnerSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+            orderDetailRespDTO.ownerSectionDelivery = ownerSectionDeliveryVO;
         }
         return orderDetailRespDTO;
 
