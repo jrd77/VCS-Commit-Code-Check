@@ -106,7 +106,8 @@ public class OwnerCancelOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.DISPATCH_ING.getCode());
-
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_DISPATCH.getStatus());
         } else {
             //取消不进调度
             cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());

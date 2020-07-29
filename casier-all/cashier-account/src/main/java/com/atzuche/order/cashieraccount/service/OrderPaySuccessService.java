@@ -83,7 +83,6 @@ public class OrderPaySuccessService {
 	            		//记录订单流程
 		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
 	            	}
-	            	log.info("orderPayCallBack paysuccess updateRenterStatusByRenterOrderNo renterOrderNo=[{}], renterStatus=[{}]",vo.getRenterOrderNo(),renterStatus);
 	            	//更新租客订单车主同意信息
 	                RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(vo.getOrderNo());
 	                if (renterOrderEntity != null) {

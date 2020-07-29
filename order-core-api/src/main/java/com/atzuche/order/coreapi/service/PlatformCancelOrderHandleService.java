@@ -117,6 +117,8 @@ public class PlatformCancelOrderHandleService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.DISPATCH_ING.getCode());
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_DISPATCH.getStatus());
         } else {
             //不进调度
             cancelOrderResDTO.setOwnerCouponNo(null == ownerCouponEntity ? null : ownerCouponEntity.getCouponId());

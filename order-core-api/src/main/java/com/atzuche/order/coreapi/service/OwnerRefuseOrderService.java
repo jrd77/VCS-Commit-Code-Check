@@ -138,7 +138,8 @@ public class OwnerRefuseOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(OrderConstant.YES);
-            
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_DISPATCH.getStatus());
             //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
             OrderPaySignReqVO vo = null;
             try {
