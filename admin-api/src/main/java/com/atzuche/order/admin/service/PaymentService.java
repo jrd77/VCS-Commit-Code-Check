@@ -346,7 +346,7 @@ public class PaymentService {
 			case "00":payName="钱包支付";break;
 			case "01":payName="银联";break;
 			case "02":payName="线下支付";break;
-			case "06":payName="支付宝普通预授权";break;
+			case "06":payName="支付宝";break;
 			case "07": payName="微信APP";break;
 			case "08": payName="快钱支付(统一app和H5)";break;
 			case "12": payName="Apple Pay";break;

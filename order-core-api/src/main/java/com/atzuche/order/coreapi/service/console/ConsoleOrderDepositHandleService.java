@@ -1,10 +1,15 @@
 package com.atzuche.order.coreapi.service.console;
 
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositEntity;
+import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositDetailNoTService;
+import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterWzDepositNoTService;
 import com.atzuche.order.cashieraccount.service.CashierQueryService;
 import com.atzuche.order.cashieraccount.vo.res.WzDepositMsgResVO;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.WzCostLogDTO;
 import com.atzuche.order.commons.entity.dto.WzDepositMsgDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountRenterDepositDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
@@ -29,6 +34,7 @@ import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,6 +67,8 @@ public class ConsoleOrderDepositHandleService {
     private RenterOrderService renterOrderService;
     @Resource
     private WzCostLogService wzCostLogService;
+    @Autowired
+    private AccountRenterWzDepositNoTService accountRenterWzDepositNoTService;
 
 
 
@@ -223,6 +231,14 @@ public class ConsoleOrderDepositHandleService {
             BeanUtils.copyProperties(renterOrderEntity, renterOrderDTO);
             res.setRenterOrderDTO(renterOrderDTO);
         }
+        //租客押金
+        AccountRenterWzDepositEntity accountRenterWZDepositByOrder = accountRenterWzDepositNoTService.getAccountRenterWZDepositByOrder(orderNo);
+        if(accountRenterWZDepositByOrder != null){
+            AccountRenterDepositDetailDTO accountRenterDepositDetailDTO = new AccountRenterDepositDetailDTO();
+            BeanUtils.copyProperties(accountRenterWZDepositByOrder,accountRenterDepositDetailDTO);
+            res.setAccountRenterDepositDetailDTO(accountRenterDepositDetailDTO);
+        }
+
         return res;
     }
 
