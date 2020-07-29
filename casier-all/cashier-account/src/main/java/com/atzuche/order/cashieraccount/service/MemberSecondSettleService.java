@@ -88,16 +88,15 @@ public class MemberSecondSettleService {
      * <p>注:只判断租车费用+车辆押金</p>
      * <p><font color=red>注:使用于车主收益变更接口</font></p>
      *
-     * @param memNo   会员号,必传
      * @param orderNo 订单号,非必传
      * @return boolean true-是 false-否
      */
-    public boolean judgeIsSecond(Integer memNo, String orderNo) {
-        log.info("Determine if the order is paid in two clear. param is,memNo:[{}], orderNo:[{}]", memNo, orderNo);
+    public boolean judgeIsSecond(String orderNo) {
+        log.info("Determine if the order is paid in two clear. param is, orderNo:[{}]", orderNo);
         if (StringUtils.isBlank(orderNo)) {
             return false;
         }
-        Integer result = memberSecondSettleMapper.selectByCondition(memNo, orderNo, OrderConstant.ONE,
+        Integer result = memberSecondSettleMapper.selectByCondition(orderNo, OrderConstant.ONE,
                 OrderConstant.YES);
         return Objects.nonNull(result) && result > OrderConstant.ZERO;
     }

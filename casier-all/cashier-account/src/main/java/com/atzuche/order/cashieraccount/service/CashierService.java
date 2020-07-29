@@ -644,8 +644,7 @@ public class CashierService {
                 accountOwnerIncomeExamineOpReq.setAccountOwnerIncomeExamineId(examineId);
                 
                 boolean isSecondFlag =
-                        memberSecondSettleService.judgeIsSecond(Integer.parseInt(accountOwnerIncomeExamineOpReq.getMemNo()),
-                        accountOwnerIncomeExamineOpReq.getOrderNo());
+                        memberSecondSettleService.judgeIsSecond(accountOwnerIncomeExamineOpReq.getOrderNo());
                 int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq,isSecondFlag);
 
                 AdjustOwnerIncomeResVO adjustOwnerIncomeResVO = new AdjustOwnerIncomeResVO();

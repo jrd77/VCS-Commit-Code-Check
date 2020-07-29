@@ -31,13 +31,12 @@ public interface MemberSecondSettleMapper {
     /**
      * 查询指定条件记录数
      *
-     * @param memNo        会员号
      * @param orderNo      订单号
      * @param settleType   结算类型：1租车押金，2违章押金
      * @param isSecondFlow 是否分流：0否1是
      * @return Integer 记录数
      */
-    Integer selectByCondition(@Param("memNo") Integer memNo, @Param("orderNo") String orderNo,
+    Integer selectByCondition(@Param("orderNo") String orderNo,
                               @Param("settleType") Integer settleType, @Param("isSecondFlow") Integer isSecondFlow);
 
 

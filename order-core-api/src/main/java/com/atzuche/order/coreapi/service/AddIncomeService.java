@@ -223,7 +223,7 @@ public class AddIncomeService {
         }
 
         boolean isSecondFlag =
-                memberSecondSettleService.judgeIsSecond(addIncomeExamine.getMemNo(), addIncomeExamine.getOrderNo());
+                memberSecondSettleService.judgeIsSecond(addIncomeExamine.getOrderNo());
         if (amt > 0) {
             greaterThanZero(addIncomeExamine, req.getOperator(), isSecondFlag);
         } else {

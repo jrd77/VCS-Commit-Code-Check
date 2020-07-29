@@ -30,8 +30,7 @@
         from
             member_second_settle
         where
-            `mem_no` = #{memNo}
-             and `order_no` = #{orderNo}
+            `order_no` = #{orderNo}
              and `settle_type` = #{settleType}
              and `is_second_flow` = #{isSecondFlow}
     </select>
