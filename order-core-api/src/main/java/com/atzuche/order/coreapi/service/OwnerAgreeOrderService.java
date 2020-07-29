@@ -148,7 +148,10 @@ public class OwnerAgreeOrderService {
         record.setReqAcceptTime(LocalDateTime.now());
         record.setAgreeFlag(OwnerAgreeTypeEnum.ARGEE.getCode());
         renterOrderService.updateRenterOrderInfo(record);
-        
+        if (orderStatusEnum == OrderStatusEnum.TO_GET_CAR) {
+        	// 更新租客之订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
+        }
         //自动拒绝时间相交的订单
         agreeOrderConflictInfoHandle(reqVO.getOrderNo(), String.valueOf(orderInfoDTO.getCarNo()),
                 renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());

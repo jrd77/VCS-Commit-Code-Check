@@ -70,7 +70,9 @@ public class OrderPaySuccessService {
 	            BeanUtils.copyProperties(vo,orderStatusDTO);
 	            //当支付成功（当车辆押金，违章押金，租车费用都支付成功，更新订单状态 待取车），更新主订单状态待取车
 	            if(isChangeOrderStatus(orderStatusDTO)){
+	            	int renterStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
 	            	if (ownerStatus > OrderStatusEnum.TO_CONFIRM.getStatus()) {
+	            		renterStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
 	            		orderStatusDTO.setStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
 		                vo.setIsGetCar(YesNoEnum.YES);
 		                //记录订单流程
@@ -80,8 +82,9 @@ public class OrderPaySuccessService {
 	            		//记录订单流程
 		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
 	            	}
+	            	log.info("orderPayCallBack paysuccess updateRenterStatusByRenterOrderNo renterOrderNo=[{}], renterStatus=[{}]",vo.getRenterOrderNo(),renterStatus);
 	                // 更新租客之订单状态
-	                renterOrderService.updateRenterStatusByRenterOrderNo(vo.getRenterOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
+	                renterOrderService.updateRenterStatusByRenterOrderNo(vo.getRenterOrderNo(), renterStatus);
 	            }
 	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
