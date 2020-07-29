@@ -169,9 +169,20 @@ public class AccountOwnerIncomeNoTService {
     }
 
     public AccountOwnerIncomeEntity getOwnerIncomeByMemNo(String memNo) {
+
         return accountOwnerIncomeMapper.selectByMemNo(memNo);
     }
 
+    /**
+     * 获取会员总收益金额
+     *
+     * @param memNo 会员号
+     * @return int
+     */
+    public int getOwnerTotalIncomeByMemNo(String memNo) {
+        AccountOwnerIncomeEntity incomeEntity = accountOwnerIncomeMapper.selectByMemNo(memNo);
+        return calOwnerTotalIncomeAmt(incomeEntity);
+    }
 
     /**
      * 更新收益并保存明细
@@ -193,7 +204,7 @@ public class AccountOwnerIncomeNoTService {
         if (CollectionUtils.isNotEmpty(accountOwnerIncomeEntities)) {
             for (AccountOwnerIncomeEntity accountOwnerIncomeEntity : accountOwnerIncomeEntities) {
                 AccountOwnerIncomeListDTO accountOwnerIncomeListDTO = new AccountOwnerIncomeListDTO();
-                accountOwnerIncomeListDTO.setIncomeAmt(accountOwnerIncomeEntity.getIncomeAmt());
+                accountOwnerIncomeListDTO.setIncomeAmt(calOwnerTotalIncomeAmt(accountOwnerIncomeEntity));
                 accountOwnerIncomeListDTO.setMemNo(accountOwnerIncomeEntity.getMemNo());
                 accountOwnerIncomeList.add(accountOwnerIncomeListDTO);
             }
@@ -224,5 +235,29 @@ public class AccountOwnerIncomeNoTService {
         }
         // 新增车主收益明细
         return accountOwnerIncomeDetailMapper.insertSelective(accountOwnerIncomeDetail);
+    }
+
+    /**
+     * 计算车主总收益金额
+     *
+     * @param incomeEntity 车主收益信息
+     * @return 总收益金额
+     */
+    private int calOwnerTotalIncomeAmt(AccountOwnerIncomeEntity incomeEntity) {
+        if (Objects.isNull(incomeEntity)) {
+            return OrderConstant.ZERO;
+        }
+        int totalIncomeAmt = 0;
+        if (Objects.nonNull(incomeEntity.getIncomeAmt())) {
+            totalIncomeAmt = totalIncomeAmt + incomeEntity.getIncomeAmt();
+        }
+        if (Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
+            totalIncomeAmt = totalIncomeAmt + incomeEntity.getSecondaryIncomeAmt();
+        }
+
+        if (Objects.nonNull(incomeEntity.getSecondaryFreezeIncomeAmt())) {
+            totalIncomeAmt = totalIncomeAmt + incomeEntity.getSecondaryFreezeIncomeAmt();
+        }
+        return totalIncomeAmt;
     }
 }

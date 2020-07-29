@@ -5,9 +5,12 @@ import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeEntity;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeNoTService;
 import com.atzuche.order.cashieraccount.entity.AccountOwnerCashExamine;
 import com.atzuche.order.cashieraccount.exception.WithdrawalBalanceNotEnoughException;
+import com.atzuche.order.cashieraccount.exception.WithdrawalException;
+import com.atzuche.order.cashieraccount.exception.WithdrawalTimesLimitException;
 import com.atzuche.order.cashieraccount.mapper.AccountOwnerCashExamineMapper;
 import com.atzuche.order.cashieraccount.service.remote.AutoSecondOpenRemoteService;
 import com.atzuche.order.cashieraccount.vo.req.WithdrawalsReqVO;
+import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.autoyol.commons.web.ErrorCode;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -74,7 +78,7 @@ public class AccountOwnerCashExamineHandleService {
                 failCode = re.getErrorCode();
                 failMessage = re.getErrorMsg();
             } catch (Exception e) {
-                log.error("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle err.", e);
+                log.error("AccountOwnerCashExamineHandleService.oldWithdrawableCashHandle err.", e);
                 handleResult = OrderConstant.TWO;
             }
             accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
@@ -142,23 +146,13 @@ public class AccountOwnerCashExamineHandleService {
      * @param dynamicCode               短信动态验证码
      * @return Integer 提现记录ID
      */
+    @Transactional(rollbackFor = Exception.class)
     public Integer secondaryWithdrawableCashHandle(AccountOwnerCashExamine record,
                                                    AccountOwnerIncomeEntity income,
                                                    int secondaryWithdrawableCash,
                                                    String serialNumber, String dynamicCode) {
         if (secondaryWithdrawableCash > OrderConstant.ZERO) {
-            // 添加提现记录
-            record.setId(null);
-            record.setSerialNumber(serialNumber);
-            record.setBalanceFlag(OrderConstant.ONE);
-            record.setSecondCleanFlag(OrderConstant.ONE);
-            record.setAmt(secondaryWithdrawableCash);
-            accountOwnerCashExamineMapper.insertSelective(record);
-
             // 更新新交易车主收益信息(二清)并记录处理结果
-            int handleResult = OrderConstant.ONE;
-            String failCode = "";
-            String failMessage = "";
             try {
                 // 调用远程方法提现
                 WithdrawalsReqVO reqVO = new WithdrawalsReqVO();
@@ -169,6 +163,14 @@ public class AccountOwnerCashExamineHandleService {
                 reqVO.setSmsCode(dynamicCode);
                 ResponseData responseData = autoSecondOpenRemoteService.sendWithdrawalRequest(reqVO);
                 if (StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
+                    // 添加提现记录
+                    record.setId(null);
+                    record.setSerialNumber(serialNumber);
+                    record.setBalanceFlag(OrderConstant.ONE);
+                    record.setSecondCleanFlag(OrderConstant.ONE);
+                    record.setAmt(secondaryWithdrawableCash);
+                    accountOwnerCashExamineMapper.insertSelective(record);
+
                     // 受理成功后同步提现记录的状态
                     AccountOwnerCashExamine cashExamine = new AccountOwnerCashExamine();
                     cashExamine.setId(record.getId());
@@ -185,18 +187,19 @@ public class AccountOwnerCashExamineHandleService {
 
                     log.info("B.new owner income info. income:[{}]", JSON.toJSONString(income));
                     accountOwnerIncomeNoTService.updateOwnerIncomeAmtForCashWith(income);
+
+                    accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), OrderConstant.ONE,
+                            null, null);
+                    return record.getId();
                 } else {
-                    handleResult = OrderConstant.TWO;
-                    failCode = responseData.getResCode();
-                    failMessage = responseData.getResMsg();
+                    log.info("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle fail. " +
+                            "responseData:[{}]", JSON.toJSONString(responseData));
+                    throw new WithdrawalException(responseData.getResCode(), responseData.getResMsg());
                 }
             } catch (Exception e) {
                 log.error("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle err.", e);
-                handleResult = OrderConstant.TWO;
+                throw new WithdrawalException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());
             }
-            accountOwnerCashExamineHandleLogService.addHandleLog(record.getMemNo(), record.getId(), handleResult,
-                    failCode, failMessage);
-            return record.getId();
         } else {
             log.info("新交易提现金额入库(二清)提现金额为零!");
         }

@@ -105,8 +105,15 @@ public class AccountOwnerCashExamineService {
         // 提现记录入库操作
         AccountOwnerCashExamine record = convertAccountOwnerCashExamine(req, bankCard, simpleMem);
         String nowDate = CommonUtils.formatTime(LocalDateTime.now(), CommonUtils.FORMAT_STR_LONG);
+
+        //新交易提现金额入库(二清)
+        //注:目前提现优先依二清返回结果处理(二清受理成功则提现成功 否则提现失败)
+        String serialNumber = nowDate + OrderConstant.THREE + req.getMemNo() + secondaryWithdrawableCash;
+        Integer secondaryId = accountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle(record, income, secondaryWithdrawableCash,
+                serialNumber, req.getDynamicCode());
+
         //老交易提现金额入库
-        String serialNumber = nowDate + OrderConstant.ONE + req.getMemNo() + oldWithdrawableCash;
+        serialNumber = nowDate + OrderConstant.ONE + req.getMemNo() + oldWithdrawableCash;
         Integer oldId = accountOwnerCashExamineHandleService.oldWithdrawableCashHandle(record, oldWithdrawableCash,
                 serialNumber);
 
@@ -114,11 +121,6 @@ public class AccountOwnerCashExamineService {
         serialNumber = nowDate + OrderConstant.TWO + req.getMemNo() + newWithdrawableCash;
         Integer newId = accountOwnerCashExamineHandleService.newWithdrawableCashHandle(record, income,
                 newWithdrawableCash, serialNumber);
-
-        //新交易提现金额入库(二清)
-        serialNumber = nowDate + OrderConstant.THREE + req.getMemNo() + secondaryWithdrawableCash;
-        Integer secondaryId = accountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle(record, income, secondaryWithdrawableCash,
-                serialNumber, req.getDynamicCode());
 
         // 记录提现金额拆分明细
         AccountOwnerIncomeWithdrawSplitDetailEntity splitDetailEntity = new AccountOwnerIncomeWithdrawSplitDetailEntity();
@@ -128,13 +130,13 @@ public class AccountOwnerCashExamineService {
         splitDetailEntity.setNewTransWithdrawAmt(newWithdrawableCash);
         splitDetailEntity.setSecondaryWithdrawAmt(secondaryWithdrawableCash);
         List<Integer> idArray = new ArrayList<>();
-        if(Objects.nonNull(oldId)) {
+        if (Objects.nonNull(oldId)) {
             idArray.add(oldId);
         }
-        if(Objects.nonNull(newId)) {
+        if (Objects.nonNull(newId)) {
             idArray.add(newId);
         }
-        if(Objects.nonNull(secondaryId)) {
+        if (Objects.nonNull(secondaryId)) {
             idArray.add(secondaryId);
         }
         splitDetailEntity.setCashExamineIds(ListUtil.reduce(idArray, ","));

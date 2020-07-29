@@ -130,10 +130,11 @@ public class OwnerIncomeController {
     @GetMapping("/getIncomTotalByOwnerMem")
     public ResponseData<Integer> getIncomTotalByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
         log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
-        AccountOwnerIncomeEntity ownerIncomeByMemNo = accountOwnerIncomeNoTService.getOwnerIncomeByMemNo(ownerMemeNo);
-        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
-        return ResponseData.success(ownerIncomeByMemNo==null||ownerIncomeByMemNo.getIncomeAmt()==null?0:ownerIncomeByMemNo.getIncomeAmt());
+        int totalIncome = accountOwnerIncomeNoTService.getOwnerTotalIncomeByMemNo(ownerMemeNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] totalIncome={}",ownerMemeNo, totalIncome);
+        return ResponseData.success(totalIncome);
     }
+
     @AutoDocMethod(value = "根据会员号列表查询车主总收益列表", description = "根据会员号列表查询车主总收益列表",response = AccountOwnerIncomeListDTO.class)
     @GetMapping("/getIncomTotalListByMemNoList")
     public ResponseData<List<AccountOwnerIncomeListDTO>> getIncomTotalListByMemNoList(@RequestParam(value = "memNoList") List<Integer> memNoList){
