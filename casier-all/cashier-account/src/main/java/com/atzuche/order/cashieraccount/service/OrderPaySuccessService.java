@@ -21,6 +21,7 @@ import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.utils.GsonUtils;
 
@@ -83,8 +84,12 @@ public class OrderPaySuccessService {
 		                orderFlowService.inserOrderStatusChangeProcessInfo(orderStatusDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
 	            	}
 	            	log.info("orderPayCallBack paysuccess updateRenterStatusByRenterOrderNo renterOrderNo=[{}], renterStatus=[{}]",vo.getRenterOrderNo(),renterStatus);
-	                // 更新租客之订单状态
-	                renterOrderService.updateRenterStatusByRenterOrderNo(vo.getRenterOrderNo(), renterStatus);
+	            	//更新租客订单车主同意信息
+	                RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(vo.getOrderNo());
+	                if (renterOrderEntity != null) {
+	                	// 更新租客之订单状态
+		                renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), renterStatus);
+	                }
 	            }
 	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
