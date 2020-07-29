@@ -65,5 +65,7 @@ public class OrderDetailRespDTO {
     public SectionDeliveryVO sectionDelivery;
     //违章结算
     public WzQueryDayConfDTO wzQueryDayConfDTO;
+    // 车主处区间配送信息
+    public SectionDeliveryVO ownerSectionDelivery;
 
 }
