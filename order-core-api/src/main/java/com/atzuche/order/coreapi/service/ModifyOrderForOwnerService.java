@@ -154,6 +154,10 @@ public class ModifyOrderForOwnerService {
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 更新车主子订单状态
 		updateOwnerOrderStatus(modifyOrderOwnerDTO, ownerOrderEntity.getId());
+		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag()) {
+			// 换车更新上一个车主子订单状态为已结束
+	        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
+		}
 	}
 	
 	
