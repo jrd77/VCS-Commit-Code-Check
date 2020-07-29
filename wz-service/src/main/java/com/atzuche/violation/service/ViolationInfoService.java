@@ -3,6 +3,7 @@ package com.atzuche.violation.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
@@ -141,14 +142,14 @@ public class ViolationInfoService {
             }
             OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationResVO.getOrderNo());
             String orderDetain = "未暂扣";
-            if (orderStatusEntity.getIsDetain().intValue() == 0) {
-                orderDetain = "未暂扣";
-            } else {
-                orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+            if (orderStatusEntity.getIsDetainWz() == OrderConstant.ONE) {
+                orderDetain = "已暂扣";
+            } else if(orderStatusEntity.getIsDetainWz() == OrderConstant.TWO) {
+                orderDetain = "撤销暂扣";
             }
             violationResVO.setWzDepositStatus(orderDetain);
             violationResVO.setCarType(CarOwnerTypeEnum.getNameByCode(Integer.valueOf(violationResVO.getCarType())));
-            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无" : "有");
+            violationResVO.setWzProcessedProof("0".equals(violationResVO.getWzProcessedProof()) ? "无" : "有");
         }
         return  violationResDesVOList;
     }

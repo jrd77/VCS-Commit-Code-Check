@@ -22,7 +22,7 @@ public class MqSendFeelbackLogService {
         mqSendFeelbackLogMapper.updateMqSendFeelbackLog(log);
     }
 
-    void saveMqSendFeelbackLog(MqSendFeelbackLogEntity log) {
+    public void saveMqSendFeelbackLog(MqSendFeelbackLogEntity log) {
         mqSendFeelbackLogMapper.saveMqSendFeelbackLog(log);
     }
 }

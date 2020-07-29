@@ -3,6 +3,7 @@ package com.atzuche.order.coreapi.entity.dto;
 import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -178,7 +179,15 @@ public class ModifyOrderDTO {
 	 */
 	private Integer driverInsurFlag;
 	/**
+	 * 配送模式：0-区间配送，1-精准配送
+	 */
+	private Integer distributionMode;
+	/**
 	 * 是否超级权限，可以跳过校验：0-否，1-是
 	 */
 	private Integer superPowerFlag;
+	/**
+	 * 修改前区间配送
+	 */
+	private RenterOrderDeliveryMode initDeliveryMode;
 }

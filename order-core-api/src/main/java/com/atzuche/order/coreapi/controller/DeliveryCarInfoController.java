@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.controller;
 
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.SectionProposaltimeDTO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
@@ -14,6 +15,7 @@ import com.atzuche.order.commons.vo.res.delivery.RenterOrderDeliveryRepVO;
 import com.atzuche.order.coreapi.service.DeliveryOrderService;
 import com.atzuche.order.delivery.entity.OrderCarTrusteeshipEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.utils.CommonUtil;
@@ -55,6 +57,8 @@ public class DeliveryCarInfoController {
     private DeliveryOrderService deliveryOrderService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 
     /**
      * 获取油费
@@ -200,6 +204,18 @@ public class DeliveryCarInfoController {
     public ResponseData<?> getOrderCarTrusteeshipEntity(@RequestBody OrderCarTrusteeshipReqVO orderCarTrusteeshipReqVO) {
     	OrderCarTrusteeshipEntity orderCarTrusteeshipEntity = deliveryOrderService.getOrderCarTrusteeshipEntity(orderCarTrusteeshipReqVO);
     	return ResponseData.success(orderCarTrusteeshipEntity);
+    }
+    
+    
+    /**
+     * 更新凹凸订单的建议时间
+     * @param deliveryCarVO
+     */
+    @PostMapping("/proposaltime/update")
+    public ResponseData<?> updateProposaltime(@RequestBody SectionProposaltimeDTO sectionProposaltimeDTO) {
+    	log.info("更新凹凸订单的建议时间 updateProposaltime sectionProposaltimeDTO=[{}]",sectionProposaltimeDTO);
+    	renterOrderDeliveryModeService.updateRenterOrderDeliveryMode(sectionProposaltimeDTO);
+    	return ResponseData.success();
     }
 
 }

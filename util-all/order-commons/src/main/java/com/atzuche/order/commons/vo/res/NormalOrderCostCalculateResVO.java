@@ -30,6 +30,9 @@ public class NormalOrderCostCalculateResVO implements Serializable {
 
     @AutoDocProperty(value = "违章押金信息")
     private IllegalDepositVO illegalDeposit;
+    
+    @AutoDocProperty(value = "区间配送信息")
+    private SectionDeliveryVO sectionDelivery;
 
 
     public TotalCostVO getTotalCost() {
@@ -71,4 +74,13 @@ public class NormalOrderCostCalculateResVO implements Serializable {
     public void setIllegalDeposit(IllegalDepositVO illegalDeposit) {
         this.illegalDeposit = illegalDeposit;
     }
+
+	public SectionDeliveryVO getSectionDelivery() {
+		return sectionDelivery;
+	}
+
+	public void setSectionDelivery(SectionDeliveryVO sectionDelivery) {
+		this.sectionDelivery = sectionDelivery;
+	}
+    
 }

@@ -1,5 +1,6 @@
 package com.atzuche.order.delivery.vo.delivery.rep;
 
+import com.atzuche.order.commons.vo.RenterOwnerSummarySectionDeliveryVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -29,10 +30,13 @@ public class DeliveryCarVO {
     private String orderNo;
     @AutoDocProperty("油耗总刻度")
     private String maxOilNumber;
+    @AutoDocProperty("区间配送信息")
+    private RenterOwnerSummarySectionDeliveryVO sectionDelivery;
     @AutoDocProperty("取车虚拟地址")
     private String getCarShowAddr;
     @AutoDocProperty("还车虚拟地址")
     private String returnCarShowAddr;
-
+    @AutoDocProperty("是否使用虚拟地址：1-使用，0-未使用")
+    private Integer useVirtualAddrFlag;
 
 }

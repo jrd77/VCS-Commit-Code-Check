@@ -305,4 +305,43 @@
         select  <include refid="Base_Column_List" /> from `order`  where mem_no_renter =#{renterMemNo} and is_delete = 0 order by id desc
     </select>
 
+    <select id="getOrderByMemNo" resultType="com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO">
+
+    SELECT t.* FROM (
+      SELECT
+        o.order_no AS orderNo,
+        oo.renter_order_no AS renterOrderNo,
+        oo.owner_order_no AS ownerOrderNo,
+        o.exp_rent_time AS expRentTime,
+        o.exp_revert_time  AS expRevertTime,
+        o.req_time AS reqTime,
+        o.city_name AS rentCity,
+        oo.show_rent_time AS showRentTime,
+        oo.show_revert_time AS showRevertTime,
+        oss.category AS category,
+        os.status AS orderStatus,
+        og.car_plate_num AS carPlateNum,
+        og.car_type_txt AS carTypeTxt,
+        roc.rent_car_amount AS rentAmt,
+        om.real_name AS ownerName,
+        om.mem_no AS ownerMemNo,
+        om.phone AS ownerPhone,
+        rm.real_name AS renterName,
+        rm.mem_no AS renterMemNo,
+        rm.phone AS renterPhone
+    FROM `order` o
+    INNER JOIN owner_order oo ON o.`order_no` = oo.`order_no`
+    INNER JOIN `renter_order` ro ON oo.renter_order_no = ro.renter_order_no
+    INNER JOIN order_status os ON o.`order_no` = os.`order_no`
+    INNER JOIN order_source_stat oss ON o.order_no = oss.`order_no`
+    INNER JOIN `renter_member` rm ON rm.`renter_order_no` = ro.`renter_order_no`
+    INNER JOIN `owner_member` om ON om.owner_order_no = oo.owner_order_no
+    INNER JOIN `renter_order_cost` roc ON ro.renter_order_no = roc.`renter_order_no`
+    INNER JOIN owner_goods og ON oo.`owner_order_no` = og.`owner_order_no`
+    WHERE oo.is_effective = 1
+    AND (rm.`mem_no` = #{memNo} OR om.`mem_no` = #{memNo})
+    ORDER BY o.id DESC,oo.id DESC) AS t GROUP BY t.orderNo LIMIT 200
+
+    </select>
+
 </mapper>

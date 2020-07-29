@@ -34,7 +34,7 @@ public class AdminOrderRentalCostController {
      */
     @AutoDocVersion(version = "管理后台平台给租客的补贴")
     @AutoDocGroup(group = "管理后台平台给租客的补贴")
-    @AutoDocMethod(description = "配送费用明细", value = "配送费用明细",response = DistributionCostVO.class)
+    @AutoDocMethod(description = "配送费用明细", value = "配送费用明细",response = com.atzuche.order.commons.vo.delivery.DistributionCostVO.class)
     @PostMapping("/distributionCost/list")
     public ResponseData<?> findDistributionCostListByOrderNo(@RequestBody DeliveryCarRepVO rentalCostReqVO) {
         if (null == rentalCostReqVO || StringUtils.isBlank(rentalCostReqVO.getOrderNo()) || StringUtils.isBlank(rentalCostReqVO.getRenterOrderNo()) ) {

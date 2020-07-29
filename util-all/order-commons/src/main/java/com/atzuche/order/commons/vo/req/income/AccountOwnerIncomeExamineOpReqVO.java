@@ -4,13 +4,14 @@ import com.autoyol.commons.web.ErrorCode;
 import lombok.Data;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 /**
  * 车主待审核收益请求信息
  * @author haibao.yan
  */
 @Data
 public class AccountOwnerIncomeExamineOpReqVO {
-
     /**
      * 会员号
      */
@@ -54,5 +55,4 @@ public class AccountOwnerIncomeExamineOpReqVO {
         Assert.notNull(getAccountOwnerIncomeExamineId(), ErrorCode.PARAMETER_ERROR.getText());
 
     }
-
 }

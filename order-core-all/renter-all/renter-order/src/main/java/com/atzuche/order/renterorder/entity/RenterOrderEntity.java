@@ -160,5 +160,10 @@ public class RenterOrderEntity implements Serializable {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	
+	/**
+	 * 配送模式，该字段不在该表中记录
+	 */
+	private Integer distributionMode;
 
 }

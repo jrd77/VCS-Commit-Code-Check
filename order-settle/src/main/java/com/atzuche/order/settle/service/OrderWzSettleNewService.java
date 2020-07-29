@@ -150,7 +150,9 @@ public class OrderWzSettleNewService {
 		// 1 先查询 发现 有结算数据停止结算 手动处理
 		boolean checkFlag = this.checkIsSettle(renterOrder.getOrderNo());
 		if(!checkFlag) {
-			return checkFlag;
+//			return checkFlag;
+			//通过异常来处理 200713
+			throw new RuntimeException("租客订单状态不是待结算，不能结算");
 		}
 		
 		// 2 校验是否存在 理赔 存在不结算 这个跟违章是一起的。

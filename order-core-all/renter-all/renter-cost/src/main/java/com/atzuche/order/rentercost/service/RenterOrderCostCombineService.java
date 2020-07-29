@@ -88,6 +88,8 @@ public class RenterOrderCostCombineService {
     private CarParamHotBrandDepositSDK carParamHotBrandDepositSDK;
     @Autowired
     private IllegalDepositConfigSDK illegalDepositConfigSDK;
+    @Autowired
+    private SysConfigSDK sysConfigSDK;
 
     @Autowired
     private GetBackCityLimitFeignApi getBackCityLimitFeignApi;
@@ -129,6 +131,8 @@ public class RenterOrderCostCombineService {
         add(RenterCashCodeEnum.EXTRA_DRIVER_INSURE);
         add(RenterCashCodeEnum.TYRE_INSURE_TOTAL_PRICES);
         add(RenterCashCodeEnum.DRIVER_INSURE_TOTAL_PRICES);
+        add(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT);
+        add(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT);
     }};
 
 	/**
@@ -268,6 +272,49 @@ public class RenterOrderCostCombineService {
 		FeeResult feeResult = RenterFeeCalculatorUtils.calServiceChargeFee();
 		RenterOrderCostDetailEntity result = costBaseConvert(costBaseDTO, feeResult, RenterCashCodeEnum.FEE);
 		return result;
+	}
+	
+	
+	/**
+	 * 获取取还车精准配送服务费
+	 * @param getReturnCarCostReqDto
+	 * @return List<RenterOrderCostDetailEntity>
+	 */
+	public List<RenterOrderCostDetailEntity> getAccurateSrvFee(GetReturnCarCostReqDto getReturnCarCostReqDto) {
+		Boolean isGetCarCost = getReturnCarCostReqDto.getIsGetCarCost();
+		Boolean isReturnCarCost = getReturnCarCostReqDto.getIsReturnCarCost();
+		// 配送模式：0-区间配送，1-精准配送
+		Integer distributionMode = getReturnCarCostReqDto.getDistributionMode() == null ? 0:getReturnCarCostReqDto.getDistributionMode();
+		if (distributionMode.intValue() != 1) {
+			return null;
+		}
+		if ((isGetCarCost == null || !isGetCarCost) && (isReturnCarCost == null || !isReturnCarCost)) {
+			return null;
+		}
+		List<RenterOrderCostDetailEntity> list = new ArrayList<RenterOrderCostDetailEntity>();
+		List<SysConfigEntity> sysConfigSDKConfig = sysConfigSDK.getConfig(new DefaultConfigContext());
+        List<SysConfigEntity> sysConfigEntityList = Optional.ofNullable(sysConfigSDKConfig)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
+                .collect(Collectors.toList());
+        if (isGetCarCost != null && isGetCarCost) {
+        	SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+            log.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
+            Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysGetAccurateAmt.getItemValue());
+            FeeResult feeResult = new FeeResult(getAccurateCost, 1.0, getAccurateCost);
+            RenterOrderCostDetailEntity result = costBaseConvert(getReturnCarCostReqDto.getCostBaseDTO(), feeResult, RenterCashCodeEnum.ACCURATE_GET_SRV_AMT);
+            list.add(result);
+        }
+        if (isReturnCarCost != null && isReturnCarCost) {
+        	SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
+    		log.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
+            Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+            FeeResult feeResult = new FeeResult(returnAccurateCost, 1.0, returnAccurateCost);
+            RenterOrderCostDetailEntity result = costBaseConvert(getReturnCarCostReqDto.getCostBaseDTO(), feeResult, RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT);
+            list.add(result);
+        }
+        return list;
 	}
 	
 	
@@ -944,6 +991,7 @@ public class RenterOrderCostCombineService {
 		result.setStartTime(costBaseDTO.getStartTime());
 		result.setEndTime(costBaseDTO.getEndTime());
 		result.setUnitPrice(feeResult.getUnitPrice());
+		result.setOriginalUnitPrice(feeResult.getUnitOrigPrice()==null?0:Integer.valueOf(feeResult.getUnitOrigPrice()));
 		result.setCount(feeResult.getUnitCount());
 		result.setTotalAmount(totalFee);
 		result.setCostCode(renterCashCodeEnum.getCashNo());
