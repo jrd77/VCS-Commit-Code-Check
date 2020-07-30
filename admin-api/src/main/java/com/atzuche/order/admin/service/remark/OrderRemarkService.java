@@ -118,7 +118,7 @@ public class OrderRemarkService {
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
         orderRemarkLogEntity.setDepartmentId(orderRemarkEntity.getDepartmentId());
         orderRemarkLogEntity.setRemarkId(oldOrderRemarkEntity.getId());
-        String remarkContent = oldOrderRemarkEntity.getRemarkContent();
+        String remarkContent = orderRemarkUpdateRequestVO.getRemarkContent();
         if(orderRemarkLogEntity.getRemarkContent()==null){
             orderRemarkLogEntity.setRemarkContent(remarkContent);
         }
