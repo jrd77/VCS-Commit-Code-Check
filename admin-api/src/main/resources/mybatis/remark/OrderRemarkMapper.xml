@@ -72,7 +72,7 @@
 
 
 	<select id="getOrderCarServiceRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT  * FROM order_remark where remark_type = 12 and order_no = #{orderNo} ORDER BY id DESC  limit 1
+		SELECT  * FROM order_remark where remark_type = 12 and order_no = #{orderNo} and is_delete = 0 ORDER BY id DESC  limit 1
 	</select>
 
 
