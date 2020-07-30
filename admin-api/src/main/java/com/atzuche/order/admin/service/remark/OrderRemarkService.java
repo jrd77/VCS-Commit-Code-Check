@@ -6,6 +6,7 @@ import com.atzuche.order.admin.entity.OrderRemarkLogEntity;
 import com.atzuche.order.admin.entity.OrderRemarkOverviewEntity;
 import com.atzuche.order.admin.enums.*;
 import com.atzuche.order.admin.enums.remark.*;
+import com.atzuche.order.admin.mapper.remark.OrderRemarkLogMapper;
 import com.atzuche.order.admin.mapper.remark.OrderRemarkMapper;
 import com.atzuche.order.admin.vo.req.remark.*;
 import com.atzuche.order.admin.vo.resp.remark.*;
@@ -29,7 +30,8 @@ public class OrderRemarkService {
     private OrderRemarkMapper orderRemarkMapper;
     @Autowired
     OrderRemarkLogService orderRemarkLogService;
-
+    @Autowired
+    OrderRemarkLogMapper orderRemarkLogMapper;
     /**
      * 获取备注总览
      * @param orderRemarkRequestVO
@@ -100,10 +102,27 @@ public class OrderRemarkService {
         OrderRemarkEntity orderRemarkEntity = new OrderRemarkEntity();
         BeanUtils.copyProperties(orderRemarkUpdateRequestVO,orderRemarkEntity);
         orderRemarkEntity.setUpdateOp(AdminUserUtil.getAdminUser().getAuthName());
+        OrderRemarkEntity oldOrderRemarkEntity = getOrderRemarkInformation(orderRemarkEntity.getRemarkId());
 
         orderRemarkMapper.updateRemarkById(orderRemarkEntity);
         //保存操作日志
-        orderRemarkLogService.addOrderRemarkLog(orderRemarkEntity, OperateTypeEnum.UPDATE.getType());
+        OrderRemarkLogEntity orderRemarkLogEntity = new OrderRemarkLogEntity();
+        BeanUtils.copyProperties(orderRemarkEntity, orderRemarkLogEntity);
+        orderRemarkLogEntity.setOperateType(OperateTypeEnum.UPDATE.getType());
+        orderRemarkLogEntity.setRemarkHistory(oldOrderRemarkEntity.getRemarkContent());
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkLogEntity.setOrderNo(oldOrderRemarkEntity.getOrderNo());
+        orderRemarkLogEntity.setCreateOp(userName);
+        orderRemarkLogEntity.setUpdateOp(userName);
+        orderRemarkLogEntity.setRemarkType(orderRemarkEntity.getRemarkType());
+        orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
+        orderRemarkLogEntity.setDepartmentId(orderRemarkEntity.getDepartmentId());
+        orderRemarkLogEntity.setRemarkId(oldOrderRemarkEntity.getId());
+        String remarkContent = oldOrderRemarkEntity.getRemarkContent();
+        if(orderRemarkLogEntity.getRemarkContent()==null){
+            orderRemarkLogEntity.setRemarkContent(remarkContent);
+        }
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
 
     /**
