@@ -568,6 +568,15 @@ public class ModifyOrderConfirmService {
 		}
 		// 超级权限
 		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRentTime()));
+			orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRevertTime()));
+			OwnerOrderEntity ownerOrderEffective = modifyOrderOwnerDTO.getOwnerOrderEffective();
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRentTime() != null) {
+				orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRentTime()));
+			}
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRevertTime() != null) {
+				orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRevertTime()));
+			}
 			stockService.cutCarStockForSuperPower(orderInfoDTO);
 		} else {
 			stockService.cutCarStock(orderInfoDTO);

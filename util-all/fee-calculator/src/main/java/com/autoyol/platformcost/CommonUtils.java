@@ -697,9 +697,9 @@ public class CommonUtils {
 				// 计算保费指导价
 				int guidePrice = inmsrpGuidePrice == null ? 0:inmsrpGuidePrice;
 				if (guidePrice <= CARPURCHASEPRICE_150000) {
-					return INSURE_DISCOUNT_DIS;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_200000) {
-					return INSURE_DISCOUNT_EIGHT;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_300000) {
 					return INSURE_DISCOUNT_NINE;
 				} else {
