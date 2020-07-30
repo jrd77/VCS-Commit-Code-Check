@@ -152,6 +152,13 @@ public class AccountOwnerCashExamineHandleService {
                                                    int secondaryWithdrawableCash,
                                                    String serialNumber, String dynamicCode) {
         if (secondaryWithdrawableCash > OrderConstant.ZERO) {
+            // 添加提现记录
+            record.setId(null);
+            record.setSerialNumber(serialNumber);
+            record.setBalanceFlag(OrderConstant.ONE);
+            record.setSecondCleanFlag(OrderConstant.ONE);
+            record.setAmt(secondaryWithdrawableCash);
+            accountOwnerCashExamineMapper.insertSelective(record);
             // 更新新交易车主收益信息(二清)并记录处理结果
             try {
                 // 调用远程方法提现
@@ -163,14 +170,6 @@ public class AccountOwnerCashExamineHandleService {
                 reqVO.setSmsCode(dynamicCode);
                 ResponseData responseData = autoSecondOpenRemoteService.sendWithdrawalRequest(reqVO);
                 if (StringUtils.equals(responseData.getResCode(), ErrorCode.SUCCESS.getCode())) {
-                    // 添加提现记录
-                    record.setId(null);
-                    record.setSerialNumber(serialNumber);
-                    record.setBalanceFlag(OrderConstant.ONE);
-                    record.setSecondCleanFlag(OrderConstant.ONE);
-                    record.setAmt(secondaryWithdrawableCash);
-                    accountOwnerCashExamineMapper.insertSelective(record);
-
                     // 受理成功后同步提现记录的状态
                     AccountOwnerCashExamine cashExamine = new AccountOwnerCashExamine();
                     cashExamine.setId(record.getId());
