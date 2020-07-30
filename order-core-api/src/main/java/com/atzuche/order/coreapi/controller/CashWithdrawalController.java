@@ -67,7 +67,7 @@ public class CashWithdrawalController {
 	public ResponseData<?> cashWithdraw(@Valid @RequestBody AccountOwnerCashExamineReqVO req, BindingResult bindingResult) {
 		log.info("提现AccountOwnerCashExamineReqVO=[{}]", req);
 		BindingResultUtil.checkBindingResult(bindingResult);
-		cashWithdrawalService.cashWithdrawal(req);
+        cashWithdrawalService.cashWithdrawal(req);
         return ResponseData.success();
     }
 
