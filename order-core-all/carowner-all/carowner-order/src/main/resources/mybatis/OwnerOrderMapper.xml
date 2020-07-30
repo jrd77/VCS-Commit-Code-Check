@@ -326,4 +326,13 @@
         order by id desc
     </select>
 
+    <select id="getOwnerOrderByChildNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_order
+        where 1= 1
+        <if test="ownerOrderNo != null and ownerOrderNo != ''">and `owner_order_no` = #{ownerOrderNo}</if>
+        <if test="renterOrderNo != null and renterOrderNo != ''">and renter_order_no = #{renterOrderNo}</if>
+        limit 1
+
+    </select>
+
 </mapper>
