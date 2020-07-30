@@ -363,9 +363,14 @@ public class OrderDetailService {
         	orderDetailRespDTO.orderStopFreightDTO = orderStopFreightDTO;
         }
         // 获取区间配送信息
-        if (renterOrderEntity != null) {
+        int srvGetFlag = renterOrderEntity.getIsGetCar() == null ? 0:renterOrderEntity.getIsGetCar();
+        int srvReturnFlag = renterOrderEntity.getIsReturnCar() == null ? 0:renterOrderEntity.getIsReturnCar();
+        if (renterOrderEntity != null && (srvGetFlag == 1 || srvReturnFlag == 1)) {
         	SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
         	orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
+        	// 获取区间配送信息
+            SectionDeliveryVO ownerSectionDeliveryVO = renterOrderDeliveryModeService.getOwnerSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+            orderDetailRespDTO.ownerSectionDelivery = ownerSectionDeliveryVO;
         }
         return orderDetailRespDTO;
 

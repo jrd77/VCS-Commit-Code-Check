@@ -65,6 +65,10 @@ public class OrderDetailRespDTO {
     public SectionDeliveryVO sectionDelivery;
     //违章结算
     public WzQueryDayConfDTO wzQueryDayConfDTO;
+    // 车主处区间配送信息
+    public SectionDeliveryVO ownerSectionDelivery;
+    
+    
 	public OrderDTO getOrder() {
 		return order;
 	}
@@ -322,6 +326,12 @@ public class OrderDetailRespDTO {
 	}
 	public void setWzQueryDayConfDTO(WzQueryDayConfDTO wzQueryDayConfDTO) {
 		this.wzQueryDayConfDTO = wzQueryDayConfDTO;
+	}
+	public SectionDeliveryVO getOwnerSectionDelivery() {
+		return ownerSectionDelivery;
+	}
+	public void setOwnerSectionDelivery(SectionDeliveryVO ownerSectionDelivery) {
+		this.ownerSectionDelivery = ownerSectionDelivery;
 	}
 
 }
