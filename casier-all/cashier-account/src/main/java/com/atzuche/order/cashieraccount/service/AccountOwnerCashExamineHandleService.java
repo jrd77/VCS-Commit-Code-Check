@@ -195,7 +195,9 @@ public class AccountOwnerCashExamineHandleService {
                             "responseData:[{}]", JSON.toJSONString(responseData));
                     throw new WithdrawalException(responseData.getResCode(), responseData.getResMsg());
                 }
-            } catch (Exception e) {
+            } catch (WithdrawalException we) {
+                throw we;
+            }catch (Exception e) {
                 log.error("AccountOwnerCashExamineHandleService.secondaryWithdrawableCashHandle err.", e);
                 throw new WithdrawalException(ErrorCode.SYS_ERROR.getCode(), ErrorCode.SYS_ERROR.getText());
             }
