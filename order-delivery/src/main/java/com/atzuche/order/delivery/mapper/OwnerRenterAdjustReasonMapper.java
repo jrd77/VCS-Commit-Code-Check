@@ -18,8 +18,6 @@ public interface OwnerRenterAdjustReasonMapper {
 
     OwnerRenterAdjustReasonEntity selectByPrimaryKey(Integer id);
 
-    int insert(OwnerRenterAdjustReasonEntity record);
-
     int insertSelective(OwnerRenterAdjustReasonEntity record);
 
     int updateByPrimaryKey(OwnerRenterAdjustReasonEntity record);
