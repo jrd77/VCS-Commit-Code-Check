@@ -40,15 +40,15 @@ public class AutoSecondOpenRemoteService {
 
 
     public ResponseData sendWithdrawalRequest(WithdrawalsReqVO reqVO) {
-        //Transaction t = Cat.newTransaction(CatConstants.URL_CALL, "二清项目应用层服务");
+        Transaction t = Cat.newTransaction(CatConstants.URL_CALL, "二清项目应用层服务");
         try {
-            //Cat.logEvent("URL.Api", "/api/second/open/withdrawal/cashOut");
-            //Cat.logEvent(CatConstants.URL_PARAM, JSON.toJSONString(reqVO));
+            Cat.logEvent("URL.Api", "/api/second/open/withdrawal/cashOut");
+            Cat.logEvent(CatConstants.URL_PARAM, JSON.toJSONString(reqVO));
 
             long startTime = System.currentTimeMillis();
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(commonConfig.secondOpenUrl + "api/second/open/withdrawal/cashOut",
                     reqVO, String.class);
-            //Cat.logEvent(CatConstants.URL_RESULT, responseEntity.getBody());
+            Cat.logEvent(CatConstants.URL_RESULT, responseEntity.getBody());
             log.info("invoke api/second/open/withdrawal/cashOut consume time is,[{}] ms",
                     System.currentTimeMillis() - startTime);
 
@@ -58,15 +58,15 @@ public class AutoSecondOpenRemoteService {
             } else {
                 responseData = JSON.parseObject(responseEntity.getBody(), ResponseData.class);
             }
-            //t.setStatus(Transaction.SUCCESS);
+            t.setStatus(Transaction.SUCCESS);
             return responseData;
         } catch (Exception e) {
-            //t.setStatus(e);
-            //Cat.logError("Invoke /api/second/open/withdrawal/cashOut err.", e);
+            t.setStatus(e);
+            Cat.logError("Invoke /api/second/open/withdrawal/cashOut err.", e);
             log.error("Invoke /api/second/open/withdrawal/cashOut err.", e);
             throw new WithdrawalAmtException("上海银行提现接口异常");
         } finally {
-            //t.complete();
+            t.complete();
         }
     }
 
