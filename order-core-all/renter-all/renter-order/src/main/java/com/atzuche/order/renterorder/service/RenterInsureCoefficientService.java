@@ -32,6 +32,9 @@ public class RenterInsureCoefficientService {
 	 * @param coefficientList
 	 */
 	public void saveRenterInsureCoefficient(List<RenterInsureCoefficientVO> coefficientList) {
+		if (coefficientList == null || coefficientList.isEmpty()) {
+			return;
+		}
 		for (RenterInsureCoefficientVO coefficient:coefficientList) {
 			RenterInsureCoefficient ric = new RenterInsureCoefficient();
 			BeanUtils.copyProperties(coefficient, ric);
@@ -48,6 +51,9 @@ public class RenterInsureCoefficientService {
 	 * @param coefficientId
 	 */
 	public void saveRenterInsureCoefficientReason(List<RenterInsureCoefficientReasonVO> reasonList, Integer coefficientId) {
+		if (reasonList == null || reasonList.isEmpty()) {
+			return;
+		}
 		for (RenterInsureCoefficientReasonVO reason:reasonList) {
 			RenterInsureCoefficientReason ricr = new RenterInsureCoefficientReason();
 			BeanUtils.copyProperties(reason, ricr);
