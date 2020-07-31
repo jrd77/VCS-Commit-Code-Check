@@ -1373,7 +1373,7 @@ public class OrderCostService {
         	} else if (type == 3) {
         		baoFeiInfoVO.setJiaShiXingWeiCoefficient(inscoevo.getCoefficient());
         		if (reasonList != null && !reasonList.isEmpty() && reasonList.get(0) != null) {
-        			baoFeiInfoVO.setDriverScore(reasonList.get(0).getValue()+"分");
+        			baoFeiInfoVO.setDriverScore(reasonList.get(0).getValue() == null ? null:reasonList.get(0).getValue()+"分");
         		}
         	}
         }
