@@ -1,5 +1,7 @@
 package com.atzuche.order.renterorder.mapper;
 
+import java.util.List;
+
 import com.atzuche.order.renterorder.entity.RenterInsureCoefficient;
 
 public interface RenterInsureCoefficientMapper {
@@ -14,4 +16,6 @@ public interface RenterInsureCoefficientMapper {
     int updateByPrimaryKeySelective(RenterInsureCoefficient record);
 
     int updateByPrimaryKey(RenterInsureCoefficient record);
+    
+    List<RenterInsureCoefficient> listInsurecoeByRenterOrderNo(String renterOrderNo);
 }

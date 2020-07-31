@@ -6,6 +6,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDT
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
 import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.rentercost.*;
 import com.atzuche.order.commons.vo.req.AdminOrderReqVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
@@ -26,6 +27,8 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
@@ -207,4 +210,6 @@ public interface FeignOrderCostService {
     @GetMapping("/order/renter/cost/getBaoFeiInfo")
     ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo);
 
+    @GetMapping("/order/renter/insurecoefficient/list")
+    public ResponseData<List<RenterInsureCoefficientVO>> insureCoefficient(@RequestParam("renterOrderNo") String renterOrderNo);
 }

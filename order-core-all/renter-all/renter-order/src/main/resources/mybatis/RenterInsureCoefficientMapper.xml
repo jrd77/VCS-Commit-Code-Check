@@ -150,4 +150,11 @@
       is_delete = #{isDelete,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="listInsurecoeByRenterOrderNo" resultMap="BaseResultMap" parameterType="String" >
+    select 
+    <include refid="Base_Column_List" />
+    from renter_insure_coefficient
+    where renter_order_no = #{renterOrderNo}
+  </select>
 </mapper>

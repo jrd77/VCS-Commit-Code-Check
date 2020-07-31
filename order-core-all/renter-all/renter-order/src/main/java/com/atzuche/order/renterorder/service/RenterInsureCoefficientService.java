@@ -116,4 +116,43 @@ public class RenterInsureCoefficientService {
 		list.add(discount);
 		saveRenterInsureCoefficient(list);
 	}
-}
+	
+	
+	public List<RenterInsureCoefficient> listInsurecoeByRenterOrderNo(String renterOrderNo) {
+		return renterInsureCoefficientMapper.listInsurecoeByRenterOrderNo(renterOrderNo);
+	}
+	
+	public List<RenterInsureCoefficientReason> listInsurecoeReasonByInsucoeId(Integer insureCoefficientId) {
+		return renterInsureCoefficientReasonMapper.listInsurecoeReasonByInsucoeId(insureCoefficientId);
+	}
+	
+	public List<RenterInsureCoefficientReasonVO> listRenterInsureCoefficientReasonVO(Integer insureCoefficientId) {
+		List<RenterInsureCoefficientReason> reasonList = listInsurecoeReasonByInsucoeId(insureCoefficientId);
+		if (reasonList == null || reasonList.isEmpty()) {
+			return null;
+		}
+		List<RenterInsureCoefficientReasonVO> reasonvoList = new ArrayList<RenterInsureCoefficientReasonVO>();
+		for (RenterInsureCoefficientReason reason:reasonList) {
+			RenterInsureCoefficientReasonVO reasonvo = new RenterInsureCoefficientReasonVO();
+			BeanUtils.copyProperties(reason, reasonvo);
+			reasonvoList.add(reasonvo);
+		}
+		return reasonvoList;
+	}
+	
+	public List<RenterInsureCoefficientVO> listRenterInsureCoefficientVO(String renterOrderNo) {
+		List<RenterInsureCoefficient> inscoeList = listInsurecoeByRenterOrderNo(renterOrderNo);
+		if (inscoeList == null || inscoeList.isEmpty()) {
+			return null;
+		}
+		List<RenterInsureCoefficientVO> inscoeVOList = new ArrayList<RenterInsureCoefficientVO>();
+		for (RenterInsureCoefficient inscoe:inscoeList) {
+			Integer insureCoefficientId = inscoe.getId();
+			RenterInsureCoefficientVO insvo = new RenterInsureCoefficientVO();
+			BeanUtils.copyProperties(inscoe, insvo);
+			insvo.setReasonList(listRenterInsureCoefficientReasonVO(insureCoefficientId));
+			inscoeVOList.add(insvo);
+		}
+		return inscoeVOList;
+	}
+ }
