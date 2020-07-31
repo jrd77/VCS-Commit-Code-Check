@@ -1354,7 +1354,7 @@ public class OrderCostService {
         	List<RenterInsureCoefficientReasonVO> reasonList = inscoevo.getReasonList();
         	if (type == 1) {
         		baoFeiInfoVO.setJiaLinCoefficient(inscoevo.getCoefficient());
-        		if (reasonList != null && !reasonList.isEmpty() && reasonList.get(0) != null) {
+        		if (reasonList != null && !reasonList.isEmpty() && reasonList.get(0) != null && reasonList.get(0).getValue() != null) {
         			String drivingAge = DateUtils.getYearMonthFormate(reasonList.get(0).getValue(), DateUtils.formate(LocalDateTime.now(), DateUtils.fmt_yyyyMMdd));
         			baoFeiInfoVO.setDrivingAge(drivingAge);
         		}
