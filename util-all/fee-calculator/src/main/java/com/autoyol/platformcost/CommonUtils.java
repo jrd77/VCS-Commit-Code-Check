@@ -26,7 +26,7 @@ public class CommonUtils {
 	public final static double MAX_Mileage=5;//超日限里程最大每天
 	// 默认除法运算精度
 	private static final int DEF_DIV_SCALE = 10;
-	public final static String [] CAR_TYPE={"20","25","30","35"};//代管车  托管车
+	public final static String [] CAR_TYPE={"30","35"};//代管车  托管车   "20","25",
 	/**
                * 最小距离处理
      */
@@ -718,9 +718,9 @@ public class CommonUtils {
 				// 计算保费指导价
 				int guidePrice = inmsrpGuidePrice == null ? 0:inmsrpGuidePrice;
 				if (guidePrice <= CARPURCHASEPRICE_150000) {
-					return INSURE_DISCOUNT_DIS;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_200000) {
-					return INSURE_DISCOUNT_EIGHT;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_300000) {
 					return INSURE_DISCOUNT_NINE;
 				} else {

@@ -36,5 +36,7 @@ public class DeliveryCarVO {
     private String getCarShowAddr;
     @AutoDocProperty("还车虚拟地址")
     private String returnCarShowAddr;
+    @AutoDocProperty("是否使用虚拟地址：1-使用，0-未使用")
+    private Integer useVirtualAddrFlag;
 
 }

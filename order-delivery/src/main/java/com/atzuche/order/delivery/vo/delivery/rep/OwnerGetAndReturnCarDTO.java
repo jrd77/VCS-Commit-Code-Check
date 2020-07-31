@@ -27,8 +27,6 @@ public class OwnerGetAndReturnCarDTO {
     public String dayKM;
     @AutoDocProperty("租期")
     public String zuQi;
-    @AutoDocProperty("超里程费")
-    public String overKNCrash;
     @AutoDocProperty("取车油表刻度")
     public String getCarOil;
     @AutoDocProperty("还车油表刻度")
@@ -39,19 +37,34 @@ public class OwnerGetAndReturnCarDTO {
     public String oilContainer;
     @AutoDocProperty("油量差额")
     public String oilDifference;
-    @AutoDocProperty("油量差价")
-    public String oilDifferenceCrash;
     @AutoDocProperty("加油服务费")
     public String oilServiceCharge;
+
+
+    @AutoDocProperty("油量差价")
+    public String oilDifferenceCrash;
     @AutoDocProperty("平台加油服务费")
     public String platFormOilServiceCharge;
-    @AutoDocProperty("代管车-油量差价")
-    public String carOilDifferenceCrash;
-    @AutoDocProperty("代管车-加油服务费")
-    public String carOilServiceCharge;
-    @AutoDocProperty("代管车-车主总油费")
-    public String carOwnerOilCrash;
     @AutoDocProperty("车主总油费")
     public String carOwnerAllOilCrash;
+    @AutoDocProperty("超里程费")
+    public String overKNCrash;
+
+
+    @AutoDocProperty("代管车/短租托管车-油量差价")
+    public String carOilDifferenceCrash;
+    @AutoDocProperty("代管车/短租托管车-加油服务费")
+    public String carOilServiceCharge;
+    @AutoDocProperty("代管车/短租托管车-车主总油费")
+    public String carOwnerOilCrash;
+    @AutoDocProperty("代管车/短租托管车-超里程费")
+    public String proxyOverKNCrash;
+    @AutoDocProperty("代管车/短租托管车-取还车邮费补贴")
+    public String getReturnCarOilSubsidy;
+
+    @AutoDocProperty("车辆类型")
+    public Integer carOwnerType;
+
+
 
 }

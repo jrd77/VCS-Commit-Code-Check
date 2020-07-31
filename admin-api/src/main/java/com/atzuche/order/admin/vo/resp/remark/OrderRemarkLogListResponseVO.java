@@ -8,6 +8,7 @@ import lombok.ToString;
 @ToString
 public class OrderRemarkLogListResponseVO {
 
+    private String remarkId;
 
     @AutoDocProperty(value = "关联编号")
     private String number;

@@ -245,6 +245,7 @@ public class CarProxyService {
             }
             renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
             renterGoodsDetailDto.setAdvanceOrderTime(transReplyVO ==null || transReplyVO.getAdvanceOrderTime() == null ? null: transReplyVO.getAdvanceOrderTime());
+
         }
 
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());

@@ -2,12 +2,14 @@ package com.atzuche.order.open.service;
 
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealResVO;
 import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
 import com.atzuche.order.commons.vo.res.account.income.OwnerIncomeExamineDetailResVO;
 import com.autoyol.commons.web.ResponseData;
+import com.autoyol.doc.annotation.AutoDocMethod;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 /**
  * 查询车主收益信息
  **/
+//@FeignClient(url = "http://localhost:1412" ,name="order-center-api")
 @FeignClient(name="order-center-api")
 public interface FeignOwnerIncomeService {
 
@@ -39,7 +42,7 @@ public interface FeignOwnerIncomeService {
      * 车主收益审核
      */
     @PostMapping("/owner/income/auditOwnerIncome")
-    public ResponseData<AdjustOwnerIncomeResVO> auditOwnerIncome(@RequestBody AccountOwnerIncomeExamineOpReqVO vo);
+    public ResponseData<List<AdjustOwnerIncomeResVO>> auditOwnerIncome(@RequestBody AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO);
 
     @GetMapping("/owner/income/getOwnerIncomeByOrderAndType")
     public ResponseData<OwnerIncomeExamineDetailResVO> getOwnerIncomeByOrderAndType(@RequestParam("orderNo") String orderNo, @RequestParam("memNo") String memNo, @RequestParam("type") Integer type

@@ -116,4 +116,12 @@ public class OwnerMemberService{
     public OwnerMemberEntity queryOwnerMemberEntityByOrderNoAndOwnerNo(String orderNo, String ownerNo) {
         return ownerMemberMapper.queryOwnerMemberEntityByOrderNoAndOwnerNo(orderNo,ownerNo);
     }
+
+    public OwnerMemberEntity getOwnerNoByMemberNo(String memNo){
+        return ownerMemberMapper.getOwnerNoByMemberNo(memNo);
+    }
+
+    public OwnerMemberEntity queryOwnerMemberByPhone(String phone) {
+        return ownerMemberMapper.queryOwnerMemberByPhone(phone);
+    }
 }

@@ -648,11 +648,6 @@ public class ModifyOrderService {
         if (osse != null) {
         	modifyOrderDTO.setLongCouponCode(osse.getLongRentCouponCode());
         }
-        RenterOrderDeliveryMode mode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(initRenterOrder.getRenterOrderNo());
-		if (modifyOrderReq.getDistributionMode() == null && mode != null) {
-			modifyOrderDTO.setDistributionMode(mode.getDistributionMode());
-		}
-		initRenterOrder.setDistributionMode(mode == null ? null:mode.getDistributionMode());
         // 设置租客子单号
 		modifyOrderDTO.setRenterOrderNo(renterOrderNo);
 		// 设置管理后台修改原因
@@ -720,6 +715,18 @@ public class ModifyOrderService {
 		if (modifyOrderReq.getUserCoinFlag() == null) {
 			modifyOrderDTO.setUserCoinFlag(initRenterOrder.getIsUseCoin());
 		}
+		if ((modifyOrderDTO.getSrvGetFlag() == null || modifyOrderDTO.getSrvGetFlag() == 0) && 
+				(modifyOrderDTO.getSrvReturnFlag() == null || modifyOrderDTO.getSrvReturnFlag() == 0)) {
+			// 未使用取还车
+			modifyOrderReq.setDistributionMode(null);
+		} else {
+			RenterOrderDeliveryMode mode = renterOrderDeliveryModeService.getDeliveryModeByRenterOrderNo(initRenterOrder.getRenterOrderNo());
+			if (modifyOrderReq.getDistributionMode() == null && mode != null) {
+				modifyOrderDTO.setDistributionMode(mode.getDistributionMode());
+			}
+			initRenterOrder.setDistributionMode(mode == null ? null:mode.getDistributionMode());
+			modifyOrderDTO.setInitDeliveryMode(mode);
+		}
 		// 获取修改前租客使用的优惠券列表
 		List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByRenterOrderNo(initRenterOrder.getRenterOrderNo());
 		String initCarOwnerCouponId = null;
@@ -742,7 +749,6 @@ public class ModifyOrderService {
 		if (StringUtils.isBlank(modifyOrderReq.getPlatformCouponId())) {
 			modifyOrderDTO.setPlatformCouponId(initPlatformCouponId);
 		}
-		modifyOrderDTO.setInitDeliveryMode(mode);
 		modifyOrderDTO.setChangeItemList(ModifyOrderUtils.listOrderChangeItemDTO(renterOrderNo, initRenterOrder, modifyOrderReq, orderCouponList, deliveryMap));
 		return modifyOrderDTO;
 	}
@@ -1636,13 +1642,22 @@ public class ModifyOrderService {
 			getDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getGetMinutes());
 			getDelivery.setAheadOrDelayLocalDateTime(carRentTimeRangeResVO.getAdvanceStartDate());
 		}
+		getDelivery.setIsNotifyRenyun(0);
 		if (modifyOrderDTO.getSrvGetFlag() != null && modifyOrderDTO.getSrvGetFlag() == 1) {
 			getDelivery.setIsNotifyRenyun(1);
-		} else {
-			getDelivery.setIsNotifyRenyun(0);
+		} else if ((modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) || 
+				StringUtils.isBlank(modifyOrderDTO.getGetCarAddress())) {
+			// 换车
 			getDelivery.setRenterGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
 			getDelivery.setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
 			getDelivery.setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
+		}
+		
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车
+			getDelivery.setOwnerGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
+			getDelivery.setOwnerGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
+			getDelivery.setOwnerGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
 		}
 		
 		delivMap.put(SrvGetReturnEnum.SRV_GET_TYPE.getCode(), getDelivery);
@@ -1659,13 +1674,20 @@ public class ModifyOrderService {
 			returnDelivery.setAheadOrDelayTime(carRentTimeRangeResVO.getReturnMinutes());
 			returnDelivery.setAheadOrDelayLocalDateTime(carRentTimeRangeResVO.getDelayEndDate());
 		}
+		returnDelivery.setIsNotifyRenyun(0);
 		if (modifyOrderDTO.getSrvReturnFlag() != null && modifyOrderDTO.getSrvReturnFlag() == 1) {
 			returnDelivery.setIsNotifyRenyun(1);
-		} else {
-			returnDelivery.setIsNotifyRenyun(0);
+		} else if ((modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) || 
+				StringUtils.isBlank(modifyOrderDTO.getRevertCarAddress())){
 			returnDelivery.setRenterGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
 			returnDelivery.setRenterGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
 			returnDelivery.setRenterGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
+		}
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车
+			returnDelivery.setOwnerGetReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
+			returnDelivery.setOwnerGetReturnAddrLat(renterGoodsDetailDTO.getCarShowLat());
+			returnDelivery.setOwnerGetReturnAddrLon(renterGoodsDetailDTO.getCarShowLon());
 		}
 		delivMap.put(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), returnDelivery);
 		return delivMap;

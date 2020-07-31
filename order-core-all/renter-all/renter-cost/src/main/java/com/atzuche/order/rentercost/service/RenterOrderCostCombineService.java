@@ -96,7 +96,7 @@ public class RenterOrderCostCombineService {
     @Autowired
     private AccountDebtDetailNoTService accountDebtDetailNoTService;
 
-    @Value("${auto.cost.getReturnOverTransportFee}")
+    @Value("${auto.cost.getReturnOverTransportFee:50}")
     private Integer getReturnOverTransportFee;
     @Value("${auto.cost.nightBegin}")
     private Integer nightBegin;
@@ -991,6 +991,7 @@ public class RenterOrderCostCombineService {
 		result.setStartTime(costBaseDTO.getStartTime());
 		result.setEndTime(costBaseDTO.getEndTime());
 		result.setUnitPrice(feeResult.getUnitPrice());
+		result.setOriginalUnitPrice(feeResult.getUnitOrigPrice()==null?0:Integer.valueOf(feeResult.getUnitOrigPrice()));
 		result.setCount(feeResult.getUnitCount());
 		result.setTotalAmount(totalFee);
 		result.setCostCode(renterCashCodeEnum.getCashNo());
@@ -1507,20 +1508,18 @@ public class RenterOrderCostCombineService {
             ResponseCheckUtil.checkResponse(responseData);
 
             t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
-            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",e);
-            t.setStatus(e);
-            throw e;
-        }
-        if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-            return responseData.getData().getHumanFee().intValue();
-        }
-        try {
-            return getReturnOverTransportFee;
-        } catch (Exception e) {
-            log.error("获取取还车超运能溢价默认值异常：", e);
-        }
-        return GlobalConstant.GET_RETURN_OVER_COST;
+			if (Objects.nonNull(responseData) && ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
+				return responseData.getData().getHumanFee().intValue();
+			}else {
+				return getReturnOverTransportFee;
+			}
+		} catch (Exception e) {
+			Cat.logError("Feign 获取取还车超出运能附加金额接口异常", e);
+			t.setStatus(e);
+		} finally {
+			t.complete();
+		}
+		return getReturnOverTransportFee;
     }
     
     
