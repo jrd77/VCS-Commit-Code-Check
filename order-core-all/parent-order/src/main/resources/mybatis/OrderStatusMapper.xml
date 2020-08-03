@@ -292,4 +292,13 @@
             #{status}
         </foreach>
     </select>
+
+    <select id = "selectByWzSettleStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            order_status
+        where `wz_settle_status` = #{wzSettleStatus} and is_delete = 0
+    </select>
+
 </mapper>

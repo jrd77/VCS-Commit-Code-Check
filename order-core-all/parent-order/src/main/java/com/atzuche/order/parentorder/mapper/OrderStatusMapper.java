@@ -39,4 +39,13 @@ public interface OrderStatusMapper{
     List<OrderStatusEntity> queryInProcess();
 
     List<OrderStatusEntity> queryByStatus(@Param("statusList")List<Integer> statusList);
+
+    /**
+     * 查询符合 wzSettleStatus 的订单状态信息
+     *
+     * @param wzSettleStatus 违章结算状态
+     * @return List<OrderStatusEntity>
+     */
+    List<OrderStatusEntity> selectByWzSettleStatus(@Param("wzSettleStatus") int wzSettleStatus);
+
 }

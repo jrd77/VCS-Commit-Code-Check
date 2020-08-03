@@ -126,4 +126,14 @@ public class OrderStatusService {
         List<Integer> statusList = orderStatusEnums.stream().map(x -> x.getStatus()).collect(Collectors.toList());
         return orderStatusMapper.queryByStatus(statusList);
     }
+
+    /**
+     * 获取符合 wzSettleStatus 的订单状态信息
+     *
+     * @param wzSettleStatus 违章结算状态
+     * @return List<OrderStatusEntity>
+     */
+    public List<OrderStatusEntity> queryByWzSettleStatus(int wzSettleStatus) {
+        return orderStatusMapper.selectByWzSettleStatus(wzSettleStatus);
+    }
 }
