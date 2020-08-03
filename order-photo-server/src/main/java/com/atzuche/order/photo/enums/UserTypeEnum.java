@@ -4,7 +4,9 @@ package com.atzuche.order.photo.enums;
 public enum UserTypeEnum {
     RENTER("1", "租客上传"),
     OWNER("2", "车主上传"),
-    PLATFORM("3", "平台上传");
+    PLATFORM("3", "平台上传"),
+    DAI_GUAN_YUAN("5", "代管员上传"),
+    ;
 
 
     private String type;

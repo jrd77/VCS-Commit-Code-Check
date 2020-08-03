@@ -10,6 +10,7 @@ import com.atzuche.order.photo.service.OrderPhotoService;
 import com.atzuche.order.photo.util.oss.PicUtils;
 import com.atzuche.order.photo.vo.req.*;
 import com.atzuche.order.photo.vo.resp.OrderPhotoResponseVO;
+import com.atzuche.order.photo.vo.resp.OrderPhotoTypeResponseVO;
 import com.atzuche.order.photo.vo.resp.OrderViolationPhotoResponseVO;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ErrorCode;
@@ -72,6 +73,23 @@ public class OrderPhotoController{
 		orderPhotoResponseVO.setOrderViolationPhotoResponseVO(orderViolationPhotoResponseVO);
 		return ResponseData.success(orderPhotoResponseVO);
 	}
+
+    /**
+     *订单照片列表(包含油表和交接车单子)
+     * @param orderRequestVO
+     * @param bindingResult
+     * @return
+     */
+	@AutoDocMethod(description = "订单照片列表(包含油表和交接车单子)", value = "订单照片列表(包含油表和交接车单子)", response = OrderPhotoTypeResponseVO.class)
+	@PostMapping("/listContainsOils")
+    public ResponseData<OrderPhotoTypeResponseVO> listContainsOils(@Valid @RequestBody OrderOilRequestVO orderRequestVO, BindingResult bindingResult) {
+        validateParameter(bindingResult);
+        String orderNo = orderRequestVO.getOrderNo();
+        List<OrderPhotoDTO> orderPhotoDTOS = orderPhotoService.queryGetSrvCarList(orderNo, orderRequestVO.getType() == null ? null : orderRequestVO.getType());
+        OrderPhotoTypeResponseVO orderPhotoTypeResponseVO = new OrderPhotoTypeResponseVO();
+        orderPhotoTypeResponseVO.setGetPhotoList(orderPhotoDTOS);
+        return ResponseData.success(orderPhotoTypeResponseVO);
+    }
 	
 	/**
 	 * 

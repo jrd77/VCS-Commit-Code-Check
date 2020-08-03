@@ -9,6 +9,7 @@
     </resultMap>
 
 	<resultMap id="orderRemarkInformationMap" type="com.atzuche.order.admin.entity.OrderRemarkEntity" >
+        <result property="id" column="id"/>
 		<result property="remarkType" column="remark_type"/>
 		<result property="orderNo" column="order_no"/>
 		<result property="remarkContent" column="remark"/>
@@ -71,7 +72,7 @@
 
 
 	<select id="getOrderCarServiceRemarkInformation" resultMap="orderRemarkInformationMap">
-		SELECT  remark  FROM order_remark where remark_type = 12 and order_no = #{orderNo} ORDER BY id DESC  limit 1
+		SELECT  * FROM order_remark where remark_type = 12 and order_no = #{orderNo} and is_delete = 0 ORDER BY id DESC  limit 1
 	</select>
 
 
@@ -104,7 +105,7 @@
 		follow_status,
 		follow_fail_reason,
 		dept_id
-		from order_remark where order_no = #{orderNo} and is_delete = 0 and remark_type!=12
+		from order_remark where order_no = #{orderNo} and is_delete = 0
 		<if test="departmentId != null and departmentId != ''">
 			and dept_id = #{departmentId}
 		</if>

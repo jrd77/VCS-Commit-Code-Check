@@ -12,7 +12,7 @@ public class OrderRemarkLogEntity {
     private String orderNo;
 
     @AutoDocProperty(value = "备注id")
-    private String remarkId;
+    private Integer remarkId;
 
     @AutoDocProperty(value = "备注编号")
     private String number;
