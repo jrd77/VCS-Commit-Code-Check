@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -38,7 +39,7 @@ import java.util.List;
 @Slf4j
 public class TranSportProxyService {
 
-    @Value("${auto.cost.getReturnOverTransportFee}")
+    @Value("${auto.cost.getReturnOverTransportFee:50}")
     private Integer getReturnOverTransportFee;
     @Value("${auto.cost.nightBegin}")
     private Integer nightBegin;
@@ -214,20 +215,18 @@ public class TranSportProxyService {
             ResponseCheckUtil.checkResponse(responseData);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(responseData));
             t.setStatus(Transaction.SUCCESS);
-        }  catch (Exception e) {
+            if (Objects.nonNull(responseData) && ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
+                return responseData.getData().getHumanFee().intValue();
+            }else {
+                return getReturnOverTransportFee;
+            }
+        } catch (Exception e) {
             Cat.logError("Feign 获取取还车超出运能附加金额接口异常", e);
             t.setStatus(e);
-            throw e;
+        } finally {
+            t.complete();
         }
-        if (ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
-            return responseData.getData().getHumanFee().intValue();
-        }
-        try {
-            return getReturnOverTransportFee;
-        } catch (Exception e) {
-            log.error("获取取还车超运能溢价默认值异常：", e);
-        }
-        return GlobalConstant.GET_RETURN_OVER_COST;
+        return getReturnOverTransportFee;
     }
 
 }

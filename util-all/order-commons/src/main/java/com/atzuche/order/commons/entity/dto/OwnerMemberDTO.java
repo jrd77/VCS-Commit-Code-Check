@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Data
+
 public class OwnerMemberDTO {
 	/**
 	 * 主订单号
@@ -70,6 +70,110 @@ public class OwnerMemberDTO {
     private Integer renterCarCount;
 
     private List<OwnerMemberRightDTO> ownerMemberRightDTOList;
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+
+	public String getOwnerOrderNo() {
+		return ownerOrderNo;
+	}
+
+	public void setOwnerOrderNo(String ownerOrderNo) {
+		this.ownerOrderNo = ownerOrderNo;
+	}
+
+	public String getMemNo() {
+		return memNo;
+	}
+
+	public void setMemNo(String memNo) {
+		this.memNo = memNo;
+	}
+
+	public Integer getMemType() {
+		return memType;
+	}
+
+	public void setMemType(Integer memType) {
+		this.memType = memType;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getHeaderUrl() {
+		return headerUrl;
+	}
+
+	public void setHeaderUrl(String headerUrl) {
+		this.headerUrl = headerUrl;
+	}
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public Integer getOrderSuccessCount() {
+		return orderSuccessCount;
+	}
+
+	public void setOrderSuccessCount(Integer orderSuccessCount) {
+		this.orderSuccessCount = orderSuccessCount;
+	}
+
+	public Integer getHaveCar() {
+		return haveCar;
+	}
+
+	public void setHaveCar(Integer haveCar) {
+		this.haveCar = haveCar;
+	}
+
+	public String getIdNo() {
+		return idNo;
+	}
+
+	public void setIdNo(String idNo) {
+		this.idNo = idNo;
+	}
+
+	public Integer getRenterCarCount() {
+		return renterCarCount;
+	}
+
+	public void setRenterCarCount(Integer renterCarCount) {
+		this.renterCarCount = renterCarCount;
+	}
+
+	public List<OwnerMemberRightDTO> getOwnerMemberRightDTOList() {
+		return ownerMemberRightDTOList;
+	}
+
+	public void setOwnerMemberRightDTOList(List<OwnerMemberRightDTO> ownerMemberRightDTOList) {
+		this.ownerMemberRightDTOList = ownerMemberRightDTOList;
+	}
 
 
 }
