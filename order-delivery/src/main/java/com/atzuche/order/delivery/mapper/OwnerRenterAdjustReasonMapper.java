@@ -24,5 +24,7 @@ public interface OwnerRenterAdjustReasonMapper {
 
     int updateByPrimaryKeySelective(OwnerRenterAdjustReasonEntity record);
 
-    OwnerRenterAdjustReasonEntity selectByChildNo(@Param("ownerOrderNo")String ownerOrderNo, @Param("renterOrderNo")String renterOrderNo);
+    OwnerRenterAdjustReasonEntity selectByChildNoAndadjustTarget(@Param("ownerOrderNo")String ownerOrderNo, @Param("renterOrderNo")String renterOrderNo,@Param("adjustTarget")Integer adjustTarget);
+
+    List<OwnerRenterAdjustReasonEntity> selectByChildNo(@Param("ownerOrderNo")String ownerOrderNo, @Param("renterOrderNo")String renterOrderNo);
 }

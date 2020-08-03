@@ -1,11 +1,17 @@
 package com.atzuche.order.delivery.service;
 
+import com.atzuche.order.commons.entity.dto.OwnerRenterAdjustReasonDTO;
 import com.atzuche.order.commons.exceptions.AdjustReasonException;
 import com.atzuche.order.delivery.entity.OwnerRenterAdjustReasonEntity;
 import com.atzuche.order.delivery.mapper.OwnerRenterAdjustReasonMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -40,13 +46,24 @@ public class OwnerRenterAdjustReasonService{
             log.error("租客车主调价备注异常",adjustReasonException);
             throw adjustReasonException;
         }
-        OwnerRenterAdjustReasonEntity ownerRenterAdjustReasonDB = ownerRenterAdjustReasonMapper.selectByChildNo(ownerOrderNo, renterOrderNo);
+        OwnerRenterAdjustReasonEntity ownerRenterAdjustReasonDB = ownerRenterAdjustReasonMapper.selectByChildNoAndadjustTarget(ownerOrderNo, renterOrderNo,ownerRenterAdjustReasonEntity.getAdjustTarget());
         if(ownerRenterAdjustReasonDB == null || ownerRenterAdjustReasonDB.getId()==null){
             ownerRenterAdjustReasonMapper.insertSelective(ownerRenterAdjustReasonEntity);
         }else{
             ownerRenterAdjustReasonEntity.setId(ownerRenterAdjustReasonDB.getId());
             ownerRenterAdjustReasonMapper.updateByPrimaryKeySelective(ownerRenterAdjustReasonEntity);
         }
+    }
+
+    public List<OwnerRenterAdjustReasonDTO> getOwnerRenterAdjustReasonByChildNo(String ownerOrderNo, String renterOrderNo){
+        List<OwnerRenterAdjustReasonEntity> ownerRenterAdjustReasonEntities = ownerRenterAdjustReasonMapper.selectByChildNo(ownerOrderNo, renterOrderNo);
+        List<OwnerRenterAdjustReasonDTO> list = new ArrayList<>();
+        Optional.ofNullable(ownerRenterAdjustReasonEntities).orElseGet(ArrayList::new).forEach(x->{
+            OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = new OwnerRenterAdjustReasonDTO();
+            BeanUtils.copyProperties(x,ownerRenterAdjustReasonDTO);
+            list.add(ownerRenterAdjustReasonDTO);
+        });
+        return list;
     }
 
 }

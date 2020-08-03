@@ -22,6 +22,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
 import com.atzuche.order.commons.entity.rentCost.RenterCostDetailDTO;
+import com.atzuche.order.commons.enums.AdjustTargetEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
@@ -429,8 +430,8 @@ public class OrderCostDetailService {
 		int renterToOwnerAdjustAmount = 0;
 		//车主给租客的调价
 	    int ownerToRenterAdjustAmount = 0;
-	    
-	    for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : consoleSubsidyList) {
+        List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonDTOS = renterAndConsoleSubsidyVO.getOwnerRenterAdjustReasonDTOS();
+        for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : consoleSubsidyList) {
 			//补贴来源方 1、租客 2、车主 3、平台
 			//补贴方名称 1、租客 2、车主 3、平台
 	    	//租客给车主的调价
@@ -441,7 +442,12 @@ public class OrderCostDetailService {
 					renterToOwnerAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
 					break;
 				}
-			}
+                OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.RENTER_TO_OWNER);
+				if(ownerRenterAdjustReasonDTO != null){
+                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
+                    resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
+                }
+            }
 		}
 	    
 	    for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : consoleSubsidyList) {
@@ -453,7 +459,12 @@ public class OrderCostDetailService {
 					ownerToRenterAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
 					break;
 				}
-			}
+                OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.OWNER_TO_RENTER);
+                if(ownerRenterAdjustReasonDTO != null){
+                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
+                    resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
+                }
+            }
 	    }
 	    
 	    //封装数据
@@ -462,6 +473,20 @@ public class OrderCostDetailService {
 		return resVo;
 	}
 
+
+	public OwnerRenterAdjustReasonDTO filterByAdjustTarget(List<OwnerRenterAdjustReasonDTO> list,AdjustTargetEnum adjustTargetEnum){
+        Optional<OwnerRenterAdjustReasonDTO> first = Optional
+                .ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> x.getAdjustReasonType() == adjustTargetEnum.getType())
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+
+    }
 	/**
 	 * 保存调价
 	 * @param renterCostReqVO

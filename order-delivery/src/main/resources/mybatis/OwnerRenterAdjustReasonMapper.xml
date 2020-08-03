@@ -42,10 +42,21 @@
 		select <include refid="Base_Column_List" /> from owner_renter_adjust_reason where id = #{value}
 	</select>
 
-    <select id="selectByChildNo" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from owner_renter_adjust_reason where owner_order_no = #{ownerOrderNo} and renter_order_no = #{renterOrderNo} limit 1
+    <select id="selectByChildNoAndadjustTarget" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_renter_adjust_reason
+        where 1=1
+        <if test="renterOrderNo != null and renterOrderNo != ''"> and renter_order_no = #{renterOrderNo}</if>
+        <if test="ownerOrderNo != null and ownerOrderNo != ''">  and owner_order_no = #{ownerOrderNo}</if>
+        and adjust_target = #{adjustTarget}
+        limit 1
     </select>
-
+    <select id="selectByChildNo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from owner_renter_adjust_reason
+        where 1=1
+        <if test="renterOrderNo != null and renterOrderNo != ''"> and renter_order_no = #{renterOrderNo}</if>
+        <if test="ownerOrderNo != null and ownerOrderNo != ''">  and owner_order_no = #{ownerOrderNo}</if>
+        limit 2
+    </select>
 	<insert id="insertSelective" parameterType="com.atzuche.order.delivery.entity.OwnerRenterAdjustReasonEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into owner_renter_adjust_reason
             <trim prefix="(" suffix=")" suffixOverrides="," >

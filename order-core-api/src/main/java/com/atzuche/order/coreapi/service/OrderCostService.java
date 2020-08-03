@@ -17,10 +17,8 @@ import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResV
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
@@ -756,19 +754,22 @@ public class OrderCostService {
 	 * @return RenterAndConsoleSubsidyVO
 	 */
 	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo) {
-		  //主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
-	      // 管理后台补贴
-		  List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
-		  
-		  RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
-		  renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
-		  if (StringUtils.isNotBlank(renterOrderNo)) {
-			  // 租客子订单补贴
-			  List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo); 
-			  renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
-		  }
-		  return renterAndConsoleSubsidyVO;
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        // 管理后台补贴
+        List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
+
+        RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
+        renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
+        if (StringUtils.isNotBlank(renterOrderNo)) {
+          // 租客子订单补贴
+          List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo);
+          renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
+        }
+        //查询调价原因
+        List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonByChildNo = ownerRenterAdjustReasonService.getOwnerRenterAdjustReasonByChildNo(renterOrderNo, null);
+        renterAndConsoleSubsidyVO.setOwnerRenterAdjustReasonDTOS(ownerRenterAdjustReasonByChildNo);
+        return renterAndConsoleSubsidyVO;
 	}
 	
 	
