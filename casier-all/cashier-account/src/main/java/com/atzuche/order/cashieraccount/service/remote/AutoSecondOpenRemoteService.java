@@ -100,8 +100,8 @@ public class AutoSecondOpenRemoteService {
             } else {
                 OpenInfoStatusVO statusVo = responseEntity.getData();
                 log.info("postForEntity ok,result=[{}],params memNo=[{}]", GsonUtils.toJson(statusVo), memNo);
-                //开户状态 0：未完成 1：完成
-                if (statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 1) {
+                // 开户状态 0：未完成 2：完成 3:待认证 
+                if (statusVo.getSecondOpenOwner() != null && statusVo.getSecondOpenOwner().getOpenStatus().intValue() == 2) {
                     return true;
                 } else {
                     return false;
