@@ -50,7 +50,7 @@ dependencies {
         exclude module:'servlet-api'
     }
     compile("com.caucho:hessian:4.0.38")
-    compile("com.autoframework:auto-mq-event:2.0.1-SNAPSHOT")
+    compile("com.autoframework:auto-mq-event:2.0.7-SNAPSHOT")
 
 
 
