@@ -915,10 +915,13 @@ public class ModifyOrderService {
 		renterOrderCostRespDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		renterOrderCostRespDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderCostRespDTO.setMemNo(modifyOrderDTO.getMemNo());
+
+		//驾驶行为评分和各项系数
+        RenterInsureCoefficientDTO renterInsureCoefficientDTO = SubmitOrderBeforeCostCalService.insureCoefficient(renterOrderCostReqDTO);
+        renterOrderCostRespDTO.setRenterInsureCoefficientDTO(renterInsureCoefficientDTO);
 		return renterOrderCostRespDTO;
 	}
-	
-	
+
 	/**
 	 * 获取费用补贴列表
 	 * @param renterOrderCostReqDTO

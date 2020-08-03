@@ -20,7 +20,7 @@ public class RenterInsureCoefficientVO {
     private Double coefficient;
 
     /**
-     * 类型：1-驾龄系数，2-易出险车系数，3-驾驶行为系数
+     * 类型：1-驾龄系数，2-易出险车系数，3-驾驶行为系数，4-折扣
      */
     private Integer type; 
     
