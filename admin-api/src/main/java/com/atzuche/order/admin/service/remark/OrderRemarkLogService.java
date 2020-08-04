@@ -1,5 +1,6 @@
 package com.atzuche.order.admin.service.remark;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.admin.common.AdminUserUtil;
 import com.atzuche.order.admin.dto.remark.OrderRemarkLogListRequestDTO;
 import com.atzuche.order.admin.entity.OrderRemarkEntity;
@@ -54,6 +55,7 @@ public class OrderRemarkLogService {
         orderRemarkLogEntity.setRemarkType(oldOrderRemarkEntity.getRemarkType());
         orderRemarkLogEntity.setNumber(oldOrderRemarkEntity.getNumber());
         orderRemarkLogEntity.setDepartmentId(oldOrderRemarkEntity.getDepartmentId());
+        orderRemarkLogEntity.setRemarkId(oldOrderRemarkEntity.getId());
         String remarkContent = oldOrderRemarkEntity.getRemarkContent();
         if(orderRemarkLogEntity.getRemarkContent()==null){
             orderRemarkLogEntity.setRemarkContent(remarkContent);
@@ -61,7 +63,14 @@ public class OrderRemarkLogService {
 
         orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
     }
-
+    public  void saveRemarkLog(OrderRemarkLogEntity orderRemarkLogEntity){
+        //保存操作日志
+        String userName = AdminUserUtil.getAdminUser().getAuthName();
+        orderRemarkLogEntity.setCreateOp(userName);
+        orderRemarkLogEntity.setUpdateOp(userName);
+        logger.info("orderRemarkLogEntity={}", JSON.toJSONString(orderRemarkLogEntity));
+        orderRemarkLogMapper.addOrderRemarkLog(orderRemarkLogEntity);
+    }
 
     /**
      * 查询备注日志列表
@@ -82,6 +91,7 @@ public class OrderRemarkLogService {
         if(!CollectionUtils.isEmpty(remarkList)) {
             remarkList.forEach(remarkLogEntity -> {
                 OrderRemarkLogListResponseVO orderRemarkLogListResponseVO = new OrderRemarkLogListResponseVO();
+                orderRemarkLogListResponseVO.setRemarkId(remarkLogEntity.getRemarkId()!=null?String.valueOf(remarkLogEntity.getRemarkId()):"");
                 orderRemarkLogListResponseVO.setNumber(remarkLogEntity.getNumber());
                 orderRemarkLogListResponseVO.setRemarkType(RemarkTypeEnum.getDescriptionByType(remarkLogEntity.getRemarkType()));
                 orderRemarkLogListResponseVO.setOperateTypeText(OperateTypeEnum.getDescriptionByType(remarkLogEntity.getOperateType()));
