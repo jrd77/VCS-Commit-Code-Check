@@ -172,6 +172,7 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO : violationResDesVOList) {
             ViolationExportResVO violationExportResVO = new ViolationExportResVO();
             CommonUtil.copyPropertiesIgnoreNull(violationResVO, violationExportResVO);
+            violationExportResVO.setCities(violationResVO.getOnlineCity());
             List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities =
                     renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(),
                             violationResVO.getPlateNum());
@@ -191,10 +192,9 @@ public class ViolationInfoService {
                     }
                     violationExportResVO.setIllegalPauseCost(orderDetain);
                     violationExportResVO.setIllegalReason(r.getIllegalReason());
-                    violationExportResVO.setIllegalServiceCost(String.valueOf(r.getIllegalServiceCost()));
-                    violationExportResVO.setIllegalSupercerCost(String.valueOf(r.getIllegalSupercerCost()));
-                    violationExportResVO.setIllegalTime(String.valueOf(r.getIllegalTime()));
-                    violationExportResVO.setId(String.valueOf(r.getId()));
+                    violationExportResVO.setIllegalTime(DateUtil.formatDate(r.getIllegalTime(), "yyyy-MM-dd HH:mm:ss"));
+                    violationExportResVO.setIllegalPauseCost(Objects.nonNull(r.getIllegalSupercerCost()) ?
+                            r.getIllegalSupercerCost().toString() : "0");
                     violationExportResVOS.add(violationExportResVO);
                 });
             } else {
