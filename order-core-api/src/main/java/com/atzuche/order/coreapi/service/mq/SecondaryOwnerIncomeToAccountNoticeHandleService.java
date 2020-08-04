@@ -49,7 +49,7 @@ public class SecondaryOwnerIncomeToAccountNoticeHandleService {
         }
         // 车主收益信息更新
         int receiveAmt = StringUtils.isBlank(noticeMq.getReceiveAmt()) ? OrderConstant.ZERO :
-                Integer.parseInt(noticeMq.getReceiveAmt());
+                Double.valueOf(noticeMq.getReceiveAmt()).intValue();
         int secondaryFreezeIncomeAmt = Objects.nonNull(accountOwnerIncomeEntity.getSecondaryFreezeIncomeAmt()) ?
                 accountOwnerIncomeEntity.getSecondaryFreezeIncomeAmt() : OrderConstant.ZERO;
 

@@ -56,7 +56,7 @@ public class SecondaryOwnerWithdrawalsNoticeHandleService {
         }
 
         // 金额不一致情况处理
-        if (accountOwnerCashExamine.getAmt() != Integer.parseInt(noticeMq.getAmt())) {
+        if (accountOwnerCashExamine.getAmt() != Double.valueOf(noticeMq.getAmt()).intValue()) {
             log.info("SecondaryOwnerWithdrawalsNoticeHandleService.process >> Amount discrepancy. " +
                             "accountOwnerCashExamine.amt:[{}], noticeMq.amt:[{}]", accountOwnerCashExamine.getAmt(),
                     noticeMq.getAmt());
