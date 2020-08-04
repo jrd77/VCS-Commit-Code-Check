@@ -172,9 +172,11 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO : violationResDesVOList) {
             ViolationExportResVO violationExportResVO = new ViolationExportResVO();
             CommonUtil.copyPropertiesIgnoreNull(violationResVO, violationExportResVO);
-            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(), violationReqVO.getCarNo());
+            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities =
+                    renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(),
+                            violationResVO.getPlateNum());
             if (!CollectionUtils.isEmpty(renterOrderWzDetailEntities)) {
-                renterOrderWzDetailEntities.stream().forEach(r -> {
+                renterOrderWzDetailEntities.forEach(r -> {
                     violationExportResVO.setIllegalAddr(r.getIllegalAddr());
                     violationExportResVO.setIllegalAmt(r.getIllegalAmt());
                     violationExportResVO.setIllegalDeduct(r.getIllegalDeduct());
@@ -182,10 +184,10 @@ public class ViolationInfoService {
                     violationExportResVO.setIllegalFine(String.valueOf(r.getIllegalFine()));
                     OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(r.getOrderNo());
                     String orderDetain = "未暂扣";
-                    if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                    if (orderStatusEntity.getIsDetain() == 0) {
                         orderDetain = "未暂扣";
                     } else {
-                        orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                        orderDetain = orderStatusEntity.getIsDetain() == 1 ? "已暂扣" : "撤销暂扣";
                     }
                     violationExportResVO.setIllegalPauseCost(orderDetain);
                     violationExportResVO.setIllegalReason(r.getIllegalReason());
@@ -198,10 +200,10 @@ public class ViolationInfoService {
             } else {
                 OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationExportResVO.getOrderNo());
                 String orderDetain = "未暂扣";
-                if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                if (orderStatusEntity.getIsDetain() == 0) {
                     orderDetain = "未暂扣";
                 } else {
-                    orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                    orderDetain = orderStatusEntity.getIsDetain() == 1 ? "已暂扣" : "撤销暂扣";
                 }
                 violationExportResVO.setIllegalPauseCost(orderDetain);
                 violationExportResVOS.add(violationExportResVO);
