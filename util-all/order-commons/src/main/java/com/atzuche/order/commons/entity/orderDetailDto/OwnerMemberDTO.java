@@ -13,7 +13,6 @@ import java.io.Serializable;
  * @date 2020-01-08 20:40:42
  * @Description:
  */
-@Data
 public class OwnerMemberDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -65,4 +64,78 @@ public class OwnerMemberDTO implements Serializable {
          * 车辆等级
          */
         private Integer carChargeLevel;
+		public String getOrderNo() {
+			return orderNo;
+		}
+		public void setOrderNo(String orderNo) {
+			this.orderNo = orderNo;
+		}
+		public String getOwnerOrderNo() {
+			return ownerOrderNo;
+		}
+		public void setOwnerOrderNo(String ownerOrderNo) {
+			this.ownerOrderNo = ownerOrderNo;
+		}
+		public String getMemNo() {
+			return memNo;
+		}
+		public void setMemNo(String memNo) {
+			this.memNo = memNo;
+		}
+		public Integer getMemType() {
+			return memType;
+		}
+		public void setMemType(Integer memType) {
+			this.memType = memType;
+		}
+		public String getPhone() {
+			return phone;
+		}
+		public void setPhone(String phone) {
+			this.phone = phone;
+		}
+		public String getHeaderUrl() {
+			return headerUrl;
+		}
+		public void setHeaderUrl(String headerUrl) {
+			this.headerUrl = headerUrl;
+		}
+		public String getRealName() {
+			return realName;
+		}
+		public void setRealName(String realName) {
+			this.realName = realName;
+		}
+		public String getNickName() {
+			return nickName;
+		}
+		public void setNickName(String nickName) {
+			this.nickName = nickName;
+		}
+		public Integer getOrderSuccessCount() {
+			return orderSuccessCount;
+		}
+		public void setOrderSuccessCount(Integer orderSuccessCount) {
+			this.orderSuccessCount = orderSuccessCount;
+		}
+		public Integer getRenterCarCount() {
+			return renterCarCount;
+		}
+		public void setRenterCarCount(Integer renterCarCount) {
+			this.renterCarCount = renterCarCount;
+		}
+		public String getIdNo() {
+			return idNo;
+		}
+		public void setIdNo(String idNo) {
+			this.idNo = idNo;
+		}
+		public Integer getCarChargeLevel() {
+			return carChargeLevel;
+		}
+		public void setCarChargeLevel(Integer carChargeLevel) {
+			this.carChargeLevel = carChargeLevel;
+		}
+        
+        
 }
