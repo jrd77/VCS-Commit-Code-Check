@@ -438,7 +438,7 @@ public class OrderCostDetailService {
 			if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
                 OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.RENTER_TO_OWNER);
                 if(ownerRenterAdjustReasonDTO != null){
-                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
+                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType()==null?"0":String.valueOf(ownerRenterAdjustReasonDTO.getAdjustReasonType()));
                     resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
                 }
 			    if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
@@ -456,7 +456,7 @@ public class OrderCostDetailService {
 			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
                 OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.OWNER_TO_RENTER);
                 if(ownerRenterAdjustReasonDTO != null){
-                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
+                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType()==null?"0":String.valueOf(ownerRenterAdjustReasonDTO.getAdjustReasonType()));
                     resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
                 }
 			    if(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
