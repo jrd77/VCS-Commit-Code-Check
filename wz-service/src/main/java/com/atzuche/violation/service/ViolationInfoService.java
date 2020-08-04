@@ -386,7 +386,7 @@ public class ViolationInfoService {
             rabbitTemplate.convertAndSend(ORDER_CENTER_WZ_WITHHOLD_EXCHANGE, ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY, renterOrderWzDetail.getOrderNo());
         }
         updateTransWzDisposeStatus(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum());
-        updateViolationCostHandle(renterOrderWzDetail);
+        //updateViolationCostHandle(renterOrderWzDetail);
     }
 
     /**
