@@ -55,7 +55,7 @@ public class OwnerRenterAdjustReasonService{
         }
     }
 
-    public List<OwnerRenterAdjustReasonDTO> getOwnerRenterAdjustReasonByChildNo(String ownerOrderNo, String renterOrderNo){
+    public List<OwnerRenterAdjustReasonDTO> getOwnerRenterAdjustReasonByChildNo(String renterOrderNo,String ownerOrderNo){
         List<OwnerRenterAdjustReasonEntity> ownerRenterAdjustReasonEntities = ownerRenterAdjustReasonMapper.selectByChildNo(ownerOrderNo, renterOrderNo);
         List<OwnerRenterAdjustReasonDTO> list = new ArrayList<>();
         Optional.ofNullable(ownerRenterAdjustReasonEntities).orElseGet(ArrayList::new).forEach(x->{
