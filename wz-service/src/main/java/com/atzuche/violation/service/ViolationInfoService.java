@@ -193,7 +193,7 @@ public class ViolationInfoService {
                     violationExportResVO.setIllegalPauseCost(orderDetain);
                     violationExportResVO.setIllegalReason(r.getIllegalReason());
                     violationExportResVO.setIllegalTime(DateUtil.formatDate(r.getIllegalTime(), "yyyy-MM-dd HH:mm:ss"));
-                    violationExportResVO.setIllegalPauseCost(Objects.nonNull(r.getIllegalSupercerCost()) ?
+                    violationExportResVO.setIllegalSupercerCost(Objects.nonNull(r.getIllegalSupercerCost()) ?
                             r.getIllegalSupercerCost().toString() : "0");
                     violationExportResVOS.add(violationExportResVO);
                 });
