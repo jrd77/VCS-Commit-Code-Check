@@ -1367,6 +1367,9 @@ public class OrderDetailService {
                 ownerOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 // 处理子订单状态
                 Integer ownerStatusx = x.getOwnerStatus() == null ? orderStatusEntity.getStatus():x.getOwnerStatus();
+                if (x.getChildStatus() != null && x.getChildStatus().intValue() == OwnerChildStatusEnum.END.getCode()) {
+                	ownerStatusx = OrderStatusEnum.CLOSED.getStatus();
+                }
                 ownerOrderDTO.setOwnerStatus(ownerStatusx);
                 ownerOrderDTO.setOwnerStatusTxt(OrderStatusEnum.getDescByStatus(ownerStatusx));
                 OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
