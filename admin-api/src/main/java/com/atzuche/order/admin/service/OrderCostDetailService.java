@@ -436,34 +436,36 @@ public class OrderCostDetailService {
 			//补贴方名称 1、租客 2、车主 3、平台
 	    	//租客给车主的调价
 			if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
-				if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
+                OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.RENTER_TO_OWNER);
+                if(ownerRenterAdjustReasonDTO != null){
+                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
+                    resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
+                }
+			    if(RenterCashCodeEnum.SUBSIDY_RENTERTOOWNER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
 //					renterToOwnerAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
 					//不需要累计，只是查询记录
 					renterToOwnerAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
 					break;
 				}
-                OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.RENTER_TO_OWNER);
-				if(ownerRenterAdjustReasonDTO != null){
-                    resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
-                    resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
-                }
+
             }
 		}
 	    
 	    for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : consoleSubsidyList) {
 		  //车主给租客的调价
 			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
-				if(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
-//					ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
-					//不需要累计，只是查询记录
-					ownerToRenterAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
-					break;
-				}
                 OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.OWNER_TO_RENTER);
                 if(ownerRenterAdjustReasonDTO != null){
                     resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
                     resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
                 }
+			    if(RenterCashCodeEnum.SUBSIDY_OWNERTORENTER_ADJUST.getCashNo().equals(orderConsoleSubsidyDetailEntity.getSubsidyCostCode())) {
+//					ownerToRenterAdjustAmount += orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue();
+					//不需要累计，只是查询记录
+					ownerToRenterAdjustAmount = Math.abs(orderConsoleSubsidyDetailEntity.getSubsidyAmount().intValue());
+					break;
+				}
+
             }
 	    }
 	    
@@ -479,7 +481,7 @@ public class OrderCostDetailService {
                 .ofNullable(list)
                 .orElseGet(ArrayList::new)
                 .stream()
-                .filter(x -> x.getAdjustReasonType() == adjustTargetEnum.getType())
+                .filter(x -> x.getAdjustTarget() == adjustTargetEnum.getType())
                 .findFirst();
         if(first.isPresent()){
             return first.get();
