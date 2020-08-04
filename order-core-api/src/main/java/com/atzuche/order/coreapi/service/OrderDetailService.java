@@ -349,6 +349,9 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailRespDTO.wzQueryDayConfDTO = wzQueryDayConfDTO;
+        /**
+         * 订单详情的主入口
+         */
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
         // 获取停运费信息
         OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
