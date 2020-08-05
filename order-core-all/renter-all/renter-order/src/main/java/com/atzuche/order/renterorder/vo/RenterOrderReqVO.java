@@ -297,5 +297,7 @@ public class RenterOrderReqVO implements Serializable {
 	 * 配送模式：0-区间配送，1-精准配送
 	 */
     private Integer distributionMode;
+    @AutoDocProperty("车辆等级")
+    private Integer carLevel;
 
 }

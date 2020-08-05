@@ -1,5 +1,6 @@
 package com.atzuche.order.coreapi.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.OrderException;
 import com.atzuche.order.commons.vo.req.OrderPriceAdjustmentReqVO;
@@ -57,6 +58,7 @@ public class OrderPriceAdjustmentController {
 
     @PostMapping("/insert")
     public ResponseData <Boolean> insert(@RequestBody OrderPriceAdjustmentReqVO reqVO) {
+        LOGGER.info("租客车主相互调价reqVO={}", JSON.toJSONString(reqVO));
         String json = null;
         try {
             Integer count = orderPriceAdjustmentService.insertAndUpdateIsDelete(reqVO);

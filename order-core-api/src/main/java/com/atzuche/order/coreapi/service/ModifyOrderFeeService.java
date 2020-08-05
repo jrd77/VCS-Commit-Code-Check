@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.renterorder.entity.dto.RenterOrderCostReqDTO;
+import com.autoyol.platformcost.CommonUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,10 +151,13 @@ public class ModifyOrderFeeService {
 			modifyOrderCompareVO.setNeedSupplementAmt(Math.abs(payable) - rentAmtPayed);
 		}
 		modifyOrderCompareVO.setRentAmtPayed(rentAmtPayed);
+
+		//驾驶行为评分和各项系数
+        modifyOrderCompareVO.setRenterInsureCoefficientDTO(renterOrderCostRespDTO.getRenterInsureCoefficientDTO());
 		return modifyOrderCompareVO;
 	}
-	
-	
+
+
 	/**
 	 * 获取总费用
 	 * @param updateModifyOrderFeeVO
