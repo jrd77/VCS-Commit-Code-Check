@@ -437,7 +437,7 @@ public class OrderCostDetailService {
 	    	//租客给车主的调价
 			if("1".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "2".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
                 OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.RENTER_TO_OWNER);
-                if(ownerRenterAdjustReasonDTO != null){
+                if(ownerRenterAdjustReasonDTO != null && StringUtils.isNotBlank(renterCostReqVO.getRenterOrderNo())){
                     resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
                     resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
                 }
@@ -455,7 +455,7 @@ public class OrderCostDetailService {
 		  //车主给租客的调价
 			if("2".equals(orderConsoleSubsidyDetailEntity.getSubsidySourceCode()) && "1".equals(orderConsoleSubsidyDetailEntity.getSubsidyTargetCode())){
                 OwnerRenterAdjustReasonDTO ownerRenterAdjustReasonDTO = filterByAdjustTarget(ownerRenterAdjustReasonDTOS, AdjustTargetEnum.OWNER_TO_RENTER);
-                if(ownerRenterAdjustReasonDTO != null){
+                if(ownerRenterAdjustReasonDTO != null && StringUtils.isNotBlank(renterCostReqVO.getOwnerOrderNo())){
                     resVo.setAdjustReasonType(ownerRenterAdjustReasonDTO.getAdjustReasonType());
                     resVo.setRemarkContent(ownerRenterAdjustReasonDTO.getAdjustRemark());
                 }

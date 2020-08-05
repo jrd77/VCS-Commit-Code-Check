@@ -29,4 +29,5 @@ public class RenterPriceAdjustmentResVO {
 
     @AutoDocProperty("当调价原因类型为【其他】时的备注内容")
     private String remarkContent;
+
 }
