@@ -144,4 +144,15 @@ public class OwnerIncomeController {
         return ResponseData.success(incomeList);
     }
 
+
+    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益")
+    @GetMapping("/getOwnerTotalIncome")
+    public ResponseData<Integer> getOwnerTotalIncome(@RequestParam("ownerMemeNo") String memNo) {
+        log.info("OwnerIncomeController getOwnerTotalIncome start. param,memNo:[{}]", memNo);
+        int totalIncome = accountOwnerIncomeExamineNoTService.getOwnerIncomeAmt(memNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end. result, memNo:[{}] totalIncome:[{}]", memNo,
+                totalIncome);
+        return ResponseData.success(totalIncome);
+    }
+
 }
