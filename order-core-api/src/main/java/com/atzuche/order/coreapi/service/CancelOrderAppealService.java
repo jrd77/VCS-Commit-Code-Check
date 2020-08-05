@@ -7,6 +7,7 @@ import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.MemRoleEnum;
 import com.atzuche.order.commons.vo.req.AdminCancelOrderReqVO;
 import com.atzuche.order.commons.vo.req.OrderCancelAppealReqVO;
+import com.atzuche.order.coreapi.service.mq.OrderActionMqService;
 import com.atzuche.order.coreapi.submit.exception.RefuseOrderCheckException;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -48,6 +49,8 @@ public class CancelOrderAppealService {
     private RenterGoodsService renterGoodsService;
     @Autowired
     private OwnerGoodsService ownerGoodsService;
+    @Autowired
+    private OrderActionMqService orderActionMqService;
 
     /**
      * 申诉
@@ -55,7 +58,7 @@ public class CancelOrderAppealService {
      * @param reqVO 申诉请求参数
      */
     public void appeal(OrderCancelAppealReqVO reqVO) {
-        //申诉信息处理
+        // 申诉信息处理
         String subOrderNo = "";
         Integer carOwnerType = null;
         if (StringUtils.equals(MemRoleEnum.RENTER.getCode(), reqVO.getMemRole())) {
@@ -73,7 +76,7 @@ public class CancelOrderAppealService {
             OwnerGoodsDetailDTO goodsDetailDTO = ownerGoodsService.getOwnerGoodsDetail(subOrderNo, false);
             carOwnerType = goodsDetailDTO.getCarOwnerType();
         }
-        //车辆类型校验
+        // 车辆类型校验
         if (null != carOwnerType) {
             logger.info("Car owner type is :[{}]", carOwnerType);
             if (carOwnerType == CarOwnerTypeEnum.DZTGC.getCode()) {
@@ -88,11 +91,14 @@ public class CancelOrderAppealService {
         OrderCancelAppealEntity record = buildOrderCancelAppealEntity(reqVO, subOrderNo);
         int result = orderCancelAppealService.addOrderCancelAppeal(record);
         if (result > 0) {
-            //取消订单处理(走管理后台取消流程)
+            // 取消订单处理(走管理后台取消流程)
             AdminCancelOrderReqVO adminCancelOrderReqVO = new AdminCancelOrderReqVO();
             BeanUtils.copyProperties(reqVO, adminCancelOrderReqVO);
             adminCancelOrderReqVO.setOperatorName("H5SystemOperator");
             cancelOrderService.cancel(adminCancelOrderReqVO, false, OrderConstant.YES, record.getAppealReason());
+
+            // 申诉成功发送mq
+            orderActionMqService.sendOrderCancelAppealSuccess(reqVO.getOrderNo(), reqVO.getMemRole(), reqVO.getAppealReason());
         }
     }
 
