@@ -345,7 +345,7 @@ public class OrderCostDetailService {
         int driverInsurSubsidySystem = 0;
 
 	    // 远程调用获取租客补贴
-	    RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+	    RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo(),null);
 	    // 管理后台补贴
 	 	List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = renterAndConsoleSubsidyVO == null ? null:renterAndConsoleSubsidyVO.getConsoleSubsidyList();
 		for (OrderConsoleSubsidyDetailEntity orderConsoleSubsidyDetailEntity : consoleSubsidyList) {
@@ -423,7 +423,7 @@ public class OrderCostDetailService {
 	public RenterPriceAdjustmentResVO findRenterPriceAdjustmentByOrderNo(RenterCostReqVO renterCostReqVO) {
 		RenterPriceAdjustmentResVO resVo = new RenterPriceAdjustmentResVO();
 	    // 远程调用获取租客补贴
-		RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo());
+		RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostRemoteService.getRenterAndConsoleSubsidyVO(renterCostReqVO.getOrderNo(), renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo());
 		// 管理后台补贴
 		List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = renterAndConsoleSubsidyVO == null ? null:renterAndConsoleSubsidyVO.getConsoleSubsidyList();
 	    //租客给车主的调价

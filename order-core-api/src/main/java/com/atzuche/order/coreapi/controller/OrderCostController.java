@@ -350,8 +350,8 @@ public class OrderCostController {
      * @param renterOrderNo
      */
     @GetMapping("/order/renter/cost/renterAndConsoleSubsidy")
-	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam(value="renterOrderNo",required=false) String renterOrderNo){
-    	RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo);
+	public ResponseData<RenterAndConsoleSubsidyVO> getRenterAndConsoleSubsidyVO(@RequestParam("orderNo") String orderNo,@RequestParam(value="renterOrderNo",required=false) String renterOrderNo,@RequestParam(value="ownerOrderNo",required=false) String ownerOrderNo){
+    	RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = orderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo,ownerOrderNo);
     	return ResponseData.success(renterAndConsoleSubsidyVO);
     }
     

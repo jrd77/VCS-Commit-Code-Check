@@ -753,7 +753,7 @@ public class OrderCostService {
 	 * @param renterOrderNo
 	 * @return RenterAndConsoleSubsidyVO
 	 */
-	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo) {
+	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo,String ownerOrderNo) {
         //主订单
         OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
         // 管理后台补贴
@@ -767,7 +767,7 @@ public class OrderCostService {
           renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
         }
         //查询调价原因
-        List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonByChildNo = ownerRenterAdjustReasonService.getOwnerRenterAdjustReasonByChildNo(renterOrderNo, null);
+        List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonByChildNo = ownerRenterAdjustReasonService.getOwnerRenterAdjustReasonByChildNo(renterOrderNo, ownerOrderNo);
         renterAndConsoleSubsidyVO.setOwnerRenterAdjustReasonDTOS(ownerRenterAdjustReasonByChildNo);
         return renterAndConsoleSubsidyVO;
 	}
