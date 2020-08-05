@@ -226,8 +226,25 @@ public class DeliveryCarTask {
     	if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
             renYunFlowOrderDTO.setSceneName(OrderScenesSourceEnum.getOrderScenesSource(renYunFlowOrderDTO.getSceneName()));
         }
-        // 获取区间配送信息
-        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity);
+    	List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+    	Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				renYunFlowOrderDTO.setOwnerGetLat(srvGetDelivery.getOwnerGetReturnAddrLat());
+				renYunFlowOrderDTO.setOwnerGetLon(srvGetDelivery.getOwnerGetReturnAddrLon());
+			}
+			if (srvReturnDelivery != null) {
+				renYunFlowOrderDTO.setOwnerReturnLat(srvReturnDelivery.getOwnerGetReturnAddrLat());
+				renYunFlowOrderDTO.setOwnerReturnLon(srvReturnDelivery.getOwnerGetReturnAddrLon());
+			}
+		}
+    	// 获取区间配送信息
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity,deliveryList);
         renYunFlowOrderDTO = convertDataAdd(renYunFlowOrderDTO, deliveryResult);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
         renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
@@ -289,8 +306,13 @@ public class DeliveryCarTask {
     	}
     	// 获取有效的租客子订单
     	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updFlow.getOrdernumber());
+    	if (renterOrderEntity == null) {
+    		log.error("appendUpdateFlowOrderDTO renterOrderEntity is null orderNo={}", updFlow.getOrdernumber());
+    		return null;
+    	}
+    	List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
     	// 获取区间配送信息
-        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity); 
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity,deliveryList); 
     	if (deliveryResult == null) {
     		return updFlow;
     	}
@@ -326,7 +348,7 @@ public class DeliveryCarTask {
      * @param renterOrderEntity
      * @return SectionDeliveryResultVO
      */
-    public SectionDeliveryResultVO getSectionDeliveryResultVO(RenterOrderEntity renterOrderEntity) {
+    public SectionDeliveryResultVO getSectionDeliveryResultVO(RenterOrderEntity renterOrderEntity, List<RenterOrderDeliveryEntity> deliveryList) {
     	if (renterOrderEntity == null) {
     		log.info("获取区间配送信息getSectionDeliveryResultVO renterOrderEntity is null");
     		return null;
@@ -338,7 +360,6 @@ public class DeliveryCarTask {
 		}
 		Integer getCarBeforeTime = 0;
 		Integer returnCarAfterTime = 0;
-		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
 		if (deliveryList != null && !deliveryList.isEmpty()) {
 			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
