@@ -19,6 +19,7 @@ import com.atzuche.order.commons.exceptions.AccountDepositException;
 import com.atzuche.order.commons.exceptions.AccountWzDepositException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.rentercost.GetReturnAndOverFeeVO;
 import com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.commons.vo.rentercost.OwnerToRenterSubsidyReqVO;
@@ -48,6 +49,7 @@ import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.GetReturnAndOverFeeDetailVO;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
+import com.atzuche.order.renterorder.service.RenterInsureCoefficientService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.settle.service.OrderSettleService;
@@ -99,6 +101,8 @@ public class OrderCostController {
 
 	@Autowired
 	private OrderSettleService orderSettleService;
+	@Autowired
+	private RenterInsureCoefficientService renterInsureCoefficientService;
 	
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
@@ -483,6 +487,14 @@ public class OrderCostController {
     public ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo){
         List<RenterOrderCostDetailDTO> renterOrderCostDetailDTOS = orderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
         return ResponseData.success(renterOrderCostDetailDTOS);
+    }
+    
+    
+    @AutoDocMethod(description = "保费系数弹窗", value = "保费系数弹窗", response = RenterInsureCoefficientVO.class)
+    @RequestMapping(value="/order/renter/insurecoefficient/list",method = RequestMethod.GET)
+    public ResponseData<List<RenterInsureCoefficientVO>> insureCoefficient(@RequestParam("renterOrderNo") String renterOrderNo){
+    	List<RenterInsureCoefficientVO> list = renterInsureCoefficientService.listRenterInsureCoefficientVO(renterOrderNo);
+        return ResponseData.success(list);
     }
 
     

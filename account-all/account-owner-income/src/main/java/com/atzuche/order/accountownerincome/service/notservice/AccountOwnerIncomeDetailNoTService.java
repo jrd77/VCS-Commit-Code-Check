@@ -41,7 +41,7 @@ public class AccountOwnerIncomeDetailNoTService {
                 .filter(x-> AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == x.getStatus())
                 .mapToInt(AccountOwnerIncomeExamineEntity::getAmt)
                 .sum();
-        Assert.isTrue(amt>0,"车主收益金额不合法");
+        Assert.isTrue(amt>=0,"车主收益金额不合法");
         LocalDateTime now = LocalDateTime.now();
         AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = new AccountOwnerIncomeDetailEntity();
         accountOwnerIncomeDetail.setAmt(amt);

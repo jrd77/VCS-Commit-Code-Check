@@ -114,5 +114,8 @@ public class RenterMemberDTO implements Serializable {
          */
         @AutoDocProperty(value="会员来源",required=true)
         private String outerSource;
-    					
+        /**
+         * 平台上架车辆数
+         */
+        private Integer renterCarCount;				
 }
