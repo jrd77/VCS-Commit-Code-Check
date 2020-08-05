@@ -32,7 +32,7 @@ public class ShortUrlService {
     private static final String SYSTEM_TYPE = "order-center";
 
     @Resource
-    private ShortFeignClient shortFeignClient;
+    private  ;
 
     /**
      * 新短链服务
@@ -48,7 +48,7 @@ public class ShortUrlService {
             logger.info("shortUrlService getShortUrlNew params:{}", shortUrlReqVO);
             Cat.logEvent(CatConstants.FEIGN_METHOD,"ShortUrlService.getShortUrlNew");
             Cat.logEvent(CatConstants.FEIGN_PARAM, JSON.toJSONString(shortUrlReqVO));
-            Response<ShortUrlResVO> resContent = shortFeignClient.saveShortUrl(shortUrlReqVO);
+            Response<ShortUrlResVO> resContent = .saveShortUrl(shortUrlReqVO);
             logger.info("SendMessageService sendMsg resContent:{}", resContent);
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(resContent));
             if(ErrorCode.SUCCESS.getCode().equals(resContent.getResCode()) && resContent.getData() != null){
