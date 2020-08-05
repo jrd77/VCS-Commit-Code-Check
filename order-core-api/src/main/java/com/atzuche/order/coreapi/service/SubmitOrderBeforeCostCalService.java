@@ -11,12 +11,13 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
-import com.atzuche.order.commons.entity.dto.SectionParamDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OsTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientReasonVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.req.AdminGetDisCouponListReqVO;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminGetDisCouponListResVO;
@@ -55,6 +56,7 @@ import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.coupon.api.MemAvailCoupon;
 import com.autoyol.coupon.api.MemAvailCouponRequest;
+import com.autoyol.platformcost.CommonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -120,6 +122,7 @@ public class SubmitOrderBeforeCostCalService {
      * @return NormalOrderCostCalculateResVO 返回信息
      */
     public NormalOrderCostCalculateResVO costCalculate(OrderReqVO orderReqVO) {
+
         //请求参数处理
         OrderReqContext reqContext = submitOrderInitContextService.convertOrderReqContext(orderReqVO);
         RenterOrderReqVO renterOrderReqVO = orderCommonConver.buildRenterOrderReqVO(null, null, reqContext);
@@ -178,8 +181,48 @@ public class SubmitOrderBeforeCostCalService {
         reduction.setAutoCoinReduction(autoCoinReductionVO);
         reduction.setWalletReduction(new WalletReductionVO(wallet));
         res.setReduction(reduction);
+
+        //获取系数喝评分
+        RenterInsureCoefficientDTO renterInsureCoefficientDTO = insureCoefficient(renterOrderCostReqDTO);
+        res.setRenterInsureCoefficientDTO(renterInsureCoefficientDTO);
         return res;
 
+    }
+
+    public static RenterInsureCoefficientDTO insureCoefficient(RenterOrderCostReqDTO renterOrderCostReqDTO){
+        if (renterOrderCostReqDTO == null) {
+            return new RenterInsureCoefficientDTO();
+        }
+        InsurAmtDTO insurAmtDTO = renterOrderCostReqDTO.getInsurAmtDTO();
+        if (insurAmtDTO == null) {
+            return new RenterInsureCoefficientDTO();
+        }
+        CostBaseDTO costBaseDTO = insurAmtDTO.getCostBaseDTO();
+        // 驾龄系数
+        Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
+
+        // 易出险车系数
+        Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
+
+        // 驾驶行为评分
+        String driverScore = insurAmtDTO.getDriverScore();
+        // 驾驶行为系数
+        Double driverCoefficient = CommonUtils.getDriverCoefficient(driverScore);
+
+        // 折扣，基本保费和不计免赔使用
+        Integer inmsrpGuidePrice = null;
+        if (insurAmtDTO != null) {
+            inmsrpGuidePrice = insurAmtDTO.getInmsrp() == null ? insurAmtDTO.getGuidPrice():insurAmtDTO.getInmsrp();
+        }
+        // 获取保险和不计免赔的折扣
+        Double insureDiscount = CommonUtils.getInsureDiscount(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), inmsrpGuidePrice);
+
+        return new RenterInsureCoefficientDTO()
+        .setDriverScore(driverScore)
+        .setDriverCoefficient(driverCoefficient)
+        .setDriverAgeCoefficient(coefficient)
+        .setInsureDiscount(insureDiscount)
+        .setEasilyDangerCoefficient(easyCoefficient);
     }
 
     /**

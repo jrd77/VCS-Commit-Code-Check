@@ -366,4 +366,6 @@ public class RenterGoodsDetailDTO {
     private Integer orderType;
     @AutoDocProperty("租客提前下单时间（小时）")
     private Integer advanceOrderTime;
+    @AutoDocProperty("车辆等级")
+    private Integer carLevel;
 }
