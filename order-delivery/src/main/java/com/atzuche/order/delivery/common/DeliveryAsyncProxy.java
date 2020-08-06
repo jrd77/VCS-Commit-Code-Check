@@ -4,20 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.service.MailSendService;
-import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
-import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.delivery.RenYunDeliveryCarService;
 import com.atzuche.order.delivery.service.handover.HandoverCarService;
 import com.atzuche.order.delivery.utils.CodeUtils;
 import com.atzuche.order.delivery.utils.EmailConstants;
 import com.atzuche.order.delivery.vo.delivery.RenYunFlowOrderDTO;
 import com.atzuche.order.delivery.vo.delivery.UpdateFlowOrderDTO;
-import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.parentorder.service.OrderStatusService;
-import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentercost.service.RenterOrderCostService;
-import com.atzuche.order.renterorder.service.RenterOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,20 +32,6 @@ public class DeliveryAsyncProxy {
     RenterOrderDeliveryService renterOrderDeliveryService;
     @Autowired
     DeliveryRenYunConfig deliveryRenYunConfig;
-    @Autowired
-    private RenterOrderService renterOrderService;
-    @Autowired
-    private RenterGoodsService renterGoodsService;
-    @Autowired
-    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
-    @Autowired
-    private RenterOrderCostService renterOrderCostService;
-    @Autowired
-    private DeliveryCarInfoPriceService deliveryCarInfoPriceService;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private OrderStatusService orderStatusService;
 
     @Async
     public void addRenYunFlowOrderInfoproxy(RenYunFlowOrderDTO renYunFlowOrderDTO){
