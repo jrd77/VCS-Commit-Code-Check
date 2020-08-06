@@ -85,6 +85,8 @@ public class DeliveryCarTask {
     private OrderService orderService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private DeliveryAsyncProxy deliveryAsyncProxy;
 
     /**
      * 添加订单到仁云流程系统
@@ -93,16 +95,9 @@ public class DeliveryCarTask {
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
         // 追加参数
         renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
-        addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
+        deliveryAsyncProxy.addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
     }
-    @Async
-    public void addRenYunFlowOrderInfoproxy(RenYunFlowOrderDTO renYunFlowOrderDTO){
-        String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
-        log.info("添加订单到仁云流程系统addRenYunFlowOrderInfo,renYunFlowOrderDTO={},result={}", JSON.toJSONString(renYunFlowOrderDTO),result);
-        if (StringUtils.isBlank(result)) {
-            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
-        }
-    }
+
 
     /**
      * 更新订单到仁云流程系统
@@ -111,16 +106,9 @@ public class DeliveryCarTask {
     	// 追加参数
     	updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO);
         appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);//添加参数化
-        updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
+        deliveryAsyncProxy.updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
     }
-    @Async
-    public void updateRenYunFlowOrderInfoProxy(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
-        log.info("更新仁云流程系统updateRenYunFlowOrderInfo，updateFlowOrderDTO={},result={}",JSON.toJSONString(updateFlowOrderDTO),result);
-        if (StringUtils.isBlank(result)) {
-            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
-        }
-    }
+
 
     /**
      * 实时更新订单信息到流程系统
@@ -138,7 +126,7 @@ public class DeliveryCarTask {
 
         String result = renyunDeliveryCarService.cancelRenYunFlowOrderInfo(cancelFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, deliveryRenYunConfig.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
+            deliveryAsyncProxy.sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, deliveryRenYunConfig.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
         }
         return new AsyncResult(true);
     }
@@ -169,35 +157,7 @@ public class DeliveryCarTask {
             }
         }
     }
-    /**
-     * 发送email
-     */
-    public void sendMailByType(String serviceType, String actionType, String url, String orderNumber) {
-        try {
-            String typeName = ServiceTypeEnum.TAKE_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_TAKE_TEXT : ServiceTypeEnum.BACK_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_BACK_TEXT : serviceType;
-            String interfaceName = "";
-            switch (actionType) {
-                case DeliveryConstants.ADD_TYPE:
-                    interfaceName = DeliveryConstants.ADD_INTERFACE_NAME;
-                    break;
-                case DeliveryConstants.CHANGE_TYPE:
-                    interfaceName = DeliveryConstants.CANCEL_INTERFACE_NAME;
-                    break;
-                case DeliveryConstants.CANCEL_TYPE:
-                    interfaceName = DeliveryConstants.CHANGE_INTERFACE_NAME;
-                    break;
-                default:
-                    break;
-            }
-            if (mailSendService != null) {
-                String[] toEmails = DeliveryConstants.EMAIL_PARAMS.split(",");
-                String content = String.format(EmailConstants.PROCESS_SYSTEM_NOTICE_CONTENT, orderNumber, interfaceName, url, typeName);
-                mailSendService.sendSimpleEmail(toEmails, EmailConstants.PROCESS_SYSTEM_NOTICE_SUBJECT, content);
-            }
-        } catch (Exception e) {
-            log.info("发送邮件失败---->>>>{}:", e);
-        }
-    }
+
     
     
     /**
