@@ -43,6 +43,7 @@ dependencies {
     compile("org.mybatis:mybatis-typehandlers-jsr310:1.0.1")
     compile("com.github.pagehelper:pagehelper:4.1.0")
     compile('net.coobird:thumbnailator:0.4.8')
+    compile 'com.autoyol.shorturl:short-url-feign:2.0-SNAPSHOT'
 	compile("com.autoyol:cat-starter:0.0.1-SNAPSHOT")
 //	compile('org.springframework.boot:spring-boot-starter-data-redis')
     testCompile 'org.springframework.boot:spring-boot-starter-test'
