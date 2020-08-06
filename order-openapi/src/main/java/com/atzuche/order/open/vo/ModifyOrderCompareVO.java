@@ -2,6 +2,7 @@ package com.atzuche.order.open.vo;
 
 import java.io.Serializable;
 
+import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import lombok.Data;
 import lombok.ToString;
 @Data
@@ -36,4 +37,9 @@ public class ModifyOrderCompareVO implements Serializable{
 	 * 需要补付金额
 	 */
 	private Integer needSupplementAmt;
+    /*
+    *
+    * 驾驶行为评分和各项系数
+    * */
+	private RenterInsureCoefficientDTO renterInsureCoefficientDTO;
 }

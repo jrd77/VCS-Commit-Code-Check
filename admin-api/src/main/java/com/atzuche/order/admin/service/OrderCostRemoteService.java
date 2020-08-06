@@ -96,14 +96,14 @@ public class OrderCostRemoteService {
 	 * 获取租客补贴
 	 * @param req
 	 */
-	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo) {
+	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo,String ownerOrderNo) {
         ResponseData<RenterAndConsoleSubsidyVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "CoreAPI服务");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"OrderCostRemoteService.getRenterAndConsoleSubsidyVO");
             log.info("Feign 获取租客补贴,orderNo=[{}],renterOrderNo=[{}]", orderNo, renterOrderNo);
             Cat.logEvent(CatConstants.FEIGN_PARAM,"orderNo="+orderNo+"&renterOrderNo="+renterOrderNo);
-            responseObject = feignOrderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo);
+            responseObject = feignOrderCostService.getRenterAndConsoleSubsidyVO(orderNo, renterOrderNo,ownerOrderNo);
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
