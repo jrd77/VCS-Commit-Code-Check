@@ -34,4 +34,20 @@ public class OrderTransferRecordService {
 	public List<OrderTransferRecordEntity> listOrderTransferRecordByOrderNo(String orderNo) {
 		return orderTransferRecordMapper.listOrderTransferRecordByOrderNo(orderNo);
 	}
+	
+	/**
+	 * 获取真实换车记录
+	 * @param orderNo
+	 * @return int
+	 */
+	public int countRealTransferByOrderNo(String orderNo) {
+		List<OrderTransferRecordEntity> list = listOrderTransferRecordByOrderNo(orderNo);
+		int count = 0;
+		for (OrderTransferRecordEntity record:list) {
+			if (record != null && record.getSource() != null && record.getSource().intValue() != 3) {
+				count++;
+			}
+		}
+		return count;
+	}
 }

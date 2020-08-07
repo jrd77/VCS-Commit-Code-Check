@@ -109,6 +109,8 @@ public class OwnerRefuseOrderService {
         boolean isConsoleInvoke =
                 StringUtils.equals(dispatcherReason.getCode(),DispatcherReasonEnum.timeout.getCode()) || (null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke());
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
+        // 加锁
+		OrderStatusEntity orderStatusEntity = orderStatusService.getOrderStatusForUpdate(reqVO.getOrderNo());
         //判断是都进入调度
         //获取订单信息
         OrderEntity orderEntity = orderService.getOrderEntity(reqVO.getOrderNo());
@@ -120,7 +122,7 @@ public class OwnerRefuseOrderService {
         //获取车主订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         //获取订单状态信息
-        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(reqVO.getOrderNo());
+        //OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(reqVO.getOrderNo());
         //获取车主券信息
         OrderCouponEntity ownerCouponEntity = orderCouponService.getOwnerCouponByOrderNoAndRenterOrderNo(reqVO.getOrderNo(),
                 renterOrderEntity.getRenterOrderNo());
@@ -136,7 +138,8 @@ public class OwnerRefuseOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(OrderConstant.YES);
-            
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_DISPATCH.getStatus());
             //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
             OrderPaySignReqVO vo = null;
             try {
@@ -153,6 +156,8 @@ public class OwnerRefuseOrderService {
             //不进调度
             orderStatusDTO.setStatus(OrderStatusEnum.CLOSED.getStatus());
             renterOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), RenterChildStatusEnum.END.getCode());
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
             //撤销优惠券
             //退还优惠券(平台券+送取服务券)
@@ -190,6 +195,8 @@ public class OwnerRefuseOrderService {
                 OrderStatusEnum.from(orderStatusDTO.getStatus()));
         ownerOrderService.updateChildStatusByOrderNo(reqVO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
         ownerOrderService.updateDispatchReasonByOrderNo(reqVO.getOrderNo(), dispatcherReason);
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         //取消信息处理(order_cancel_reason)
         OrderCancelReasonEntity orderCancelReasonEntity = buildOrderCancelReasonEntity(reqVO.getOrderNo(),
                 renterOrderEntity.getRenterOrderNo(),
@@ -247,6 +254,8 @@ public class OwnerRefuseOrderService {
         record.setReqAcceptTime(LocalDateTime.now());
         record.setAgreeFlag(OwnerAgreeTypeEnum.REFUSE.getCode());
         renterOrderService.updateRenterOrderInfo(record);
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
         //更新车主拒单理由
         ownerOrderService.updateDispatchReasonByOrderNo(orderNo, DispatcherReasonEnum.owner_refuse);
@@ -261,6 +270,9 @@ public class OwnerRefuseOrderService {
         orderCancelReasonEntity.setCreateOp(OrderConstant.SYSTEM_OPERATOR);
         orderCancelReasonEntity.setCancelReqTime(LocalDateTime.now());
         orderCancelReasonService.addOrderCancelReasonRecord(orderCancelReasonEntity);
+        
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
 
         //撤销优惠券

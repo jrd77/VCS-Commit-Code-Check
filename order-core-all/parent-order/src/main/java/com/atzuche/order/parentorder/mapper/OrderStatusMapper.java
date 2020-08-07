@@ -39,4 +39,6 @@ public interface OrderStatusMapper{
     List<OrderStatusEntity> queryInProcess();
 
     List<OrderStatusEntity> queryByStatus(@Param("statusList")List<Integer> statusList);
+    
+    OrderStatusEntity getOrderStatusForUpdate(@Param("orderNo") String orderNo);
 }

@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 
 import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +45,8 @@ public class PayCallbackService implements OrderPayCallBack {
     AccountDebtProxyService accountDebtProxyService;
     @Autowired
     OrderSupplementDetailService orderSupplementDetailService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
     
     /**
      * ModifyOrderForRenterService.supplementPayPostProcess（修改订单补付回掉）
@@ -65,8 +70,15 @@ public class PayCallbackService implements OrderPayCallBack {
         
         //租车费用已支付 并且非补付支付
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
-            log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", renterOrderNo);
-            deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+        	// 获取车主子订单状态
+        	OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        	int ownerStatus = ownerOrder.getOwnerStatus() == null ? 0:ownerOrder.getOwnerStatus();
+        	int status = entity.getStatus() == null ? 0:entity.getStatus();
+        	log.info("PayCallbackService sendDataMessageToRenYun remote renterOrderNo=[{}],ownerStatus=[{}]", renterOrderNo,ownerStatus);
+        	if (ownerStatus > OrderStatusEnum.TO_CONFIRM.getStatus() || status == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+        		// 现在车主接单和租客支付分离，需要车主同意后才发仁云
+                deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+        	}
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
     }

@@ -38,6 +38,7 @@
         <result property="supplementAmt" column="supplement_amt"/>
         <result property="tyreInsurFlag" column="tyre_insur_flag"/>
         <result property="driverInsurFlag" column="driver_insur_flag"/>
+        <result property="renterStatus" column="renter_status"/>
     </resultMap>
 
 
@@ -75,7 +76,8 @@
 	`req_accept_time`,
 	supplement_amt,
 	tyre_insur_flag,
-	driver_insur_flag
+	driver_insur_flag,
+	renter_status
 	</sql>
 
 
@@ -160,6 +162,7 @@
             <if test="goodsType != null">`goods_type`, </if>
             <if test="agreeFlag != null">`agree_flag`, </if>
             <if test="childStatus != null">`child_status`, </if>
+            <if test="renterStatus != null">`renter_status`, </if>
             <if test="isUseCoin != null">`is_use_coin`, </if>
             <if test="isUseWallet != null">`is_use_wallet`, </if>
             <if test="isUseCoupon != null">`is_use_coupon`, </if>
@@ -192,6 +195,7 @@
             <if test="goodsType != null">#{goodsType},  </if>
             <if test="agreeFlag != null">#{agreeFlag},  </if>
             <if test="childStatus != null">#{childStatus},  </if>
+            <if test="renterStatus != null">#{renterStatus},  </if>
             <if test="isUseCoin != null">#{isUseCoin},  </if>
             <if test="isUseWallet != null">#{isUseWallet},  </if>
             <if test="isUseCoupon != null">#{isUseCoupon},  </if>
@@ -228,6 +232,7 @@
             <if test="goodsType != null">`goods_type` = #{goodsType}, </if>
             <if test="agreeFlag != null">`agree_flag` = #{agreeFlag}, </if>
             <if test="childStatus != null">`child_status` = #{childStatus}, </if>
+            <if test="renterStatus != null">`renter_status` = #{renterStatus}, </if>
             <if test="isUseCoin != null">`is_use_coin` = #{isUseCoin}, </if>
             <if test="isUseWallet != null">`is_use_wallet` = #{isUseWallet}, </if>
             <if test="isUseCoupon != null">`is_use_coupon` = #{isUseCoupon}, </if>
@@ -431,5 +436,10 @@
 		order by id desc
 		limit 1
 	</select>
+	
+	
+	<update id="updateRenterStatusByRenterOrderNo">
+        update renter_order set renter_status = #{renterStatus} where  `renter_order_no` = #{renterOrderNo}
+    </update>
 
 </mapper>

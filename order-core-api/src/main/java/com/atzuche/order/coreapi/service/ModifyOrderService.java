@@ -851,7 +851,7 @@ public class ModifyOrderService {
 		renterOrderNew.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
 		renterOrderNew.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderNew.setIsEffective(0);
-		renterOrderNew.setAgreeFlag(0);
+		//renterOrderNew.setAgreeFlag(0);
 		renterOrderNew.setCreateOp(modifyOrderDTO.getOperator());
 		renterOrderNew.setCreateTime(null);
 		renterOrderNew.setUpdateOp(null);
@@ -868,6 +868,10 @@ public class ModifyOrderService {
 			renterOrderNew.setActRevertTime(modifyOrderDTO.getRevertTime());
 			renterOrderNew.setExpRevertTime(renterOrderEntity.getExpRevertTime());
 
+		}
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车默认已同意
+			renterOrderNew.setAgreeFlag(1);
 		}
 		return renterOrderNew;
 	}

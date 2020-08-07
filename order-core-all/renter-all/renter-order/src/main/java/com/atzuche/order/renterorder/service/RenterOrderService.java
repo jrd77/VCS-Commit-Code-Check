@@ -627,4 +627,8 @@ public class RenterOrderService {
         }
         return false;
     }
+    
+    public int updateRenterStatusByRenterOrderNo(String renterOrderNo, Integer renterStatus) {
+    	return renterOrderMapper.updateRenterStatusByRenterOrderNo(renterOrderNo, renterStatus);
+    }
 }

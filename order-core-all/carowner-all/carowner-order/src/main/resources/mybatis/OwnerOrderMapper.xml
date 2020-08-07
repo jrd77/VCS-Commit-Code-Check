@@ -30,6 +30,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="updateOp" column="update_op"/>
         <result property="isDelete" column="is_delete"/>
+        <result property="ownerStatus" column="owner_status"/>
     </resultMap>
 
 
@@ -59,7 +60,8 @@
 	`create_op`,
 	`update_time`,
 	`update_op`,
-	`is_delete`
+	`is_delete`,
+	owner_status
 
 	</sql>
 
@@ -137,6 +139,7 @@
             <if test="goodsCode != null">`goods_code`, </if>
             <if test="goodsType != null">`goods_type`, </if>
             <if test="childStatus != null">`child_status`, </if>
+            <if test="ownerStatus != null">`owner_status`, </if>
             <if test="changeSource != null">`change_source`, </if>
             <if test="isCancel != null">`is_cancel`, </if>
             <if test="isEffective != null">`is_effective`, </if>
@@ -164,6 +167,7 @@
             <if test="goodsCode != null">#{goodsCode},  </if>
             <if test="goodsType != null">#{goodsType},  </if>
             <if test="childStatus != null">#{childStatus},  </if>
+            <if test="ownerStatus != null">#{ownerStatus},  </if>
             <if test="changeSource != null">#{changeSource},  </if>
             <if test="isCancel != null">#{isCancel},  </if>
             <if test="isEffective != null">#{isEffective},  </if>
@@ -196,6 +200,7 @@
             <if test="goodsCode != null">`goods_code` = #{goodsCode}, </if>
             <if test="goodsType != null">`goods_type` = #{goodsType}, </if>
             <if test="childStatus != null">`child_status` = #{childStatus}, </if>
+            <if test="ownerStatus != null">`owner_status` = #{ownerStatus}, </if>
             <if test="changeSource != null">`change_source` = #{changeSource}, </if>
             <if test="isCancel != null">`is_cancel` = #{isCancel}, </if>
             <if test="isEffective != null">`is_effective` = #{isEffective}, </if>
@@ -325,6 +330,10 @@
         and is_effective = 1
         order by id desc
     </select>
+    
+    <update id="updateOwnerStatusByOwnerOrderNo">
+		update owner_order set owner_status = #{ownerStatus} where owner_order_no = #{ownerOrderNo}
+	</update>
 
     <select id="getOwnerOrderByChildNo" resultMap="BaseResultMap">
         select <include refid="Base_Column_List" /> from owner_order
