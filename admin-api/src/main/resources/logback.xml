@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-	<property name="LOG_HOME" value="/dd/log/orderWallet" />
-	<property name="FILE_LOG_NAME" value="orderWallet" />
+	<property name="LOG_HOME" value="/dd/log/OrderAdminApi" />
+	<property name="FILE_LOG_NAME" value="OrderAdminApi" />
 	<!-- root日志级别-->
 	<property name="LOG_LEVEL" value="INFO"/>
 
