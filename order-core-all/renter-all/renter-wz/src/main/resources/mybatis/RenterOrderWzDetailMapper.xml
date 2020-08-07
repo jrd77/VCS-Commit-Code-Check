@@ -375,7 +375,8 @@
 			illegal_reason,
 			illegal_amt,
 			illegal_deduct,
-			is_sms
+			is_sms,
+			illegal_supercer_cost
 		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1 and is_delete = 0
 	</select>
 

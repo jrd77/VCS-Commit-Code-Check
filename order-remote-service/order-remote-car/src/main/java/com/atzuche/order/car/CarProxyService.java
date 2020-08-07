@@ -236,6 +236,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setPremiumMoney(carBaseVO.getPremiumMoney());
             renterGoodsDetailDto.setLongRentVerifyStatus(carBaseVO.getLongRentVerifyStatus());
             renterGoodsDetailDto.setOrderType(carBaseVO.getOrderType());
+            renterGoodsDetailDto.setCarLevel(carBaseVO.getCarLevel());
             TransReplyVO transReplyVO = null;
             if(OrderCategoryEnum.SHORT_ORDER.getCategory().equals(reqVO.getOrderCategory())){
                transReplyVO = carBaseVO.getTransReplyVO();

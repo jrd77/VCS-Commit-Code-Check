@@ -10,6 +10,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
 import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
@@ -74,6 +75,28 @@ public class RemoteFeignService {
             return responseObject.getData();
         }catch (Exception e){
             log.error("Feign 保费系数,responseObject={},renterOwnerNo={}", JSON.toJSONString(responseObject),renterOwnerNo,e);
+            Cat.logError("Feign 保费系数",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+    
+    
+    public  List<RenterInsureCoefficientVO> insureCoefficient(String renterOrderNo) {
+        ResponseData<List<RenterInsureCoefficientVO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "保费系数");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.getBaoFeiInfo");
+            log.info("Feign 保费系数,renterOrderNo={}",renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"renterOwnerNo="+renterOrderNo);
+            responseObject= feignOrderCostService.insureCoefficient(renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 保费系数,responseObject={},renterOrderNo={}", JSON.toJSONString(responseObject),renterOrderNo,e);
             Cat.logError("Feign 保费系数",e);
             throw e;
         }finally {

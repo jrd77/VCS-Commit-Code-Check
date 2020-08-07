@@ -1,5 +1,6 @@
 package com.atzuche.order.commons.vo.res;
 
+import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import com.atzuche.order.commons.vo.res.order.*;
 import com.autoyol.doc.annotation.AutoDocProperty;
 
@@ -34,6 +35,8 @@ public class NormalOrderCostCalculateResVO implements Serializable {
     @AutoDocProperty(value = "区间配送信息")
     private SectionDeliveryVO sectionDelivery;
 
+    @AutoDocProperty(value = "驾驶行为评分、各项系数")
+    private RenterInsureCoefficientDTO renterInsureCoefficientDTO;
 
     public TotalCostVO getTotalCost() {
         return totalCost;
@@ -82,5 +85,12 @@ public class NormalOrderCostCalculateResVO implements Serializable {
 	public void setSectionDelivery(SectionDeliveryVO sectionDelivery) {
 		this.sectionDelivery = sectionDelivery;
 	}
-    
+
+    public RenterInsureCoefficientDTO getRenterInsureCoefficientDTO() {
+        return renterInsureCoefficientDTO;
+    }
+
+    public void setRenterInsureCoefficientDTO(RenterInsureCoefficientDTO renterInsureCoefficientDTO) {
+        this.renterInsureCoefficientDTO = renterInsureCoefficientDTO;
+    }
 }

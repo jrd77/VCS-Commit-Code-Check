@@ -1,7 +1,9 @@
 package com.atzuche.order.commons.vo.res;
 
+import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -74,6 +76,8 @@ public class RenterCostDetailVO {
     @AutoDocProperty(value = "消费总额")
     private int totalAmt;
 
+    @AutoDocProperty(value = "驾驶行为评分和各项系数")
+    private List<RenterInsureCoefficientVO> renterInsureCoefficientVOS;
 
     public int getTotalAmt(){
         int total= (rentAmt==null?0:rentAmt)
