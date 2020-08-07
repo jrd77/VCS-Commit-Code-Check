@@ -76,8 +76,6 @@ public class CancelOrderJudgeDutyService {
     private OrderRefundRecordService orderRefundRecordService;
     @Autowired
     private RenterOrderService renterOrderService;
-    @Autowired
-    private OrderTransferRecordService orderTransferRecordService;
 
     @Transactional(rollbackFor = Exception.class)
     public JudgeDutyResDTO judgeDuty(Integer wrongdoer, Boolean isDispatch, Boolean isSubsidyFineAmt,
@@ -95,9 +93,11 @@ public class CancelOrderJudgeDutyService {
             RenterGoodsDetailDTO goodsDetail = reqContext.getRenterGoodsDetailDTO();
             RenterOrderFineDeatailEntity renterOrderFineDetailEntityOne = null;
             ConsoleOwnerOrderFineDeatailEntity consoleOwnerOrderFineDeatailEntity = null;
-            // 车主子订单状态
-            Integer ownerStatus = ownerOrderEntity.getOwnerStatus();
-            if (orderStatusEntity.getRentCarPayStatus() == OrderConstant.YES && (ownerStatus == null || ownerStatus.intValue() != OrderStatusEnum.TO_CONFIRM.getStatus())) {
+            // 车主是否同意 0-未处理，1-已同意，2-已拒绝
+            // 获取已同意的租客子单
+    		List<RenterOrderEntity> renterOrderList = renterOrderService.listAgreeRenterOrderByOrderNo(cancelOrderReqDTO.getOrderNo());
+            int agreeFlag = renterOrderList == null || renterOrderList.isEmpty() ? 0:1;
+            if (orderStatusEntity.getRentCarPayStatus() == OrderConstant.YES && agreeFlag == 1) {
                 CancelFineAmtDTO cancelFineAmt = buildCancelFineAmtDTO(renterOrderEntity,
                         renterOrderCostEntity, goodsDetail.getCarOwnerType());
                 cancelFineAmt.setCancelTime(cancelReqTime);
@@ -117,15 +117,7 @@ public class CancelOrderJudgeDutyService {
                     renterOrderFineDeatailService.saveRenterOrderFineDeatail(renterOrderFineDetailEntityTwo);
                 }
                 
-				/*
-				 * // 车主是否同意 0-未处理，1-已同意，2-已拒绝 // 获取已同意的租客子单 List<RenterOrderEntity>
-				 * renterOrderList =
-				 * renterOrderService.listAgreeRenterOrderByOrderNo(cancelOrderReqDTO.getOrderNo
-				 * ()); int agreeFlag = renterOrderList == null || renterOrderList.isEmpty() ?
-				 * 0:1; int transferCount =
-				 * orderTransferRecordService.countRealTransferByOrderNo(cancelOrderReqDTO.
-				 * getOrderNo());
-				 */
+                
                 //车主收益(来自租客罚金)
                 if (!isSubsidyFineAmt) {
                     consoleOwnerOrderFineDeatailEntity =
