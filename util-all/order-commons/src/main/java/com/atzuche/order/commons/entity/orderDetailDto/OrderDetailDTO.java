@@ -23,5 +23,6 @@ public class OrderDetailDTO {
     public String revertTimeStr;
     @AutoDocProperty("订单编号")
     public String orderNo;
-
+    @AutoDocProperty("是否显示【同意订单】【拒绝订单】按钮,0-不显示，1-显示")
+    public Integer showConfirmButFlag;
 }

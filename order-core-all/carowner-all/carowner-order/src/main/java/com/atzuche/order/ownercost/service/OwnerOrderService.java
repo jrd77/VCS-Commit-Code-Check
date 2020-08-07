@@ -55,6 +55,16 @@ public class OwnerOrderService {
     public OwnerOrderEntity getOwnerOrderByOwnerOrderNo(String ownerOrderNo){
         return ownerOrderMapper.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
     }
+
+
+    /**
+     * 根据租客子订单号或者车主子订单号查询
+     * @param
+     * @return
+     */
+    public OwnerOrderEntity getOwnerOrderByChildNo(String ownerOrderNo,String renterOrderNo){
+        return ownerOrderMapper.getOwnerOrderByChildNo(ownerOrderNo,renterOrderNo);
+    }
     
     /**
      * 根据id把上笔车主子单置为无效
@@ -162,5 +172,9 @@ public class OwnerOrderService {
 
     public List<OwnerOrderEntity> queryByOwnerOrderNoAndMemNo(String ownerOrderNo,String ownerMemNo) {
         return ownerOrderMapper.queryByOwnerOrderNoAndMemNo(ownerOrderNo,ownerMemNo);
+    }
+    
+    public int updateOwnerStatusByOwnerOrderNo(String ownerOrderNo,int ownerStatus) {
+    	return ownerOrderMapper.updateOwnerStatusByOwnerOrderNo(ownerOrderNo, ownerStatus);
     }
 }

@@ -126,7 +126,7 @@ public class OwnerIncomeController {
         return ResponseData.success(incomByOwnerMem);
     }
 
-    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
+    @AutoDocMethod(value = "根据会员号查询车主可提现收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
     @GetMapping("/getIncomTotalByOwnerMem")
     public ResponseData<Integer> getIncomTotalByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
         log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
@@ -135,7 +135,7 @@ public class OwnerIncomeController {
         return ResponseData.success(totalIncome);
     }
 
-    @AutoDocMethod(value = "根据会员号列表查询车主总收益列表", description = "根据会员号列表查询车主总收益列表",response = AccountOwnerIncomeListDTO.class)
+    @AutoDocMethod(value = "根据会员号列表查询车主可提现收益列表", description = "根据会员号列表查询车主总收益列表",response = AccountOwnerIncomeListDTO.class)
     @GetMapping("/getIncomTotalListByMemNoList")
     public ResponseData<List<AccountOwnerIncomeListDTO>> getIncomTotalListByMemNoList(@RequestParam(value = "memNoList") List<Integer> memNoList){
         log.info("OwnerIncomeController getIncomTotalListByMemNoList start param [{}]", memNoList);

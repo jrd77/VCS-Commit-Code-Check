@@ -34,6 +34,7 @@ dependencies {
     compile project(":order-flow")
     compile project(":order-mq")
     compile project(":order-delivery")
+    compile project(":order-core-all:carowner-all:carowner-order")
     //compile 'com.autoyol:autoPayGatewaySecondary-api:1.1.2-SNAPSHOT'
     compile 'com.autoyol:auto-wallet-service-api:1.0.2-SNAPSHOT'
 

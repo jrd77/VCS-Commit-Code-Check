@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class AdminPreOrderController {
     @Autowired
     private AutoCoinProxyService coinProxyService;
     
+    private static final Integer[] CAN_BUT_DRIVERINSURE_SEATNUMS = {2,4,5,6,7};
 
     @AutoDocVersion(version = "下单前确定页面")
     @AutoDocGroup(group = "下单前确定页面")
@@ -113,7 +115,8 @@ public class AdminPreOrderController {
 
 
         CarProxyService.CarPriceDetail carPriceDetail = carProxyService.getCarPriceDetail(carDetailReqVO);
-        if(carPriceDetail != null && carPriceDetail.getSeatNum()!= null && carPriceDetail.getSeatNum()==5 || carPriceDetail.getSeatNum()==7){
+        List<Integer> seatList = Arrays.asList(CAN_BUT_DRIVERINSURE_SEATNUMS);
+        if(carPriceDetail != null && carPriceDetail.getSeatNum()!= null && seatList.contains(carPriceDetail.getSeatNum())){
             responseVO.setIsDriverInsure(1);
         }
 

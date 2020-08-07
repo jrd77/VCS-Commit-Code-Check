@@ -14,13 +14,19 @@ import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.autoyol.event.rabbit.neworder.NewOrderMQOtherEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSupplementPayMq;
+import com.autoyol.feign.ShortFeignClient;
+import com.autoyol.vo.Response;
+import com.autoyol.vo.req.ShortUrlReqVO;
+import com.autoyol.vo.res.ShortUrlResVO;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +46,8 @@ public class SupplementSendmsgLogService {
 
     @Autowired
     private SupplementSendmsgLogMapper supplementSendmsgLogMapper;
-
+    @Resource
+    private ShortFeignClient shortFeignClient;
     @Autowired
     private BaseProducer baseProducer;
 
@@ -115,7 +122,16 @@ public class SupplementSendmsgLogService {
         map.put("item", reqVO.getItem());
         map.put("amount", reqVO.getAmount());
         map.put("orderNo",reqVO.getOrderNo());
-        map.put("url",reqVO.getUrl());
+        ShortUrlReqVO shortUrlReqVO = new ShortUrlReqVO();
+        shortUrlReqVO.setLongUrl(reqVO.getUrl());
+        shortUrlReqVO.setRemarks("新交易补付短信H5跳转页面");
+        shortUrlReqVO.setUserId("system");
+        shortUrlReqVO.setUserName("system");
+        shortUrlReqVO.setFailRredirectUrl(reqVO.getUrl());
+        shortUrlReqVO.setSystemType("auto_console");
+        Response<ShortUrlResVO> shortUrlResVOResponse = shortFeignClient.saveShortUrl(shortUrlReqVO);
+        ShortUrlResVO data = shortUrlResVOResponse.getData();
+        map.put("url",data.getShortUrl());
         orderMessage.setMap(map);
         baseProducer.sendTopicMessage(NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.exchange,NewOrderMQOtherEventEnum.ORDER_RENTER_SUPPLEMENT.routingKey, orderMessage);
     }

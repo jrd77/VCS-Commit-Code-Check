@@ -102,7 +102,7 @@ public class ModifyOrderForRenterService {
 		// 修改租客待确认的子单状态为有效
 		renterOrderService.updateRenterOrderEffective(agreeRenterOrderEntity.getId(), EFFECTIVE_FLAG);
 		// 修改agree_flag为已同意
-		renterOrderService.updateRenterOrderAgreeFlag(agreeRenterOrderEntity.getId(), AUDIT_STATUS_AGREE);
+		//renterOrderService.updateRenterOrderAgreeFlag(agreeRenterOrderEntity.getId(), AUDIT_STATUS_AGREE);
 		// 获取申请记录
 		RenterOrderChangeApplyEntity renterOrderChangeApplyEntity = renterOrderChangeApplyService.getRenterOrderChangeApplyByRenterOrderNo(renterOrderNo);
 		if (renterOrderChangeApplyEntity != null) {

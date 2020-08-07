@@ -116,6 +116,8 @@ public class CashierPayService{
 	@Autowired
 	private CashierPayService cashierPayService;
 	@Autowired
+	private OrderPaySuccessService orderPaySuccessService;
+	@Autowired
 	private DeliveryCarService deliveryCarService;
 	
 
@@ -216,7 +218,7 @@ public class CashierPayService{
             getExtendParamsParam(vo,batchNotifyDataVo);
            // 3 订单流程 数据更新
             log.info("payCallBack OrderPayCallBackSuccessVO start:[{}]", GsonUtils.toJson(vo));
-            orderPayCallBack(vo,callBack);
+            orderPaySuccessService.orderPayCallBack(vo,callBack);
             log.info("payCallBack OrderPayCallBackSuccessVO end:[{}]", GsonUtils.toJson(vo));
         }
     }
@@ -326,6 +328,7 @@ public class CashierPayService{
         }
         return "";
     }
+
 
     /**
      * 订单流程 数据更新

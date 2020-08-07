@@ -50,10 +50,12 @@ public class RefuseOrderCheckService {
         checkCommonInfo(orderNo, isConsoleInvoke);
         //订单状态校验
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        int ownerStatus = ownerOrderEntity == null || ownerOrderEntity.getOwnerStatus() == null ? 0:ownerOrderEntity.getOwnerStatus();
         if(null != orderStatusEntity && null != orderStatusEntity.getStatus()) {
             logger.info("RefuseOrderCheckService.checkOwnerAgreeOrRefuseOrder.orderStatusEntity:[{}]",
                     JSON.toJSONString(orderStatusEntity));
-            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus()) {
+            if(OrderStatusEnum.TO_CONFIRM.getStatus() != orderStatusEntity.getStatus() && OrderStatusEnum.TO_CONFIRM.getStatus() != ownerStatus) {
                 throw new RefuseOrderCheckException();
             }
         }

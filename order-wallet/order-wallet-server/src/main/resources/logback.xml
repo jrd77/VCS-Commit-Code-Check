@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-
 	<property name="LOG_HOME" value="/dd/log/orderWallet" />
 	<property name="FILE_LOG_NAME" value="orderWallet" />
 	<!-- root日志级别-->
 	<property name="LOG_LEVEL" value="INFO"/>
+
 
 	<appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -21,7 +21,7 @@
 			<FileNamePattern>${LOG_HOME}/${FILE_LOG_NAME}-%d{yyyy-MM-dd}-%i.log</FileNamePattern>
 			<MaxHistory>100</MaxHistory>
 			<TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<MaxFileSize>500MB</MaxFileSize>
+				<MaxFileSize>200MB</MaxFileSize>
 			</TimeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -32,13 +32,13 @@
 		</filter>
 	</appender>
 
-	<logger name="com.autoyol.car" level="INFO" additivity="false">
-		<appender-ref ref="consoleLog" />
+
+	<logger name="com.autoyol" level="INFO" additivity="false">
         <appender-ref ref="fileLog" />
 	</logger>
 	<root level="INFO">
-        <appender-ref ref="consoleLog" />
         <appender-ref ref="fileLog" />
+        <!--<appender-ref ref="consoleLog"/>-->
     </root>
 
 </configuration>

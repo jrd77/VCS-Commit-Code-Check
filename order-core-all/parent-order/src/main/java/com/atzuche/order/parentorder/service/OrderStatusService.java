@@ -126,4 +126,13 @@ public class OrderStatusService {
         List<Integer> statusList = orderStatusEnums.stream().map(x -> x.getStatus()).collect(Collectors.toList());
         return orderStatusMapper.queryByStatus(statusList);
     }
+    
+    /**
+     * 带锁的查询
+     * @param orderNo
+     * @return OrderStatusEntity
+     */
+    public OrderStatusEntity getOrderStatusForUpdate(String orderNo) {
+    	return orderStatusMapper.getOrderStatusForUpdate(orderNo);
+    }
 }

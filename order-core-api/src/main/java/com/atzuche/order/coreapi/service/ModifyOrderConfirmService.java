@@ -209,6 +209,8 @@ public class ModifyOrderConfirmService {
 			orderStatusService.updateOrderStatus(modifyOrderOwnerDTO.getOrderNo(), updOrderStatus);
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
+			// 更新租客子订单状态
+			renterOrderService.updateRenterStatusByRenterOrderNo(modifyOrderDTO.getRenterOrderNo(), updOrderStatus);
 		}
 		// 换车更新停运费信息
 		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
