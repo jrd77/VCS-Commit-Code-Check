@@ -95,8 +95,8 @@ public class TransIllegalNoSettleNoticeTask extends IJobHandler {
             common.setFromPwd(illegalNoSettleNoticeEmailConfig.fromPwd);
 
             String subject = "违章结算异常邮件";
-            List<Integer> orderNos =
-                    orderList.stream().map(order -> Integer.valueOf(order.getOrderNo())).collect(Collectors.toList());
+            List<String> orderNos =
+                    orderList.stream().map(OrderStatusEntity::getOrderNo).collect(Collectors.toList());
             String context = "违章结算异常\r" +
                     "\t订单号：" + ListUtil.reduce(orderNos, ",") + "，违章未结算，请及时处理！";
             String mesgId = EmailUtil.sendSimpleEmail(common, toAddrs.split(","), subject, context);
