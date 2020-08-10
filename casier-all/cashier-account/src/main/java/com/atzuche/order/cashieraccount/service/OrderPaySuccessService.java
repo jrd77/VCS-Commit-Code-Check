@@ -61,7 +61,7 @@ public class OrderPaySuccessService {
         		// 加锁
         		OrderStatusEntity orderStatus = orderStatusService.getOrderStatusForUpdate(vo.getOrderNo());
         		if (orderStatus != null && orderStatus.getStatus() != null && 
-        				OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus().intValue()) {
+        				OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus()) {
         			return;
         		}
             	// 获取车主子订单状态

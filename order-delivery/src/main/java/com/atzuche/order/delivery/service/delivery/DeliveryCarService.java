@@ -133,7 +133,9 @@ public class DeliveryCarService {
         }
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
             if (renterOrderDeliveryEntity.getIsNotifyRenyun() == OrderConstant.ONE) {
-                OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(), renterOrderDeliveryEntity.getType() == 1 ? "take" : "back");
+                OrderDeliveryFlowEntity orderDeliveryFlowEntity =
+                        deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(),
+                                renterOrderDeliveryEntity.getType() == OrderConstant.ONE ? "take" : "back");
                 if (Objects.isNull(orderDeliveryFlowEntity)) {
                     continue;
                 }
@@ -158,7 +160,7 @@ public class DeliveryCarService {
         OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
         orderDeliveryVO.setOrderDeliveryDTO(updateFlowOrderVO.getOrderDeliveryDTO());
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
-        insertRenterDeliveryInfoAndDeliveryAddressInfo(0, 0, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+        insertRenterDeliveryInfoAndDeliveryAddressInfo(0, 0, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue());
     }
 
     /**
@@ -387,7 +389,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTenantName(renterMemberDTO.getRealName());
         orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
         orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
-        orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getCarOwnerType()));
+        orderDeliveryFlowEntity.setOwnerType(ownerGoodsDetailDTO.getCarOwnerType());
         //需要订单来源场景名称20200525
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
 
@@ -398,10 +400,8 @@ public class DeliveryCarService {
         //内部分类 1:普通,2:套餐,3:长租
         String renyunOrderType = "0";
         if (StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())) {
-//            orderDeliveryFlowEntity.setOrderType("0");
         	renyunOrderType = "0";
         } else if(StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "3".equals(orderReqVO.getOrderCategory())) {
-//        	orderDeliveryFlowEntity.setOrderType("8");
         	renyunOrderType = "8";
         }
         orderDeliveryFlowEntity.setOrderType(renyunOrderType);
