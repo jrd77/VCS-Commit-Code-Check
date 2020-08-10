@@ -204,6 +204,7 @@ public class HandoverCarInfoService {
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
+    @Deprecated
     public void updateDeliveryCarInfo(DeliveryReqVO deliveryReqVO) throws Exception {
         logger.debug("参数：{}", ToStringBuilder.reflectionToString(deliveryReqVO));
         if (Objects.isNull(deliveryReqVO)) {
@@ -249,11 +250,12 @@ public class HandoverCarInfoService {
      *
      * @param deliveryReqDTO
      */
+    @Deprecated
     public void updateDeliveryCarInfoByUsed(DeliveryReqDTO deliveryReqDTO, Integer type) {
 
             RenterOrderDeliveryEntity renterOrderDeliveryEntity = renterOrderDeliveryMapper.findRenterOrderByrOrderNo(deliveryReqDTO.getOrderNo(), type);
         if (renterOrderDeliveryEntity != null && String.valueOf(UsedDeliveryTypeEnum.NO_USED.getValue()).equals(deliveryReqDTO.getIsUsedGetAndReturnCar())) {
-            if (renterOrderDeliveryEntity.getStatus().intValue() != 3 && renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
+            if (renterOrderDeliveryEntity.getStatus() != 3 && renterOrderDeliveryEntity.getIsNotifyRenyun() == 1) {
                 deliveryCarInfoService.cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setCancelFlowOrderDTO(new CancelFlowOrderDTO().setServicetype(type == 1 ? "take" : "back").setOrdernumber(renterOrderDeliveryEntity.getOrderNo())).setRenterOrderNo(renterOrderDeliveryEntity.getRenterOrderNo()),1);
             }
         } else{
@@ -272,9 +274,9 @@ public class HandoverCarInfoService {
                 OrderDeliveryFlowEntity orderDeliveryFlow = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(deliveryReqDTO.getOrderNo(),type == 1 ? "take" : "back");
                 orderDeliveryFlow.setServiceTypeInfo(type,orderDeliveryVO.getOrderDeliveryDTO());
                 orderDeliveryVO.setOrderDeliveryFlowEntity(orderDeliveryFlow);
-                deliveryCarInfoService.insertRenterDeliveryInfoAndDeliveryAddressInfo(null,null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+                deliveryCarInfoService.insertRenterDeliveryInfoAndDeliveryAddressInfo(null,null, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue());
                 RenYunFlowOrderDTO renYunFlowOrderDTO = deliveryCarInfoService.createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
-                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, OrderConstant.ONE, null);
             }
         }
 

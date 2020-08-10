@@ -186,18 +186,27 @@ public class UpdateFlowOrderDTO implements Serializable{
     /**
      * 租客处建议送达时间
      */
-    private String renterProposalGetTime;
+    private String renterProposalGetTime="";
     /**
      * 租客处建议取车时间
      */
-    private String renterProposalReturnTime;
+    private String renterProposalReturnTime="";
     /**
      * 车主处建议取车时间 
      */
-    private String ownerProposalGetTime;
+    private String ownerProposalGetTime="";
     /**
      * 车主处建议送达时间
      */
-    private String ownerProposalReturnTime;
+    private String ownerProposalReturnTime="";
+    /**
+     * 是否使用取送车服务:0-否 1-是
+     */
+    private String pickUpCarSrvFlag="";
+
+    /**
+     * 是否使用虚拟地址：0-否 1-是
+     */
+    private String useVirtualAddrFlag="";
 
 }

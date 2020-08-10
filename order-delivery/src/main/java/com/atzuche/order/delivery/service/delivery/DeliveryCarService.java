@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.orderDetailDto.RenterGoodsDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
@@ -24,6 +25,8 @@ import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +61,8 @@ public class DeliveryCarService {
     OrderDeliveryFlowService deliveryFlowService;
     @Autowired
     OrderStatusService orderStatusService;
+    @Autowired
+    RenterGoodsService renterGoodsService;
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
@@ -112,9 +117,8 @@ public class DeliveryCarService {
                 .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())),2);
         if (result.isDone()) {
             //开始新增数据并发送仁云
-            //insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
-            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, OrderConstant.ONE, orderDeliveryVO.getRenterGoodsDetailDTO());
         }
     }
 
@@ -131,8 +135,15 @@ public class DeliveryCarService {
             log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}", renterOrderNo);
             return;
         }
+
+        RenterGoodsDetailDTO goodsDto = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
+        Integer carAddrIndex = Objects.nonNull(goodsDto) ? goodsDto.getCarAddrIndex() : null;
+
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
-            if (renterOrderDeliveryEntity.getIsNotifyRenyun() == OrderConstant.ONE) {
+            int noticeRenYunFlag = getNoticeRenYunFlag(renterOrderDeliveryEntity.getIsNotifyRenyun(), null,
+                    carAddrIndex);
+            log.info("DeliveryCarService.getNoticeRenYunFlag. result is, noticeRenYunFlag:[{}]", noticeRenYunFlag);
+            if(noticeRenYunFlag > OrderConstant.ZERO) {
                 OrderDeliveryFlowEntity orderDeliveryFlowEntity =
                         deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(),
                                 renterOrderDeliveryEntity.getType() == OrderConstant.ONE ? "take" : "back");
@@ -144,9 +155,8 @@ public class DeliveryCarService {
                 if (Objects.isNull(renYunFlowOrderDTO)) {
                     continue;
                 }
-                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, noticeRenYunFlag, goodsDto);
             }
-
         }
     }
 
@@ -508,6 +518,34 @@ public class DeliveryCarService {
         log.info("changeRenYunFlowOrderInfo-查询订单状态orderStatusEntity={}", JSON.toJSONString(orderStatusEntity));
         changeOrderInfoDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
         deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
+    }
+
+
+    /**
+     * 获取通知仁云标识
+     *
+     * @param isNotifyRenyun      是否通知仁云(配送订单)
+     * @param getAndReturnSrvFlag 取还车服务标识
+     * @return int 0-不通知 1-通知(取还车服务) 2-通知(自取自还并使用虚拟地址)
+     */
+    public int getNoticeRenYunFlag(Integer isNotifyRenyun, Integer getAndReturnSrvFlag, Integer carAddrIndex) {
+        log.info("DeliveryCarService.getNoticeRenYunFlag. param is,isNotifyRenyun:[{}], getAndReturnSrvFlag:[{}], " +
+                "carAddrIndex:[{}]", isNotifyRenyun, getAndReturnSrvFlag, carAddrIndex);
+        // 配送订单明确推送
+        if (Objects.nonNull(isNotifyRenyun) && isNotifyRenyun == OrderConstant.YES) {
+            return OrderConstant.ONE;
+        }
+
+        // 使用取还车服务
+        if (Objects.nonNull(getAndReturnSrvFlag) && getAndReturnSrvFlag == OrderConstant.YES) {
+            return OrderConstant.ONE;
+        }
+
+        // 自取自还并使用了虚拟地址
+        if (Objects.nonNull(carAddrIndex) && carAddrIndex > OrderConstant.ZERO) {
+            return OrderConstant.TWO;
+        }
+        return OrderConstant.ZERO;
     }
 
 }
