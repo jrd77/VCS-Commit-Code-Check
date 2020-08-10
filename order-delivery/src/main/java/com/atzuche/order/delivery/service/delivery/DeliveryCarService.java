@@ -233,6 +233,7 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
+
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue());
                 addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue());
                 OrderDeliveryFlowEntity orderDeliveryFlowEntity = createUpdateFlow(lastOrderDeliveryEntity,lastOrderDeliveryEntity.getType(),orderDeliveryVO.getOrderDeliveryDTO());
@@ -355,7 +356,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
         orderDeliveryDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryDTO.setRenterDealCount(renterMemberDTO.getOrderSuccessCount());
-        orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
+        orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue());
         orderDeliveryDTO.setOwnerGetReturnAddr(ownerGoodsDetailDTO.getCarRealAddr());
         orderDeliveryDTO.setOwnerGetReturnAddrLat(ownerGoodsDetailDTO.getCarRealLat());
         orderDeliveryDTO.setOwnerGetReturnAddrLon(ownerGoodsDetailDTO.getCarRealLon());
