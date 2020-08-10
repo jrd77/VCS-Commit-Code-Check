@@ -46,5 +46,6 @@ dependencies {
     compile project(":order-core-all:parent-order")
     compile project(":account-all:account-owner-cost")
     compile project(":account-all:account-platorm")
+    compile project(":order-remote-service:order-remote-car")
 
 }

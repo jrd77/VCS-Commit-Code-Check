@@ -137,7 +137,7 @@ public class DeliveryCarService {
         }
 
         RenterGoodsDetailDTO goodsDto = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
-        Integer carAddrIndex = Objects.nonNull(goodsDto) ? goodsDto.getCarAddrIndex() : null;
+        int carAddrIndex = Objects.nonNull(goodsDto) ? goodsDto.getCarAddrIndex() : OrderConstant.ZERO;
 
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
             int noticeRenYunFlag = getNoticeRenYunFlag(renterOrderDeliveryEntity.getIsNotifyRenyun(), null,
@@ -155,6 +155,10 @@ public class DeliveryCarService {
                 if (Objects.isNull(renYunFlowOrderDTO)) {
                     continue;
                 }
+                renYunFlowOrderDTO.setPickUpCarSrvFlag(noticeRenYunFlag == OrderConstant.ONE ? String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
+                renYunFlowOrderDTO.setUseVirtualAddrFlag(carAddrIndex > OrderConstant.ZERO ?
+                        String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
+
                 deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, noticeRenYunFlag, goodsDto);
             }
         }
