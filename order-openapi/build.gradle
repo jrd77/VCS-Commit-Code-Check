@@ -24,7 +24,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'com.autoyol'
             artifactId = 'order-openapi'
-            version = '1.8.8-SNAPSHOT'
+            version = '1.8.9-SNAPSHOT'
             from components.java
             artifact sourceJar
         }
