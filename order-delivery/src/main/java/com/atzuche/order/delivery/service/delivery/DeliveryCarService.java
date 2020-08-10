@@ -77,8 +77,8 @@ public class DeliveryCarService {
 
         log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
                 orderReqContext.getOrderReqVO().getSrvGetAddr());
-        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
-        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue());
+        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue());
     }
 
     /**
@@ -89,7 +89,7 @@ public class DeliveryCarService {
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue());
         log.info(orderDeliveryVO.getOrderDeliveryDTO().toString());
     }
 
@@ -121,7 +121,8 @@ public class DeliveryCarService {
 
     /**
      * 发送配送订单到仁云 提供给外层回调
-     * @param renterOrderNo
+     *
+     * @param renterOrderNo 租客订单号
      */
     public void sendDataMessageToRenYun(String renterOrderNo) {
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntities = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
@@ -131,8 +132,8 @@ public class DeliveryCarService {
             return;
         }
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
-            if (renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
-                OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(), renterOrderDeliveryEntity.getType().intValue() == 1 ? "take" : "back");
+            if (renterOrderDeliveryEntity.getIsNotifyRenyun() == OrderConstant.ONE) {
+                OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(), renterOrderDeliveryEntity.getType() == 1 ? "take" : "back");
                 if (Objects.isNull(orderDeliveryFlowEntity)) {
                     continue;
                 }
@@ -214,8 +215,8 @@ public class DeliveryCarService {
                 orderDeliveryEntity.setStatus(1);
                 orderDeliveryEntity.setIsDelete(0);
                 renterOrderDeliveryService.insert(orderDeliveryEntity);
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue());
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue());
             } else {
                 RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
                 if (null == lastOrderDeliveryEntity) {
@@ -232,11 +233,11 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
-                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue());
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue());
                 OrderDeliveryFlowEntity orderDeliveryFlowEntity = createUpdateFlow(lastOrderDeliveryEntity,lastOrderDeliveryEntity.getType(),orderDeliveryVO.getOrderDeliveryDTO());
                 if (orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime() != null) {
-                	if (orderDeliveryVO.getOrderDeliveryDTO().getType() != null && orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
+                	if (orderDeliveryVO.getOrderDeliveryDTO().getType() != null && orderDeliveryVO.getOrderDeliveryDTO().getType() == 1) {
                 		orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
                 	} else {
                 		orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
