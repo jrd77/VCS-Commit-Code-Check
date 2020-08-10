@@ -160,10 +160,17 @@ public class SubmitOrderHandleService {
                 context.getOrderReqVO(),context.getRenterGoodsDetailDto());
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
         // 订单流程处理(orderFlow)
-        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
+        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_PAY); // 支付接单分离，默认下单待支付
+        // 车主订单状态
+        int ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
         if (replyFlag) {
-            orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
+        	ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
+            //orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
         }
+     // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(baseReqDTO.getRenterOrderNo(), OrderStatusEnum.TO_PAY.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(baseReqDTO.getOwnerOrderNo(), ownerStatus);
         // 保存停运费信息
         saveOrderStopFreightInfo(baseReqDTO.getOrderNo(), context.getOwnerGoodsDetailDto());
         // 换车记录初始化(orderTransferRecordService.saveOrderTransferRecord)
@@ -306,7 +313,7 @@ public class SubmitOrderHandleService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
             renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus()); // 支付接单分离，下单默认待支付
             renterGoodsDetailDto.setIsAutoReplayFlag(0);
         }
         parentOrderDTO.setOrderDTO(orderDTO);

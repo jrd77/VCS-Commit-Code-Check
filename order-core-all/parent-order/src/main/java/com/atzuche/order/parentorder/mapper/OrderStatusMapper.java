@@ -40,6 +40,8 @@ public interface OrderStatusMapper{
 
     List<OrderStatusEntity> queryByStatus(@Param("statusList")List<Integer> statusList);
 
+    OrderStatusEntity getOrderStatusForUpdate(@Param("orderNo") String orderNo);
+
     /**
      * 查询符合 wzSettleStatus 的订单状态信息
      *

@@ -103,6 +103,7 @@ public class LocalDateTimeUtils {
         return formatDateTime(dateTime, DEFAULT_PATTERN);
     }
 
+
     /**
      * 按pattern格式化时间-默认yyyy-MM-dd HH:mm:ss格式
      *
@@ -522,7 +523,7 @@ public class LocalDateTimeUtils {
 //
 //        System.out.println(localDateTimeToLong(LocalDateTime.now()));;
         LocalDateTime rentTime = LocalDateTime.of(2020,1,2,12,1,1);
-        long l = localDateTimeToLong(rentTime);
+        //long l = localDateTimeToLong(rentTime);
 
 //        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");//代替simpleDateFormat
 //
@@ -533,8 +534,8 @@ public class LocalDateTimeUtils {
 //        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 //        LocalDateTime parse = LocalDateTime.parse(str1, dtf);
 //        System.out.println(parse);
-        LocalDateTime da = parseStringToDateTime("20200110170824",YYYYMMDDHHMMSSS_PATTERN);
-        System.out.println(da);
+        //LocalDateTime da = parseStringToDateTime("20200110170824",YYYYMMDDHHMMSSS_PATTERN);
+        //System.out.println(da);
 
 
     }

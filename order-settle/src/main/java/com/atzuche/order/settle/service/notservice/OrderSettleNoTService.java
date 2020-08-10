@@ -1024,6 +1024,10 @@ public class OrderSettleNoTService {
         orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(settleOrdersAccount.getRenterOrderNo(), OrderStatusEnum.TO_WZ_SETTLE.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(settleOrdersAccount.getOwnerOrderNo(), OrderStatusEnum.TO_WZ_SETTLE.getStatus());
     }
 
 

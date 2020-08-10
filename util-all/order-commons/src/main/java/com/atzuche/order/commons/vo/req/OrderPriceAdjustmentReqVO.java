@@ -37,6 +37,9 @@ public class OrderPriceAdjustmentReqVO implements java.io.Serializable {
     @AutoDocProperty(value = "补贴说明")
     private String remark;
 
+    @AutoDocProperty(value = "补贴说明code")
+    private Integer remarkCode;
+
     /**
      * 创建人员
      */

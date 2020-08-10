@@ -44,6 +44,7 @@ public class StockProxyService {
             log.info("Feign 开始校验库存信息,orderInfoDTO={}", JSON.toJSONString(orderInfoDTO));
             Cat.logEvent(CatConstants.FEIGN_PARAM,JSON.toJSONString(orderInfoDTO));
             responseObject = carRentalTimeApi.checkCarStock(orderInfoDTO);
+            log.info("Feign 校验库存信息orderInfoDTO={},responseObject", JSON.toJSONString(orderInfoDTO),JSON.toJSONString(responseObject));
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);

@@ -206,6 +206,8 @@ public class ModifyOrderConfirmService {
 			orderStatusService.updateOrderStatus(modifyOrderOwnerDTO.getOrderNo(), updOrderStatus);
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
+			// 更新租客子订单状态
+			renterOrderService.updateRenterStatusByRenterOrderNo(modifyOrderDTO.getRenterOrderNo(), updOrderStatus);
 		}
 		// 换车更新停运费信息
 		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
@@ -566,6 +568,15 @@ public class ModifyOrderConfirmService {
 		}
 		// 超级权限
 		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRentTime()));
+			orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRevertTime()));
+			OwnerOrderEntity ownerOrderEffective = modifyOrderOwnerDTO.getOwnerOrderEffective();
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRentTime() != null) {
+				orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRentTime()));
+			}
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRevertTime() != null) {
+				orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRevertTime()));
+			}
 			stockService.cutCarStockForSuperPower(orderInfoDTO);
 		} else {
 			stockService.cutCarStock(orderInfoDTO);

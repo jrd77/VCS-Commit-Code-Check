@@ -86,6 +86,8 @@ public class RenterGetCarService {
             record.setActRentTime(LocalDateTime.now());
             record.setUpdateOp(reqVO.getOperatorName());
             renterOrderService.updateRenterOrderInfo(record);
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_RETURN_CAR.getStatus());
         }
 
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
@@ -95,6 +97,8 @@ public class RenterGetCarService {
             record.setActRentTime(LocalDateTime.now());
             record.setUpdateOp(reqVO.getOperatorName());
             ownerOrderService.updateOwnerOrderInfo(record);
+            // 更新车主订单状态
+            ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.TO_RETURN_CAR.getStatus());
         }
 
         //发送租客取车事件

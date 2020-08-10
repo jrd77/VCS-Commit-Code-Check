@@ -81,6 +81,8 @@ public class CommonUtils {
 	private static final int CARPURCHASEPRICE_200000 = 200000;
 	private static final int CARPURCHASEPRICE_300000 = 400000;
 	
+	public static final int CAR_LEVEL_SPORTS_CAR = 22;
+	
     /**
                * 初始化补充保障服务费单价配置
      */
@@ -635,7 +637,7 @@ public class CommonUtils {
 	 * @param labelIds 车辆标签
 	 * @return Double
 	 */
-	public static Double getEasyCoefficient(List<String> labelIds) {
+	public static Double getEasyCoefficient(List<String> labelIds, Integer carLevel) {
 		Double easyCoefficient = EASYCOEFFICIENT_INIT;
 		if (labelIds == null || labelIds.isEmpty()) {
 			return EASYCOEFFICIENT_INIT;
@@ -646,6 +648,10 @@ public class CommonUtils {
 				easyCoefficient = EASYCOEFFICIENT_NOVICE;
 				break;
 			}
+		}
+		if (carLevel != null && carLevel.intValue() == CAR_LEVEL_SPORTS_CAR) {
+			// 跑车
+			easyCoefficient = EASYCOEFFICIENT_NOVICE;
 		}
 		return easyCoefficient;
 	}
@@ -679,6 +685,21 @@ public class CommonUtils {
 	}
 	
 	/**
+     * 格式化 LocalDate
+     *
+     * @param localDate 将要格式化的日期
+     * @return 例如,  2020-04-03
+     */
+    public static String localDateToString(LocalDate localDate, String formatStr) {
+    	if (localDate == null || StringUtils.isBlank(formatStr)) {
+    		return null;
+    	}
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatStr);
+        return dateTimeFormatter.format(localDate);
+    }
+
+	
+	/**
 	 * 获取平台保证费和补充保障服务费折扣
 	 * @param rentTime 取车时间
 	 * @param revertTime 还车时间
@@ -697,9 +718,9 @@ public class CommonUtils {
 				// 计算保费指导价
 				int guidePrice = inmsrpGuidePrice == null ? 0:inmsrpGuidePrice;
 				if (guidePrice <= CARPURCHASEPRICE_150000) {
-					return INSURE_DISCOUNT_DIS;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_200000) {
-					return INSURE_DISCOUNT_EIGHT;
+					return INSURE_DISCOUNT_NINE;//统一改成打九折
 				} else if (guidePrice <= CARPURCHASEPRICE_300000) {
 					return INSURE_DISCOUNT_NINE;
 				} else {

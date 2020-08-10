@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 
@@ -190,6 +191,61 @@ public class DateUtils {
         }
         Duration duration = Duration.between(timeLatter,now);
         return duration.getSeconds();
+    }
+    
+    
+    public static String getYearMonthFormate(String startTime, String endTime) {
+    	String term = "";
+    	try {
+    		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(fmt_yyyyMMdd);
+    		LocalDate startDate = LocalDate.parse(startTime, formatter);
+    		LocalDate endDate = LocalDate.parse(endTime, formatter);
+    		int start_month = startDate.getMonthValue();	//开始日期月份
+    		int start_day = startDate.getDayOfMonth();		//开始日期天数
+    		int end_year = endDate.getYear();				//结束日期年份
+    		int end_month = endDate.getMonthValue();		//结束日期月份
+    		int end_day = endDate.getDayOfMonth();			//结束日期天数
+
+    		long y = ChronoUnit.YEARS.between(startDate, endDate);		//计算两个日期间的年
+    		long m = ChronoUnit.MONTHS.between(startDate, endDate);		//计算两个日期间的月
+    		long d = ChronoUnit.DAYS.between(startDate, endDate);		//计算两个日期间的天
+
+    		int lastDayOfEndDate = endDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();//获取日期月份的最后一天
+    		if (start_day == end_day || lastDayOfEndDate == end_day) {
+    			m = end_month - start_month;
+    			d = 0;
+    		} else if (end_day > start_day) {
+    			d = endDate.getDayOfMonth() - startDate.getDayOfMonth();
+    		} else {
+    			String tmpY = "";
+    			String tmpM = "";
+    			String tmpD = "";
+    			if(end_month == 1) {
+    				tmpY = String.valueOf(end_year-1);
+    				tmpM = String.valueOf(12);
+    				tmpD = String.valueOf(start_day);
+    			}else {
+    				tmpY = String.valueOf(end_year);
+    				if (end_month < 10) {
+    					tmpM = "0" + (end_month - 1);
+    				} else {
+    					tmpM = String.valueOf(end_month - 1);
+    				}
+    				tmpD = String.valueOf(start_day);
+    			}
+    			String tmpTime = tmpY + tmpM + tmpD;
+    			LocalDate tmpDate = LocalDate.parse(tmpTime, formatter);
+    			d = ChronoUnit.DAYS.between(tmpDate, endDate);
+    		}
+    		if (m >= 12) {
+    			m = m - y * 12;
+    		}
+    		term = (y == 0 ? "" : y + "年") + (m == 0 ? "" : +m + "个月");
+    	} catch (Exception e) {
+    		term = startTime + "-" + endTime;
+    		logger.error("getYearMonthDayFormate exception:", e);
+    	}
+    	return term;
     }
 
 }

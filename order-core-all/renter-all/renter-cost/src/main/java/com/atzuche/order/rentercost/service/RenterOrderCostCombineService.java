@@ -96,7 +96,7 @@ public class RenterOrderCostCombineService {
     @Autowired
     private AccountDebtDetailNoTService accountDebtDetailNoTService;
 
-    @Value("${auto.cost.getReturnOverTransportFee}")
+    @Value("${auto.cost.getReturnOverTransportFee:50}")
     private Integer getReturnOverTransportFee;
     @Value("${auto.cost.nightBegin}")
     private Integer nightBegin;
@@ -345,7 +345,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -387,7 +387,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(abatementAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(abatementAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(abatementAmtDTO.getCarLabelIds(), abatementAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(abatementAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -429,7 +429,7 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -471,15 +471,15 @@ public class RenterOrderCostCombineService {
 		// 会员系数
 		Double coefficient = CommonUtils.getDriveAgeCoefficientByDri(insurAmtDTO.getCertificationTime());
 		// 车辆标签系数
-		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds());
+		Double easyCoefficient = CommonUtils.getEasyCoefficient(insurAmtDTO.getCarLabelIds(), insurAmtDTO.getCarLevel());
 		// 驾驶行为系数
 		Double driverCoefficient = CommonUtils.getDriverCoefficient(insurAmtDTO.getDriverScore());
 		// 车辆座位数
 		int seatNum = insurAmtDTO.getSeatNum() == null ? 0:insurAmtDTO.getSeatNum().intValue();
 		Integer driverPrice = null;
-		if (seatNum == 5) {
+		if (seatNum == 5 || seatNum == 2 || seatNum == 4) {
 			driverPrice = driverFiveSeatsPrice;
-		} else if (seatNum == 7) {
+		} else if (seatNum == 7 || seatNum == 6) {
 			driverPrice = driverSevenSeatsPrice;
 		}
 		InsuranceCommonDTO insCom = convertInsuranceCommonDTO(costBaseDTO.getStartTime(), costBaseDTO.getEndTime(), 
@@ -1508,20 +1508,18 @@ public class RenterOrderCostCombineService {
             ResponseCheckUtil.checkResponse(responseData);
 
             t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
-            Cat.logError("Feign 获取取还车超出运能附加金额接口异常",e);
-            t.setStatus(e);
-            throw e;
-        }
-        if(ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())){
-            return responseData.getData().getHumanFee().intValue();
-        }
-        try {
-            return getReturnOverTransportFee;
-        } catch (Exception e) {
-            log.error("获取取还车超运能溢价默认值异常：", e);
-        }
-        return GlobalConstant.GET_RETURN_OVER_COST;
+			if (Objects.nonNull(responseData) && ErrorCode.SUCCESS.getCode().equals(responseData.getResCode())) {
+				return responseData.getData().getHumanFee().intValue();
+			}else {
+				return getReturnOverTransportFee;
+			}
+		} catch (Exception e) {
+			Cat.logError("Feign 获取取还车超出运能附加金额接口异常", e);
+			t.setStatus(e);
+		} finally {
+			t.complete();
+		}
+		return getReturnOverTransportFee;
     }
     
     

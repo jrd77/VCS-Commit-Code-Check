@@ -136,4 +136,13 @@ public class OrderStatusService {
     public List<OrderStatusEntity> queryByWzSettleStatus(int wzSettleStatus) {
         return orderStatusMapper.selectByWzSettleStatus(wzSettleStatus);
     }
+
+    /**
+     * 带锁的查询
+     * @param orderNo
+     * @return OrderStatusEntity
+     */
+    public OrderStatusEntity getOrderStatusForUpdate(String orderNo) {
+    	return orderStatusMapper.getOrderStatusForUpdate(orderNo);
+    }
 }

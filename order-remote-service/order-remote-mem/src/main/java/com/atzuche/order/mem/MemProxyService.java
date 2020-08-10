@@ -357,6 +357,9 @@ public class MemProxyService {
         renterMemberDto.setDriLicAuth(memberAuthInfo.getDriLicAuth());
         renterMemberDto.setDriViceLicAuth(memberAuthInfo.getDriViceLicAuth());
         renterMemberDto.setOrderSuccessCount(memberStatisticsInfo.getSuccessOrderNum());
+        ///huangjing 增加租客
+        renterMemberDto.setRenterCarCount(null != memberTotalInfo.getMemberBaseInfo() ? memberTotalInfo.getMemberBaseInfo().getHaveCar() : 0);
+        
         List<CommUseDriverInfo> commUseDriverList = memberAdditionInfo.getCommUseDriverList();
         List<CommUseDriverInfoDTO> CommUseDriverList = new ArrayList<>();
         commUseDriverList.forEach(x->{

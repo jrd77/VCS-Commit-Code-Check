@@ -301,4 +301,11 @@
         where `wz_settle_status` = #{wzSettleStatus} and is_delete = 0
     </select>
 
+
+    <select id="getOrderStatusForUpdate" resultMap="BaseResultMap">
+		select
+		    <include refid="Base_Column_List" />
+		from order_status where order_no = #{orderNo} and is_delete = 0 limit 1
+		FOR UPDATE
+	</select>
 </mapper>

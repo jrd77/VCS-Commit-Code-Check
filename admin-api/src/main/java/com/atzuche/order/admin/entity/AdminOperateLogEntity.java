@@ -55,6 +55,10 @@ public class AdminOperateLogEntity implements Serializable {
      */
     private String desc;
     /**
+     * 备注内容
+     */
+    private String remark;
+    /**
      * 操作时间
      */
     private LocalDateTime createTime;
