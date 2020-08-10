@@ -23,12 +23,13 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.service.MemberSecondSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -45,7 +46,6 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
-import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
@@ -84,6 +84,8 @@ public class OrderSettleService{
     private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     @Autowired
     private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired
+    private MemberSecondSettleService memberSecondSettleService;
     
     /**
      * 查询所以费用
@@ -590,7 +592,11 @@ public class OrderSettleService{
             // 调远程抵扣老系统车主欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
             
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
+            
+            //记录分流标识(已车主的会员号为准。) 200616
+            memberSecondSettleService.initDepositMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));
+            
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
@@ -616,7 +622,7 @@ public class OrderSettleService{
               
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();

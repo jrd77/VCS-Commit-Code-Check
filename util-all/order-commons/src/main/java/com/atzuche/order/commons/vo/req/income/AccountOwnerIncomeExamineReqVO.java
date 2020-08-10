@@ -55,7 +55,7 @@ public class AccountOwnerIncomeExamineReqVO {
     private String detail;
 
     public void check() {
-        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
+//        Assert.isTrue(getAmt()!=0, ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getMemNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOrderNo(), ErrorCode.PARAMETER_ERROR.getText());
         Assert.notNull(getOwnerOrderNo(), ErrorCode.PARAMETER_ERROR.getText());

@@ -133,6 +133,9 @@ public class ModifyOrderConfirmService {
 		}
 		// 重新生成车主订单
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, subsidyDetailEntityList, modifyOrderDTO.getRenterOrderNo());
+		// 车主信息带出 200710 huangjing
+		modifyOrderDTO.setOwnerMemberDTO(modifyOrderOwnerDTO.getOwnerMemberDTO());
+		
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
 		// 如果是换车增加一条换车记录

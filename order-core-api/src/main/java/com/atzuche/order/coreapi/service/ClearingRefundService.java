@@ -50,6 +50,9 @@ public class ClearingRefundService {
         preRoutingPayRequest.setInternalNo(cashierEntity.getVersion()==null?"0":String.valueOf(cashierEntity.getVersion()));
         preRoutingPayRequest.setEnv(cashierEntity.getPayEvn());
         preRoutingPayRequest.setPayAmt(cashierEntity.getPayAmt()==null?"0":String.valueOf(cashierEntity.getPayAmt())); //跟金额无关。
+        ///增加会员号区分分流。200615
+        preRoutingPayRequest.setMemNo(cashierEntity.getMemNo());
+        
         Response<AutoPayResultVo> autoPayResultVoResponse = routingRulesQuery(preRoutingPayRequest);
         return autoPayResultVoResponse;
     }

@@ -422,6 +422,16 @@ public class LocalDateTimeUtils {
         return localDate.format(formatter);
     }
     
+    /**
+     * yyyy-MM-dd HH:mm:ss 
+     */
+    public static String dateToStringDefault(Date date) {
+    	LocalDateTime localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_PATTERN);
+        return localDate.format(formatter);
+    }
+    
+    
 
     /**
      * 按照给定的格式获取昨天这个时候的时间日期字符串
