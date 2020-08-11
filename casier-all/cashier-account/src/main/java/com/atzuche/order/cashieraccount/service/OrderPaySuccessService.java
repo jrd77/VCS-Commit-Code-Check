@@ -25,6 +25,7 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.autoyol.commons.utils.GsonUtils;
 
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -53,17 +54,21 @@ public class OrderPaySuccessService {
         if(Objects.nonNull(vo) && Objects.nonNull(vo.getOrderNo())){
         	//order_supplement_detail  支付欠款的逻辑处理,否则结算后补付会修改订单状态。分离。
         	//rentAmountAfterRenterOrderNo 暂不处理。
-        	if( !CollectionUtils.isEmpty(vo.getSupplementIds()) || !CollectionUtils.isEmpty(vo.getDebtIds()) ) {
+        	if( !CollectionUtils.isEmpty(vo.getSupplementIds()) || !CollectionUtils.isEmpty(vo.getDebtIds()) || !CollectionUtils.isEmpty(vo.getRentAmountAfterRenterOrderNos())) {
         		//补付总和  vo.getMemNo(), vo.getIsPayAgain(),vo.getIsGetCar(),
         		//支付欠款，不更新订单状态。
+        		//支付补充金额
         		callBack.callBack(vo.getOrderNo(),vo.getRentAmountAfterRenterOrderNos(),vo.getSupplementIds(),vo.getDebtIds());
         	}else {
         		// 加锁
         		OrderStatusEntity orderStatus = orderStatusService.getOrderStatusForUpdate(vo.getOrderNo());
-        		if (orderStatus != null && orderStatus.getStatus() != null && 
-        				OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus().intValue()) {
-        			return;
+        		if (orderStatus != null && orderStatus.getStatus() != null) {
+        			if(OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus().intValue() || OrderStatusEnum.TO_GET_CAR.getStatus() <= orderStatus.getStatus().intValue()) {
+        				log.info("当前订单状态=[{}]，无需重复修改订单状态，orderNo=[{}]",orderStatus.getStatus(),vo.getOrderNo());
+        				return;
+        			}
         		}
+        		
             	// 获取车主子订单状态
             	OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(vo.getOrderNo());
             	int ownerStatus = ownerOrder.getOwnerStatus() == null ? 0:ownerOrder.getOwnerStatus();
