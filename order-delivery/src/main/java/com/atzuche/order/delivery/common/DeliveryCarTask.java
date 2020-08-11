@@ -17,6 +17,7 @@ import com.atzuche.order.delivery.config.DeliveryRenYunConfig;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.delivery.enums.OrderScenesSourceEnum;
+import com.atzuche.order.delivery.enums.ServiceTypeEnum;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
@@ -104,13 +105,30 @@ public class DeliveryCarTask {
 
     /**
      * 更新订单到仁云流程系统
+     *
+     * @param updateFlowOrderDTO 通知仁云数据
      */
     public void updateRenYunFlowOrderInfo(UpdateFlowOrderDTO updateFlowOrderDTO) {
+        // 获取订单信息
+        OrderEntity orderEntity = orderService.getOrderEntity(updateFlowOrderDTO.getOrdernumber());
+        // 获取有效的租客子订单
+        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updateFlowOrderDTO.getOrdernumber());
+        // 获取租客商品信息
+        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
+
         // 追加参数
-        updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO);
+        updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO, renterOrderEntity);
         //添加参数化
-        appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);
-        deliveryAsyncProxy.updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
+        appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO, renterGoodsDetail, orderEntity);
+
+        int noticeRenYunFlag = getNoticeRenYunFlag(null, Integer.valueOf(updateFlowOrderDTO.getPickUpCarSrvFlag()), renterGoodsDetail.getCarAddrIndex());
+        if (noticeRenYunFlag > OrderConstant.ZERO) {
+            // 自取自还并使用虚拟地址特殊处理
+            if (noticeRenYunFlag == OrderConstant.TWO) {
+                noServiceSpecialHandle(updateFlowOrderDTO, renterGoodsDetail, orderEntity.getCityCode());
+            }
+            deliveryAsyncProxy.updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
+        }
     }
 
 
@@ -166,7 +184,7 @@ public class DeliveryCarTask {
     /**
      * 新增仁云追加参数
      *
-     * @param renYunFlowOrderDTO 通知仁云数据
+     * @param renYunFlowOrderDTO   通知仁云数据
      * @param renterGoodsDetailDTO 租客订单商品信息
      * @return RenYunFlowOrderDTO
      */
@@ -261,15 +279,14 @@ public class DeliveryCarTask {
     /**
      * 追加修改参数
      *
-     * @param updFlow 通知仁云数据
+     * @param updFlow           通知仁云数据
+     * @param renterOrderEntity 租客订单信息
      * @return UpdateFlowOrderDTO
      */
-    public UpdateFlowOrderDTO appendUpdateFlowOrderDTO(UpdateFlowOrderDTO updFlow) {
+    public UpdateFlowOrderDTO appendUpdateFlowOrderDTO(UpdateFlowOrderDTO updFlow, RenterOrderEntity renterOrderEntity) {
         if (updFlow == null) {
             return null;
         }
-        // 获取有效的租客子订单
-        RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updFlow.getOrdernumber());
         if (renterOrderEntity == null) {
             log.error("appendUpdateFlowOrderDTO renterOrderEntity is null orderNo={}", updFlow.getOrdernumber());
             return null;
@@ -368,18 +385,60 @@ public class DeliveryCarTask {
      * 追加参数
      *
      * @param updateFlowOrderDTO 通知仁云数据
+     * @param orderEntity        订单信息
+     * @param renterGoodsDetail  租客商品信息
      **/
-    public void appendRenyunUpdateFlowOrderParam(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        OrderEntity orderEntity = orderService.getOrderEntity(updateFlowOrderDTO.getOrdernumber());
+    public void appendRenyunUpdateFlowOrderParam(UpdateFlowOrderDTO updateFlowOrderDTO,
+                                                 RenterGoodsDetailDTO renterGoodsDetail, OrderEntity orderEntity) {
         RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updateFlowOrderDTO.getOrdernumber());
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
-        RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
         updateFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount() == null ? "" : String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
         updateFlowOrderDTO.setDayUnitPrice(renterGoodsDetail.getCarGuideDayPrice() == null ? "" : String.valueOf(renterGoodsDetail.getCarGuideDayPrice()));
         Double oilPriceByCityCodeAndType = deliveryCarInfoPriceService.getOilPriceByCityCodeAndType(Integer.valueOf(orderEntity.getCityCode()), renterGoodsDetail.getCarEngineType());
         updateFlowOrderDTO.setOilPrice(oilPriceByCityCodeAndType == null ? "0" : String.valueOf(oilPriceByCityCodeAndType));
+
+
+        updateFlowOrderDTO.setUseVirtualAddrFlag(Objects.nonNull(renterGoodsDetail.getCarAddrIndex()) && renterGoodsDetail.getCarAddrIndex() > OrderConstant.ZERO ?
+                String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
+        if (ServiceTypeEnum.TAKE_TYPE.getValue().equals(updateFlowOrderDTO.getServicetype())) {
+            updateFlowOrderDTO.setPickUpCarSrvFlag(Objects.nonNull(renterOrderEntity.getIsGetCar()) ?
+                    renterOrderEntity.getIsGetCar().toString() : String.valueOf(OrderConstant.NO));
+        } else if (ServiceTypeEnum.BACK_TYPE.getValue().equals(updateFlowOrderDTO.getServicetype())) {
+            updateFlowOrderDTO.setPickUpCarSrvFlag(Objects.nonNull(renterOrderEntity.getIsReturnCar()) ?
+                    renterOrderEntity.getIsReturnCar().toString() : String.valueOf(OrderConstant.NO));
+        } else {
+            updateFlowOrderDTO.setPickUpCarSrvFlag(String.valueOf(OrderConstant.YES));
+        }
         log.info("推送仁云子订单号renterOrderNo={}", renterOrderEntity.getRenterOrderNo());
     }
+
+    /**
+     * 获取通知仁云标识
+     *
+     * @param isNotifyRenyun      是否通知仁云(配送订单)
+     * @param getAndReturnSrvFlag 取还车服务标识
+     * @return int 0-不通知 1-通知(取还车服务) 2-通知(自取自还并使用虚拟地址)
+     */
+    public int getNoticeRenYunFlag(Integer isNotifyRenyun, Integer getAndReturnSrvFlag, Integer carAddrIndex) {
+        log.info("DeliveryCarService.getNoticeRenYunFlag. param is,isNotifyRenyun:[{}], getAndReturnSrvFlag:[{}], " +
+                "carAddrIndex:[{}]", isNotifyRenyun, getAndReturnSrvFlag, carAddrIndex);
+        // 配送订单明确推送
+        if (Objects.nonNull(isNotifyRenyun) && isNotifyRenyun == OrderConstant.YES) {
+            return OrderConstant.ONE;
+        }
+
+        // 使用取还车服务
+        if (Objects.nonNull(getAndReturnSrvFlag) && getAndReturnSrvFlag == OrderConstant.YES) {
+            return OrderConstant.ONE;
+        }
+
+        // 自取自还并使用了虚拟地址
+        if (Objects.nonNull(carAddrIndex) && carAddrIndex > OrderConstant.ZERO) {
+            return OrderConstant.TWO;
+        }
+        return OrderConstant.ZERO;
+    }
+
 
     /**
      * 自取自还并使用虚拟地址特殊处理
@@ -438,4 +497,66 @@ public class DeliveryCarTask {
             renYunFlowOrderDTO.setAfterTime(DateUtils.formate(dto.getDelayEndDate(), DateUtils.FORMAT_STR_RENYUN));
         }
     }
+
+
+    /**
+     * 自取自还并使用虚拟地址特殊处理(修改订单)
+     *
+     * @param renYunFlowOrderDTO   童子仁云数据
+     * @param renterGoodsDetailDTO 租客商品信息
+     * @param cityCode             城市编码
+     */
+    private void noServiceSpecialHandle(UpdateFlowOrderDTO renYunFlowOrderDTO,
+                                        RenterGoodsDetailDTO renterGoodsDetailDTO, String cityCode) {
+
+        if (Objects.isNull(renYunFlowOrderDTO)) {
+            return;
+        }
+        // 重置配送模式相关信息
+        if (!StringUtils.equals(renYunFlowOrderDTO.getDistributionMode(), String.valueOf(OrderConstant.ONE))) {
+            renYunFlowOrderDTO.setDistributionMode(String.valueOf(OrderConstant.ONE));
+            renYunFlowOrderDTO.setRenterRentTimeStart(null);
+            renYunFlowOrderDTO.setRenterRentTimeEnd(null);
+            renYunFlowOrderDTO.setRenterRevertTimeStart(null);
+            renYunFlowOrderDTO.setRenterRevertTimeEnd(null);
+            renYunFlowOrderDTO.setRenterProposalGetTime(null);
+            renYunFlowOrderDTO.setRenterProposalReturnTime(null);
+
+            renYunFlowOrderDTO.setOwnerRentTimeStart(null);
+            renYunFlowOrderDTO.setOwnerRentTimeEnd(null);
+            renYunFlowOrderDTO.setOwnerRevertTimeStart(null);
+            renYunFlowOrderDTO.setOwnerRevertTimeEnd(null);
+            renYunFlowOrderDTO.setOwnerProposalGetTime(null);
+            renYunFlowOrderDTO.setOwnerProposalReturnTime(null);
+        }
+        // 重置订单地址信息
+        renYunFlowOrderDTO.setNewpickupcaraddr(renterGoodsDetailDTO.getCarShowAddr());
+        renYunFlowOrderDTO.setRealGetCarLat(renterGoodsDetailDTO.getCarShowLat());
+        renYunFlowOrderDTO.setRealGetCarLon(renterGoodsDetailDTO.getCarShowLon());
+        renYunFlowOrderDTO.setNewalsocaraddr(renterGoodsDetailDTO.getCarShowAddr());
+        renYunFlowOrderDTO.setRealReturnCarLat(renterGoodsDetailDTO.getCarShowLat());
+        renYunFlowOrderDTO.setRealReturnCarLon(renterGoodsDetailDTO.getCarShowLon());
+        // 计算提前延后时间
+        CarRentTimeRangeReqDTO reqDTO = new CarRentTimeRangeReqDTO();
+        reqDTO.setCarNo(renterGoodsDetailDTO.getCarNo().toString());
+        reqDTO.setCityCode(cityCode);
+        reqDTO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(renYunFlowOrderDTO.getNewtermtime()));
+        reqDTO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(renYunFlowOrderDTO.getNewreturntime()));
+        reqDTO.setSrvGetFlag(OrderConstant.YES);
+        reqDTO.setSrvGetAddr(renYunFlowOrderDTO.getNewpickupcaraddr());
+        reqDTO.setSrvGetLat(renYunFlowOrderDTO.getRealGetCarLat());
+        reqDTO.setSrvGetLon(renYunFlowOrderDTO.getRealGetCarLon());
+        reqDTO.setSrvReturnFlag(OrderConstant.YES);
+        reqDTO.setSrvReturnAddr(renYunFlowOrderDTO.getNewalsocaraddr());
+        reqDTO.setSrvReturnLat(renYunFlowOrderDTO.getRealReturnCarLat());
+        reqDTO.setSrvReturnLon(renYunFlowOrderDTO.getRealReturnCarLon());
+        CarRentTimeRangeDTO dto = carRentalTimeProxyService.getCarRentTimeRange(reqDTO);
+        if (Objects.nonNull(dto)) {
+            renYunFlowOrderDTO.setNewbeforeTime(DateUtils.formate(dto.getAdvanceStartDate(),
+                    DateUtils.FORMAT_STR_RENYUN));
+            renYunFlowOrderDTO.setNewafterTime(DateUtils.formate(dto.getDelayEndDate(), DateUtils.FORMAT_STR_RENYUN));
+        }
+    }
+
+
 }
