@@ -506,10 +506,7 @@ public class OrderCommonConver {
      * @return CancelOrderDeliveryVO 仁云流程系统请求信息
      */
     public CancelOrderDeliveryVO buildCancelOrderDeliveryVO(String orderNo, CancelOrderResDTO res) {
-        if (!res.getSrvGetFlag() && !res.getSrvReturnFlag()) {
-            return null;
-        }
-        String servicetype = "";
+        String servicetype = "all";
         if (res.getSrvGetFlag() && res.getSrvReturnFlag()) {
             servicetype = "all";
         } else if (res.getSrvGetFlag()) {
