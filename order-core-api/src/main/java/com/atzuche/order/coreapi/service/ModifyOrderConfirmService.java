@@ -526,6 +526,16 @@ public class ModifyOrderConfirmService {
 			Cat.logError("ModifyOrderConfirmService.cutCarStock扣库存modifyOrderOwnerDTO为空",new ModifyOrderParameterException());
 			throw new ModifyOrderParameterException();
 		}
+		OwnerOrderEntity ownerOrder = modifyOrderOwnerDTO.getOwnerOrderEffective();
+		Integer ownerStatus = ownerOrder == null ? null:ownerOrder.getOwnerStatus();
+		// 查询订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		Integer status = orderStatus == null ? null:orderStatus.getStatus();
+		if ((status != null && status.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) || 
+				(ownerStatus != null && ownerStatus.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus())) {
+			// 车主未接单不扣库存
+			return;
+		}
 		// 修改项目
 		/*
 		 * if (changeItemList == null || changeItemList.isEmpty()) { return; } if
