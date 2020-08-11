@@ -18,10 +18,12 @@ public class OrderPhotoResponseVO {
     @AutoDocProperty(value = "还车照片列表")
     private List<OrderPhotoDTO> returnCarPhotoList;
 
+    @AutoDocProperty(value = "取车-服务凭证照片列表")
+    private List<OrderPhotoDTO> getCarServiceVoucherList;
+
+    @AutoDocProperty(value = "还车-服务凭证照片列表")
+    private List<OrderPhotoDTO> returnCarServiceVoucherList;
+
     @AutoDocProperty(value = "违章缴纳凭证照片列表")
     private OrderViolationPhotoResponseVO OrderViolationPhotoResponseVO;
-
-
-
-
 }
