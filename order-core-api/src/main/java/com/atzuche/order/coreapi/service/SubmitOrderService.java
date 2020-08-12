@@ -302,6 +302,8 @@ public class SubmitOrderService {
         if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getIsAutoReplayFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(context.getOrderReqVO());
             orderInfoDTO.setOrderNo(orderNo);
+
+
             stockService.cutCarStock(orderInfoDTO);
         }
         
