@@ -559,7 +559,8 @@ public class CashierPayService{
                     if (!CollectionUtils.isEmpty(payKind) && orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
                         //修改子订单费用信息
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+//                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, YesNoEnum.NO.getCode(), YesNoEnum.NO);
                         
                         //公共抵扣企业用户的押金的方法
                         commonDebtEnterpriseDeposit(orderPaySign, orderPayable);
