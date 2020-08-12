@@ -130,7 +130,11 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO: violationResDesVOList) {
             violationResVO.setOrderType("普通订单");
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
-                violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
+                if(org.apache.commons.lang3.StringUtils.equals(violationResVO.getWzInfo(), "2")) {
+                    violationResVO.setWzInfo("有违章");
+                } else {
+                    violationResVO.setWzInfo("无违章");
+                }
             }else {
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(3));
             }
