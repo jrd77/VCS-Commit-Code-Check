@@ -120,6 +120,8 @@ public class CashierService {
     private BaseProducer baseProducer;
     @Autowired
     private CashierShishouService cashierShishouService;
+    @Autowired
+    private MemberSecondSettleService memberSecondSettleService;
     
     /**  *************************************** 租车费用 start****************************************************/
 
@@ -640,12 +642,18 @@ public class CashierService {
                 accountOwnerIncomeExamineOpReq.setUpdateOp(accountOwnerIncomeExamineOpDTO.getUpdateOp());
                 accountOwnerIncomeExamineOpReq.setOpName(accountOwnerIncomeExamineOpDTO.getOpName());
                 accountOwnerIncomeExamineOpReq.setAccountOwnerIncomeExamineId(examineId);
-                accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
+                
+                boolean isSecondFlag =
+                        memberSecondSettleService.judgeIsSecond(accountOwnerIncomeExamineOpReq.getOrderNo());
+                int id = accountOwnerIncomeService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpReq,isSecondFlag);
 
                 AdjustOwnerIncomeResVO adjustOwnerIncomeResVO = new AdjustOwnerIncomeResVO();
                 adjustOwnerIncomeResVO.setMemNo(accountOwnerIncomExamineVO.getMemNo());
                 adjustOwnerIncomeResVO.setOrderNo(accountOwnerIncomExamineVO.getOrderNo());
                 adjustOwnerIncomeResVO.setExamineId(examineId);
+                ///
+                adjustOwnerIncomeResVO.setAccountOwnerIncomeDetailId(id);
+                
                 adjustOwnerIncomeResVOS.add(adjustOwnerIncomeResVO);
             }catch (Exception e){
                 log.error("本条订单收益审核失败accountOwnerIncomeExamineOpReq={}", JSON.toJSONString(accountOwnerIncomeExamineOpReq),e);

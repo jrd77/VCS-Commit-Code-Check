@@ -43,8 +43,8 @@ public class CommonUtils {
 	private static final double COEFFICIENT_NOVICE = 1.2;
 	
 	private static final double EASYCOEFFICIENT_INIT = 1.0;
-    
-	private static final double EASYCOEFFICIENT_NOVICE = 1.3;
+    // BASIC-1544由1.3改成1.2
+	private static final double EASYCOEFFICIENT_NOVICE = 1.2;
 	
 	private static final double DRIVERCOEFFICIENT_INIT = 1.0;
     

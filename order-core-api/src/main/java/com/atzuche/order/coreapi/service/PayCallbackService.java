@@ -1,8 +1,10 @@
 package com.atzuche.order.coreapi.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
@@ -98,34 +100,37 @@ public class PayCallbackService implements OrderPayCallBack {
     //rentAmountAfterRenterOrderNo  管理后台修改增加的补付记录。
 	@Override
 	public void callBack(String orderNo, List<String> rentAmountAfterRenterOrderNo, List<NotifyDataVo> supplementIds, List<NotifyDataVo> debtIds) {
+		Optional.ofNullable(rentAmountAfterRenterOrderNo).orElseGet(ArrayList::new).stream().forEach(x -> log.info("支付补充租车押金订单号:"+x));
+		
 		//rentAmountAfterRenterOrderNo  无需处理
 		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}]",orderNo);
 		if(supplementIds != null) {
 			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}],size=[{}]",orderNo,supplementIds.size());
+		
+			//更新supplement
+			for (NotifyDataVo vo : supplementIds) {
+				String id = vo.getExtendParams();
+				String settleAmt = vo.getSettleAmount();
+				String memNo = vo.getMemNo();
+				String qn = vo.getQn();
+				int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
+				log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
+			}
 		}
-		//更新supplement
-		for (NotifyDataVo vo : supplementIds) {
-			String id = vo.getExtendParams();
-			String settleAmt = vo.getSettleAmount();
-			String memNo = vo.getMemNo();
-			String qn = vo.getQn();
-			int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
-			log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
-			
-		}
+		
 		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}]",orderNo);
 		if(debtIds != null) {
 			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}],size=[{}]",orderNo,debtIds.size());
+			
+			//更新欠款
+			for (NotifyDataVo vo : debtIds) {
+				String id = vo.getExtendParams();
+				String settleAmt = vo.getSettleAmount();
+				String memNo = vo.getMemNo();
+				String qn = vo.getQn();
+				int realDebt = accountDebtProxyService.deductDebtByDebtId(id, Integer.valueOf(settleAmt), memNo, qn);
+				log.info("抵扣欠款，真实金额=[{}],params id=[{}],payDebtAmt=[{}],memNo=[{}],qn=[{}]",realDebt,id, Integer.valueOf(settleAmt), memNo, qn);
+			}
 		}
-		//更新欠款
-		for (NotifyDataVo vo : debtIds) {
-			String id = vo.getExtendParams();
-			String settleAmt = vo.getSettleAmount();
-			String memNo = vo.getMemNo();
-			String qn = vo.getQn();
-			int realDebt = accountDebtProxyService.deductDebtByDebtId(id, Integer.valueOf(settleAmt), memNo, qn);
-			log.info("抵扣欠款，真实金额=[{}],params id=[{}],payDebtAmt=[{}],memNo=[{}],qn=[{}]",realDebt,id, Integer.valueOf(settleAmt), memNo, qn);
-		}
-		
 	}
 }

@@ -133,6 +133,9 @@ public class ModifyOrderConfirmService {
 		}
 		// 重新生成车主订单
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, subsidyDetailEntityList, modifyOrderDTO.getRenterOrderNo());
+		// 车主信息带出 200710 huangjing
+		modifyOrderDTO.setOwnerMemberDTO(modifyOrderOwnerDTO.getOwnerMemberDTO());
+		
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
 		// 如果是换车增加一条换车记录
@@ -522,6 +525,16 @@ public class ModifyOrderConfirmService {
 			log.error("ModifyOrderConfirmService.cutCarStock扣库存  modifyOrderOwnerDTO为空");
 			Cat.logError("ModifyOrderConfirmService.cutCarStock扣库存modifyOrderOwnerDTO为空",new ModifyOrderParameterException());
 			throw new ModifyOrderParameterException();
+		}
+		OwnerOrderEntity ownerOrder = modifyOrderOwnerDTO.getOwnerOrderEffective();
+		Integer ownerStatus = ownerOrder == null ? null:ownerOrder.getOwnerStatus();
+		// 查询订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		Integer status = orderStatus == null ? null:orderStatus.getStatus();
+		if ((status != null && status.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) || 
+				(ownerStatus != null && ownerStatus.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus())) {
+			// 车主未接单不扣库存
+			return;
 		}
 		// 修改项目
 		/*
