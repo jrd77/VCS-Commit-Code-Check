@@ -66,7 +66,6 @@ public class TransIllegalSendAliYunMq {
 
     private static final String OSS_BASE_URL = "oss-cn-hangzhou.aliyuncs.com";
 
-    private String bucketUrl = "http://" + bucket + "." + OSS_BASE_URL + "/";
 
     public void renYunReceiveQueueResultFeedbackQueue(Map resMap){
         if(resMap==null){
@@ -80,6 +79,7 @@ public class TransIllegalSendAliYunMq {
     }
 
     public void transIllegalPhotoToRenYun(RenterOrderWzIllegalPhotoEntity photo) {
+        String bucketUrl = "http://" + bucket + "." + OSS_BASE_URL + "/";
         try{
             String orderNo = photo.getOrderNo();
             String carPlateNum = photo.getCarPlateNum();
