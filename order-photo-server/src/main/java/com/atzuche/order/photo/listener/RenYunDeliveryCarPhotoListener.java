@@ -41,7 +41,7 @@ public class RenYunDeliveryCarPhotoListener {
      */
     @RabbitListener(queues = REN_YUN_DELIVERY_CAR_PHOTO, containerFactory = "rabbitListenerContainerFactory")
     public void onMessage(Message message) {
-        LOGGER.info("RenYunDeliveryCarPhotoListener process start param;[{}]", message.toString());
+        LOGGER.info("RenYunDeliveryCarPhotoListener.onMessage.[{}]", message.toString());
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "获取仁云交接车 取还车照片数据信息MQ");
         try {
             String handoverCarOilJson = new String(message.getBody());
