@@ -30,7 +30,7 @@ public class AddIncomeExamineService {
 
 	/**
 	 * 获取追加收益审核列表
-	 * @param aie
+	 * @param req
 	 * @return AddIncomeExcelVO
 	 */
 	public AddIncomeExamineVO getAddIncomeExamineVO(AddIncomeExamineDTO req) {
@@ -114,4 +114,8 @@ public class AddIncomeExamineService {
 		return addIncomeExamineLogMapper.insertSelective(elog);
 	}
 
+
+	public List<AddIncomeExamine> queryListByMemNo(String memNo) {
+        return addIncomeExamineMapper.selectByMemNo(memNo);
+    }
 }

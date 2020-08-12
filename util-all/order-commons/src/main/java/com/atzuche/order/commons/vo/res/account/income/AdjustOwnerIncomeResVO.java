@@ -17,4 +17,7 @@ public class AdjustOwnerIncomeResVO {
     private String memNo;
     @AutoDocProperty("订单号")
     private String orderNo;
+    
+    private Integer accountOwnerIncomeDetailId;
+    
 }

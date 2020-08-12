@@ -363,5 +363,13 @@
     where id = #{id,jdbcType=INTEGER}
     and status != #{status,jdbcType=INTEGER}
   </update>
-  
+
+
+    <select id="selectByMemNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"/>
+        from
+            add_income_examine
+        where mem_no=#{memNo} AND is_delete=0
+    </select>
 </mapper>

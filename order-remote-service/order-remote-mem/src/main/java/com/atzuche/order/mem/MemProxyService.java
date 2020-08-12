@@ -496,36 +496,37 @@ public class MemProxyService {
 
     /**
      * 获取简单的会员信息
-     * @param memNo
+     *
+     * @param memNo 会员号
      * @return CashWithdrawalSimpleMemberDTO
      */
-    public CashWithdrawalSimpleMemberDTO getSimpleMemberInfo(String memNo)  {
+    public CashWithdrawalSimpleMemberDTO getSimpleMemberInfo(String memNo) {
         List<String> selectKey = Arrays.asList(
                 MemberSelectKeyEnum.MEMBER_CORE_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_AUTH_INFO.getKey(),
                 MemberSelectKeyEnum.MEMBER_ASSERTS_INFO.getKey());
         ResponseData<MemberTotalInfo> responseData = null;
-        log.info("Feign 开始获取简单的会员信息,memNo={}",memNo);
+        log.info("Feign 开始获取简单的会员信息,memNo={}", memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "会员详情服务");
-        try{
-            Cat.logEvent(CatConstants.FEIGN_METHOD,"MemberDetailFeignService.getSimpleMemberInfo");
-            String parameter = "memNo="+memNo+"&selectKey"+JSON.toJSONString(selectKey);
-            Cat.logEvent(CatConstants.FEIGN_PARAM,parameter);
+        try {
+            Cat.logEvent(CatConstants.FEIGN_METHOD, "MemberDetailFeignService.getSimpleMemberInfo");
+            String parameter = "memNo=" + memNo + "&selectKey" + JSON.toJSONString(selectKey);
+            Cat.logEvent(CatConstants.FEIGN_PARAM, parameter);
             responseData = memberDetailFeignService.getMemberSelectInfo(Integer.parseInt(memNo), selectKey);
             ResponseCheckUtil.checkResponse(responseData);
             t.setStatus(Transaction.SUCCESS);
-        }catch (Exception e){
-            log.error("Feign 获取简单的会员信息失败,ResponseData={},memNo={}",responseData,memNo,e);
-            Cat.logError("Feign 获取简单的会员信息失败",e);
+        } catch (Exception e) {
+            log.error("Feign 获取简单的会员信息失败,ResponseData={},memNo={}", responseData, memNo, e);
+            Cat.logError("Feign 获取简单的会员信息失败", e);
             t.setStatus(e);
             throw e;
-        }finally {
+        } finally {
             t.complete();
         }
 
         MemberTotalInfo memberTotalInfo = responseData.getData();
         if (memberTotalInfo == null) {
-        	return null;
+            return null;
         }
         // 会员核心信息
         MemberCoreInfo memberCoreInfo = memberTotalInfo.getMemberCoreInfo();
@@ -536,15 +537,16 @@ public class MemProxyService {
         CashWithdrawalSimpleMemberDTO simpleMem = new CashWithdrawalSimpleMemberDTO();
         simpleMem.setMemNo(memNo);
         if (memberCoreInfo != null) {
-        	simpleMem.setMobile(memberCoreInfo.getMobile() == null ? null:String.valueOf(memberCoreInfo.getMobile()));
-        	simpleMem.setRealName(memberCoreInfo.getRealName());
+            simpleMem.setMobile(memberCoreInfo.getMobile() == null ? null : String.valueOf(memberCoreInfo.getMobile()));
+            simpleMem.setRealName(memberCoreInfo.getRealName());
         }
         if (memberAuthInfo != null) {
-        	simpleMem.setIdCardAuth(memberAuthInfo.getIdCardAuth());
+            simpleMem.setIdCardAuth(memberAuthInfo.getIdCardAuth());
         }
         if (memberAssetsInfo != null) {
-        	simpleMem.setBalance(memberAssetsInfo.getBalance());
+            simpleMem.setBalance(memberAssetsInfo.getBalance());
         }
+        log.info("获取简单的会员信息. simpleMem:[{}]", JSON.toJSONString(simpleMem));
         return simpleMem;
     }
 
