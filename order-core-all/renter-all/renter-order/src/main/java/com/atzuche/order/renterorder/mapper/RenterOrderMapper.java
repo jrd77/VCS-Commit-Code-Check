@@ -80,4 +80,6 @@ public interface RenterOrderMapper{
     RenterOrderEntity getRenterOrderNoByOrderNoAndFinish(@Param("orderNo")String orderNo);
     
     RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(@Param("orderNo") String orderNo);
+    
+    int updateRenterStatusByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo, @Param("renterStatus") Integer renterStatus);
 }

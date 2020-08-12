@@ -53,6 +53,7 @@ public class OrderActionMqService {
     OrderCostService orderCostService;
     @Autowired
     AccountRenterCostSettleService accountRenterCostSettleService;
+
     /**
      * 发送下单成功事件
      *
@@ -61,7 +62,7 @@ public class OrderActionMqService {
      * @param riskAuditId 风控审核ID
      * @param orderReqVO  下单请求参数
      */
-    public void sendCreateOrderSuccess(String orderNo, String ownerMemNo, String riskAuditId, OrderReqVO orderReqVO) {
+    public void sendCreateOrderSuccess(String orderNo, String ownerMemNo, String riskAuditId, OrderReqVO orderReqVO, Integer isAutoReplayFlag) {
         OrderCreateMq orderCreateMq = new OrderCreateMq();
         orderCreateMq.setOrderNo(orderNo);
         orderCreateMq.setCategory(orderReqVO.getOrderCategory());
@@ -75,7 +76,7 @@ public class OrderActionMqService {
         orderCreateMq.setOwnerMemNo(StringUtils.isNotBlank(ownerMemNo) ? Integer.valueOf(ownerMemNo) : null);
         orderCreateMq.setRiskReqId(riskAuditId);
         orderCreateMq.setCarNo(Integer.valueOf(orderReqVO.getCarNo()));
-
+        orderCreateMq.setIsAutoReply(isAutoReplayFlag);
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderCreateMq);
         logger.info("发送下单成功事件.mq:[exchange={},routingKey={}],message=[{}]",
@@ -230,9 +231,10 @@ public class OrderActionMqService {
 
     /**
      * 发送订单车主确认还车成功事件
+     *
      * @param orderNo 订单号
      */
-    public void sendOrderOwnerReturnCarSuccess(String orderNo,String renterOrderNo) {
+    public void sendOrderOwnerReturnCarSuccess(String orderNo, String renterOrderNo) {
         OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
         OrderConfirmReturnCarMq orderCreateMq = new OrderConfirmReturnCarMq();
         BeanUtils.copyProperties(orderBaseDataMq, orderCreateMq);
@@ -345,6 +347,27 @@ public class OrderActionMqService {
                 NewOrderMQActionEventEnum.ORDER_AGREE_CONFLICT_NOTICE_OLD.routingKey,
                 orderMessage);
 
+    }
+
+
+    /**
+     * 发送订单取消申诉成功事件
+     *
+     * @param orderNo 订单号
+     */
+    public void sendOrderCancelAppealSuccess(String orderNo, String memRole, String appealReason) {
+        OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
+        OrderCancelAppealMq orderCancelAppealMq = new OrderCancelAppealMq();
+        BeanUtils.copyProperties(orderBaseDataMq, orderCancelAppealMq);
+        orderCancelAppealMq.setMemRole(memRole);
+        orderCancelAppealMq.setAppealReason(appealReason);
+        OrderMessage orderMessage = OrderMessage.builder().build();
+        orderMessage.setMessage(orderCancelAppealMq);
+        logger.info("发送订单取消申诉成功事件.mq:[exchange={},routingKey={}],message=[{}]",
+                NewOrderMQActionEventEnum.ORDER_CANCEL_APPEAL_SUCCESS.exchange,
+                NewOrderMQActionEventEnum.ORDER_CANCEL_APPEAL_SUCCESS.routingKey,
+                JSON.toJSON(orderMessage));
+        baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_CANCEL_APPEAL_SUCCESS.exchange, NewOrderMQActionEventEnum.ORDER_CANCEL_APPEAL_SUCCESS.routingKey, orderMessage);
     }
 
 }

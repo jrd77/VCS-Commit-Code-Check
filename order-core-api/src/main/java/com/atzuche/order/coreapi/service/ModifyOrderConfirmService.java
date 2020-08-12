@@ -133,6 +133,9 @@ public class ModifyOrderConfirmService {
 		}
 		// 重新生成车主订单
 		modifyOrderForOwnerService.modifyOrderForOwner(modifyOrderOwnerDTO, subsidyDetailEntityList, modifyOrderDTO.getRenterOrderNo());
+		// 车主信息带出 200710 huangjing
+		modifyOrderDTO.setOwnerMemberDTO(modifyOrderOwnerDTO.getOwnerMemberDTO());
+		
 		// 处理租客订单信息
 		modifyOrderForRenterService.updateRenterOrderStatus(renterOrder.getOrderNo(), renterOrder.getRenterOrderNo(), initRenterOrder);
 		// 如果是换车增加一条换车记录
@@ -206,6 +209,8 @@ public class ModifyOrderConfirmService {
 			orderStatusService.updateOrderStatus(modifyOrderOwnerDTO.getOrderNo(), updOrderStatus);
 			// 增加订单状态流转
 			orderFlowService.inserOrderStatusChangeProcessInfo(modifyOrderOwnerDTO.getOrderNo(), OrderStatusEnum.from(updOrderStatus));
+			// 更新租客子订单状态
+			renterOrderService.updateRenterStatusByRenterOrderNo(modifyOrderDTO.getRenterOrderNo(), updOrderStatus);
 		}
 		// 换车更新停运费信息
 		submitOrderHandleService.saveOrderStopFreightInfo(modifyOrderOwnerDTO.getOrderNo(), ownerGoodsDetailDTO);
@@ -323,6 +328,9 @@ public class ModifyOrderConfirmService {
 			if (modify == null) {
 				return;
 			}
+            //换车就通知任云
+            log.info("换车触发事件通知任云modify={}",modify);
+            deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(modify.getOrderNo()));
 			if (changeItemList == null || changeItemList.isEmpty()) {
 				return;
 			}
@@ -396,13 +404,15 @@ public class ModifyOrderConfirmService {
 			}
 			if (srvGetFlag != null && srvGetFlag == 1) {
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改时间
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "time");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 				}
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改地址
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "addr");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
@@ -411,13 +421,15 @@ public class ModifyOrderConfirmService {
 			
 			if (srvReturnFlag != null && srvReturnFlag == 1) {
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改时间
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "time");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 				}
 				if (changeItemList.contains(OrderChangeItemEnum.MODIFY_GETADDR.getCode())
-						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode())) {
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_RETURNADDR.getCode()) 
+						|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
 					// 修改地址
 					UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "addr");
 					deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
@@ -514,6 +526,16 @@ public class ModifyOrderConfirmService {
 			Cat.logError("ModifyOrderConfirmService.cutCarStock扣库存modifyOrderOwnerDTO为空",new ModifyOrderParameterException());
 			throw new ModifyOrderParameterException();
 		}
+		OwnerOrderEntity ownerOrder = modifyOrderOwnerDTO.getOwnerOrderEffective();
+		Integer ownerStatus = ownerOrder == null ? null:ownerOrder.getOwnerStatus();
+		// 查询订单状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(modifyOrderOwnerDTO.getOrderNo());
+		Integer status = orderStatus == null ? null:orderStatus.getStatus();
+		if ((status != null && status.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) || 
+				(ownerStatus != null && ownerStatus.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus())) {
+			// 车主未接单不扣库存
+			return;
+		}
 		// 修改项目
 		/*
 		 * if (changeItemList == null || changeItemList.isEmpty()) { return; } if
@@ -559,6 +581,15 @@ public class ModifyOrderConfirmService {
 		}
 		// 超级权限
 		if (modifyOrderOwnerDTO.getSuperPowerFlag() != null && modifyOrderOwnerDTO.getSuperPowerFlag().intValue() == 1) {
+			orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRentTime()));
+			orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderOwnerDTO.getRevertTime()));
+			OwnerOrderEntity ownerOrderEffective = modifyOrderOwnerDTO.getOwnerOrderEffective();
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRentTime() != null) {
+				orderInfoDTO.setAdvanceStartDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRentTime()));
+			}
+			if (ownerOrderEffective != null && ownerOrderEffective.getShowRevertTime() != null) {
+				orderInfoDTO.setDelayEndDate(LocalDateTimeUtils.localDateTimeToDate(ownerOrderEffective.getShowRevertTime()));
+			}
 			stockService.cutCarStockForSuperPower(orderInfoDTO);
 		} else {
 			stockService.cutCarStock(orderInfoDTO);

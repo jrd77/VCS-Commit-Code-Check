@@ -1,4 +1,6 @@
 package com.atzuche.order.owner.commodity.mapper;
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
+import com.atzuche.order.commons.vo.LianHeMaiTongOrderVO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 
 import java.util.List;
@@ -34,4 +36,7 @@ public interface OwnerGoodsMapper{
     OwnerGoodsEntity getOwnerGoodsByCarNoAndOrderNo(@Param("carNo")Integer carNo, @Param("orderNo")String orderNo);
     
     List<String> listOrderNoByCarNo(@Param("carNo")Integer carNo);
+
+    OwnerGoodsEntity getOwnerGoodsByPlatNum(@Param("platNum")String platNum);
+
 }

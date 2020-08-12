@@ -58,6 +58,11 @@ public class RenterOrderReqVO implements Serializable {
      * 应答标识位，0未设置，1已设置
      */
     private Integer replyFlag;
+    /*
+    *
+    * 自动应答标志位 最终值
+    * */
+    private boolean isAutoReplyFlag;
 
     /**
      * 城市编码
@@ -288,5 +293,11 @@ public class RenterOrderReqVO implements Serializable {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	/**
+	 * 配送模式：0-区间配送，1-精准配送
+	 */
+    private Integer distributionMode;
+    @AutoDocProperty("车辆等级")
+    private Integer carLevel;
 
 }

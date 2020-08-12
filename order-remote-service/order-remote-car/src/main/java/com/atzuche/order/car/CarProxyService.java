@@ -236,6 +236,7 @@ public class CarProxyService {
             renterGoodsDetailDto.setPremiumMoney(carBaseVO.getPremiumMoney());
             renterGoodsDetailDto.setLongRentVerifyStatus(carBaseVO.getLongRentVerifyStatus());
             renterGoodsDetailDto.setOrderType(carBaseVO.getOrderType());
+            renterGoodsDetailDto.setCarLevel(carBaseVO.getCarLevel());
             TransReplyVO transReplyVO = null;
             if(OrderCategoryEnum.SHORT_ORDER.getCategory().equals(reqVO.getOrderCategory())){
                transReplyVO = carBaseVO.getTransReplyVO();
@@ -244,6 +245,7 @@ public class CarProxyService {
             }
             renterGoodsDetailDto.setReplyFlag(transReplyVO ==null || transReplyVO.getReplyFlag() == null ? 0: transReplyVO.getReplyFlag());
             renterGoodsDetailDto.setAdvanceOrderTime(transReplyVO ==null || transReplyVO.getAdvanceOrderTime() == null ? null: transReplyVO.getAdvanceOrderTime());
+
         }
 
         renterGoodsDetailDto.setChoiceCar(data.isChoiceCar());

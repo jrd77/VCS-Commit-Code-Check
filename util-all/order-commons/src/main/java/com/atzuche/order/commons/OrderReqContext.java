@@ -12,7 +12,6 @@ import java.util.Map;
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
  * @date 2019/12/19 7:32 下午
  **/
-@Data
 public class OrderReqContext {
 
     public static final String RISK_AUDIT_ID="risk_audit_id";
@@ -60,5 +59,58 @@ public class OrderReqContext {
         throw new RuntimeException("not supported");
     }
 
+	public OwnerMemberDTO getOwnerMemberDto() {
+		return ownerMemberDto;
+	}
+
+	public void setOwnerMemberDto(OwnerMemberDTO ownerMemberDto) {
+		this.ownerMemberDto = ownerMemberDto;
+	}
+
+	public RenterMemberDTO getRenterMemberDto() {
+		return renterMemberDto;
+	}
+
+	public void setRenterMemberDto(RenterMemberDTO renterMemberDto) {
+		this.renterMemberDto = renterMemberDto;
+	}
+
+	public OwnerGoodsDetailDTO getOwnerGoodsDetailDto() {
+		return ownerGoodsDetailDto;
+	}
+
+	public void setOwnerGoodsDetailDto(OwnerGoodsDetailDTO ownerGoodsDetailDto) {
+		this.ownerGoodsDetailDto = ownerGoodsDetailDto;
+	}
+
+	public RenterGoodsDetailDTO getRenterGoodsDetailDto() {
+		return renterGoodsDetailDto;
+	}
+
+	public void setRenterGoodsDetailDto(RenterGoodsDetailDTO renterGoodsDetailDto) {
+		this.renterGoodsDetailDto = renterGoodsDetailDto;
+	}
+
+	public OrderReqVO getOrderReqVO() {
+		return orderReqVO;
+	}
+
+	public void setOrderReqVO(OrderReqVO orderReqVO) {
+		this.orderReqVO = orderReqVO;
+	}
+
+	public CarRentTimeRangeDTO getCarRentTimeRangeDTO() {
+		return carRentTimeRangeDTO;
+	}
+
+	public void setCarRentTimeRangeDTO(CarRentTimeRangeDTO carRentTimeRangeDTO) {
+		this.carRentTimeRangeDTO = carRentTimeRangeDTO;
+	}
+
+	public Map<String, String> getInternalParams() {
+		return internalParams;
+	}
+	
+    
 
 }

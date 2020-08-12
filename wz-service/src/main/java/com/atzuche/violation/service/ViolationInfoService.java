@@ -3,6 +3,7 @@ package com.atzuche.violation.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atzuche.order.commons.DateUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
 import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
@@ -141,14 +142,14 @@ public class ViolationInfoService {
             }
             OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationResVO.getOrderNo());
             String orderDetain = "未暂扣";
-            if (orderStatusEntity.getIsDetain().intValue() == 0) {
-                orderDetain = "未暂扣";
-            } else {
-                orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+            if (orderStatusEntity.getIsDetainWz() == OrderConstant.ONE) {
+                orderDetain = "已暂扣";
+            } else if(orderStatusEntity.getIsDetainWz() == OrderConstant.TWO) {
+                orderDetain = "撤销暂扣";
             }
             violationResVO.setWzDepositStatus(orderDetain);
             violationResVO.setCarType(CarOwnerTypeEnum.getNameByCode(Integer.valueOf(violationResVO.getCarType())));
-            violationResVO.setWzProcessedProof(violationResVO.getWzProcessedProof().equals("0") ? "无" : "有");
+            violationResVO.setWzProcessedProof("0".equals(violationResVO.getWzProcessedProof()) ? "无" : "有");
         }
         return  violationResDesVOList;
     }
@@ -171,9 +172,12 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO : violationResDesVOList) {
             ViolationExportResVO violationExportResVO = new ViolationExportResVO();
             CommonUtil.copyPropertiesIgnoreNull(violationResVO, violationExportResVO);
-            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities = renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(), violationReqVO.getCarNo());
+            violationExportResVO.setCities(violationResVO.getOnlineCity());
+            List<RenterOrderWzDetailEntity> renterOrderWzDetailEntities =
+                    renterOrderWzDetailMapper.findDetailByOrderNo(violationExportResVO.getOrderNo(),
+                            violationResVO.getPlateNum());
             if (!CollectionUtils.isEmpty(renterOrderWzDetailEntities)) {
-                renterOrderWzDetailEntities.stream().forEach(r -> {
+                renterOrderWzDetailEntities.forEach(r -> {
                     violationExportResVO.setIllegalAddr(r.getIllegalAddr());
                     violationExportResVO.setIllegalAmt(r.getIllegalAmt());
                     violationExportResVO.setIllegalDeduct(r.getIllegalDeduct());
@@ -181,26 +185,25 @@ public class ViolationInfoService {
                     violationExportResVO.setIllegalFine(String.valueOf(r.getIllegalFine()));
                     OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(r.getOrderNo());
                     String orderDetain = "未暂扣";
-                    if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                    if (orderStatusEntity.getIsDetain() == 0) {
                         orderDetain = "未暂扣";
                     } else {
-                        orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                        orderDetain = orderStatusEntity.getIsDetain() == 1 ? "已暂扣" : "撤销暂扣";
                     }
                     violationExportResVO.setIllegalPauseCost(orderDetain);
                     violationExportResVO.setIllegalReason(r.getIllegalReason());
-                    violationExportResVO.setIllegalServiceCost(String.valueOf(r.getIllegalServiceCost()));
-                    violationExportResVO.setIllegalSupercerCost(String.valueOf(r.getIllegalSupercerCost()));
-                    violationExportResVO.setIllegalTime(String.valueOf(r.getIllegalTime()));
-                    violationExportResVO.setId(String.valueOf(r.getId()));
+                    violationExportResVO.setIllegalTime(DateUtil.formatDate(r.getIllegalTime(), "yyyy-MM-dd HH:mm:ss"));
+                    violationExportResVO.setIllegalSupercerCost(Objects.nonNull(r.getIllegalSupercerCost()) ?
+                            r.getIllegalSupercerCost().toString() : "0");
                     violationExportResVOS.add(violationExportResVO);
                 });
             } else {
                 OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByOrderNo(violationExportResVO.getOrderNo());
                 String orderDetain = "未暂扣";
-                if (orderStatusEntity.getIsDetain().intValue() == 0) {
+                if (orderStatusEntity.getIsDetain() == 0) {
                     orderDetain = "未暂扣";
                 } else {
-                    orderDetain = orderStatusEntity.getIsDetain().intValue() == 1 ? "已暂扣" : "撤销暂扣";
+                    orderDetain = orderStatusEntity.getIsDetain() == 1 ? "已暂扣" : "撤销暂扣";
                 }
                 violationExportResVO.setIllegalPauseCost(orderDetain);
                 violationExportResVOS.add(violationExportResVO);
@@ -385,7 +388,7 @@ public class ViolationInfoService {
             rabbitTemplate.convertAndSend(ORDER_CENTER_WZ_WITHHOLD_EXCHANGE, ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY, renterOrderWzDetail.getOrderNo());
         }
         updateTransWzDisposeStatus(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum());
-        updateViolationCostHandle(renterOrderWzDetail);
+        //updateViolationCostHandle(renterOrderWzDetail);
     }
 
     /**

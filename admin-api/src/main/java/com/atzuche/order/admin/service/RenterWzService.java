@@ -14,6 +14,7 @@ import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.WzCostLogDTO;
 import com.atzuche.order.commons.entity.dto.WzDepositMsgDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.AccountRenterDepositDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderWzCostDetailDTO;
@@ -365,7 +366,7 @@ public class RenterWzService {
         rs.setWithhold(withhold);
 
         //违章支付信息
-        RenterWzInfoResVO renterWzInfo = this.queryRenterWzInfoByOrderNo(wzDepositMsg);
+        RenterWzInfoResVO renterWzInfo = this.queryRenterWzInfoByOrderNo(wzDepositMsg,vo.getAccountRenterDepositDetailDTO());
         rs.setInfo(renterWzInfo);
 
         return rs;
@@ -448,14 +449,14 @@ public class RenterWzService {
         return result;
     }
 
-    private RenterWzInfoResVO queryRenterWzInfoByOrderNo(WzDepositMsgDTO wzDepositMsg) {
+    private RenterWzInfoResVO queryRenterWzInfoByOrderNo(WzDepositMsgDTO wzDepositMsg, AccountRenterDepositDetailDTO accountRenterDepositDetailDTO) {
         RenterWzInfoResVO result = new RenterWzInfoResVO();
-        if (wzDepositMsg == null) {
+        if (wzDepositMsg == null || accountRenterDepositDetailDTO ==null) {
             return result;
         }
         result.setYingshouDeposit(String.valueOf(NumberUtils.convertNumberToZhengshu(wzDepositMsg.getYingshouWzDepositAmt())));
         result.setWzDeposit(String.valueOf(wzDepositMsg.getWzDepositAmt()));
-        result.setWaiverAmount(String.valueOf(wzDepositMsg.getReductionAmt()));
+        result.setWaiverAmount("信用减免"+(accountRenterDepositDetailDTO.getCreditPayAmt()==null?0:accountRenterDepositDetailDTO.getCreditPayAmt())+"，预授权减免"+(accountRenterDepositDetailDTO.getAuthorizeDepositAmt()==null?0:accountRenterDepositDetailDTO.getAuthorizeDepositAmt()));
         result.setTransStatusStr(wzDepositMsg.getPayStatus());
         result.setPayTimeStr(wzDepositMsg.getPayTime());
         result.setPaymentStr(wzDepositMsg.getPaySource());

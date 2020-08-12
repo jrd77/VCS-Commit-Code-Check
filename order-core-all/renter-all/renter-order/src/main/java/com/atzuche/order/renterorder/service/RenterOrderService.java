@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,8 @@ public class RenterOrderService {
     
     @Autowired
     private InsurAbamentDiscountService insurAbamentDiscountService;
+    @Autowired
+    private RenterInsureCoefficientService renterInsureCoefficientService;
 
 
     public List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(String orderNo) {
@@ -241,7 +244,7 @@ public class RenterOrderService {
         record.setExpRevertTime(renterOrderReqVO.getRevertTime());
         record.setGoodsCode(String.valueOf(renterOrderReqVO.getCarNo()));
         record.setGoodsType("1");
-        record.setAgreeFlag(null == renterOrderReqVO.getReplyFlag() ? 0 : renterOrderReqVO.getReplyFlag());
+        record.setAgreeFlag(renterOrderReqVO.isAutoReplyFlag()?1:0);
         record.setReqAcceptTime(record.getAgreeFlag() == OrderConstant.NO ? null : LocalDateTime.now());
         record.setIsUseCoin(renterOrderReqVO.getUseAutoCoin());
         record.setIsUseWallet(renterOrderReqVO.getUseBal());
@@ -288,6 +291,8 @@ public class RenterOrderService {
         couponAndAutoCoinResVO.setRentAmt(renterOrderCostRespDTO.getRentAmount());
 
         renterOrderResVO.setCouponAndAutoCoinResVO(couponAndAutoCoinResVO);
+        // 保存系数信息
+        renterInsureCoefficientService.saveCombineCoefficient(renterOrderCostReqDTO);
         return renterOrderResVO;
     }
 
@@ -346,6 +351,7 @@ public class RenterOrderService {
         insurAmtDTO.setSeatNum(renterOrderReqVO.getSeatNum());
         insurAmtDTO.setTyreInsurFlag(renterOrderReqVO.getTyreInsurFlag());
         insurAmtDTO.setDriverInsurFlag(renterOrderReqVO.getDriverInsurFlag());
+        insurAmtDTO.setCarLevel(renterOrderReqVO.getCarLevel());
 
         //补充全险计算相关信息
         AbatementAmtDTO abatementAmtDTO = new AbatementAmtDTO();
@@ -358,6 +364,7 @@ public class RenterOrderService {
         abatementAmtDTO.setGuidPrice(renterOrderReqVO.getGuidPrice());
         abatementAmtDTO.setIsAbatement(null != renterOrderReqVO.getAbatement() && renterOrderReqVO.getAbatement() == 1 );
         abatementAmtDTO.setDriverScore(renterOrderReqVO.getDriverScore());
+        abatementAmtDTO.setCarLevel(renterOrderReqVO.getCarLevel());
 
         //附加驾驶人险计算相关信息
         ExtraDriverDTO extraDriverDTO = new ExtraDriverDTO();
@@ -383,6 +390,7 @@ public class RenterOrderService {
                 renterOrderReqVO.getSrvGetFlag().toString()));
         getReturnCarCostReqDto.setIsReturnCarCost(null != renterOrderReqVO.getSrvReturnFlag() && StringUtils.equals("1",
                 renterOrderReqVO.getSrvReturnFlag().toString()));
+        getReturnCarCostReqDto.setDistributionMode(renterOrderReqVO.getDistributionMode());
 
         //超运能溢价计算相关信息
         GetReturnCarOverCostReqDto getReturnCarOverCostReqDto = new GetReturnCarOverCostReqDto();
@@ -620,5 +628,22 @@ public class RenterOrderService {
      */
     public RenterOrderEntity getRenterOrderByOrderNoAndChildStatus(String orderNo) {
     	return renterOrderMapper.getRenterOrderByOrderNoAndChildStatus(orderNo);
+    }
+    /*
+     * @Author ZhangBin
+     * @Date 2020/7/7 11:31
+     * @Description: 获取是否自动接单条件
+     *
+     **/
+    public static boolean isAutoReplyFlag(LocalDateTime rentTime,Integer advanceOrderTime,Integer replyFlagInt){
+        boolean replyFlag = null != replyFlagInt && replyFlagInt == OrderConstant.YES;
+        if (replyFlag && (advanceOrderTime==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= advanceOrderTime)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public int updateRenterStatusByRenterOrderNo(String renterOrderNo, Integer renterStatus) {
+    	return renterOrderMapper.updateRenterStatusByRenterOrderNo(renterOrderNo, renterStatus);
     }
 }

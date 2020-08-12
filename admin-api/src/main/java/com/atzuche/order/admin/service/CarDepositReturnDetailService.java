@@ -64,7 +64,6 @@ public class CarDepositReturnDetailService {
         if(orderStatusDTO == null){
             throw new RuntimeException("车辆押金获取失败:"+ orderNo);
         }
-        RenterOrderDTO renterOrderDTO = data.getRenterOrderDTO();
         AccountRenterDepositDTO accountRenterDepositDTO = data.getAccountRenterDepositDTO();
         RenterDepositDetailDTO renterDepositDetailDTO = data.getRenterDepositDetailDTO();
         OrderDTO orderDTO = data.getOrderDTO();
@@ -140,7 +139,7 @@ public class CarDepositReturnDetailService {
 
         carDepositRespVo.setPayType(payType);
         carDepositRespVo.setDepositType(depositType);
-        carDepositRespVo.setReliefAmtStr(renterDepositDetailDTO.getReductionDepositAmt());
+        carDepositRespVo.setReliefAmtStr("信用减免"+(accountRenterDepositDTO.getCreditPayAmt()==null?0:accountRenterDepositDTO.getCreditPayAmt())+"，预授权减免"+(accountRenterDepositDTO.getAuthorizeDepositAmt()==null?0:accountRenterDepositDTO.getAuthorizeDepositAmt()));
         carDepositRespVo.setPayDateStr(payTimeStr);
         carDepositRespVo.setPayStatusStr(TransStatusEnum.getFlagText(payStatus));
         carDepositRespVo.setSurplusDepositAmt(accountRenterDepositDTO.getSurplusDepositAmt());

@@ -8,6 +8,10 @@ import lombok.ToString;
 @ToString
 public class OrderRemarkResponseVO {
 
+    private Integer id;
+    @AutoDocProperty(value = "备注编号")
+    private String number;
+
     @AutoDocProperty(value = "备注id")
     private String remarkId;
 

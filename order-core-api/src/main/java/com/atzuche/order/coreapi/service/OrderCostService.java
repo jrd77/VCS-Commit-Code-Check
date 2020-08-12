@@ -3,6 +3,9 @@
  */
 package com.atzuche.order.coreapi.service;
 
+import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
+import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.service.notservice.AccountOwnerIncomeExamineNoTService;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.res.AccountRenterDepositResVO;
@@ -14,23 +17,17 @@ import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResV
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
-import com.atzuche.order.commons.entity.dto.CostBaseDTO;
-import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
+import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
-import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.OrderStatusDTO;
-import com.atzuche.order.commons.entity.orderDetailDto.RenterOrderDTO;
+import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.ownerOrderDetail.RenterRentDetailDTO;
-import com.atzuche.order.commons.enums.DeliveryOrderTypeEnum;
-import com.atzuche.order.commons.enums.OrderStatusEnum;
-import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
-import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
+import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.ConsoleCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.NotAllowedEditException;
+import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.vo.rentercost.OwnerToPlatformCostReqVO;
 import com.atzuche.order.commons.vo.rentercost.RenterCostReqVO;
 import com.atzuche.order.commons.vo.rentercost.RenterToPlatformCostReqVO;
@@ -40,6 +37,7 @@ import com.atzuche.order.commons.vo.res.OrderOwnerCostResVO;
 import com.atzuche.order.commons.vo.res.OrderRenterCostResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostDetailResVO;
 import com.atzuche.order.commons.vo.res.account.AccountRenterCostSettleResVO;
+import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderDeliveryResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
@@ -52,7 +50,9 @@ import com.atzuche.order.commons.vo.res.rentcosts.ConsoleRenterOrderFineDeatailE
 import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleFineVO;
 import com.atzuche.order.coreapi.entity.vo.RenterAndConsoleSubsidyVO;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderRenterOrderNotFindException;
+import com.atzuche.order.delivery.entity.OwnerRenterAdjustReasonEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.service.OwnerRenterAdjustReasonService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.vo.delivery.rep.OwnerGetAndReturnCarDTO;
 import com.atzuche.order.delivery.vo.delivery.rep.RenterGetAndReturnCarDTO;
@@ -153,6 +153,11 @@ public class OrderCostService {
     private OwnerMemberService ownerMemberService;
     @Autowired
     private RenterOrderService renterOrderService;
+    @Autowired
+    private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
+    @Autowired
+    private OwnerRenterAdjustReasonService ownerRenterAdjustReasonService;
+
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
 		OrderRenterCostResVO resVo = new OrderRenterCostResVO();
@@ -462,76 +467,85 @@ public class OrderCostService {
 	}
 
 	public OrderOwnerCostResVO orderCostOwnerGet(OrderCostReqVO req)  {
-		OrderOwnerCostResVO resVo = new OrderOwnerCostResVO();
-		
-		//参数定义
-		String orderNo = req.getOrderNo();  //仅仅一个订单号
-//		String memNo = req.getMemNo();
-		String ownerOrderNo = req.getSubOrderNo();
-		// ----------------------------------------------------- 结算前查询
-		OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo,ownerOrderNo);
-		String ownerNo = "0";
-		if(ownerCosts != null) {
-			log.info("ownerCosts===============不为空");
-			ownerNo = ownerCosts.getOwnerNo();
-		}else {
-			log.info("ownerCosts===============为空");
-		}
-		//数据封装
-		putOwnerCosts(resVo,ownerCosts);
-		log.info("ownerCosts===============数据封装");
-		
-		// 获取修改前租客使用的优惠券列表
-		  List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByOrderNo(orderNo);
-		  List<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity> orderCouponListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity>();
-		  if(orderCouponList != null) {
-			  orderCouponList.stream().forEach(x->{
-				  com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
-		      		try {
-						BeanUtils.copyProperties(x,real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		      		orderCouponListReal.add(real);
-		          });
-		      }
-		  resVo.setOrderCouponList(orderCouponListReal);
-		  
-		  ///
-			List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,ownerNo);
-			List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
-			if(consoleCostLst != null) {
-				consoleCostLst.stream().forEach(x->{
-					com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
-		      		try {
-						BeanUtils.copyProperties(x,real);
-					} catch (Exception e) {
-						log.error("对象属性赋值报错:",e);
-					}
-		      		consoleCostLstReal.add(real);
-		          });
-		      }
-			resVo.setOrderConsoleCostDetails(consoleCostLstReal);
-            OwnerOrderEntity ownerOrderByOwnerOrderNo = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
-            String renterOrderNo = ownerOrderByOwnerOrderNo.getRenterOrderNo();
-            if(renterOrderNo != null){
-                OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
-                if(ownerCouponLongEntity != null){
-                    OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
-                    BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
-                    resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
-                }
-            }
+        OrderOwnerCostResVO resVo = new OrderOwnerCostResVO();
 
-			///车主的结算后收益 200215  结算收益有多条记录的情况。
-//			AccountOwnerIncomeExamineEntity examine = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo);
-//			if(examine != null) {
-//				ownerCostAmtSettleAfter = examine.getAmt().intValue();
-//			}
-			Integer ownerCostAmtSettleAfter = accountOwnerIncomeExamineNoTService.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
-			resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
-            resVo.setGpsDepositTotal(ownerCosts.getGpsDepositDetail()==null?0:ownerCosts.getGpsDepositDetail().getTotalAmount());
-		return resVo;
+        //参数定义
+        String orderNo = req.getOrderNo();  //仅仅一个订单号
+        //		String memNo = req.getMemNo();
+        String ownerOrderNo = req.getSubOrderNo();
+        // ----------------------------------------------------- 结算前查询
+        OwnerCosts ownerCosts = orderSettleService.preOwnerSettleOrder(orderNo,ownerOrderNo);
+        String ownerNo = "0";
+        if(ownerCosts != null) {
+            log.info("ownerCosts===============不为空");
+            ownerNo = ownerCosts.getOwnerNo();
+        }else {
+            log.info("ownerCosts===============为空");
+        }
+        //数据封装
+        putOwnerCosts(resVo,ownerCosts);
+        log.info("ownerCosts===============数据封装");
+
+        // 获取修改前租客使用的优惠券列表
+        List<OrderCouponEntity> orderCouponList = orderCouponService.listOrderCouponByOrderNo(orderNo);
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity> orderCouponListReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity>();
+        if(orderCouponList != null) {
+        orderCouponList.stream().forEach(x->{
+          com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderCouponEntity();
+            try {
+                BeanUtils.copyProperties(x,real);
+            } catch (Exception e) {
+                log.error("对象属性赋值报错:",e);
+            }
+            orderCouponListReal.add(real);
+          });
+        }
+        resVo.setOrderCouponList(orderCouponListReal);
+
+        ///
+        List<OrderConsoleCostDetailEntity> consoleCostLst = orderConsoleCostDetailService.selectByOrderNoAndMemNo(orderNo,ownerNo);
+        List<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity> consoleCostLstReal = new ArrayList<com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity>();
+        if(consoleCostLst != null) {
+        consoleCostLst.stream().forEach(x->{
+            com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity real = new com.atzuche.order.commons.vo.res.rentcosts.OrderConsoleCostDetailEntity();
+            try {
+                BeanUtils.copyProperties(x,real);
+            } catch (Exception e) {
+                log.error("对象属性赋值报错:",e);
+            }
+            consoleCostLstReal.add(real);
+          });
+        }
+        resVo.setOrderConsoleCostDetails(consoleCostLstReal);
+        OwnerOrderEntity ownerOrderByOwnerOrderNo = ownerOrderService.getOwnerOrderByOwnerOrderNo(ownerOrderNo);
+        String renterOrderNo = ownerOrderByOwnerOrderNo.getRenterOrderNo();
+        if(renterOrderNo != null){
+        OwnerCouponLongEntity ownerCouponLongEntity = ownerCouponLongService.getByRenterOrderNo(renterOrderNo);
+        if(ownerCouponLongEntity != null){
+            OwnerCouponLongDTO ownerCouponLongDTO = new OwnerCouponLongDTO();
+            BeanUtils.copyProperties(ownerCouponLongEntity,ownerCouponLongDTO);
+            resVo.setOwnerCouponLongDTO(ownerCouponLongDTO);
+        }
+        }
+        Integer ownerCostAmtSettleAfter = accountOwnerIncomeExamineNoTService.getTotalAccountOwnerIncomeExamineByOrderNo(orderNo);
+        resVo.setOwnerCostAmtSettleAfter(ownerCostAmtSettleAfter);
+        resVo.setGpsDepositTotal(ownerCosts.getGpsDepositDetail()==null?0:ownerCosts.getGpsDepositDetail().getTotalAmount());
+
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderNo);
+        if(orderStatusEntity != null){
+            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+            BeanUtils.copyProperties(orderStatusEntity,orderStatusDTO);
+            List<AccountOwnerCostSettleDetailEntity> OwnerCostSettleDetaillist = accountOwnerCostSettleDetailNoTService.getAccountOwnerCostSettleDetailsByOwnerOrderNo(orderNo, ownerOrderNo);
+            List<AccountOwnerSettleCostDetailResVO> accountOwnerSettleCostDetailResVOS = new ArrayList<>();
+            Optional.ofNullable(OwnerCostSettleDetaillist).orElseGet(ArrayList::new).stream().forEach(x->{
+                AccountOwnerSettleCostDetailResVO accountOwnerSettleCostDetailResVO = new AccountOwnerSettleCostDetailResVO();
+                BeanUtils.copyProperties(x,accountOwnerSettleCostDetailResVO);
+                accountOwnerSettleCostDetailResVOS.add(accountOwnerSettleCostDetailResVO);
+            });
+            resVo.setOrderStatusDTO(orderStatusDTO);
+            resVo.setAccountOwnerSettleCostDetailResVOS(accountOwnerSettleCostDetailResVOS);
+        }
+        return resVo;
 	}
 	
 	private void putOwnerCosts(OrderOwnerCostResVO resVo, OwnerCosts ownerCosts)  {
@@ -739,20 +753,23 @@ public class OrderCostService {
 	 * @param renterOrderNo
 	 * @return RenterAndConsoleSubsidyVO
 	 */
-	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo) {
-		  //主订单
-	      OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
-	      // 管理后台补贴
-		  List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
-		  
-		  RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
-		  renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
-		  if (StringUtils.isNotBlank(renterOrderNo)) {
-			  // 租客子订单补贴
-			  List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo); 
-			  renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
-		  }
-		  return renterAndConsoleSubsidyVO;
+	public RenterAndConsoleSubsidyVO getRenterAndConsoleSubsidyVO(String orderNo, String renterOrderNo,String ownerOrderNo) {
+        //主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+        // 管理后台补贴
+        List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
+
+        RenterAndConsoleSubsidyVO renterAndConsoleSubsidyVO = new RenterAndConsoleSubsidyVO();
+        renterAndConsoleSubsidyVO.setConsoleSubsidyList(consoleSubsidyList);
+        if (StringUtils.isNotBlank(renterOrderNo)) {
+          // 租客子订单补贴
+          List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList = renterOrderSubsidyDetailService.listRenterOrderSubsidyDetail(orderNo,renterOrderNo);
+          renterAndConsoleSubsidyVO.setRenterOrderSubsidyDetailEntityList(renterOrderSubsidyDetailEntityList);
+        }
+        //查询调价原因
+        List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonByChildNo = ownerRenterAdjustReasonService.getOwnerRenterAdjustReasonByChildNo(renterOrderNo, ownerOrderNo);
+        renterAndConsoleSubsidyVO.setOwnerRenterAdjustReasonDTOS(ownerRenterAdjustReasonByChildNo);
+        return renterAndConsoleSubsidyVO;
 	}
 	
 	
@@ -823,6 +840,11 @@ public class OrderCostService {
             recordConvert.setUpdateOp(renterCostReqVO.getOperateName());
             recordConvert.setOperatorId(renterCostReqVO.getOperateName());
             orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(recordConvert);
+
+            //添加备注信息
+           saveOrUpdateAdjustRemark(renterCostReqVO,recordConvert,AdjustTargetEnum.RENTER_TO_OWNER);
+
+
  	   }
  	   // 车主给租客的调价
  	   if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())) {
@@ -848,9 +870,39 @@ public class OrderCostService {
  	    	recordConvert.setUpdateOp(renterCostReqVO.getOperateName());
  	    	recordConvert.setOperatorId(renterCostReqVO.getOperateName());
  	    	orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
+
+ 	    	//添加备注信息
+           saveOrUpdateAdjustRemark(renterCostReqVO,recordConvert,AdjustTargetEnum.OWNER_TO_RENTER);
+
  	   }
 	}
-	
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/7/29 15:47
+     * @Description:
+     * 
+     **/
+    public void saveOrUpdateAdjustRemark(RenterAdjustCostReqVO renterCostReqVO, OrderConsoleSubsidyDetailEntity record,AdjustTargetEnum adjustTargetEnum){
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByChildNo(renterCostReqVO.getOwnerOrderNo(), renterCostReqVO.getRenterOrderNo());
+        if(ownerOrderEntity == null){
+            OwnerOrderNotFoundException e = new OwnerOrderNotFoundException(renterCostReqVO.getOwnerOrderNo());
+            log.error("获取车主子订单为空",e);
+            throw e;
+        }
+        OwnerRenterAdjustReasonEntity ownerRenterAdjustReasonEntity = new OwnerRenterAdjustReasonEntity();
+        ownerRenterAdjustReasonEntity.setOrderNo(renterCostReqVO.getOrderNo());
+        ownerRenterAdjustReasonEntity.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
+        ownerRenterAdjustReasonEntity.setRenterOrderNo(ownerOrderEntity.getRenterOrderNo());
+        ownerRenterAdjustReasonEntity.setAdjustTarget(adjustTargetEnum.getType());
+        ownerRenterAdjustReasonEntity.setAdjustReasonType(renterCostReqVO.getAdjustReasonType());
+        ownerRenterAdjustReasonEntity.setAdjustReasonDesc(renterCostReqVO.getAdjustReasonDesc());
+        ownerRenterAdjustReasonEntity.setAdjustRemark(renterCostReqVO.getRemarkContent());
+        ownerRenterAdjustReasonEntity.setCreateOp(record.getCreateOp());
+        ownerRenterAdjustReasonEntity.setUpdateOp(record.getUpdateOp());
+        log.info("记录调价备注和调价原因ownerRenterAdjustReasonEntity={}", JSON.toJSONString(ownerRenterAdjustReasonEntity));
+        ownerRenterAdjustReasonService.saveOrUpdateAdjustReason(ownerRenterAdjustReasonEntity);
+    }
 	
 	/**
 	 * 租客需支付给平台的费用 修改
@@ -1125,4 +1177,13 @@ public class OrderCostService {
 		  return renterAndConsoleFineVO;
 	}
 
+    public List<RenterOrderCostDetailDTO> getBaoFeiInfo(String orderNo, String renterOwnerNo) {
+        List<RenterOrderCostDetailEntity> renterOrderCostDetailList = renterOrderCostDetailService.getRenterOrderCostDetailList(orderNo, renterOwnerNo);
+        List<RenterOrderCostDetailDTO> collect = Optional.ofNullable(renterOrderCostDetailList).orElseGet(ArrayList::new).stream().map(x -> {
+            RenterOrderCostDetailDTO renterOrderCostDetailDTO = new RenterOrderCostDetailDTO();
+            BeanUtils.copyProperties(x, renterOrderCostDetailDTO);
+            return renterOrderCostDetailDTO;
+        }).collect(Collectors.toList());
+        return collect;
+    }
 }

@@ -147,7 +147,7 @@ public class SubmitOrderController {
      		}
             
             //发送订单成功的MQ事件
-            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO,context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
             NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;
             if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
                 newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;
@@ -273,7 +273,7 @@ public class SubmitOrderController {
             
               
             //发送订单成功的MQ事件
-            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO);
+            orderActionMqService.sendCreateOrderSuccess(orderResVO.getOrderNo(),context.getOwnerMemberDto().getMemNo(),context.getRiskAuditId(),orderReqVO,context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
             NewOrderMQStatusEventEnum newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PRECONFIRM;
             if(StringUtils.equals(orderResVO.getStatus(), String.valueOf(OrderStatusEnum.TO_PAY.getStatus()))) {
                 newOrderMQStatusEventEnum = NewOrderMQStatusEventEnum.ORDER_PREPAY;

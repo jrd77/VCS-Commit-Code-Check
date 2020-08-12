@@ -1,7 +1,9 @@
 package com.atzuche.order.commons.vo.res;
 
+import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.autoyol.doc.annotation.AutoDocProperty;
 import lombok.Data;
@@ -39,6 +41,12 @@ public class RenterCostDetailVO {
 
     @AutoDocProperty(value = "驾乘无忧保障服务费")
     public Integer driverInsurAmt;
+    
+    @AutoDocProperty(value = "精准取车服务费")
+    private Integer accurateGetSrvAmt;
+    
+    @AutoDocProperty(value = "精准还车服务费")
+    private Integer accurateReturnSrvAmt;
 
     @AutoDocProperty(value = "配送费详情及其总额")
     private RenterDeliveryFeeDetailVO deliveryFeeDetail;
@@ -68,6 +76,8 @@ public class RenterCostDetailVO {
     @AutoDocProperty(value = "消费总额")
     private int totalAmt;
 
+    @AutoDocProperty(value = "驾驶行为评分和各项系数")
+    private List<RenterInsureCoefficientVO> renterInsureCoefficientVOS;
 
     public int getTotalAmt(){
         int total= (rentAmt==null?0:rentAmt)
@@ -76,7 +86,9 @@ public class RenterCostDetailVO {
                 +(fee==null?0:fee)
                 +(extraDriverInsuranceAmt==null?0:extraDriverInsuranceAmt)
                 +(tyreInsurAmt==null?0:tyreInsurAmt)
-                +(driverInsurAmt==null?0:driverInsurAmt);
+                +(driverInsurAmt==null?0:driverInsurAmt)
+                +(accurateGetSrvAmt==null?0:accurateGetSrvAmt)
+                +(accurateReturnSrvAmt==null?0:accurateReturnSrvAmt);
         if(deliveryFeeDetail!=null){
             total= total+deliveryFeeDetail.getDeliveryTotal();
         }

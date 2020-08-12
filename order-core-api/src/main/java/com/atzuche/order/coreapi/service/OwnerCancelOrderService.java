@@ -106,7 +106,8 @@ public class OwnerCancelOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_DISPATCH.getStatus());
             orderStatusDTO.setIsDispatch(OrderConstant.YES);
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.DISPATCH_ING.getCode());
-
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_DISPATCH.getStatus());
         } else {
             //取消不进调度
             cancelOrderResDTO.setRenterOrderNo(renterOrderEntity.getRenterOrderNo());
@@ -119,6 +120,8 @@ public class OwnerCancelOrderService {
             orderStatusDTO.setIsDispatch(OrderConstant.NO);
             orderStatusDTO.setDispatchStatus(DispatcherStatusEnum.NOT_DISPATCH.getCode());
             renterOrderService.updateChildStatusByOrderNo(cancelOrderReqDTO.getOrderNo(), RenterChildStatusEnum.END.getCode());
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         }
         //落库
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
@@ -127,6 +130,8 @@ public class OwnerCancelOrderService {
 
         if (null != ownerOrderEntity) {
             ownerOrderService.updateChildStatusByOrderNo(cancelOrderReqDTO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
+            // 更新车主订单状态
+            ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
             ownerOrderService.updateDispatchReasonByOrderNo(cancelOrderReqDTO.getOrderNo(), DispatcherReasonEnum.owner_cancel);
             //取消信息处理(order_cancel_reason)
             OrderCancelReasonEntity orderCancelReasonEntity =

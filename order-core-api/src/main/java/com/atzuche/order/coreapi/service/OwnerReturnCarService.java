@@ -65,6 +65,7 @@ public class OwnerReturnCarService {
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
         //添加order_flow记录
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), OrderStatusEnum.TO_SETTLE);
+        
         // 实际还车时间
         LocalDateTime actRevertTime = LocalDateTime.now();
         if (StringUtils.isNotBlank(reqVO.getRevertTime())) {
@@ -80,6 +81,8 @@ public class OwnerReturnCarService {
             record.setActRevertTime(actRevertTime);
             record.setUpdateOp(reqVO.getOperatorName());
             renterOrderService.updateRenterOrderInfo(record);
+            // 更新租客订单状态
+            renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_SETTLE.getStatus());
         }
 
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
@@ -90,6 +93,8 @@ public class OwnerReturnCarService {
             record.setActRevertTime(actRevertTime);
             record.setUpdateOp(reqVO.getOperatorName());
             ownerOrderService.updateOwnerOrderInfo(record);
+            // 更新车主订单状态
+            ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.TO_SETTLE.getStatus());
         }
 
         //发送车主确认还车事件

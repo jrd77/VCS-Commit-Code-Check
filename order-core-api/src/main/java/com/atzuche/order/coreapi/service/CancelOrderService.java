@@ -133,7 +133,9 @@ public class CancelOrderService {
         cancelOrderReqDTO.setConsoleInvoke(false);
         CancelOrderReqContext reqContext = buildCancelOrderReqContext(cancelOrderReqDTO);
         //公共校验
-        if (!StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB, cancelOrderReqVO.getOperatorName())) {
+        if (StringUtils.equals(OrderConstant.SYSTEM_OPERATOR_JOB, cancelOrderReqVO.getOperatorName())) {
+            cancelOrderCheckService.checkStatusCancelOrder(false, reqContext.getOrderStatusEntity(), reqContext.getRenterOrderEntity());
+        } else {
             cancelOrderCheckService.checkCancelOrder(reqContext);
         }
         //取消处理

@@ -134,4 +134,9 @@ public class RenterMemberDTO {
      * 租客驾驶行为评分
      */
     private String driverScore;
+    /**
+	 * 平台上架车辆数
+	 */
+	private Integer renterCarCount;
+	
 }
