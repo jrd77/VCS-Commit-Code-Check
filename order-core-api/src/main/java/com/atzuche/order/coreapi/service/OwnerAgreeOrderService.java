@@ -112,6 +112,8 @@ public class OwnerAgreeOrderService {
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         //扣减库存
         OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo(), ownerOrderEntity);
+        //todo 自取自还并使用虚拟地址 特殊处理
+
         stockService.cutCarStock(orderInfoDTO);
 
         // 加锁
