@@ -1,15 +1,5 @@
 package com.atzuche.order.settle.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.accountrenterdeposit.entity.AccountRenterDepositDetailEntity;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositDetailNoTService;
 import com.atzuche.order.accountrenterdeposit.service.notservice.AccountRenterDepositNoTService;
@@ -32,8 +22,16 @@ import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
 import com.atzuche.order.settle.vo.res.OrderSettleResVO;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 订单结算钱包抵扣相关操作
@@ -112,7 +110,7 @@ public class OrderSettleHandleService {
      * @param deductionAmt 预计抵扣金额
      * @return int 真实抵扣金额
      */
-    public int deductionWalletHandle(String memNo, String orderNo, int deductionAmt) {
+    private int deductionWalletHandle(String memNo, String orderNo, int deductionAmt) {
         log.info("Deduction wallet.param is,memNo:[{}],orderNo:[{}],deductionAmt:[{}]", memNo, orderNo, deductionAmt);
         if (OrderConstant.ZERO == deductionAmt) {
             log.info("Deduction wallet. deductionAmt is zero!");
@@ -130,7 +128,6 @@ public class OrderSettleHandleService {
             }
             int newDeductionAmt = balance >= deductionAmt ? deductionAmt : balance;
             log.info("Deduction wallet.realDeductionAmt:[{}],balance:[{}],deductionAmt:[{}]", realDeductionAmt, balance, deductionAmt);
-//            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt);
             //按新的钱包金额来抵扣。
             realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, newDeductionAmt);
         }
@@ -144,7 +141,7 @@ public class OrderSettleHandleService {
      * @param memNo   租客会员号
      * @param orderNo 订单号
      */
-    public int deductionNewDebtHandle(String memNo, String orderNo, RenterCashCodeEnum renterCashCodeEnum) {
+    private int deductionNewDebtHandle(String memNo, String orderNo, RenterCashCodeEnum renterCashCodeEnum) {
         // 获取会员欠款总金额
         int debtAmt = accountDebtService.getAccountDebtNumByMemNo(memNo);
         if (debtAmt >= OrderConstant.ZERO) {
@@ -194,7 +191,7 @@ public class OrderSettleHandleService {
      * @param orderNo 订单号
      * @return int 真实抵扣金额
      */
-    public int deductionOldDebtHandle(String memNo, String orderNo, RenterCashCodeEnum renterCashCodeEnum) {
+    private int deductionOldDebtHandle(String memNo, String orderNo, RenterCashCodeEnum renterCashCodeEnum) {
         // 获取会员欠款总金额
         Integer debtAmt = remoteOldSysDebtService.getMemBalance(memNo);
         if (Objects.isNull(debtAmt) || debtAmt == OrderConstant.ZERO) {
@@ -288,7 +285,7 @@ public class OrderSettleHandleService {
             }else {
             	//车辆押金
 	            // 新增account_renter_wz_deposit_detail
-	            accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterDepositDetailEntity(reqVO, uniqueNo));// .insertRenterDepositDetailEntity(buildAccountRenterWzDepositDetailEntity(reqVO, uniqueNo));
+	            accountRenterDepositDetailNoTService.insertRenterDepositDetailEntity(buildAccountRenterDepositDetailEntity(reqVO, uniqueNo));
 	            // 更新account_renter_wz_deposit.shishou_deposit
 	            accountRenterDepositNoTService.updateShishouDepositSettle(reqVO.getMemNo(), reqVO.getOrderNo(),reqVO.getRealDeductAmt());
             }

@@ -58,13 +58,13 @@ public class PreOrderAdminResponseVO {
     private List<DisCouponMemInfoVO> getCarCouponList;
     @AutoDocProperty(value = "是否可购买驾乘无忧险 0：不可以购买 1：可以购买")
     private Integer isDriverInsure =0;
-    
     @AutoDocProperty(value = "精准取车服务费")
     private Integer accurateGetSrvAmt;
     
     @AutoDocProperty(value = "精准还车服务费")
     private Integer accurateReturnSrvAmt;
-
+    @AutoDocProperty(value = "是否勾选使用钱包0：不勾选 1：勾选，-1可选可不选")
+    private Integer isUseWallet = 0;
 
     @Data
     @ToString

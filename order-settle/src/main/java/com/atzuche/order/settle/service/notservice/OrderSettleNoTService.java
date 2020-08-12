@@ -804,10 +804,10 @@ public class OrderSettleNoTService {
         //9 租客费用 结余处理
         orderSettleNewService.rentCostSettle(settleOrders,settleOrdersAccount,callBack);
 
-        //公共
-        int yingkouAmt1 = accountRenterCostSettle.getShifuAmt() - settleOrdersAccount.getRentCostSurplusAmt();  //需要根据实际的实收来计算。
-        int totalOldRealDebtAmt = 0;
-        int yingkouAmt = 0; //总的应扣
+        //需要根据实际的实收来计算。
+        int yingkouAmt1 = accountRenterCostSettle.getShifuAmt() - settleOrdersAccount.getRentCostSurplusAmt();
+        int totalOldRealDebtAmt;
+        int yingkouAmt = 0;
         int yingkouAmt2 = 0;
         if(Objects.nonNull(settleOrders.getIsEnterpriseUserOrder()) && settleOrders.getIsEnterpriseUserOrder()) {
             OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_SETTLE_TYPE);
@@ -821,17 +821,26 @@ public class OrderSettleNoTService {
             reqVO.setMemNo(settleOrders.getRenterMemNo());
             reqVO.setCostEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_RENT_COST);
             reqVO.setSourceEnum(RenterCashCodeEnum.SETTLE_WALLET_TO_RENT_COST);
-            reqVO.setShouldTakeAmt(settleOrdersDefinition.getRenterCostAmtFinal());  //总计消费，应收=应扣
+            //总计消费，应收=应扣
+            reqVO.setShouldTakeAmt(settleOrdersDefinition.getRenterCostAmtFinal());
             reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
             yingkouAmt2 = orderSettleHandleService.accountRentetDepositHandle(reqVO);
-
-//            yingkouAmt2 = resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt();
-
         } else {
-            // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
-            orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
-            // 10.2 抵扣老系统欠款
-            totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
+	        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
+	        orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
+	        // 10.2 抵扣老系统欠款
+	        totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
+            // 10.3 钱包余额抵扣欠款(押金抵扣->欠款(押金不足)->钱包抵扣->欠款(钱包余额不足))
+            if (settleOrdersAccount.getDepositSurplusAmt() <= OrderConstant.ZERO
+                    && Objects.nonNull(settleOrders.getUseWallet()) && settleOrders.getUseWallet()) {
+                //使用钱包抵扣欠款
+                OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(), settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_SETTLE_TYPE);
+                totalOldRealDebtAmt = totalOldRealDebtAmt + resVO.getOldTotalRealDebtAmt();
+                yingkouAmt2 =
+                        settleOrdersAccount.getDepositAmt() + resVO.getOldTotalRealDebtAmt() + resVO.getNewTotalRealDebtAmt();
+            } else {
+                yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+            }
         }
         settleOrders.setRenterTotalOldRealDebtAmt(totalOldRealDebtAmt);
 
@@ -859,13 +868,13 @@ public class OrderSettleNoTService {
 //        int yingkouAmt1 = settleOrdersAccount.getRentCostPayAmt() - settleOrdersAccount.getRentCostSurplusAmt();  // rentCostPayAmt在抵扣欠款的过程中发生了变更。
 
         //非企业用户
-        if(Objects.nonNull(settleOrders.getIsEnterpriseUserOrder()) && settleOrders.getIsEnterpriseUserOrder() == false) {
-            yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
-            log.info("rentCostPayAmt=[{}],rentCostSurplusAmt=[{}],depositAmt=[{}],depositSurplusAmt=[{}],yingkouAmt1=[{}],yingkouAmt2=[{}],yingkouAmt=[{}],orderNo=[{}]",
-                    settleOrdersAccount.getRentCostPayAmt() , settleOrdersAccount.getRentCostSurplusAmt(),
-                    settleOrdersAccount.getDepositAmt() , settleOrdersAccount.getDepositSurplusAmt(),
-                    yingkouAmt1,yingkouAmt2,yingkouAmt,settleOrders.getOrderNo());
-        }
+//        if(Objects.nonNull(settleOrders.getIsEnterpriseUserOrder()) && settleOrders.getIsEnterpriseUserOrder() == false) {
+//	        yingkouAmt2 = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+//	        log.info("rentCostPayAmt=[{}],rentCostSurplusAmt=[{}],depositAmt=[{}],depositSurplusAmt=[{}],yingkouAmt1=[{}],yingkouAmt2=[{}],yingkouAmt=[{}],orderNo=[{}]",
+//	        		settleOrdersAccount.getRentCostPayAmt() , settleOrdersAccount.getRentCostSurplusAmt(),
+//	        		settleOrdersAccount.getDepositAmt() , settleOrdersAccount.getDepositSurplusAmt(),
+//	        		yingkouAmt1,yingkouAmt2,yingkouAmt,settleOrders.getOrderNo());
+//        }
         yingkouAmt = yingkouAmt1 + yingkouAmt2;
 
         //单独修改

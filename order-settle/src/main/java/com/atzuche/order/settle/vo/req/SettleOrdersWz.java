@@ -5,8 +5,8 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 
 /**
  * 订单违章结算对象
+ * @author jing.huang
  */
-//@Data
 public class SettleOrdersWz {
     /**
      * 主订单号
@@ -34,7 +34,7 @@ public class SettleOrdersWz {
     /**
      *  租客订单信息
      */
-    RenterOrderEntity renterOrder;
+    private RenterOrderEntity renterOrder;
     
     ///预留字段，违章结算跟车主无关。
     /**
@@ -48,7 +48,7 @@ public class SettleOrdersWz {
 	/**
 	* 车主订单信息
 	*/
-	OwnerOrderEntity ownerOrder;
+    private OwnerOrderEntity ownerOrder;
 	
 	/**
 	 * 违章押金抵扣老系统欠款金额
@@ -70,6 +70,11 @@ public class SettleOrdersWz {
      * 应该收取的违章费用(违章费用 + 未支付补付记录金额 - 无需支付的补付金额)
      */
 	private int shouldTakeWzCost;
+
+    /**
+     * 是否使用钱包
+     */
+	private Boolean useWallet;
 	
 	
 	public String getOwnerOrderNo() {
@@ -174,5 +179,13 @@ public class SettleOrdersWz {
 
     public void setShouldTakeWzCost(int shouldTakeWzCost) {
         this.shouldTakeWzCost = shouldTakeWzCost;
+    }
+
+    public Boolean getUseWallet() {
+        return useWallet;
+    }
+
+    public void setUseWallet(Boolean useWallet) {
+        this.useWallet = useWallet;
     }
 }

@@ -2,6 +2,7 @@ package com.atzuche.order.admin.controller.order;
 
 import com.atzuche.order.admin.PreOrderReqVO;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.vo.req.order.PreOrderAdminRequestVO;
 import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
@@ -13,7 +14,10 @@ import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.HolidayTypeEnum;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
+import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
@@ -43,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 下单前管理后台页面展示
@@ -70,6 +76,8 @@ public class AdminPreOrderController {
     private AutoCoinProxyService coinProxyService;
     
     private static final Integer[] CAN_BUT_DRIVERINSURE_SEATNUMS = {2,4,5,6,7};
+
+
 
     @AutoDocVersion(version = "下单前确定页面")
     @AutoDocGroup(group = "下单前确定页面")
@@ -99,8 +107,6 @@ public class AdminPreOrderController {
         responseVO.setRenterName(renterMember.getRealName());
         responseVO.setCityCode(request.getCityCode());
         responseVO.setRentCity(request.getRentCity());
-
-
 
         CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(0);
@@ -167,9 +173,15 @@ public class AdminPreOrderController {
         }
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
-
-
-        responseVO.setTotalWallet(walletProxyService.getWalletByMemNo(memNo));
+        int totalWallet = walletProxyService.getWalletByMemNo(memNo);
+        if(totalWallet<=0){
+            responseVO.setIsUseWallet(0);
+        }else if(filterRight(renterMember.getRenterMemberRightDTOList(), RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1") != null && totalWallet > 0){
+            responseVO.setIsUseWallet(1);
+        }else{
+            responseVO.setIsUseWallet(-1);
+        }
+        responseVO.setTotalWallet(totalWallet);
         responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
 
         NormalOrderCostCalculateReqVO normalOrderCostCalculateReqVO = new NormalOrderCostCalculateReqVO();
@@ -204,7 +216,28 @@ public class AdminPreOrderController {
         return ResponseData.success(responseVO);
 
     }
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/17 10:56
+     * @Description:
+     *
+     **/
+    public static RenterMemberRightDTO filterRight(List<RenterMemberRightDTO> list, RightTypeEnum rightTypeEnum, List<MemberFlagEnum> memberFlagEnumList, String rightValue){
+        if(rightValue == null||rightValue.trim().length()<=0)return null;
+        if(memberFlagEnumList==null|| memberFlagEnumList.size()<=0)return null;
+        List<String> rightCodeList = memberFlagEnumList.stream().map(x -> x.getRightCode()).collect(Collectors.toList());
+        Optional<RenterMemberRightDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> rightTypeEnum.getCode() == x.getRightType()
+                        && rightCodeList.contains(x.getRightCode())
+                        && rightValue.equals(x.getRightValue()))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
     private int isDriverInsure(CarProxyService.CarPriceDetail carPriceDetail) {
         if(carPriceDetail == null || carPriceDetail.getSeatNum() == null){
             return 0;
