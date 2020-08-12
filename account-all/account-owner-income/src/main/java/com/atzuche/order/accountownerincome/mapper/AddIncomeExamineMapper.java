@@ -32,4 +32,12 @@ public interface AddIncomeExamineMapper {
     int queryCount(AddIncomeExamineDTO addIncomeExamineDTO);
     
     int updateAddIncomeExaminePass(AddIncomeExamine record);
+
+    /**
+     * 查询会员追加收益明细列表
+     *
+     * @param memNo 会员号
+     * @return List<AddIncomeExamine>
+     */
+    List<AddIncomeExamine> selectByMemNo(String memNo);
 }

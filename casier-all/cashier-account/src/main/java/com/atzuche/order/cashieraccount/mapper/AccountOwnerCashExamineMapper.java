@@ -18,8 +18,12 @@ public interface AccountOwnerCashExamineMapper {
     int updateByPrimaryKeySelective(AccountOwnerCashExamine record);
 
     int updateByPrimaryKey(AccountOwnerCashExamine record);
-    
+
     List<AccountOwnerCashExamine> listAccountOwnerCashExamineByMemNo(@Param("memNo") Integer memNo);
-    
-    Integer getCountByMemNoAndDateTime(@Param("memNo")String memNo,@Param("date")String date);
+
+    Integer getCountByMemNoAndDateTime(@Param("memNo") String memNo, @Param("date") String date);
+
+
+    AccountOwnerCashExamine selectBySerialNumberAndMemNo(@Param("serialNumber") String serialNumber,
+                                                         @Param("memNo") String memNo);
 }

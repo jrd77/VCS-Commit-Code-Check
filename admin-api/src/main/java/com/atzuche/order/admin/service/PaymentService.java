@@ -465,6 +465,8 @@ public class PaymentService {
 			return "PMS";
 		}else if("11".equals(payKind)) {
 			return "租车费用";
+		}else if("12".equals(payKind)) {
+			return "补充租车费用";
 		}
 		return "未知";
 	}

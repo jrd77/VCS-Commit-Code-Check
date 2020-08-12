@@ -13,6 +13,7 @@ import java.util.List;
  * @date 2019/12/31 5:20 下午
  **/
 @FeignClient(name="config-service")
+//@FeignClient(url = "http://localhost:1388" ,name="config-service")  //本地测试
 public interface ConfigFeignService {
 
     @GetMapping("/config/get")

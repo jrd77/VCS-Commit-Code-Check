@@ -46,44 +46,47 @@ public class AccountOwnerIncomeService{
 
     /**
      * 收益审核通过 更新车主收益信息
+     *
+     * @param accountOwnerIncomeExamineOpReq 车主收益信息
+     * @param isSecondFlag                   是否二清订单
+     * @return int 收益明细ID
      */
-    @Transactional
-    public void examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq){
+    @Transactional(rollbackFor=Exception.class)
+    public int examineOwnerIncomeExamine(AccountOwnerIncomeExamineOpReqVO accountOwnerIncomeExamineOpReq, boolean isSecondFlag) {
         //1参数校验
         Assert.notNull(accountOwnerIncomeExamineOpReq, ErrorCode.PARAMETER_ERROR.getText());
         accountOwnerIncomeExamineOpReq.check();
         //2 更新审核表状态
         accountOwnerIncomeExamineNoTService.updateOwnerIncomeExamine(accountOwnerIncomeExamineOpReq);
         //3 更新车主收益表
-        if(AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == accountOwnerIncomeExamineOpReq.getStatus()){
+        if (AccountOwnerIncomeExamineStatus.PASS_EXAMINE.getStatus() == accountOwnerIncomeExamineOpReq.getStatus()) {
             //3.1 新增收益明细并返回
             AccountOwnerIncomeDetailEntity accountOwnerIncomeDetail = accountOwnerIncomeDetailNoTService.insertAccountOwnerIncomeDetail(accountOwnerIncomeExamineOpReq);
             //3.2 更新车主收益总和
-            accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetail);
+            accountOwnerIncomeNoTService.updateOwnerIncomeAmt(accountOwnerIncomeDetail, isSecondFlag);
+            return accountOwnerIncomeDetail.getId();
         }
+        return 0;
     }
 
     /**
      * 查询订单车主收益，明细
      */
     public List<AccountOwnerIncomeDetailEntity> getOwnerRealIncomeByOrder(String orderNo,String memNo) {
-        List<AccountOwnerIncomeDetailEntity> list = accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo,memNo);
-        return list;
+        return accountOwnerIncomeDetailNoTService.selectByOrderNo(orderNo,memNo);
     }
 
     /**
      * 查询订单车主收益待审核明细
      */
     public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrder(String orderNo,String memNo) {
-        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo,memNo);
-        return list;
+        return accountOwnerIncomeExamineNoTService.getAccountOwnerIncomeExamineByOrderNo(orderNo,memNo);
     }
 
     /**
      * 查询订单车主收益待审核明细
      */
     public List<AccountOwnerIncomeExamineEntity> getOwnerIncomeByOrderAndType(String orderNo,String memNo,int type) {
-        List<AccountOwnerIncomeExamineEntity> list = accountOwnerIncomeExamineNoTService.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
-        return list;
+        return accountOwnerIncomeExamineNoTService.getOwnerIncomeByOrderAndType(orderNo,memNo,type);
     }
 }
