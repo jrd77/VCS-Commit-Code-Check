@@ -159,7 +159,6 @@ public class DeliveryCarTask {
      * @param renterOrderNo 租客订单号
      * @param serviceType   服务类型
      */
-    @Transactional(rollbackFor = Exception.class)
     public Future<Boolean> cancelOrderDelivery(String renterOrderNo, Integer serviceType, CancelOrderDeliveryVO cancelOrderDeliveryVO) {
         cancelOtherDeliveryTypeInfo(renterOrderNo, serviceType, cancelOrderDeliveryVO);
         return cancelRenYunFlowOrderInfo(cancelOrderDeliveryVO.getCancelFlowOrderDTO());

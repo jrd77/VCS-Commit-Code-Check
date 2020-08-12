@@ -329,84 +329,30 @@ public class ModifyOrderConfirmService {
 	public void noticeRenYun(String renterOrderNo, ModifyOrderOwnerDTO modify, List<String> changeItemList, OrderReqContext reqContext) {
 		log.info("modifyorder sent to renyun renterOrderNo=[{}], modify=[{}], changeItemList=[{}]",renterOrderNo, modify, changeItemList);
 		try {
-			if (modify == null) {
-				return;
-			}
-            //换车就通知任云
-            log.info("换车触发事件通知任云modify={}",modify);
             deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(modify.getOrderNo()));
 			if (changeItemList == null || changeItemList.isEmpty()) {
 				return;
 			}
-			// 取车服务标志
-			Integer srvGetFlag = modify.getSrvGetFlag();
-			// 还车服务标志
-			Integer srvReturnFlag = modify.getSrvReturnFlag();
+			OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
+			Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
+			Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
 			if (modify.getTransferFlag() != null && modify.getTransferFlag()) {
 				// 换车操作先取消上笔仁云再新增当前订单
-				OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
-				Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
-				Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
-				if (srvGetFlag != null && srvGetFlag == 1) {
-					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
-				}
-				if (srvReturnFlag != null && srvReturnFlag == 1) {
-					deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
-				}
-				
+				deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode(), true);
+				deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), true);
 			}
-			// 是否发送仁云
-			boolean sendRenyunFlag = false;
+			// 租车费用支付状态:0,待支付 1,已支付
+			Integer rentCarPayStatus = modify.getRentCarPayStatus();
+			// 允许新增仁云
+			Boolean allowAddFlag = rentCarPayStatus != null && rentCarPayStatus == 1 ? true:false;
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode())) {
 				// 修改过取车服务标记
-				if (srvGetFlag != null && srvGetFlag == 1) {
-					OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
-					Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
-					Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
-					if (reqContext != null && reqContext.getOrderReqVO() != null) {
-						reqContext.getOrderReqVO().setSrvGetFlag(1);
-						reqContext.getOrderReqVO().setSrvReturnFlag(0);
-					}
-					// 新增取车服务 （修改订单前面已经做了，此处不需要再新增配送订单）
-					//deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode());
-					sendRenyunFlag = true;
-				}
-				if (srvGetFlag != null && srvGetFlag == 0) {
-					// 取消取车服务
-					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "take"),1);
-				}
+				deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode(), allowAddFlag);
 			}
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode())) {
 				// 修改过还车服务标记
-				if (srvReturnFlag != null && srvReturnFlag == 1) {
-					// 新增还车服务
-					OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
-					Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
-					Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
-					if (reqContext != null && reqContext.getOrderReqVO() != null) {
-						reqContext.getOrderReqVO().setSrvGetFlag(0);
-						reqContext.getOrderReqVO().setSrvReturnFlag(1);
-					}
-					// 新增取车服务 （修改订单前面已经做了，此处不需要再新增配送订单）
-					//deliveryCarService.addRenYunFlowOrderInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
-					sendRenyunFlag = true;
-				}
-				if (srvReturnFlag != null && srvReturnFlag == 0) {
-					// 取消还车服务
-					deliveryCarService.cancelRenYunFlowOrderInfo(getCancelOrderDeliveryVO(modify.getOrderNo(), renterOrderNo, "back"),1);
-				}
+				deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_RETURN_TYPE.getCode(), allowAddFlag);
 			}
-			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVRETURNFLAG.getCode()) || 
-					changeItemList.contains(OrderChangeItemEnum.MODIFY_SRVGETFLAG.getCode())) {
-				// 租车费用支付状态:0,待支付 1,已支付
-				Integer rentCarPayStatus = modify.getRentCarPayStatus();
-				if (sendRenyunFlag && (rentCarPayStatus != null && rentCarPayStatus == 1)) {
-					// 发送给仁云
-					deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
-				}
-				return;
-			}
-			/* if (srvGetFlag != null && srvGetFlag == 1) {} */
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
 					|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
 					|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
@@ -421,8 +367,6 @@ public class ModifyOrderConfirmService {
 				UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "take", "addr");
 				deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 			}
-		
-			/* if (srvReturnFlag != null && srvReturnFlag == 1) {} */
 			if (changeItemList.contains(OrderChangeItemEnum.MODIFY_RENTTIME.getCode())
 					|| changeItemList.contains(OrderChangeItemEnum.MODIFY_REVERTTIME.getCode()) 
 					|| changeItemList.contains(OrderChangeItemEnum.MODIFY_ACCURATE_SRV.getCode())) {
@@ -437,7 +381,6 @@ public class ModifyOrderConfirmService {
 				UpdateFlowOrderDTO getUpdFlow = getUpdateFlowOrderDTO(modify, modify.getOwnerOrderEffective(), "back", "addr");
 				deliveryCarService.updateRenYunFlowOrderInfo(getUpdFlow);
 			}
-		
 			// 修改购买保费标志通知流程系统
 			getChangeOrderInfoDTO(modify, changeItemList);
 		} catch (Exception e) {
