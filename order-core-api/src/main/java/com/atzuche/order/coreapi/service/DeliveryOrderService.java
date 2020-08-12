@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.commons.constant.OrderConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,11 +85,12 @@ public class DeliveryOrderService {
 	private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 	@Autowired
 	private RenterGoodsService renterGoodsService;
- 
-	/**
+
+    /**
      * 获取配送相关信息
-     * @param deliveryCarDTO
-     * @return
+     *
+     * @param deliveryCarDTO 请求参数
+     * @return DeliveryCarVO
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         log.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
@@ -97,10 +99,9 @@ public class DeliveryOrderService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
         ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(OilCostTypeEnum.getOilCostType(renterGoodsDetailDTO.getCarEngineType())));
-        String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
+        String daykM = renterGoodsDetailDTO.getCarDayMileage() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
         ownerGetAndReturnCarDTO.setDayKM(daykM);
-        ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()) + "L");
-        //boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
+        ownerGetAndReturnCarDTO.setOilContainer(renterGoodsDetailDTO.getCarOilVolume() + "L");
         int carType = renterGoodsDetailDTO.getCarType();
         int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
         DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
@@ -109,17 +110,16 @@ public class DeliveryOrderService {
         RenterOwnerSummarySectionDeliveryVO summary = getRenterOwnerSummarySectionDeliveryVO(renterOrderEntity, deliveryCarVO);
         deliveryCarVO.setSectionDelivery(summary);
         // 获取商品信息
-        //RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex().intValue() == 0) {
-        	// 非虚拟地址
-        	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
-        	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
-            deliveryCarVO.setUseVirtualAddrFlag(0);
+        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex() == 0) {
+            // 非虚拟地址
+            deliveryCarVO.setGetCarShowAddr("非虚拟地址");
+            deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
+            deliveryCarVO.setUseVirtualAddrFlag(OrderConstant.NO);
         } else {
-        	// 虚拟地址
-        	deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
-        	deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
-            deliveryCarVO.setUseVirtualAddrFlag(1);
+            // 虚拟地址
+            deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+            deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+            deliveryCarVO.setUseVirtualAddrFlag(OrderConstant.YES);
         }
         return deliveryCarVO;
     }
