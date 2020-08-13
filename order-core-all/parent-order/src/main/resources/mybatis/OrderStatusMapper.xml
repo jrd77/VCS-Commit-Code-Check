@@ -292,11 +292,20 @@
             #{status}
         </foreach>
     </select>
-    
+
+    <select id = "selectByWzSettleStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            order_status
+        where `wz_settle_status` = #{wzSettleStatus} and is_delete = 0 and TO_DAYS(wz_settle_time) = TO_DAYS(NOW())
+    </select>
+
+
     <select id="getOrderStatusForUpdate" resultMap="BaseResultMap">
 		select
 		    <include refid="Base_Column_List" />
-		from order_status where order_no = #{orderNo} and is_delete = 0 limit 1 
+		from order_status where order_no = #{orderNo} and is_delete = 0 limit 1
 		FOR UPDATE
 	</select>
 </mapper>
