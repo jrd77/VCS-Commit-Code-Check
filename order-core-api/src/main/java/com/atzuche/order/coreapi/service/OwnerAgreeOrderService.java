@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.coreapi.filter.StockFilter;
 import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderSourceStatService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,8 @@ public class OwnerAgreeOrderService {
     @Autowired
     private OwnerGoodsService ownerGoodsService;
     @Autowired
+    private RenterGoodsService renterGoodsService;
+    @Autowired
     private OrderActionMqService orderActionMqService;
     @Autowired
     private OrderStatusMqService orderStatusMqService;
@@ -106,19 +110,25 @@ public class OwnerAgreeOrderService {
     @Transactional(rollbackFor = Exception.class)
     public void agree(AgreeOrderReqVO reqVO) {
         boolean isConsoleInvoke = null != reqVO.getIsConsoleInvoke() && OrderConstant.YES == reqVO.getIsConsoleInvoke();
-        //车主同意前置校验
+        // 车主同意前置校验
         refuseOrderCheckService.checkOwnerAgreeOrRefuseOrder(reqVO.getOrderNo(), isConsoleInvoke);
-
+        // 获取车组订单信息
         OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
-        //扣减库存
+        // 获取租客订单信息
+        RenterOrderEntity renterOrderEntity =
+                renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
+        // 扣减库存
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(reqVO.getOrderNo(), false);
         OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo(), ownerOrderEntity);
-        //todo 自取自还并使用虚拟地址 特殊处理
-
+        // 自取自还并使用虚拟地址 特殊处理
+        stockService.cutCarStockParamSpecialHandle(orderInfoDTO, renterGoodsDetailDTO,
+                renterOrderEntity.getIsGetCar(), renterOrderEntity.getIsReturnCar());
+        // 扣除库存
         stockService.cutCarStock(orderInfoDTO);
 
         // 加锁
      	OrderStatusEntity orderStatusEntity = orderStatusService.getOrderStatusForUpdate(reqVO.getOrderNo());
-     	//以参数的为准。
+     	// 以参数的为准。
         Integer rentCarPayStatus = orderStatusEntity.getRentCarPayStatus();
         Integer depositPayStatus = orderStatusEntity.getDepositPayStatus();
         Integer wzPayStatus = orderStatusEntity.getWzPayStatus();
@@ -129,7 +139,7 @@ public class OwnerAgreeOrderService {
         	// 已支付到待取车
         	orderStatusEnum = OrderStatusEnum.TO_GET_CAR;
         }
-        //变更订单状态
+        // 变更订单状态
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(reqVO.getOrderNo());
         orderStatusDTO.setStatus(orderStatusEnum.getStatus());
@@ -139,11 +149,8 @@ public class OwnerAgreeOrderService {
         // 更新车主订单状态
         ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
 
-        //添加order_flow记录
+        // 添加order_flow记录
         orderFlowService.inserOrderStatusChangeProcessInfo(reqVO.getOrderNo(), orderStatusEnum);
-        //更新租客订单车主同意信息
-        RenterOrderEntity renterOrderEntity =
-                renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
 
         RenterOrderEntity record = new RenterOrderEntity();
         record.setId(renterOrderEntity.getId());
@@ -154,11 +161,11 @@ public class OwnerAgreeOrderService {
         	// 更新租客之订单状态
             renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.TO_GET_CAR.getStatus());
         }
-        //自动拒绝时间相交的订单
+        // 自动拒绝时间相交的订单
         agreeOrderConflictInfoHandle(reqVO.getOrderNo(), String.valueOf(orderInfoDTO.getCarNo()),
                 renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
 
-        //发送车主同意事件
+        // 发送车主同意事件
         orderActionMqService.sendOwnerAgreeOrderSuccess(reqVO.getOrderNo());
         orderStatusMqService.sendOrderStatusByOrderNo(reqVO.getOrderNo(), orderStatusDTO.getStatus(), NewOrderMQStatusEventEnum.ORDER_PREPAY);
         
@@ -166,7 +173,7 @@ public class OwnerAgreeOrderService {
         	// 现在车主接单和租客支付分离，需要车主同意并且已支付租车费用才发送仁云
             deliveryCarService.sendDataMessageToRenYun(renterOrderEntity.getRenterOrderNo());
         }
-        //如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
+        // 如果是使用钱包，检测是否钱包全额抵扣，推动订单流程。huangjing 200324  刷新钱包
        OrderPaySignReqVO vo = null;
        try {
     	   if(renterOrderEntity.getIsUseWallet() == OrderConstant.YES) {

@@ -267,7 +267,6 @@ public class SubmitOrderService {
         int ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
-            //orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
             ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
         }
 
@@ -291,8 +290,9 @@ public class SubmitOrderService {
         if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getIsAutoReplayFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(context.getOrderReqVO());
             orderInfoDTO.setOrderNo(orderNo);
-            //todo 自取自还并使用虚拟地址 特殊处理
-
+            // 自取自还并使用虚拟地址 特殊处理
+            stockService.cutCarStockParamSpecialHandle(orderInfoDTO, context.getRenterGoodsDetailDto(),
+                    orderReqVO.getSrvGetFlag(), orderReqVO.getSrvReturnFlag());
             stockService.cutCarStock(orderInfoDTO);
         }
         
@@ -340,7 +340,7 @@ public class SubmitOrderService {
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
-        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
+        cutStockHandle(orderNo, context.getRenterGoodsDetailDto(), orderReqVO);
         return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
     }
 
@@ -349,18 +349,17 @@ public class SubmitOrderService {
      * 车辆库存扣减处理
      * <p>是自动应答的车辆才能锁库存，其他类型车辆要车主同意时才能锁库存。</p>
      *
-     * @param orderNo    订单号
-     * @param replyFlag  自动应答
-     * @param orderReqVO 请求参数
+     * @param orderNo     订单号
+     * @param goodsDetail 商品信息
+     * @param orderReqVO  请求参数
      */
-    private void cutStockHandle(String orderNo, Integer replyFlag, OrderReqVO orderReqVO) {
-        if (AUTO_REPLY_FLAG.equals(replyFlag)) {
+    private void cutStockHandle(String orderNo, RenterGoodsDetailDTO goodsDetail, OrderReqVO orderReqVO) {
+        if (AUTO_REPLY_FLAG.equals(goodsDetail.getReplyFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
             orderInfoDTO.setOrderNo(orderNo);
-
-            //todo 自取自还并使用虚拟地址 特殊处理
-
-
+            // 自取自还并使用虚拟地址 特殊处理
+            stockService.cutCarStockParamSpecialHandle(orderInfoDTO, goodsDetail,
+                    orderReqVO.getSrvGetFlag(), orderReqVO.getSrvReturnFlag());
             stockService.cutCarStock(orderInfoDTO);
         }
     }
@@ -596,17 +595,27 @@ public class SubmitOrderService {
                 .stream()
                 .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
                 .collect(Collectors.toList());
-        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-    	LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
-        Integer getAccurateCost = sysGetAccurateAmt.getItemValue() == null ? null : Integer.valueOf(sysGetAccurateAmt.getItemValue());
-        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-    	LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
-        Integer returnAccurateCost = sysReturnAccurateAmt.getItemValue() == null ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        Optional<SysConfigEntity> sysGetAccurateAmtOptional =
+                sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst();
+        if (sysGetAccurateAmtOptional.isPresent()) {
+            LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",
+                    JSON.toJSONString(sysGetAccurateAmtOptional.get()));
+            Integer getAccurateCost = sysGetAccurateAmtOptional.get().getItemValue() == null ? 30 :
+                    Integer.valueOf(sysGetAccurateAmtOptional.get().getItemValue());
+            mode.setAccurateGetSrvUnit(getAccurateCost);
+        }
+
+
+        Optional<SysConfigEntity> sysReturnAccurateAmtOptional = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst();
+        if (sysReturnAccurateAmtOptional.isPresent()) {
+            LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",
+                    JSON.toJSONString(sysReturnAccurateAmtOptional.get()));
+            Integer returnAccurateCost = sysReturnAccurateAmtOptional.get().getItemValue() == null ? 30 : Integer.valueOf(sysReturnAccurateAmtOptional.get().getItemValue());
+            mode.setAccurateReturnSrvUnit(returnAccurateCost);
+        }
         mode.setId(null);
         mode.setOrderNo(orderNo);
         mode.setRenterOrderNo(renterOrderNo);
-        mode.setAccurateGetSrvUnit(getAccurateCost);
-        mode.setAccurateReturnSrvUnit(returnAccurateCost);
         mode.setDistributionMode(distributionMode);
         if (initMode != null) {
         	mode.setRenterProposalGetTime(initMode.getRenterProposalGetTime());
