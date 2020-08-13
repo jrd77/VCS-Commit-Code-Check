@@ -116,6 +116,8 @@ public class CashierPayService{
 	@Autowired
 	private CashierPayService cashierPayService;
 	@Autowired
+	private OrderPaySuccessService orderPaySuccessService;
+	@Autowired
 	private DeliveryCarService deliveryCarService;
 	
 
@@ -216,7 +218,7 @@ public class CashierPayService{
             getExtendParamsParam(vo,batchNotifyDataVo);
            // 3 订单流程 数据更新
             log.info("payCallBack OrderPayCallBackSuccessVO start:[{}]", GsonUtils.toJson(vo));
-            orderPayCallBack(vo,callBack);
+            orderPaySuccessService.orderPayCallBack(vo,callBack);
             log.info("payCallBack OrderPayCallBackSuccessVO end:[{}]", GsonUtils.toJson(vo));
         }
     }
@@ -326,6 +328,7 @@ public class CashierPayService{
         }
         return "";
     }
+
 
     /**
      * 订单流程 数据更新
@@ -556,7 +559,8 @@ public class CashierPayService{
                     if (!CollectionUtils.isEmpty(payKind) && orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
                         //修改子订单费用信息
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+//                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, YesNoEnum.NO.getCode(), YesNoEnum.NO);
                         
                         //公共抵扣企业用户的押金的方法
                         commonDebtEnterpriseDeposit(orderPaySign, orderPayable);

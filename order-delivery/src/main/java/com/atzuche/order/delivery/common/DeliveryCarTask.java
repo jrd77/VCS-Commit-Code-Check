@@ -85,6 +85,8 @@ public class DeliveryCarTask {
     private OrderService orderService;
     @Autowired
     private OrderStatusService orderStatusService;
+    @Autowired
+    private DeliveryAsyncProxy deliveryAsyncProxy;
 
     /**
      * 添加订单到仁云流程系统
@@ -93,16 +95,9 @@ public class DeliveryCarTask {
     public void addRenYunFlowOrderInfo(RenYunFlowOrderDTO renYunFlowOrderDTO) {
         // 追加参数
         renYunFlowOrderDTO = appendRenYunFlowOrderDTO(renYunFlowOrderDTO);
-        addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
+        deliveryAsyncProxy.addRenYunFlowOrderInfoproxy(renYunFlowOrderDTO);
     }
-    @Async
-    public void addRenYunFlowOrderInfoproxy(RenYunFlowOrderDTO renYunFlowOrderDTO){
-        String result = renyunDeliveryCarService.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
-        log.info("添加订单到仁云流程系统addRenYunFlowOrderInfo,renYunFlowOrderDTO={},result={}", JSON.toJSONString(renYunFlowOrderDTO),result);
-        if (StringUtils.isBlank(result)) {
-            sendMailByType(renYunFlowOrderDTO.getServicetype(), DeliveryConstants.ADD_TYPE, deliveryRenYunConfig.ADD_FLOW_ORDER, renYunFlowOrderDTO.getOrdernumber());
-        }
-    }
+
 
     /**
      * 更新订单到仁云流程系统
@@ -111,16 +106,9 @@ public class DeliveryCarTask {
     	// 追加参数
     	updateFlowOrderDTO = appendUpdateFlowOrderDTO(updateFlowOrderDTO);
         appendRenyunUpdateFlowOrderParam(updateFlowOrderDTO);//添加参数化
-        updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
+        deliveryAsyncProxy.updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
     }
-    @Async
-    public void updateRenYunFlowOrderInfoProxy(UpdateFlowOrderDTO updateFlowOrderDTO) {
-        String result = renyunDeliveryCarService.updateRenYunFlowOrderInfo(updateFlowOrderDTO);
-        log.info("更新仁云流程系统updateRenYunFlowOrderInfo，updateFlowOrderDTO={},result={}",JSON.toJSONString(updateFlowOrderDTO),result);
-        if (StringUtils.isBlank(result)) {
-            sendMailByType(updateFlowOrderDTO.getServicetype(), DeliveryConstants.CHANGE_TYPE, deliveryRenYunConfig.CHANGE_FLOW_ORDER, updateFlowOrderDTO.getOrdernumber());
-        }
-    }
+
 
     /**
      * 实时更新订单信息到流程系统
@@ -138,7 +126,7 @@ public class DeliveryCarTask {
 
         String result = renyunDeliveryCarService.cancelRenYunFlowOrderInfo(cancelFlowOrderDTO);
         if (StringUtils.isBlank(result)) {
-            sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, deliveryRenYunConfig.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
+            deliveryAsyncProxy.sendMailByType(cancelFlowOrderDTO.getServicetype(), DeliveryConstants.CANCEL_TYPE, deliveryRenYunConfig.CANCEL_FLOW_ORDER, cancelFlowOrderDTO.getOrdernumber());
         }
         return new AsyncResult(true);
     }
@@ -169,35 +157,7 @@ public class DeliveryCarTask {
             }
         }
     }
-    /**
-     * 发送email
-     */
-    public void sendMailByType(String serviceType, String actionType, String url, String orderNumber) {
-        try {
-            String typeName = ServiceTypeEnum.TAKE_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_TAKE_TEXT : ServiceTypeEnum.BACK_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_BACK_TEXT : serviceType;
-            String interfaceName = "";
-            switch (actionType) {
-                case DeliveryConstants.ADD_TYPE:
-                    interfaceName = DeliveryConstants.ADD_INTERFACE_NAME;
-                    break;
-                case DeliveryConstants.CHANGE_TYPE:
-                    interfaceName = DeliveryConstants.CANCEL_INTERFACE_NAME;
-                    break;
-                case DeliveryConstants.CANCEL_TYPE:
-                    interfaceName = DeliveryConstants.CHANGE_INTERFACE_NAME;
-                    break;
-                default:
-                    break;
-            }
-            if (mailSendService != null) {
-                String[] toEmails = DeliveryConstants.EMAIL_PARAMS.split(",");
-                String content = String.format(EmailConstants.PROCESS_SYSTEM_NOTICE_CONTENT, orderNumber, interfaceName, url, typeName);
-                mailSendService.sendSimpleEmail(toEmails, EmailConstants.PROCESS_SYSTEM_NOTICE_SUBJECT, content);
-            }
-        } catch (Exception e) {
-            log.info("发送邮件失败---->>>>{}:", e);
-        }
-    }
+
     
     
     /**
@@ -226,8 +186,25 @@ public class DeliveryCarTask {
     	if (StringUtils.isNotBlank(renYunFlowOrderDTO.getSceneName())) {
             renYunFlowOrderDTO.setSceneName(OrderScenesSourceEnum.getOrderScenesSource(renYunFlowOrderDTO.getSceneName()));
         }
-        // 获取区间配送信息
-        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity);
+    	List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
+    	Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
+		if (deliveryList != null && !deliveryList.isEmpty()) {
+			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));
+		}
+		if (deliveryMap != null) {
+			RenterOrderDeliveryEntity srvGetDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_GET_TYPE.getCode());
+			RenterOrderDeliveryEntity srvReturnDelivery = deliveryMap.get(SrvGetReturnEnum.SRV_RETURN_TYPE.getCode());
+			if (srvGetDelivery != null) {
+				renYunFlowOrderDTO.setOwnerGetLat(srvGetDelivery.getOwnerGetReturnAddrLat());
+				renYunFlowOrderDTO.setOwnerGetLon(srvGetDelivery.getOwnerGetReturnAddrLon());
+			}
+			if (srvReturnDelivery != null) {
+				renYunFlowOrderDTO.setOwnerReturnLat(srvReturnDelivery.getOwnerGetReturnAddrLat());
+				renYunFlowOrderDTO.setOwnerReturnLon(srvReturnDelivery.getOwnerGetReturnAddrLon());
+			}
+		}
+    	// 获取区间配送信息
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity,deliveryList);
         renYunFlowOrderDTO = convertDataAdd(renYunFlowOrderDTO, deliveryResult);
         RenterOrderCostEntity renterOrderCostEntity = renterOrderCostService.getByOrderNoAndRenterNo(renterOrderEntity.getOrderNo(), renterOrderEntity.getRenterOrderNo());
         renYunFlowOrderDTO.setRentAmt(renterOrderCostEntity.getRentCarAmount()==null?"":String.valueOf(Math.abs(renterOrderCostEntity.getRentCarAmount())));
@@ -289,8 +266,13 @@ public class DeliveryCarTask {
     	}
     	// 获取有效的租客子订单
     	RenterOrderEntity renterOrderEntity = renterOrderService.getRenterOrderByOrderNoAndIsEffective(updFlow.getOrdernumber());
+    	if (renterOrderEntity == null) {
+    		log.error("appendUpdateFlowOrderDTO renterOrderEntity is null orderNo={}", updFlow.getOrdernumber());
+    		return null;
+    	}
+    	List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
     	// 获取区间配送信息
-        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity); 
+        SectionDeliveryResultVO deliveryResult = getSectionDeliveryResultVO(renterOrderEntity,deliveryList); 
     	if (deliveryResult == null) {
     		return updFlow;
     	}
@@ -326,7 +308,7 @@ public class DeliveryCarTask {
      * @param renterOrderEntity
      * @return SectionDeliveryResultVO
      */
-    public SectionDeliveryResultVO getSectionDeliveryResultVO(RenterOrderEntity renterOrderEntity) {
+    public SectionDeliveryResultVO getSectionDeliveryResultVO(RenterOrderEntity renterOrderEntity, List<RenterOrderDeliveryEntity> deliveryList) {
     	if (renterOrderEntity == null) {
     		log.info("获取区间配送信息getSectionDeliveryResultVO renterOrderEntity is null");
     		return null;
@@ -338,7 +320,6 @@ public class DeliveryCarTask {
 		}
 		Integer getCarBeforeTime = 0;
 		Integer returnCarAfterTime = 0;
-		List<RenterOrderDeliveryEntity> deliveryList = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 		Map<Integer, RenterOrderDeliveryEntity> deliveryMap = null;
 		if (deliveryList != null && !deliveryList.isEmpty()) {
 			deliveryMap = deliveryList.stream().collect(Collectors.toMap(RenterOrderDeliveryEntity::getType, deliver -> {return deliver;}));

@@ -13,6 +13,6 @@ public class OwnerOrderNotFoundException extends OrderException {
 
 
     public OwnerOrderNotFoundException(String ownerOrderNo){
-        super(errorCode,"车主子订单号{"+ownerOrderNo+"}不存在");
+        super(errorCode,"子订单号{"+ownerOrderNo+"}不存在");
     }
 }

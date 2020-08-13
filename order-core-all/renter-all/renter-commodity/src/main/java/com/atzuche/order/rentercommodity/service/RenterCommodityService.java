@@ -193,12 +193,9 @@ public class RenterCommodityService {
 
     //初始化设置小时数和分组日期
     private void init(RenterGoodsDetailDTO renterGoodsDetailDTO){
-
         LocalDateTime rentTime = renterGoodsDetailDTO.getRentTime();
         LocalDateTime revertTime = renterGoodsDetailDTO.getRevertTime();
         List<RenterGoodsPriceDetailDTO> renterGoodsPriceDetailDTOList = renterGoodsDetailDTO.getRenterGoodsPriceDetailDTOList();
-
-
         if (renterGoodsPriceDetailDTOList.size() == 1) {//一天的情况
             float holidayTopHours = CommonUtils.getHolidayTopHours(rentTime, LocalDateTimeUtils.localdateToString(revertTime.toLocalDate()));
             RenterGoodsPriceDetailDTO renterGoodsPriceDetailDto = renterGoodsPriceDetailDTOList.get(0);
@@ -228,7 +225,6 @@ public class RenterCommodityService {
             renterGoodsPriceDetailDto.setCarHourCount(HLast);
             renterGoodsPriceDetailDto.setMaxDay(true);
         }
-
     }
 
     public static void main(String[] args) {

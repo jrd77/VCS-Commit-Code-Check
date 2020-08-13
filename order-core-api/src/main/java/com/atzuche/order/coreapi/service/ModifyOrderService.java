@@ -144,6 +144,8 @@ public class ModifyOrderService {
     private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 	@Autowired
 	private SubmitOrderService submitOrderService;
+	@Autowired
+	private RenterInsureCoefficientService renterInsureCoefficientService;
 	
 	/**
 	 * 修改订单主逻辑（含换车）
@@ -199,6 +201,8 @@ public class ModifyOrderService {
 		modifyOrderDTO.setCarRentTimeRangeResVO(carRentTimeRangeResVO);
 		// 封装计算用对象
 		RenterOrderReqVO renterOrderReqVO = convertToRenterOrderReqVO(modifyOrderDTO, renterMemberDTO, renterGoodsDetailDTO, orderEntity, carRentTimeRangeResVO);
+		// 构建参数
+		RenterOrderCostReqDTO renterOrderCostReqDTO = renterOrderService.buildRenterOrderCostReqDTO(renterOrderReqVO);
 		// 基础费用计算包含租金，手续费，基础保障费用，补充保障服务费，附加驾驶人保障费用，取还车费用计算和超运能费用计算
 		RenterOrderCostRespDTO renterOrderCostRespDTO = getRenterOrderCostRespDTO(modifyOrderDTO, renterOrderReqVO, initCostList, initSubsidyList);
 		// 调用风控审核
@@ -239,6 +243,8 @@ public class ModifyOrderService {
 		orderCouponService.insertBatch(costDeductVO.getOrderCouponList());
 		// 保存修改项目
 		orderChangeItemService.saveOrderChangeItemBatch(modifyOrderDTO.getChangeItemList());
+		// 保存保费系数
+        renterInsureCoefficientService.saveCombineCoefficient(renterOrderCostReqDTO);
 		// 保存配送订单信息
 		saveRenterDelivery(modifyOrderDTO);
 		// 保存区间配送信息
@@ -845,7 +851,7 @@ public class ModifyOrderService {
 		renterOrderNew.setTyreInsurFlag(modifyOrderDTO.getTyreInsurFlag());
 		renterOrderNew.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderNew.setIsEffective(0);
-		renterOrderNew.setAgreeFlag(0);
+		//renterOrderNew.setAgreeFlag(0);
 		renterOrderNew.setCreateOp(modifyOrderDTO.getOperator());
 		renterOrderNew.setCreateTime(null);
 		renterOrderNew.setUpdateOp(null);
@@ -862,6 +868,10 @@ public class ModifyOrderService {
 			renterOrderNew.setActRevertTime(modifyOrderDTO.getRevertTime());
 			renterOrderNew.setExpRevertTime(renterOrderEntity.getExpRevertTime());
 
+		}
+		if (modifyOrderDTO.getTransferFlag() != null && modifyOrderDTO.getTransferFlag()) {
+			// 换车默认已同意
+			renterOrderNew.setAgreeFlag(1);
 		}
 		return renterOrderNew;
 	}
@@ -909,10 +919,13 @@ public class ModifyOrderService {
 		renterOrderCostRespDTO.setOrderNo(modifyOrderDTO.getOrderNo());
 		renterOrderCostRespDTO.setRenterOrderNo(modifyOrderDTO.getRenterOrderNo());
 		renterOrderCostRespDTO.setMemNo(modifyOrderDTO.getMemNo());
+
+		//驾驶行为评分和各项系数
+        RenterInsureCoefficientDTO renterInsureCoefficientDTO = SubmitOrderBeforeCostCalService.insureCoefficient(renterOrderCostReqDTO);
+        renterOrderCostRespDTO.setRenterInsureCoefficientDTO(renterInsureCoefficientDTO);
 		return renterOrderCostRespDTO;
 	}
-	
-	
+
 	/**
 	 * 获取费用补贴列表
 	 * @param renterOrderCostReqDTO
@@ -1525,6 +1538,7 @@ public class ModifyOrderService {
 		renterOrderReqVO.setDriverInsurFlag(modifyOrderDTO.getDriverInsurFlag());
 		renterOrderReqVO.setDriverScore(renterMemberDTO.getDriverScore());
 		renterOrderReqVO.setDistributionMode(modifyOrderDTO.getDistributionMode());
+		renterOrderReqVO.setCarLevel(renterGoodsDetailDTO.getCarLevel());
 		return renterOrderReqVO;
 	}
 	

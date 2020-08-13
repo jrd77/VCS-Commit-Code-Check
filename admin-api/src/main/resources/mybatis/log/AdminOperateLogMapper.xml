@@ -14,13 +14,14 @@
         <result property="opTypeCode" column="op_type_code"/>
         <result property="opTypeDesc" column="op_type_desc"/>
         <result property="desc" column="desc"/>
+        <result property="remark" column="remark"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
 
 	<insert id="insertLog">
         insert into
-        order_console_operate_log(order_no,`renter_order_no`,`owner_order_no`,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`)
-        values(#{orderNo},#{renterOrderNo}, #{ownerOrderNo}	,#{operatorId},#{operatorName},#{deptId},#{opTypeCode},#{opTypeDesc},#{desc})
+        order_console_operate_log(order_no,`renter_order_no`,`owner_order_no`,operator_id,operator_name,dept_id,op_type_code,op_type_desc,`desc`,`remark`)
+        values(#{orderNo},#{renterOrderNo}, #{ownerOrderNo}	,#{operatorId},#{operatorName},#{deptId},#{opTypeCode},#{opTypeDesc},#{desc},#{remark})
 
 	</insert>
 
@@ -35,6 +36,7 @@
 		    `op_type_code`,
 		    `op_type_desc`,
 		    `desc`,
+            `remark`,
 		    `create_time`
 		from order_console_operate_log where order_no=#{orderNo} and is_delete=0 order by create_time desc
 	</select>
@@ -50,6 +52,7 @@
             `op_type_code`,
             `op_type_desc`,
             `desc`,
+            `remark`,
             `create_time`
 		from
 		    order_console_operate_log

@@ -1,8 +1,5 @@
 package com.atzuche.order.cashieraccount.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.BankCardDTO;
@@ -13,8 +10,9 @@ import com.atzuche.order.wallet.api.MemBalanceVO;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -57,7 +55,7 @@ public class RemoteAccountService {
      * @return MemBalanceVO
      */
     public void deductBalance(String memNo, Integer deduct)  {
-        ResponseData<MemBalanceVO> responseData = null;
+        ResponseData responseData = null;
         log.info("Feign 开始抵扣老系统可提现余额,memNo={}",memNo);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "账户服务");
         try{

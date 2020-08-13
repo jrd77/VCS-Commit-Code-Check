@@ -1,5 +1,6 @@
 package com.atzuche.order.renterorder.entity.dto;
 
+import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
@@ -71,6 +72,10 @@ public class RenterOrderCostRespDTO {
      * 补贴对应的明细列表
      */
     List<RenterOrderSubsidyDetailDTO> renterOrderSubsidyDetailDTOList;
-
+    /*
+    *
+    * 驾驶行为评分和各项系数
+    * */
+    RenterInsureCoefficientDTO renterInsureCoefficientDTO;
 
 }

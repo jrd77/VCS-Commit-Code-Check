@@ -124,8 +124,12 @@ public class OwnerCommodityService {
                         ownerGoods.setRevertTime(y.getRevertTime());
                         newOwnerGoodsPriceList.add(ownerGoods);
                     });
-
-                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    float HFirst = 0;
+                    if(x.isMaxDay()){
+                        HFirst = CommonUtils.getTotalHoursByRentAveragePrice(dbPriceMaxCarDay.getRevertTime(),x.getRevertTime());
+                    }else{
+                        HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    }
                     OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
                     ownerGoods.setCarHourCount(HFirst);
                     ownerGoods.setCarDay(x.getCarDay());
@@ -230,6 +234,7 @@ public class OwnerCommodityService {
             float HLast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(dateLast));
             ownerGoodsPriceDetailDto.setRevertTime(revertTime);
             ownerGoodsPriceDetailDto.setCarHourCount(HLast);
+            ownerGoodsPriceDetailDto.setMaxDay(true);
         }
     }
 

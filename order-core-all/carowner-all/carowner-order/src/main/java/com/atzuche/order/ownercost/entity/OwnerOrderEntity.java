@@ -131,5 +131,9 @@ public class OwnerOrderEntity implements Serializable {
 	 * 还车延后分钟
 	 */
 	private Integer afterMinutes;
+	/**
+	 * 车主子订单状态: 1,待确认 4,待支付 8,待调度  16,待取车 32,待还车 64,待结算 128,待违章结算 256,待理赔处理 512,完成 0结束
+	 */
+	private Integer ownerStatus;
 
 }

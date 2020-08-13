@@ -385,17 +385,19 @@ public class AdminOrderCostDetailController {
         	 */
         	orderCostDetailService.updateRenterPriceAdjustmentByOrderNo(renterCostReqVO);
             try{
+                String remark = renterCostReqVO.getAdjustReasonDesc()==null?"":renterCostReqVO.getAdjustReasonDesc()+" "
+                        +renterCostReqVO.getRemarkContent()==null?"":renterCostReqVO.getRemarkContent();
                 if(StringUtils.isNotBlank(renterCostReqVO.getOwnerToRenterAdjustAmt())){
                     String oldData = resp.getOwnerToRenterAdjustAmt();
                     String desc = "车主给租客调价 由 " + oldData +" 修改为 " + renterCostReqVO.getOwnerToRenterAdjustAmt();
                     adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc,remark);
                 }
                 if(StringUtils.isNotBlank(renterCostReqVO.getRenterToOwnerAdjustAmt())){
                     String oldData = resp.getRenterToOwnerAdjustAmt();
                     String desc = "租客给车主的调价 由 " + oldData +" 修改为 " + renterCostReqVO.getRenterToOwnerAdjustAmt();
                     adminLogService.insertLog(AdminOpTypeEnum.RENTER_PRICE_ADJUSTMENT,renterCostReqVO.getOrderNo(),
-                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc);
+                            renterCostReqVO.getRenterOrderNo(),renterCostReqVO.getOwnerOrderNo(),desc,remark);
                 }
             }catch (Exception e){
                 log.error("租客车主互相调价 车主租客互相调价操作 日志记录 异常",e);

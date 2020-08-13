@@ -170,25 +170,11 @@ public class OrderSearchRemoteService {
             reqVO.setPageSize(10000);
             reqVO.setType("2");
             reqVO.setDate(DateUtils.minDays(day));
-            //所有城市的列表,15天的
-            cityCodeAll.addAll(cityCode);
             List<IllegalToDO> list = this.violatePendingOrderByDay(reqVO);
             //不符合条件的过滤
             list = list.parallelStream().filter(illegal -> isInQueryRange(illegal, cityCode, day, minKey)).collect(Collectors.toList());
             all.addAll(list);
         }
-        //30
-        Integer maxKey = treeMap.lastKey();
-        //查询最大
-        reqVO = new ViolateVO();
-        reqVO.setPageNum(1);
-        reqVO.setPageSize(10000);
-        reqVO.setType("2");
-        reqVO.setDate(DateUtils.minDays(maxKey));
-        List<IllegalToDO> list = this.violatePendingOrderByDay(reqVO);
-        //过滤城市cityCodeAll集合之外的数据（默认都以最大值查询）
-        list = list.parallelStream().filter(illegal -> isOutOfQueryRange(illegal, cityCodeAll)).collect(Collectors.toList());
-        all.addAll(list);
         return all;
     }
     private List<IllegalToDO> queryIllegalList(Map<Integer, List<Integer>> map,String type) {
@@ -242,11 +228,11 @@ public class OrderSearchRemoteService {
                 && cityCode.size()>0) {
             //15天的订单的特殊处理，春节订单往后延时处理
             if(days!=null && days.equals(minKey)){
-                if (cityCode.contains(illegal.getCityCode())) {
+                //if (cityCode.contains(illegal.getCityCode())) {
                     String startTime = DateUtils.formate(illegal.getRentTime(),DateUtils.DATE_DEFAUTE);
                     String endTime = DateUtils.formate(illegal.getRevertTime(),DateUtils.DATE_DEFAUTE);
                     return !DateUtils.isFestival(Long.parseLong(startTime), Long.parseLong(endTime));
-                }
+                //}
             }else{
                 //正常的情况  非15天的情况   包含城市列表且  排除 附赠套餐的订单。
                 return cityCode.contains(illegal.getCityCode());
@@ -254,7 +240,6 @@ public class OrderSearchRemoteService {
         }else {
             return false;
         }
-        return false;
     }
 
     private boolean isOutOfQueryRange(IllegalToDO illegal, List<Integer> cityCode) {
@@ -335,7 +320,7 @@ public class OrderSearchRemoteService {
         confs = this.filterQueryDayConf(confs);
         Set<Integer> days = confs.stream().map(WzQueryDayConfEntity::getIllegalQueryDay).collect(Collectors.toSet());
         //节假日
-        days.add(30);
+        //days.add(30);
         List<ViolateBO> violates = new ArrayList<>();
         for (Integer day : days) {
             List<ViolateBO> violateBos = violatePendingOrderByDay(day);
@@ -377,17 +362,17 @@ public class OrderSearchRemoteService {
             violateList.addAll(festivalViolates);
         }
         //非节假日订单
-        for (WzQueryDayConfEntity conf : confs) {
+        //for (WzQueryDayConfEntity conf : confs) {
             /*and (a.rent_time &gt; #{festivalEndTime} or a.`revert_time` &lt; #{festivalStartTime})*/
             List<ViolateBO> temp = violates
                     .stream()
-                    .filter(dto -> String.valueOf(conf.getCityCode()).equals(dto.getCity()))
+                    //.filter(dto -> String.valueOf(conf.getCityCode()).equals(dto.getCity()))
                     .filter(dto -> dto.getRentTime().isAfter(FESTIVAL_END_TIME) || dto.getRevertTime().isBefore(FESTIVAL_START_TIME))
                     .collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(temp)){
                 violateList.addAll(temp);
             }
-        }
+        //}
         return violateList.stream().map(this::convertTo).collect(Collectors.toList());
     }
 

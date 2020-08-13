@@ -268,16 +268,18 @@ public class SubmitOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
             context.getRenterGoodsDetailDto().setIsAutoReplayFlag(0);
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus()); // 支付接单分离，默认下单待支付
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
 
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
 
         //6.4 order_flow
-        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_CONFIRM);
+        Integer ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
+        orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
-            orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
+            //orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
+            ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
         }
 
         //7. 优惠券绑定、凹凸币扣除等
@@ -305,9 +307,13 @@ public class SubmitOrderService {
         
         // 保存车辆停运费信息
         submitOrderHandleService.saveOrderStopFreightInfo(orderNo, ownerGoodsDetailDTO);
+        
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderNo, OrderStatusEnum.TO_PAY.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderNo, ownerStatus);
         // 保存区间配送信息
         saveSectionDelivery(orderReqVO, orderNo, renterOrderNo, null);
-        
         //end 组装接口返回
         OrderResVO orderResVO = new OrderResVO();
         orderResVO.setOrderNo(orderNo);

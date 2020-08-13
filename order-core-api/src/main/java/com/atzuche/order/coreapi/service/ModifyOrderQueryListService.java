@@ -164,17 +164,19 @@ public class ModifyOrderQueryListService {
 		for (RenterOrderEntity renterOrderEntity : rentLst) {
 			RenterOrderChangeApplyEntity entity = renterOrderChangeApplyService.getRenterOrderApplyByRenterOrderNo(renterOrderEntity.getRenterOrderNo());
 			if(entity != null) {
+				// 修改记录审核状态
+				int auditStatus = entity.getAuditStatus() == null ? 0:entity.getAuditStatus();
 				//需要判定订单状态是否结束
 				Integer status = orderStatusService.getStatusByOrderNo(orderNo);
-				if(status != null && OrderStatusEnum.CLOSED.getStatus() == status.intValue()) {
+				if(status != null && OrderStatusEnum.CLOSED.getStatus() == status.intValue() && auditStatus == 0) {
 					renterOrderEntity.setAgreeFlag(3);
 				}else {
 					//审核状态:0-未处理，1-已同意，2-主动拒绝,3-自动拒绝
-					if(entity.getAuditStatus().intValue() == 2 || entity.getAuditStatus().intValue() == 3) {
+					if(auditStatus == 2 || auditStatus == 3) {
 						//车主是否同意 0-未处理，1-已同意，2-已拒绝，3不处理 横线
 						renterOrderEntity.setAgreeFlag(2);
 					}else {
-						renterOrderEntity.setAgreeFlag(entity.getAuditStatus());
+						renterOrderEntity.setAgreeFlag(auditStatus);
 					}
 				}
 			}else {

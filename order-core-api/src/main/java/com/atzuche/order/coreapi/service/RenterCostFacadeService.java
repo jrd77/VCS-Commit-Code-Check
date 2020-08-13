@@ -22,6 +22,7 @@ import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.RenterOrderEffectiveNotFoundException;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.res.*;
@@ -44,6 +45,7 @@ import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
+import com.atzuche.order.renterorder.service.RenterInsureCoefficientService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
@@ -119,6 +121,8 @@ public class RenterCostFacadeService {
     private HandoverCarService handoverCarService;
     @Autowired
     private OrderSettleNoTService orderSettleNoTService;
+    @Autowired
+    private RenterInsureCoefficientService renterInsureCoefficientService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -203,6 +207,10 @@ public class RenterCostFacadeService {
             e.printStackTrace();
             logger.error("获取油费和超里程费用异常",e);
         }
+        //获取驾驶行为评分和各项系数
+        List<RenterInsureCoefficientVO> renterInsureCoefficientVOS = renterInsureCoefficientService.listRenterInsureCoefficientVO(renterOrderNo);
+        basicCostDetailVO.setRenterInsureCoefficientVOS(renterInsureCoefficientVOS);
+        basicCostDetailVO.setRenterOrderNo(renterOrderNo);
         return basicCostDetailVO;
     }
     /*

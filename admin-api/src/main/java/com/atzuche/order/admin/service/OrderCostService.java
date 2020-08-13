@@ -12,6 +12,7 @@ import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.admin.vo.resp.order.cost.detail.OrderRenterFineAmtDetailResVO;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
 import com.atzuche.order.commons.CostStatUtils;
+import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.NumberUtils;
 import com.atzuche.order.commons.entity.dto.OwnerCouponLongDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
@@ -23,6 +24,8 @@ import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientReasonVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.req.OrderCostReqVO;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
@@ -45,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -1317,6 +1321,8 @@ public class OrderCostService {
         baoFeiInfoVO.setJiaLinCoefficient(0D);
         baoFeiInfoVO.setYiChuXianCheCoefficient(0D);
         baoFeiInfoVO.setJiaShiXingWeiCoefficient(0D);
+        // 处理保费系数
+        baoFeiInfoVO = handBaoFeiInfoVO(baoFeiInfoVO, renterOrderNo);
         return baoFeiInfoVO;
     }
 
@@ -1326,5 +1332,51 @@ public class OrderCostService {
                 .filter(x -> cashCodeEnum.getCashNo().equals(x.getCostCode()))
                 .collect(Collectors.toList());
         return collect;
+    }
+    
+    
+    /**
+     * 处理保费系数
+     * @param baoFeiInfoVO
+     * @param renterOrderNo
+     * @return BaoFeiInfoVO
+     */
+    public BaoFeiInfoVO handBaoFeiInfoVO(BaoFeiInfoVO baoFeiInfoVO, String renterOrderNo) {
+    	baoFeiInfoVO = baoFeiInfoVO == null ? new BaoFeiInfoVO():baoFeiInfoVO;
+    	// 获取系数
+        List<RenterInsureCoefficientVO> inscoevoList = remoteFeignService.insureCoefficient(renterOrderNo);
+        if (inscoevoList == null || inscoevoList.isEmpty()) {
+        	return baoFeiInfoVO;
+        }
+        // 1-驾龄系数，2-易出险车系数，3-驾驶行为系数
+        for (RenterInsureCoefficientVO inscoevo:inscoevoList) {
+        	int type = inscoevo.getType() == null ? 0:inscoevo.getType();
+        	List<RenterInsureCoefficientReasonVO> reasonList = inscoevo.getReasonList();
+        	if (type == 1) {
+        		baoFeiInfoVO.setJiaLinCoefficient(inscoevo.getCoefficient());
+        		if (reasonList != null && !reasonList.isEmpty() && reasonList.get(0) != null && reasonList.get(0).getValue() != null) {
+        			String drivingAge = DateUtils.getYearMonthFormate(reasonList.get(0).getValue(), DateUtils.formate(LocalDateTime.now(), DateUtils.fmt_yyyyMMdd));
+        			baoFeiInfoVO.setDrivingAge(drivingAge);
+        		}
+        	} else if (type == 2) {
+        		baoFeiInfoVO.setYiChuXianCheCoefficient(inscoevo.getCoefficient());
+        		if (reasonList != null && !reasonList.isEmpty()) {
+        			for (RenterInsureCoefficientReasonVO reason:reasonList) {
+        				if (reason != null &&  "car_tags".equals(reason.getKeyCode())) {
+        					baoFeiInfoVO.setCarTags(reason.getValue());
+        				} else if (reason != null &&  "car_level".equals(reason.getKeyCode())) {
+        					String carLevelStr = "22".equals(reason.getValue()) ? "跑车":"非跑车";
+        					baoFeiInfoVO.setCarLevel(carLevelStr);
+        				}
+        			}
+        		}
+        	} else if (type == 3) {
+        		baoFeiInfoVO.setJiaShiXingWeiCoefficient(inscoevo.getCoefficient());
+        		if (reasonList != null && !reasonList.isEmpty() && reasonList.get(0) != null) {
+        			baoFeiInfoVO.setDriverScore(reasonList.get(0).getValue() == null ? null:reasonList.get(0).getValue()+"分");
+        		}
+        	}
+        }
+        return baoFeiInfoVO;
     }
 }

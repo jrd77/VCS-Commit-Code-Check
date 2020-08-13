@@ -4,6 +4,7 @@ package com.atzuche.order.photo.controller;
 import com.atzuche.order.photo.common.AdminUserUtil;
 import com.atzuche.order.photo.dto.OrderPhotoDTO;
 import com.atzuche.order.photo.dto.TransIllegalPhotoDTO;
+import com.atzuche.order.photo.enums.PhotoTypeEnum;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.exception.OrderPhotoException;
 import com.atzuche.order.photo.service.OrderPhotoService;
@@ -26,12 +27,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 
@@ -64,12 +72,16 @@ public class OrderPhotoController{
 	public ResponseData list(@Valid OrderRequestVO orderRequestVO, BindingResult bindingResult){
         validateParameter(bindingResult);
 		String orderNo = orderRequestVO.getOrderNo();
-	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo, UserTypeEnum.RENTER.getType());
-	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo, UserTypeEnum.OWNER.getType());
+	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.GET_CAR.getType()));
+	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.RETURN_CAR.getType()));
+        List<OrderPhotoDTO> getCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.GET_CAR_SERVICE_VOUCHER.getType()));
+        List<OrderPhotoDTO> returnCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.RETURN_CAR_SERVICE_VOUCHER.getType()));
 		OrderViolationPhotoResponseVO orderViolationPhotoResponseVO =orderPhotoService.queryViolationPhotoList(orderNo);
 		OrderPhotoResponseVO orderPhotoResponseVO = new OrderPhotoResponseVO();
 		orderPhotoResponseVO.setGetCarPhotoList(getCarList);
 		orderPhotoResponseVO.setReturnCarPhotoList(srvCarList);
+        orderPhotoResponseVO.setGetCarServiceVoucherList(getCarServiceVoucherList);
+        orderPhotoResponseVO.setReturnCarServiceVoucherList(returnCarServiceVoucherList);
 		orderPhotoResponseVO.setOrderViolationPhotoResponseVO(orderViolationPhotoResponseVO);
 		return ResponseData.success(orderPhotoResponseVO);
 	}
@@ -237,5 +249,13 @@ public class OrderPhotoController{
 		transIllegalPhotoDTO.setUpdateTime(new Date());
 		rabbitTemplate.convertAndSend("ren_yun_delivery_car_photo_queue1",GsonUtils.toJson(transIllegalPhotoDTO));
 	}
+
+    @AutoDocMethod(description = "图片批量下载", value = "图片批量下载", response = ResponseData.class)
+    @RequestMapping("/batchDownLoadImgs")
+    public void downLoadImgs(@RequestParam("orderNo") String orderNo,@RequestParam("photoType") Integer photoType,HttpServletResponse response) throws IOException {
+        logger.info("图片批量下载，orderNo={},photoType={}",orderNo,photoType);
+	    orderPhotoService.downLoadImgs(orderNo,photoType,response);
+        logger.info("图片批量下载，orderNo={},photoType={},处理结束",orderNo,photoType);
+    }
 
 }

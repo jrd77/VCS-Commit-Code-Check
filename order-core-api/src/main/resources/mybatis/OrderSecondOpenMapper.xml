@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atzuche.order.coreapi.mapper.OrderSecondOpenMapper">
+
+    <resultMap type="com.atzuche.order.coreapi.entity.OrderSecondOpenEntity" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="carNo" column="car_no"/>
+        <result property="plateNum" column="plate_num"/>
+        <result property="carOwnerType" column="car_owner_type"/>
+        <result property="ownerPhone" column="owner_phone"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="rentTime" column="rent_time"/>
+        <result property="revertTime" column="revert_time"/>
+        <result property="savePoint" column="save_point"/>
+        <result property="ownerNo" column="owner_no"/>
+        <result property="isOpenVir" column="is_open_vir"/>
+        <result property="ext1" column="ext1"/>
+        <result property="ext2" column="ext2"/>
+        <result property="ext3" column="ext3"/>
+        <result property="ext4" column="ext4"/>
+        <result property="ext5" column="ext5"/>
+    </resultMap>
+
+
+	<sql id="Base_Column_List">
+	`id`,
+	  `car_no`,
+	  `plate_num`,
+	  `car_owner_type`,
+	  `owner_phone`,
+	  `order_no`,
+	  `rent_time`,
+	  `revert_time`,
+	  save_point,
+	  owner_no,
+	  is_open_vir,
+	  `ext1`,
+	  `ext2`,
+	  `ext3`,
+	  `ext4`,
+	  `ext5`
+	</sql>
+	
+	<insert id="insert">
+		insert into `order_second_open` (
+		  `car_no`,
+		  `plate_num`,
+		  `car_owner_type`,
+		  `owner_phone`,
+		  `order_no`,
+		  `rent_time`,
+		  `revert_time`,
+		  save_point,
+		  owner_no,
+		  is_open_vir,
+		  `ext1`,
+		  `ext2`,
+		  `ext3`,
+		  `ext4`,
+		  `ext5`,
+		  `flag`
+		) 
+		values
+		  (
+		    #{carNo},
+		    #{plateNum},
+		    #{carOwnerType},
+		    #{ownerPhone},
+		    #{orderNo},
+		    #{rentTime},
+		    #{revertTime},
+		    #{savePoint},
+		    #{ownerNo},
+		    #{isOpenVir},
+		    #{ext1},
+		    #{ext2},
+		    #{ext3},
+		    #{ext4},
+		    #{ext5},
+		    '0'
+		  )
+	</insert>
+	
+	<select id="query" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from order_second_open 
+		where flag = 0 and is_open_vir = 0 and is_delete = 0 
+	</select>
+	
+    <update id="updateFlag">
+   	 update order_second_open set flag = 1 
+	     where id in 
+	    <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+		  #{id}
+		</foreach>
+    </update>
+	
+	</mapper>

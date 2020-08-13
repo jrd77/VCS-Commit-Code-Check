@@ -1,5 +1,6 @@
 package com.atzuche.order.settle.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterdeposit.vo.req.OrderCancelRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
@@ -96,18 +97,24 @@ public class RenterOrderSettleService {
 
             //2 查询租客罚金明细  及 凹凸币补贴
             orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
+            log.info("订单取消结算-租客-settleOrders={}",JSON.toJSONString(settleOrders));
+
 
             //3、获取租客罚金、收益、钱包、租车费用、车辆押金，违章押金
             SettleCancelOrdersAccount settleCancelOrdersAccount = this.initRenterSettleCancelOrdersAccount(settleOrders);
+            log.info("订单取消结算-租客-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
 
             //4、租客、罚金与收益处理
             this.rentFinehandler(settleOrders,settleCancelOrdersAccount);
+            log.info("订单取消结算-租客-罚金收益处理-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
 
             //5、租客、历史欠款处理
             orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
+            log.info("订单取消结算-租客-历史欠款处理-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
 
             //6、租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 ->不在结算中做,在取消订单中完成）
             orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
+            log.info("订单取消结算-租客-退款-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
 
             //10 修改订单状态表
             updateOrderStatus(orderStatusDTO,settleOrders,settleCancelOrdersAccount);
@@ -129,7 +136,7 @@ public class RenterOrderSettleService {
         orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
         orderStatusDTO.setWzSettleTime(now);
         orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-
+        log.info("订单取消结算-更新订单状态-settleOrders={},settleCancelOrdersAccount={}，orderStatusDTO={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount),JSON.toJSONString(orderStatusDTO));
         //更新应扣
         AccountRenterCostSettleEntity byOrderNo = accountRenterCostSettleNoTService.getByOrderNo(orderStatusDTO.getOrderNo(), settleOrders.getRenterMemNo());
         if(byOrderNo != null){
