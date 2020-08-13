@@ -49,4 +49,7 @@ public class OwnerGoodsPriceDetailDTO {
      */
     @AutoDocProperty("还车时间")
     private LocalDateTime revertTime;
+
+    //内部使用（只算一天一价使用）
+    private boolean isMaxDay =false;
 }

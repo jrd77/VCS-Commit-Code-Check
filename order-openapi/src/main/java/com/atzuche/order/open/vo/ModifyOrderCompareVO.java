@@ -1,6 +1,9 @@
 package com.atzuche.order.open.vo;
 
 import java.io.Serializable;
+import java.util.List;
+
+import com.atzuche.order.commons.vo.res.order.CostItemVO;
 
 import com.atzuche.order.commons.entity.dto.RenterInsureCoefficientDTO;
 import lombok.Data;
@@ -37,8 +40,12 @@ public class ModifyOrderCompareVO implements Serializable{
 	 * 需要补付金额
 	 */
 	private Integer needSupplementAmt;
-    /*
-    *
+	
+	/**
+	 * 平台给租客的补贴明细
+	 */
+	List<CostItemVO> platformToRenterSubsidyList;
+    /**
     * 驾驶行为评分和各项系数
     * */
 	private RenterInsureCoefficientDTO renterInsureCoefficientDTO;

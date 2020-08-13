@@ -57,6 +57,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -115,6 +116,8 @@ public class CashierPayService{
 	private String newOrderPayGatewayURL;
 	@Autowired
 	private CashierPayService cashierPayService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 	@Autowired
 	private OrderPaySuccessService orderPaySuccessService;
 	@Autowired
@@ -855,6 +858,9 @@ public class CashierPayService{
             
             //应付租车费用
             rentIncrementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
+            // 平台给租客的补贴总额
+    		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderPayReqVO.getOrderNo(), orderPayReqVO.getMenNo());
+    		rentIncrementAmt = rentIncrementAmt + platformToRenterAmt;
             //已付租车费用(shifu  租车费用的实付)
             rentAmtPayedIncrement = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
             if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementAmt+rentAmtPayedIncrement < 0){   // +rentAmtPayed
@@ -865,7 +871,7 @@ public class CashierPayService{
                     if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.equals(type)){
                         result.setIsPayAgain(YesNoEnum.YES.getCode());
                     }
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayedIncrement),type,payableVO.getTitle()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(platformToRenterAmt+payableVO.getAmt()+rentAmtPayedIncrement),type,payableVO.getTitle()));
                 }
             }
             

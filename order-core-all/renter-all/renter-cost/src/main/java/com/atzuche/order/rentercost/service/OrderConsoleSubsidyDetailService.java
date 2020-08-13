@@ -10,6 +10,7 @@ import com.atzuche.order.rentercost.mapper.OrderConsoleSubsidyDetailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -315,5 +316,68 @@ public class OrderConsoleSubsidyDetailService{
     	
     	
     	return 1;
+    }
+    
+    
+    /**
+     * 获取平台给租客的补贴
+     * @param orderNo
+     * @param memNo
+     * @return List<OrderConsoleSubsidyDetailEntity>
+     */
+    public List<OrderConsoleSubsidyDetailEntity> listPlatformToRenterSubsidy(String orderNo, String memNo){
+        List<OrderConsoleSubsidyDetailEntity> entityList = listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo,memNo);
+        if (entityList == null || entityList.isEmpty()) {
+        	return null;
+        }
+        List<OrderConsoleSubsidyDetailEntity> list = new ArrayList<OrderConsoleSubsidyDetailEntity>();
+        for(OrderConsoleSubsidyDetailEntity entity:entityList){
+        	if (SubsidySourceCodeEnum.PLATFORM.getCode().equals(entity.getSubsidySourceCode()) && 
+        			SubsidySourceCodeEnum.RENTER.getCode().equals(entity.getSubsidyTargetCode())) {
+        		list.add(entity);
+        	}
+        }
+        return list;
+    }
+    
+    
+    
+    /**
+     * 获取平台给租客的补贴总额
+     * @param orderNo
+     * @param memNo
+     * @return int
+     */
+    public int getPlatformToRenterSubsidyAmt(String orderNo, String memNo){
+        List<OrderConsoleSubsidyDetailEntity> entityList = listPlatformToRenterSubsidy(orderNo,memNo);
+        if (entityList == null || entityList.isEmpty()) {
+        	return 0;
+        }
+        int total = 0;
+        for(OrderConsoleSubsidyDetailEntity entity:entityList){
+            if(entity != null && entity.getSubsidyAmount() != null){
+                total = total + entity.getSubsidyAmount();
+            }
+        }
+        return total;
+    }
+    
+    
+    /**
+     * 获取平台给租客的补贴总额
+     * @param entityList
+     * @return int
+     */
+    public int getPlatformToRenterSubsidyAmt(List<OrderConsoleSubsidyDetailEntity> entityList){
+    	if (entityList == null || entityList.isEmpty()) {
+        	return 0;
+        }
+        int total = 0;
+        for(OrderConsoleSubsidyDetailEntity entity:entityList){
+            if(entity != null && entity.getSubsidyAmount() != null){
+                total = total + entity.getSubsidyAmount();
+            }
+        }
+        return total;
     }
 }

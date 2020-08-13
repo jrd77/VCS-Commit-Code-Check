@@ -246,6 +246,7 @@ public class AdminOrderService {
 
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
             adminModifyOrderFeeCompareVO.setNeedSupplementAmt(modifyOrderCompareVO.getNeedSupplementAmt());
+            adminModifyOrderFeeCompareVO.setPlatformToRenterSubsidyList(handInvertData(modifyOrderCompareVO.getPlatformToRenterSubsidyList()));
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();
             if(initModifyOrderFeeVO.getModifyOrderCostVO()!=null) {
                 BeanUtils.copyProperties(initModifyOrderFeeVO.getModifyOrderCostVO(), before);
@@ -570,5 +571,18 @@ public class AdminOrderService {
             }
             throw remoteCallException;
         }
+    }
+    
+    
+    private List<CostItemVO> handInvertData(List<CostItemVO> list) {
+    	if (list == null || list.isEmpty()) {
+    		return null;
+    	}
+    	for (CostItemVO cost:list) {
+    		if (cost.getTotalAmount() != null) {
+    			cost.setTotalAmount(-cost.getTotalAmount());
+    		}
+    	}
+    	return list;
     }
 }

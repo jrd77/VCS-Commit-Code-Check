@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.vo.res.order.CostItemVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderOwnerDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
@@ -33,10 +34,12 @@ import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
@@ -73,6 +76,8 @@ public class ModifyOrderFeeService {
 	private OwnerOrderService ownerOrderService;
 	@Autowired
 	private AccountRenterCostSettleService accountRenterCostSettleService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 
 	/**
 	 * 获取修改订单前后费用
@@ -143,7 +148,14 @@ public class ModifyOrderFeeService {
 		int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,modifyOrderReq.getMemNo());
 		// 应付
 		int payable = getTotalRentCarFee(updateModifyOrderFeeVO);
-		if (rentAmtPayed >= Math.abs(payable)) {
+		// 获取平台给租客的补贴明细
+		List<OrderConsoleSubsidyDetailEntity> consoleSubsidylist = orderConsoleSubsidyDetailService.listPlatformToRenterSubsidy(orderNo, modifyOrderReq.getMemNo());
+		List<CostItemVO> platformToRenterSubsidyList = getPlatformToRenterSubsidyList(consoleSubsidylist);
+		modifyOrderCompareVO.setPlatformToRenterSubsidyList(platformToRenterSubsidyList);
+		// 平台给租客的补贴总额
+		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(consoleSubsidylist);
+		payable = payable + platformToRenterAmt;
+		if (payable >= 0 || rentAmtPayed >= Math.abs(payable)) {
 			// 实付大于应付，不需要支付
 			modifyOrderCompareVO.setCleanSupplementAmt(1);
 			modifyOrderCompareVO.setNeedSupplementAmt(0);
@@ -158,6 +170,29 @@ public class ModifyOrderFeeService {
 	}
 
 
+	/**
+	 * 平台给租客的补贴数据转换
+	 * @param consoleSubsidylist
+	 * @return List<CostItemVO>
+	 */
+	public List<CostItemVO> getPlatformToRenterSubsidyList(List<OrderConsoleSubsidyDetailEntity> consoleSubsidylist) {
+		if (consoleSubsidylist == null || consoleSubsidylist.isEmpty()) {
+			return null;
+		}
+		List<CostItemVO> costItemList = new ArrayList<>();
+		consoleSubsidylist.forEach(cost -> {
+            CostItemVO vo = new CostItemVO();
+            vo.setCostCode(cost.getSubsidyCostCode());
+            vo.setCostDesc(cost.getSubsidyCostName());
+            vo.setCount(1.0);
+            vo.setUnitPrice(cost.getSubsidyAmount());
+            vo.setTotalAmount(cost.getSubsidyAmount());
+            costItemList.add(vo);
+        });
+		return costItemList;
+	}
+	
+	
 	/**
 	 * 获取总费用
 	 * @param updateModifyOrderFeeVO

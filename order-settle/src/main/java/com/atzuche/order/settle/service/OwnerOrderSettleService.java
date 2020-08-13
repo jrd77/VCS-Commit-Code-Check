@@ -95,17 +95,23 @@ public class OwnerOrderSettleService {
             settleOrders.setOwnerOrderNo(ownerOrderNo);
             settleOrders.setOwnerMemNo(ownerOrder.getMemNo());
             settleOrders.setOwnerOrder(ownerOrder);
+            log.info("订单取消结算-车主-settleOrders={}",JSON.toJSONString(settleOrders));
 
             //2、查询车主罚金明细
             orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
+            log.info("订单取消结算-车主-罚金明细-settleOrders={}",JSON.toJSONString(settleOrders));
 
             //3、获取车主罚金与收益
             SettleCancelOrdersAccount settleCancelOrdersAccount = this.initOwnerSettleCancelOrdersAccount(settleOrders);
+            log.info("订单取消结算-车主-罚金与收益-settleOrders={}，settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
+
             //4、车主、平台罚金与收益处理
             this.platformAndOwnerIncomeFineHandler(settleOrders,settleCancelOrdersAccount);
+            log.info("订单取消结算-车主、平台罚金与收益处理-settleOrders={}，settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
 
             //5、更新车主子订单状态
             updateOwnerOrderChildStatus(ownerOrderNo);
+            log.info("订单取消结算-车主-更新订单状态为已结算-settleOrders={}，settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
         }catch (Exception e){
             e.printStackTrace();
             log.error("订单取消-车主端结算异常orderNo={}，ownerOrderNo={}，ownerMemNo={}",orderNo,ownerOrderNo,ownerOrder.getMemNo(),e);
