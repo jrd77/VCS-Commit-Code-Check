@@ -1,5 +1,6 @@
 package com.atzuche.order.photo.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
 import com.atzuche.order.photo.entity.OrderPhotoEntity;
 import com.atzuche.order.photo.service.OrderPhotoService;
@@ -10,6 +11,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -26,10 +28,10 @@ import java.util.Objects;
  * @author 胡春林
  * 接受仁云 交接车 取还车照片数据
  */
+@Slf4j
 @Service
 public class RenYunDeliveryCarPhotoListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RenYunDeliveryCarPhotoListener.class);
     private static final String REN_YUN_DELIVERY_CAR_PHOTO = "ren_yun_delivery_car_photo_queue1";
 
     @Autowired
@@ -41,7 +43,7 @@ public class RenYunDeliveryCarPhotoListener {
      */
     @RabbitListener(queues = REN_YUN_DELIVERY_CAR_PHOTO, containerFactory = "rabbitListenerContainerFactory")
     public void onMessage(Message message) {
-        LOGGER.info("RenYunDeliveryCarPhotoListener process start param;[{}]", message.toString());
+        log.info("RenYunDeliveryCarPhotoListener.onMessage.[{}]", message.toString());
         Transaction t = Cat.getProducer().newTransaction(CatConstants.RABBIT_MQ_CALL, "获取仁云交接车 取还车照片数据信息MQ");
         try {
             String handoverCarOilJson = new String(message.getBody());
@@ -72,9 +74,21 @@ public class RenYunDeliveryCarPhotoListener {
         } finally {
             t.complete();
         }
-        LOGGER.info("-----获取交接车、取还车照片数据结束--------");
+        log.info("-----获取交接车、取还车照片数据结束--------");
 
     }
 
+    public static void main(String[] args) {
+        String handoverCarOilJson = "{\"path\":\"hrocloud/cgh/app/auto021585809806074/storage/emulated/0/DCIM/Screenshots/Screenshot_2020-03-31-16-26-24-95.jpg\",\"userType\":3,\"serialNumber\":1,\"orderNo\":24248131800299,\"photoType\":9,\"id\":2278}";
+        DeliveryCarConditionPhotoVO deliveryCarConditionPhotoVO = GsonUtils.convertObj(handoverCarOilJson, DeliveryCarConditionPhotoVO.class);
+        OrderPhotoEntity orderPhotoEntity = new OrderPhotoEntity();
+        orderPhotoEntity.setCreateTime(LocalDateTime.now());
+        orderPhotoEntity.setOrderNo(String.valueOf(deliveryCarConditionPhotoVO.getOrderNo()));
+        orderPhotoEntity.setPath(deliveryCarConditionPhotoVO.getPath());
+        orderPhotoEntity.setUserType(String.valueOf(deliveryCarConditionPhotoVO.getUserType()));
+        orderPhotoEntity.setPhotoType(String.valueOf(deliveryCarConditionPhotoVO.getPhotoType()));
+        orderPhotoEntity.setSerialNumber(deliveryCarConditionPhotoVO.getSerialNumber());
+        System.out.println(JSON.toJSONString(orderPhotoEntity));
+    }
 }
 
