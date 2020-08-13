@@ -70,7 +70,11 @@ public class RenterCancelOrderService {
         //订单状态更新
         orderStatusService.saveOrderStatusInfo(buildOrderStatusDTO(cancelOrderReqDTO.getOrderNo()));
         renterOrderService.updateChildStatusByOrderNo(cancelOrderReqDTO.getOrderNo(), RenterChildStatusEnum.END.getCode());
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(renterOrderEntity.getRenterOrderNo(), OrderStatusEnum.CLOSED.getStatus());
         ownerOrderService.updateChildStatusByOrderNo(cancelOrderReqDTO.getOrderNo(), OwnerChildStatusEnum.END.getCode());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
 
         orderFlowService.inserOrderStatusChangeProcessInfo(cancelOrderReqDTO.getOrderNo(), OrderStatusEnum.CLOSED);
         //取消信息处理(order_cancel_reason)

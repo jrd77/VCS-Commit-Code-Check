@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +118,10 @@ public class CashierPayService{
 	private CashierPayService cashierPayService;
 	@Autowired
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
+	@Autowired
+	private OrderPaySuccessService orderPaySuccessService;
+	@Autowired
+	private DeliveryCarService deliveryCarService;
 	
 
     public void virtualPay(VirtualPayDTO virtualPayVO,OrderPayCallBack callBack){
@@ -215,7 +221,7 @@ public class CashierPayService{
             getExtendParamsParam(vo,batchNotifyDataVo);
            // 3 订单流程 数据更新
             log.info("payCallBack OrderPayCallBackSuccessVO start:[{}]", GsonUtils.toJson(vo));
-            orderPayCallBack(vo,callBack);
+            orderPaySuccessService.orderPayCallBack(vo,callBack);
             log.info("payCallBack OrderPayCallBackSuccessVO end:[{}]", GsonUtils.toJson(vo));
         }
     }
@@ -326,6 +332,7 @@ public class CashierPayService{
         return "";
     }
 
+
     /**
      * 订单流程 数据更新
      * @param vo
@@ -352,7 +359,8 @@ public class CashierPayService{
 	            }
 	            //更新支付状态（含批量修改，支付租车费用，租车押金，违章押金）
 	            orderStatusService.saveOrderStatusInfo(orderStatusDTO);
-	            
+                log.info("押金支付发送给任云orderStatusDTO={}",orderStatusDTO);
+                deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(vo.getOrderNo()));
 	            //更新配送 订单补付等信息 只有订单状态为已支付
 	            //callback
 	            if(isGetCar(vo)){
@@ -554,7 +562,8 @@ public class CashierPayService{
                     if (!CollectionUtils.isEmpty(payKind) && orderPaySign.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)) {
                         //修改子订单费用信息
                         String renterOrderNo = getExtendParamsRentOrderNo(orderPayable);
-                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+//                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, orderPayable.getIsPayAgain(), YesNoEnum.NO);
+                        orderPayCallBack.callBack(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), renterOrderNo, YesNoEnum.NO.getCode(), YesNoEnum.NO);
                         
                         //公共抵扣企业用户的押金的方法
                         commonDebtEnterpriseDeposit(orderPaySign, orderPayable);
@@ -1457,8 +1466,10 @@ public class CashierPayService{
 		vo.setOpenId("");
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
+		vo.setPaySource(DataPaySourceConstant.WALLETPAY);
 //		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
-		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+//		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+		
 		return vo;
 	}
     
@@ -1490,8 +1501,9 @@ public class CashierPayService{
 		vo.setOpenId("");
 		vo.setPayType("01");   //默认 消费
 		vo.setReqOs("IOS");  //默认
+		vo.setPaySource(DataPaySourceConstant.WALLETPAY);
 //		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
-		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
+//		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
 		return vo;
 	}
     

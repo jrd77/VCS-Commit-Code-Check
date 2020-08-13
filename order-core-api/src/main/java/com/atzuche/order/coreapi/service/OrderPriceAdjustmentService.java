@@ -7,14 +7,18 @@ import com.atzuche.order.commons.JsonUtil;
 import com.atzuche.order.commons.entity.dto.CostBaseDTO;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.enums.AdjustTargetEnum;
 import com.atzuche.order.commons.enums.SubsidySourceCodeEnum;
 import com.atzuche.order.commons.enums.SubsidyTypeCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.NoEffectiveErrException;
+import com.atzuche.order.commons.exceptions.OwnerOrderNotFoundException;
 import com.atzuche.order.commons.exceptions.RenterOrderNotFoundException;
 import com.atzuche.order.commons.vo.req.OrderPriceAdjustmentReqVO;
 import com.atzuche.order.commons.vo.req.RenterAdjustCostReqVO;
 import com.atzuche.order.commons.vo.res.OrderPriceAdjustmentVO;
+import com.atzuche.order.delivery.entity.OwnerRenterAdjustReasonEntity;
+import com.atzuche.order.delivery.service.OwnerRenterAdjustReasonService;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsEntity;
 import com.atzuche.order.owner.commodity.service.OwnerGoodsService;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
@@ -64,6 +68,8 @@ public class OrderPriceAdjustmentService {
     private OwnerGoodsService ownerGoodsService;
     @Autowired
     private OwnerMemberService ownerMemberService;
+    @Autowired
+    private OwnerRenterAdjustReasonService ownerRenterAdjustReasonService;
     /**
      * 新增
      */
@@ -146,11 +152,12 @@ public class OrderPriceAdjustmentService {
         entity.setOrderNo(request.getOrderNo());
         entity.setIsDelete(0);
         entity.setType(request.getType());
-
+        AdjustTargetEnum adjustTargetEnum = AdjustTargetEnum.OWNER_TO_RENTER;
         if (Objects.equals(OrderPriceAdjustmentReqVO.OrderPriceAdjustmentReqVOType.OWNER_TO_RENTER.getCode(), request.getType())) {
             entity.setOwnerMemberCode(request.getOwnerMemberCode());
         } else if (Objects.equals(OrderPriceAdjustmentReqVO.OrderPriceAdjustmentReqVOType.RENTER_TO_OWNER.getCode(), request.getType())) {
             entity.setRenterMemberCode(request.getRenterMemberCode());
+            adjustTargetEnum = AdjustTargetEnum.RENTER_TO_OWNER;
         } else {
             throw new OrderPriceAdjustmentReqVOTypeException(JsonUtil.toJson(request));
         }
@@ -170,10 +177,37 @@ public class OrderPriceAdjustmentService {
 
                 orderPriceAdjustmentMapper.updateByExampleSelectiveById(updateEntity);
             }
-        }
 
-        return insert(request);
+        }
+        //记录调价原因 (理论只会有一条记录)
+        saveOrUpdateAdjustRemark(request,adjustTargetEnum);
+        int insertResult = insert(request);
+        return insertResult;
     }
+
+    public void saveOrUpdateAdjustRemark(OrderPriceAdjustmentReqVO reqVO,AdjustTargetEnum adjustTargetEnum){
+        String renterMemberCode = reqVO.getRenterMemberCode();
+
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByChildNo(null, renterMemberCode);
+        if(ownerOrderEntity == null){
+            OwnerOrderNotFoundException e = new OwnerOrderNotFoundException(renterMemberCode);
+            logger.error("获取车主子订单为空",e);
+            throw e;
+        }
+        OwnerRenterAdjustReasonEntity ownerRenterAdjustReasonEntity = new OwnerRenterAdjustReasonEntity();
+        ownerRenterAdjustReasonEntity.setOrderNo(reqVO.getOrderNo());
+        ownerRenterAdjustReasonEntity.setOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo());
+        ownerRenterAdjustReasonEntity.setRenterOrderNo(ownerOrderEntity.getRenterOrderNo());
+        ownerRenterAdjustReasonEntity.setAdjustTarget(adjustTargetEnum.getType());
+        ownerRenterAdjustReasonEntity.setAdjustReasonType(reqVO.getRemarkCode());
+        ownerRenterAdjustReasonEntity.setAdjustReasonDesc((reqVO.getRemarkCode()!=null&&reqVO.getRemarkCode()==0)?reqVO.getRemark():null);
+        ownerRenterAdjustReasonEntity.setAdjustRemark(reqVO.getRemark()!=null?reqVO.getRemark().split("-")[0]:null);
+        ownerRenterAdjustReasonEntity.setCreateOp("system");
+        ownerRenterAdjustReasonEntity.setUpdateOp("system");
+        logger.info("记录调价备注和调价原因ownerRenterAdjustReasonEntity={}", JSON.toJSONString(ownerRenterAdjustReasonEntity));
+        ownerRenterAdjustReasonService.saveOrUpdateAdjustReason(ownerRenterAdjustReasonEntity);
+    }
+
     private RenterAdjustCostReqVO renterAdjustCostReqVOBuild(OrderPriceAdjustmentReqVO orderPriceAdjustmentReqVO){
         RenterAdjustCostReqVO renterAdjustCostReqVO = new RenterAdjustCostReqVO();
         Integer type = orderPriceAdjustmentReqVO.getType();
@@ -236,13 +270,6 @@ public class OrderPriceAdjustmentService {
                 throw new Exception("获取订单数据(车主)为空");
             }
         }
-//	    else {
-//	    	//否则根据主订单号查询
-//	    	orderEntityOwner = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(renterCostReqVO.getOrderNo());
-//
-//	    }
-
-        //String userName = AdminUserUtil.getAdminUser().getAuthName();  //获取的管理后台的用户名。
 
         /**
          * 租客给车主的调价
@@ -256,25 +283,14 @@ public class OrderPriceAdjustmentService {
             costBaseDTO.setOrderNo(renterCostReqVO.getOrderNo());
             costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
             OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, -Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
-            //
-            //record.setCreateOp(userName);
-            //record.setUpdateOp(userName);
-            //record.setOperatorId(userName);
-            //orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
             orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(record);
-            /*if(orderEntityOwner != null) {*/
             //反向记录
             RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterCostReqVO.getRenterOrderNo(), false);
             OwnerGoodsEntity ownerGoodsEntity = ownerGoodsService.getOwnerGoodsByCarNoAndOrderNo(renterGoodsDetail.getCarNo(), renterCostReqVO.getOrderNo());
             OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(ownerGoodsEntity.getOwnerOrderNo(), false);
             costBaseDTO.setMemNo(ownerMemberDTO.getMemNo());
             OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getRenterToOwnerAdjustAmt()),targetEnum,sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
-            //
-            //recordConvert.setCreateOp(userName);
-            //recordConvert.setUpdateOp(userName);
-            //recordConvert.setOperatorId(userName);
             orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetailByMemNo(recordConvert);
-            /*}*/
         }
 
         /**
@@ -290,20 +306,12 @@ public class OrderPriceAdjustmentService {
             if(orderEntityOwner != null) {
                 costBaseDTO.setMemNo(orderEntityOwner.getMemNo());
                 OrderConsoleSubsidyDetailEntity record = orderConsoleSubsidyDetailService.buildData(costBaseDTO, -Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
-                //
-                //record.setCreateOp(userName);
-                //record.setUpdateOp(userName);
-                //record.setOperatorId(userName);
                 orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(record);
             }
 
             //反向记录
             costBaseDTO.setMemNo(orderEntity.getMemNoRenter());
             OrderConsoleSubsidyDetailEntity recordConvert = orderConsoleSubsidyDetailService.buildData(costBaseDTO, Integer.valueOf(renterCostReqVO.getOwnerToRenterAdjustAmt()), targetEnum, sourceEnum, SubsidyTypeCodeEnum.ADJUST_AMT, cash);
-            //
-            //recordConvert.setCreateOp(userName);
-            //recordConvert.setUpdateOp(userName);
-            //recordConvert.setOperatorId(userName);
             orderConsoleSubsidyDetailService.saveOrUpdateOrderConsoleSubsidyDetail(recordConvert);
         }
 

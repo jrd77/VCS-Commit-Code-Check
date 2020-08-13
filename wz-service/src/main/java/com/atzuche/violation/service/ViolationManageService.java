@@ -9,6 +9,7 @@ import com.atzuche.order.commons.CompareHelper;
 import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.WzLogOperateTypeEnums;
+import com.atzuche.order.commons.exceptions.AccountDepositException;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsEntity;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -102,6 +103,7 @@ public class ViolationManageService {
             updateTransWzDisposeStatus(violationHandleRequestVO.getOrderNo(),violationHandleRequestVO.getPlateNum(),RENTER_HANDLE_WZ_DISPOSE_STATUS);
         } else {
             renterOrderWzSettleFlagService.updateIsIllegal(violationHandleRequestVO.getOrderNo(),violationHandleRequestVO.getPlateNum(),HAS_ILLEGAL_NO, AdminUserUtil.getAdminUser().getAuthName());
+            renterOrderWzSettleFlagService.updateIsIllegalCost(violationHandleRequestVO.getOrderNo(),0,AdminUserUtil.getAdminUser().getAuthName(),violationHandleRequestVO.getPlateNum());
         }
     }
 
@@ -118,6 +120,21 @@ public class ViolationManageService {
         List<RenterWzCostDetailResVO> costDetails = getRenterWzCostDetailRes(orderNo);
         int zanKouAmount = this.getZanKouAmount(costDetails);
         violationHandleInformationResponseVO.setWzDepositAmt(entity.getShishouDeposit().toString());
+
+        if(Objects.isNull(entity) || Objects.isNull(entity.getOrderNo())){
+            AccountDepositException accountDepositException = new AccountDepositException();
+            log.error("车辆押金查询为空",accountDepositException);
+            throw accountDepositException;
+        }
+        int authorizeDepositAmt = entity.getAuthorizeDepositAmt() == null ? 0 : entity.getAuthorizeDepositAmt();
+        int creditPayAmt = entity.getCreditPayAmt() == null ? 0 : entity.getCreditPayAmt();
+        if(entity.getIsAuthorize()==null || entity.getIsAuthorize() == 0){
+            violationHandleInformationResponseVO.setWzDepositAmt(String.valueOf(entity.getShishouDeposit()==null?0:entity.getShishouDeposit()));
+        }else if(entity.getIsAuthorize() == 1){
+            violationHandleInformationResponseVO.setWzDepositAmt(String.valueOf(authorizeDepositAmt));
+        }else if(entity.getIsAuthorize() == 2){
+            violationHandleInformationResponseVO.setWzDepositAmt(String.valueOf(creditPayAmt + authorizeDepositAmt));
+        }
         violationHandleInformationResponseVO.setShouldReturnDepositAmt(String.valueOf(entity.getShishouDeposit()-zanKouAmount));
         if (!CollectionUtils.isEmpty(costDetails)) {
             for (RenterWzCostDetailResVO renterWzCostDetailResVO : costDetails) {

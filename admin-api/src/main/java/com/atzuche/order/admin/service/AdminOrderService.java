@@ -14,6 +14,7 @@ import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailReqDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.OrderDetailRespDTO;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
+import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.DebtDetailVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
@@ -526,6 +527,31 @@ public class AdminOrderService {
         }catch (Exception e){
             log.error("Feign 管理后台获取欠款,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),memNo,e);
             Cat.logError("Feign 管理后台获取欠款",e);
+            t.setStatus(e);
+        }finally {
+            t.complete();
+        }
+        return null;
+    }
+    
+    
+    /**
+     *获取精准达费用配置
+     * @return AccurateGetReturnSrvVO
+     */
+    public AccurateGetReturnSrvVO getAccurateGetReturnSrvAmt(){
+        ResponseData<AccurateGetReturnSrvVO> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "获取精准达费用配置");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderDetailService.getAccurateGetReturnSrvAmt");
+            responseObject = feignOrderCostService.getAccurateGetReturnSrvAmt();
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 获取精准达费用配置,responseObject={}",JSON.toJSONString(responseObject),e);
+            Cat.logError("Feign 获取精准达费用配置",e);
             t.setStatus(e);
         }finally {
             t.complete();

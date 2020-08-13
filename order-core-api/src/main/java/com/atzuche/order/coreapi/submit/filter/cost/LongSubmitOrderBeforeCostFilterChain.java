@@ -48,6 +48,8 @@ public class LongSubmitOrderBeforeCostFilterChain implements ApplicationContextA
         orderCostFilterList.add(applicationContext.getBean(OrderGetAndReturnCarCostFilter.class));
         //超运能溢价
         orderCostFilterList.add(applicationContext.getBean(OrderOverTransportCapacityPremiumFilter.class));
+        // 取还车精准达服务费
+        orderCostFilterList.add(applicationContext.getBean(AccurateSrvCostFilter.class));
         //取还车、超运能溢价费用补贴
         orderCostFilterList.add(applicationContext.getBean(LongOrderGetAndReturnCarCostSubsidyFilter.class));
         //平台优惠券抵扣

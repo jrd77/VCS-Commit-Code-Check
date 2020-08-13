@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
 import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
@@ -153,6 +154,10 @@ public class ModifyOrderForOwnerService {
 		ownerOrderService.saveOwnerOrder(ownerOrderEffective);
 		// 更新车主子订单状态
 		updateOwnerOrderStatus(modifyOrderOwnerDTO, ownerOrderEntity.getId());
+		if (modifyOrderOwnerDTO.getTransferFlag() != null && modifyOrderOwnerDTO.getTransferFlag()) {
+			// 换车更新上一个车主子订单状态为已结束
+	        ownerOrderService.updateOwnerStatusByOwnerOrderNo(ownerOrderEntity.getOwnerOrderNo(), OrderStatusEnum.CLOSED.getStatus());
+		}
 	}
 	
 	
@@ -317,9 +322,9 @@ public class ModifyOrderForOwnerService {
 		// 获取车主还车费用
 		OwnerOrderIncrementDetailEntity srvReturnFeeEntity = ownerOrderCostCombineService.getOwnerSrvReturnAmtEntity(costBaseDTO, ownerGoodsDetailDTO.getCarOwnerType(), modifyOrderOwnerDTO.getSrvReturnFlag());
 		// 平台服务费比例
-		//Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
+		Double serviceRate = ownerGoodsDetailDTO.getServiceRate();
 		// 代管车服务费比例
-		//Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
+		Double serviceProxyRate = ownerGoodsDetailDTO.getServiceProxyRate();
 
 
         Double useServiceRate = ownerGoodsDetailDTO.getUseServiceRate();
@@ -350,7 +355,12 @@ public class ModifyOrderForOwnerService {
                     .mapToInt(RenterOrderSubsidyDetailEntity::getSubsidyAmount)
                     .sum();
             log.info("长租-修改订单-获取租金补贴金额subsidyRentAmt={}",subsidyRentAmt);
-            OwnerOrderIncrementDetailEntity serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount+(-subsidyRentAmt), useServiceRate.intValue());
+            OwnerOrderIncrementDetailEntity serviceFeeEntity = null;
+            if(serviceProxyRate != null){//代管
+                serviceFeeEntity= ownerOrderCostCombineService.getProxyServiceExpenseIncrement(costBaseDTO, purchaseAmount + (-subsidyRentAmt), useServiceRate.intValue());
+            }else{
+                serviceFeeEntity = ownerOrderCostCombineService.getServiceExpenseIncrement(costBaseDTO, purchaseAmount+(-subsidyRentAmt), useServiceRate.intValue());
+            }
             if (serviceFeeEntity != null) {
                 incrementList.add(serviceFeeEntity);
             }
@@ -530,6 +540,7 @@ public class ModifyOrderForOwnerService {
 			ownerOrderEntityEffective.setMemNo(ownerGoodsDetailDTO.getMemNo());
 			ownerOrderEntityEffective.setGoodsCode(ownerGoodsDetailDTO.getCarNo() == null ? null:String.valueOf(ownerGoodsDetailDTO.getCarNo()));
 			ownerOrderEntityEffective.setChildStatus(RenterChildStatusEnum.PROCESS_ING.getCode());
+			ownerOrderEntityEffective.setOwnerStatus(OrderStatusEnum.TO_GET_CAR.getStatus());
 		}
 		if (modifyOrderOwnerDTO.getScanCodeFlag() != null && modifyOrderOwnerDTO.getScanCodeFlag()) {
 			// 扫码还车

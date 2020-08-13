@@ -22,5 +22,9 @@ public class DistributionCostVO {
     private String getCarChaoYunNeng;
     @AutoDocProperty("还车-超运能加价")
     private String returnCarChaoYunNeng;
+    @AutoDocProperty(value = "精准取车服务费")
+    private Integer accurateGetSrvAmt;
+    @AutoDocProperty(value = "精准还车服务费")
+    private Integer accurateReturnSrvAmt;
 
 }

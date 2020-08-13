@@ -23,11 +23,13 @@ import com.atzuche.order.accountrenterwzdepost.service.notservice.AccountRenterW
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.service.MemberSecondSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.ErrorCode;
 import com.atzuche.order.commons.enums.account.SettleStatusEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
@@ -44,7 +46,6 @@ import com.atzuche.order.settle.vo.req.RentCosts;
 import com.atzuche.order.settle.vo.req.SettleCancelOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersDefinition;
-import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import com.dianping.cat.Cat;
@@ -83,6 +84,8 @@ public class OrderSettleService{
     private RenterOrderWzCostDetailService renterOrderWzCostDetailService;
     @Autowired
     private AccountRenterCostDetailNoTService accountRenterCostDetailNoTService;
+    @Autowired
+    private MemberSecondSettleService memberSecondSettleService;
     
     /**
      * 查询所以费用
@@ -486,7 +489,7 @@ public class OrderSettleService{
     }
     
     /**
-     * 获取租客预结算数据 huangjing
+     * 获取车主预结算数据 huangjing
      * @param orderNo
      */
     public OwnerCosts preOwnerSettleOrder(String orderNo,String ownerOrderNo) {
@@ -495,7 +498,7 @@ public class OrderSettleService{
 //        orderSettleNoTService.getRenterCostSettleDetailSimpleForOwnerPlatformSrvFee(settleOrders);
         
         //3.5 查询所有车主费用明细 TODO 暂不支持 多个车主
-    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders);
+    	orderOwnerSettleNoTService.getOwnerCostSettleDetail(settleOrders,"pre");//pre  预算
 
     	//车主预计收益 200214
     	SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
@@ -539,11 +542,12 @@ public class OrderSettleService{
             log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
             //检查是否可以结算。 外置。
-            boolean checkFlag = orderSettleNoTService.check(settleOrders,listOrderNos);
-            if(!checkFlag) {
-            	log.info("提前终止结算，当前结算状态不符合。orderNo [{}]",orderNo);
-            	return;
-            }
+//            boolean checkFlag = orderSettleNoTService.check(settleOrders,listOrderNos);
+            orderSettleNoTService.check(settleOrders,listOrderNos);
+//            if(!checkFlag) {
+//            	log.info("提前终止结算，当前结算状态不符合。orderNo [{}]",orderNo);
+//            	return;
+//            }
             
             //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
@@ -564,6 +568,9 @@ public class OrderSettleService{
             if(totleAmt != 0){
                 Cat.logEvent("pingzhang","平账失败");
                 log.error("平账失败");
+                //更新标识。
+                updateFailStatusFlag(orderNo,ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getText());
+                
                 //TODO 走Cat告警
                 throw new OrderSettleFlatAccountException();
             }
@@ -585,35 +592,58 @@ public class OrderSettleService{
             // 调远程抵扣老系统车主欠款
             remoteOldSysDebtService.deductBalance(settleOrders.getOwnerMemNo(), settleOrders.getOwnerTotalOldRealDebtAmt());
             
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),0,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
+            
+            //记录分流标识(已车主的会员号为准。) 200616
+            memberSecondSettleService.initDepositMemberSecondSettle(orderNo, Integer.valueOf(settleOrders.getRenterMemNo()));
+            
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
-            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+            
+            //更新标识。
+            updateFailStatusFlag(orderNo,e.getMessage());
+            
+//            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
             
 //            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {  //去掉暂扣标识
-                OrderStatusEntity record = new OrderStatusEntity();
-                record.setId(entity.getId());
-                record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-                record.setSettleTime(LocalDateTime.now());
-                //车辆押金状态
-                record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-                record.setCarDepositSettleTime(LocalDateTime.now());
-                //记录结算消息，错误码
-                record.setSettleMsg(e.getMessage());
-                
-                orderStatusService.updateByPrimaryKeySelective(record);
+//                OrderStatusEntity record = new OrderStatusEntity();
+//                record.setId(entity.getId());
+//                record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+//                record.setSettleTime(LocalDateTime.now());
+//                //车辆押金状态
+//                record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+//                record.setCarDepositSettleTime(LocalDateTime.now());
+//                //记录结算消息，错误码
+//                record.setSettleMsg(e.getMessage());
+//                
+//                orderStatusService.updateByPrimaryKeySelective(record);
 //            }
-                
+              
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
-            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo());
+            orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
             throw new RuntimeException("结算失败 ,不能结算");
         } finally {
             t.complete();
         }
         log.info("OrderPayCallBack payCallBack end " );
     }
+    
+	private void updateFailStatusFlag(String orderNo,String msg) {
+		//更新结算标识
+		OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
+		OrderStatusEntity record = new OrderStatusEntity();
+		record.setId(entity.getId());
+		record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+		record.setSettleTime(LocalDateTime.now());
+		//车辆押金状态
+		record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
+		record.setCarDepositSettleTime(LocalDateTime.now());
+		//记录结算消息，错误码
+		record.setSettleMsg(msg);
+		orderStatusService.updateByPrimaryKeySelective(record);
+	}
     
 
     /**

@@ -11,6 +11,7 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeListDTO;
 import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.vo.res.account.income.*;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -71,10 +73,11 @@ public class OwnerIncomeController {
 
     @AutoDocMethod(value = "车主收益审核", description = "车主收益审核", response = AdjustOwnerIncomeResVO.class)
     @PostMapping("/auditOwnerIncome")
-    public ResponseData<AdjustOwnerIncomeResVO> auditOwnerIncome(@RequestBody AccountOwnerIncomeExamineOpReqVO vo){
-        log.info("OwnerIncomeController auditOwnerIncome start param [{}]", GsonUtils.toJson(vo));
-        AdjustOwnerIncomeResVO resVO = cashierService.examineOwnerIncomeExamine(vo);
-        log.info("OwnerIncomeController auditOwnerIncome end param [{}]",GsonUtils.toJson(vo));
+    public ResponseData<List<AdjustOwnerIncomeResVO>> auditOwnerIncome(@RequestBody @Validated AccountOwnerIncomeExamineOpDTO accountOwnerIncomeExamineOpDTO, BindingResult bindingResult){
+        log.info("OwnerIncomeController auditOwnerIncome start param [{}]", GsonUtils.toJson(accountOwnerIncomeExamineOpDTO));
+        BindingResultUtil.checkBindingResult(bindingResult);
+        List<AdjustOwnerIncomeResVO> resVO = cashierService.examineOwnerIncomeExamine(accountOwnerIncomeExamineOpDTO);
+        log.info("OwnerIncomeController auditOwnerIncome end param [{}]",GsonUtils.toJson(accountOwnerIncomeExamineOpDTO));
         return ResponseData.success(resVO);
     }
 
@@ -123,21 +126,33 @@ public class OwnerIncomeController {
         return ResponseData.success(incomByOwnerMem);
     }
 
-    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
+    @AutoDocMethod(value = "根据会员号查询车主可提现收益", description = "根据会员号查询车主总收益",response = AccountOwnerIncomeExamineDTO.class)
     @GetMapping("/getIncomTotalByOwnerMem")
     public ResponseData<Integer> getIncomTotalByOwnerMem(@RequestParam("ownerMemeNo") String ownerMemeNo){
         log.info("OwnerIncomeController getIncomTotalByOwnerMem start param [{}]", ownerMemeNo);
-        AccountOwnerIncomeEntity ownerIncomeByMemNo = accountOwnerIncomeNoTService.getOwnerIncomeByMemNo(ownerMemeNo);
-        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] result={}",ownerMemeNo, JSON.toJSONString(ownerIncomeByMemNo));
-        return ResponseData.success(ownerIncomeByMemNo==null||ownerIncomeByMemNo.getIncomeAmt()==null?0:ownerIncomeByMemNo.getIncomeAmt());
+        int totalIncome = accountOwnerIncomeNoTService.getOwnerTotalIncomeByMemNo(ownerMemeNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end param [{}] totalIncome={}",ownerMemeNo, totalIncome);
+        return ResponseData.success(totalIncome);
     }
-    @AutoDocMethod(value = "根据会员号列表查询车主总收益列表", description = "根据会员号列表查询车主总收益列表",response = AccountOwnerIncomeListDTO.class)
+
+    @AutoDocMethod(value = "根据会员号列表查询车主可提现收益列表", description = "根据会员号列表查询车主总收益列表",response = AccountOwnerIncomeListDTO.class)
     @GetMapping("/getIncomTotalListByMemNoList")
     public ResponseData<List<AccountOwnerIncomeListDTO>> getIncomTotalListByMemNoList(@RequestParam(value = "memNoList") List<Integer> memNoList){
         log.info("OwnerIncomeController getIncomTotalListByMemNoList start param [{}]", memNoList);
         List<AccountOwnerIncomeListDTO> incomeList = accountOwnerIncomeNoTService.getIncomTotalListByMemNoList(memNoList);
         log.info("OwnerIncomeController getIncomTotalListByMemNoList end param [{}] result={}",memNoList, JSON.toJSONString(incomeList));
         return ResponseData.success(incomeList);
+    }
+
+
+    @AutoDocMethod(value = "根据会员号查询车主总收益", description = "根据会员号查询车主总收益")
+    @GetMapping("/getOwnerTotalIncome")
+    public ResponseData<Integer> getOwnerTotalIncome(@RequestParam("ownerMemeNo") String memNo) {
+        log.info("OwnerIncomeController getOwnerTotalIncome start. param,memNo:[{}]", memNo);
+        int totalIncome = accountOwnerIncomeExamineNoTService.getOwnerIncomeAmt(memNo);
+        log.info("OwnerIncomeController getIncomTotalByOwnerMem end. result, memNo:[{}] totalIncome:[{}]", memNo,
+                totalIncome);
+        return ResponseData.success(totalIncome);
     }
 
 }

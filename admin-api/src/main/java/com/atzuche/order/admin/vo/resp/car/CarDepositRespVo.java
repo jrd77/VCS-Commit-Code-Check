@@ -21,7 +21,7 @@ public class CarDepositRespVo {
     private String depositType;
 
     @AutoDocProperty("减免金额")
-    private Integer reliefAmtStr;
+    private String reliefAmtStr;
     @AutoDocProperty("支付时间")
     private String payDateStr;
 

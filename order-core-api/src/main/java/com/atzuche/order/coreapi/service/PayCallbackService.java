@@ -1,8 +1,14 @@
 package com.atzuche.order.coreapi.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +47,8 @@ public class PayCallbackService implements OrderPayCallBack {
     AccountDebtProxyService accountDebtProxyService;
     @Autowired
     OrderSupplementDetailService orderSupplementDetailService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
     
     /**
      * ModifyOrderForRenterService.supplementPayPostProcess（修改订单补付回掉）
@@ -64,11 +72,17 @@ public class PayCallbackService implements OrderPayCallBack {
         
         //租车费用已支付 并且非补付支付
         if(!YesNoEnum.YES.getCode().equals(isPayAgain) && Objects.nonNull(entity) && Objects.nonNull(entity.getRentCarPayStatus()) && OrderPayStatusEnum.PAYED.getStatus()==entity.getRentCarPayStatus()){
-            log.info("PayCallbackService sendDataMessageToRenYun remote param [{}]", renterOrderNo);
-            deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+        	// 获取车主子订单状态
+        	OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        	int ownerStatus = ownerOrder.getOwnerStatus() == null ? 0:ownerOrder.getOwnerStatus();
+        	int status = entity.getStatus() == null ? 0:entity.getStatus();
+        	log.info("PayCallbackService sendDataMessageToRenYun remote renterOrderNo=[{}],ownerStatus=[{}]", renterOrderNo,ownerStatus);
+        	if (ownerStatus > OrderStatusEnum.TO_CONFIRM.getStatus() || status == OrderStatusEnum.TO_DISPATCH.getStatus()) {
+        		// 现在车主接单和租客支付分离，需要车主同意后才发仁云
+                deliveryCarService.sendDataMessageToRenYun(renterOrderNo);
+        	}
         }
         log.info("PayCallbackService callBack end param [{}]", GsonUtils.toJson(renterOrderNo));
-
     }
 
     /**
@@ -86,34 +100,37 @@ public class PayCallbackService implements OrderPayCallBack {
     //rentAmountAfterRenterOrderNo  管理后台修改增加的补付记录。
 	@Override
 	public void callBack(String orderNo, List<String> rentAmountAfterRenterOrderNo, List<NotifyDataVo> supplementIds, List<NotifyDataVo> debtIds) {
+		Optional.ofNullable(rentAmountAfterRenterOrderNo).orElseGet(ArrayList::new).stream().forEach(x -> log.info("支付补充租车押金订单号:"+x));
+		
 		//rentAmountAfterRenterOrderNo  无需处理
 		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}]",orderNo);
 		if(supplementIds != null) {
 			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>orderSupplementDetail补付回调通知处理:orderNo=[{}],size=[{}]",orderNo,supplementIds.size());
+		
+			//更新supplement
+			for (NotifyDataVo vo : supplementIds) {
+				String id = vo.getExtendParams();
+				String settleAmt = vo.getSettleAmount();
+				String memNo = vo.getMemNo();
+				String qn = vo.getQn();
+				int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
+				log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
+			}
 		}
-		//更新supplement
-		for (NotifyDataVo vo : supplementIds) {
-			String id = vo.getExtendParams();
-			String settleAmt = vo.getSettleAmount();
-			String memNo = vo.getMemNo();
-			String qn = vo.getQn();
-			int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
-			log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
-			
-		}
+		
 		log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}]",orderNo);
 		if(debtIds != null) {
 			log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>debt欠款回调通知处理:orderNo=[{}],size=[{}]",orderNo,debtIds.size());
+			
+			//更新欠款
+			for (NotifyDataVo vo : debtIds) {
+				String id = vo.getExtendParams();
+				String settleAmt = vo.getSettleAmount();
+				String memNo = vo.getMemNo();
+				String qn = vo.getQn();
+				int realDebt = accountDebtProxyService.deductDebtByDebtId(id, Integer.valueOf(settleAmt), memNo, qn);
+				log.info("抵扣欠款，真实金额=[{}],params id=[{}],payDebtAmt=[{}],memNo=[{}],qn=[{}]",realDebt,id, Integer.valueOf(settleAmt), memNo, qn);
+			}
 		}
-		//更新欠款
-		for (NotifyDataVo vo : debtIds) {
-			String id = vo.getExtendParams();
-			String settleAmt = vo.getSettleAmount();
-			String memNo = vo.getMemNo();
-			String qn = vo.getQn();
-			int realDebt = accountDebtProxyService.deductDebtByDebtId(id, Integer.valueOf(settleAmt), memNo, qn);
-			log.info("抵扣欠款，真实金额=[{}],params id=[{}],payDebtAmt=[{}],memNo=[{}],qn=[{}]",realDebt,id, Integer.valueOf(settleAmt), memNo, qn);
-		}
-		
 	}
 }

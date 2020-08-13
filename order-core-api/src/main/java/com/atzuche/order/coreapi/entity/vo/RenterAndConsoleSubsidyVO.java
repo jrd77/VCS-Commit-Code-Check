@@ -2,6 +2,7 @@ package com.atzuche.order.coreapi.entity.vo;
 
 import java.util.List;
 
+import com.atzuche.order.commons.entity.dto.OwnerRenterAdjustReasonDTO;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
 
@@ -11,4 +12,5 @@ import lombok.Data;
 public class RenterAndConsoleSubsidyVO {
 	private List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList;
 	private List<RenterOrderSubsidyDetailEntity> renterOrderSubsidyDetailEntityList;
+    private List<OwnerRenterAdjustReasonDTO> ownerRenterAdjustReasonDTOS;
 }

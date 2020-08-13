@@ -19,14 +19,13 @@ public class OrderPhotoEntity {
 	private Integer serialNumber;
 
 
-    public void setPhotoOperator(Integer photoUserType) {
-        if (photoUserType.intValue() == 3) {
-            setOperator("平台");
-        } else {
-            setOperator(photoUserType.intValue() == 1 ? "租客" : "车主");
-        }
-    }
-
-	
-
+	public void setPhotoOperator(Integer photoUserType) {
+		if (photoUserType.intValue() == 3) {
+			setOperator("平台");
+		} else if (photoUserType.intValue() == 6 || photoUserType.intValue() == 7) {
+			setOperator("代管员");
+		} else {
+			setOperator(photoUserType.intValue() == 1 ? "租客" : "车主");
+		}
+	}
 }

@@ -68,4 +68,14 @@ public class ModifyOrderCostVO implements Serializable{
      * 驾乘无忧保障服务费
      */
     private Integer driverInsurAmt;
+    
+    /**
+     * 精准取车服务费
+     */
+    private Integer accurateGetSrvAmt;
+    
+    /**
+     * 精准还车服务费
+     */
+    private Integer accurateReturnSrvAmt;
 }

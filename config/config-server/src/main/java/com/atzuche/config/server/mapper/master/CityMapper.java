@@ -13,4 +13,6 @@ import java.util.List;
 public interface CityMapper {
 
     List<CityEntity> findAll();
+    
+    CityEntity getCityByCode(Integer cityCode);
 }

@@ -22,6 +22,7 @@ import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.RenterOrderEffectiveNotFoundException;
 import com.atzuche.order.commons.vo.DepostiDetailVO;
 import com.atzuche.order.commons.vo.OrderSupplementDetailVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.WzDepositDetailVO;
 import com.atzuche.order.commons.vo.req.handover.rep.HandoverCarRespVO;
 import com.atzuche.order.commons.vo.res.*;
@@ -44,6 +45,7 @@ import com.atzuche.order.renterorder.entity.RenterDepositDetailEntity;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.OwnerCouponLongService;
 import com.atzuche.order.renterorder.service.RenterDepositDetailService;
+import com.atzuche.order.renterorder.service.RenterInsureCoefficientService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.service.notservice.OrderSettleNoTService;
@@ -119,6 +121,8 @@ public class RenterCostFacadeService {
     private HandoverCarService handoverCarService;
     @Autowired
     private OrderSettleNoTService orderSettleNoTService;
+    @Autowired
+    private RenterInsureCoefficientService renterInsureCoefficientService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -143,25 +147,7 @@ public class RenterCostFacadeService {
         return totalCost;
     }
 
-    /**
-     * 获得租车的总费用（不包括罚金）
-     * @param orderNo
-     * @param renterOrderNo
-     * @param memNo
-     * @return
-     */
-    public int getTotalRenterCostWithoutFine(String orderNo,String renterOrderNo,String memNo){
-        int totalBsicRentCostAmt = orderCostDetailService.getTotalOrderCostAmt(orderNo,renterOrderNo);
-        int totalSubsidyAmt = subsidyDetailService.getTotalRenterOrderSubsidyAmt(orderNo,renterOrderNo);
-        int totalConsoleSubsidyAmt = consoleSubsidyDetailService.getTotalRenterOrderConsoleSubsidy(orderNo,memNo);
-        int totalConsoleCostAmt = consoleCostDetailService.getTotalOrderConsoleCostAmt(orderNo,memNo);
 
-        int totalCost = totalBsicRentCostAmt +totalSubsidyAmt+totalConsoleSubsidyAmt+totalConsoleCostAmt;
-        logger.info("getTotalRenterCost[orderNo={},renterOrderNo={},memNo={}]==[totalBasicRentCostAmt={},totalSubsidyAmt={},totalConsoleSubsidyAmt={},totalConsoleCostAmt={}]",
-                orderNo,renterOrderNo,memNo,totalBsicRentCostAmt,totalSubsidyAmt,totalConsoleSubsidyAmt,totalConsoleCostAmt);
-        return totalCost;
-    }
-    
     
     ////全费用对象full
     public RenterCostDetailVO getRenterCostFullDetail(String orderNo, String renterOrderNo, String memNo){
@@ -180,6 +166,8 @@ public class RenterCostFacadeService {
         basicCostDetailVO.setExtraDriverInsuranceAmt(-RenterOrderCostDetailUtils.getExtraDriverInsureAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setTyreInsurAmt(-RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         basicCostDetailVO.setDriverInsurAmt(-RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateGetSrvAmt(-RenterOrderCostDetailUtils.getAccurateGetSrvAmt(renterOrderCostDetailEntityList));
+        basicCostDetailVO.setAccurateReturnSrvAmt(-RenterOrderCostDetailUtils.getAccurateReturnSrvAmt(renterOrderCostDetailEntityList));
         //取送车费用
         RenterDeliveryFeeDetailVO deliveryFeeDetailVO = getRenterDeliveryFeeDetail(renterOrderCostDetailEntityList);
         basicCostDetailVO.setDeliveryFeeDetail(deliveryFeeDetailVO);
@@ -219,6 +207,10 @@ public class RenterCostFacadeService {
             e.printStackTrace();
             logger.error("获取油费和超里程费用异常",e);
         }
+        //获取驾驶行为评分和各项系数
+        List<RenterInsureCoefficientVO> renterInsureCoefficientVOS = renterInsureCoefficientService.listRenterInsureCoefficientVO(renterOrderNo);
+        basicCostDetailVO.setRenterInsureCoefficientVOS(renterInsureCoefficientVOS);
+        basicCostDetailVO.setRenterOrderNo(renterOrderNo);
         return basicCostDetailVO;
     }
     /*
@@ -405,7 +397,7 @@ public class RenterCostFacadeService {
         baseCostDTO.renterOWnerAdjustmentFee = renterSubsidyDetail.getRenter2OwnerSubsidyAmt() + renterSubsidyDetail.getOwner2RenterSubsidyAmt();
         baseCostDTO.tyreInsurAmt =  abs(RenterOrderCostDetailUtils.getTyreInsureTotalPricesAmt(renterOrderCostDetailEntityList));
         baseCostDTO.driverInsurAmt =  abs(RenterOrderCostDetailUtils.getDriverInsureTotalPricesAmt(renterOrderCostDetailEntityList));
-        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null?renterGoodsDetailDTO.getPremiumMoney():null;
+        baseCostDTO.premiumMoney = renterGoodsDetailDTO!=null&&renterGoodsDetailDTO.getPremiumMoney()!=null?renterGoodsDetailDTO.getPremiumMoney():0;
         rentCarCostDTO.baseCostDTO = baseCostDTO;
         //1.2、优惠券抵扣
         CouponDeductionDTO couponDeductionDTO = new CouponDeductionDTO();

@@ -105,7 +105,7 @@ public class RenterMemberRightService{
             }else if(rightValueTotal.get() >= GlobalConstant.REDUCTION_RATE_MAX){
                 reductionRate = 0.7;
             }else{
-                reductionRate = rightValueTotal.get()/100;
+                reductionRate = rightValueTotal.get()/100D;
             }
         }
         memRightCarDepositAmtRespDTO.setReductionRate(reductionRate);

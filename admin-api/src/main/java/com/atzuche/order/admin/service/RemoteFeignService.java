@@ -1,8 +1,8 @@
 package com.atzuche.order.admin.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.open.vo.BaoFeiInfoVO;
 import com.atzuche.order.commons.CatConstants;
-import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.ResponseCheckUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -10,13 +10,13 @@ import com.atzuche.order.commons.entity.orderDetailDto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerMemberDTO;
 import com.atzuche.order.commons.vo.OrderStopFreightInfo;
 import com.atzuche.order.commons.vo.OwnerTransAddressReqVO;
+import com.atzuche.order.commons.vo.RenterInsureCoefficientVO;
 import com.atzuche.order.commons.vo.req.*;
 import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
 import com.atzuche.order.open.service.*;
-import com.atzuche.order.open.vo.RenterGoodWithoutPriceVO;
 import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
@@ -24,9 +24,7 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -62,6 +60,49 @@ public class RemoteFeignService {
     FeignModifyOwnerAddrService feignModifyOwnerAddrService;
     @Autowired
     FeignClearingRefundService feignClearingRefundService;
+
+    public  List<RenterOrderCostDetailDTO> getBaoFeiInfo(String orderNo, String renterOwnerNo) {
+        ResponseData<List<RenterOrderCostDetailDTO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "保费系数");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.getBaoFeiInfo");
+            log.info("Feign 保费系数,orderNo={}，renterOwnerNo={}", orderNo,renterOwnerNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"orderNo="+orderNo+",renterOwnerNo="+renterOwnerNo);
+            responseObject= feignOrderCostService.getBaoFeiInfo(orderNo,renterOwnerNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 保费系数,responseObject={},renterOwnerNo={}", JSON.toJSONString(responseObject),renterOwnerNo,e);
+            Cat.logError("Feign 保费系数",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
+    
+    
+    public  List<RenterInsureCoefficientVO> insureCoefficient(String renterOrderNo) {
+        ResponseData<List<RenterInsureCoefficientVO>> responseObject = null;
+        Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "保费系数");
+        try{
+            Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderCostService.getBaoFeiInfo");
+            log.info("Feign 保费系数,renterOrderNo={}",renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_PARAM,"renterOwnerNo="+renterOrderNo);
+            responseObject= feignOrderCostService.insureCoefficient(renterOrderNo);
+            Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
+            ResponseCheckUtil.checkResponse(responseObject);
+            t.setStatus(Transaction.SUCCESS);
+            return responseObject.getData();
+        }catch (Exception e){
+            log.error("Feign 保费系数,responseObject={},renterOrderNo={}", JSON.toJSONString(responseObject),renterOrderNo,e);
+            Cat.logError("Feign 保费系数",e);
+            throw e;
+        }finally {
+            t.complete();
+        }
+    }
 
     /*
      * @Author ZhangBin

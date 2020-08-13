@@ -1,5 +1,6 @@
 package com.atzuche.order.parentorder.mapper;
 
+import com.atzuche.order.commons.entity.dto.LianHeMaiTongOrderDTO;
 import com.atzuche.order.parentorder.dto.SuccessOrderDTO;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -68,4 +69,6 @@ public interface OrderMapper {
     List<String> getorderNoAll();
 
     List<OrderEntity> getOrderByRenterMemNo(@Param("renterMemNo")String renterMemNo);
+
+    List<LianHeMaiTongOrderDTO> getOrderByMemNo(@Param("memNo")String memNo);
 }

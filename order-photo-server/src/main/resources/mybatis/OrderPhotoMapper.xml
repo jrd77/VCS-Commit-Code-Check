@@ -3,8 +3,12 @@
 <mapper namespace="com.atzuche.order.photo.mapper.OrderPhotoMapper">
 	
 	<select id="queryGetSrvCarList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
-		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator FROM order_car_condition_photo
-		where order_no=#{orderNo} and photo_type=#{type}	
+		SELECT id,photo_type photoType,path,user_type userType,order_no orderNo,create_time createTime,update_time updateTime,operator,serial_number as serialNumber FROM order_car_condition_photo
+		where order_no=#{orderNo}
+		<if test="type != null and type != ''">
+			and photo_type=#{type}
+		</if>
+
 	</select>
 	
 	<select id="queryInsuranceClaimPhotoList" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
@@ -17,7 +21,7 @@
 	
 	<insert id="addUploadOrderPhoto" parameterType="map">
 		 INSERT INTO
-		 <if test="photoType==1||photoType==2">
+		 <if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 		  order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},0,#{operator});
 		 </if>
 		 <if test="photoType==3">
@@ -31,7 +35,7 @@
 
 	<update id="updateUploadOrderPhoto" parameterType="map">
 		update
-		<if test="photoType==1||photoType==2">
+		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 			order_car_condition_photo set path = #{path}, operator = #{operator}, user_type = #{userType} where id = #{photoId};
 		</if>
 		<if test="photoType==3">
@@ -69,7 +73,7 @@
 
 	<select id="queryPhotoInfo" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		select order_no as orderNo, user_type as userType
-		<if test="photoType==1||photoType==2">
+		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 			from order_car_condition_photo where id = #{photoId};
 		</if>
 		<if test="photoType==3">
@@ -82,9 +86,9 @@
 
 	<insert id="addRenYunUploadOrderPhoto" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		INSERT INTO
-		<if test="photoType==1||photoType==2">
-			order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator});
-		</if>
+		order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator)
+        VALUES
+        (#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator})
 	</insert>
 
 	<select id="selectObjectByParams" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
@@ -94,7 +98,7 @@
 
 	<update id="updateUploadRenYunOrderPhoto" parameterType="map">
 	update
-	<if test="photoType==1||photoType==2">
+	<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
 		order_car_condition_photo set path = #{path},user_type = #{userType},serial_number = #{serialNumber},operator = #{operator},photo_type = #{photoType} where id = #{photoId};
 	</if>
 	</update>

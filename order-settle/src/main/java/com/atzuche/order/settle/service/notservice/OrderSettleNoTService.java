@@ -245,9 +245,9 @@ public class OrderSettleNoTService {
         if(OrderStatusEnum.TO_SETTLE.getStatus() != orderStatus.getStatus()
                 || SettleStatusEnum.SETTLEING.getCode() != orderStatus.getSettleStatus()
                 || SettleStatusEnum.SETTLEING.getCode() != orderStatus.getCarDepositSettleStatus() ){
-//            throw new RuntimeException("租客订单状态不是待结算，不能结算");
-            log.error("租客订单状态不是待结算，不能结算，orderNo=[{}]",renterOrder.getOrderNo());
-            return false;
+        	log.error("租客订单状态不是待结算，不能结算，orderNo=[{}]",renterOrder.getOrderNo());
+            throw new RuntimeException("租客订单状态不是待结算，不能结算");
+//            return false;
         }
 
         //判断取送车里程数是否填写，只有都填写了，才正常结算，否则不结算。
@@ -444,6 +444,7 @@ public class OrderSettleNoTService {
                 BeanUtils.copyProperties(oilAmt,accountRenterCostSettleDetail);
                 accountRenterCostSettleDetail.setCostCode(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getCashNo());
                 accountRenterCostSettleDetail.setCostDetail(RenterCashCodeEnum.ACCOUNT_RENTER_DELIVERY_OIL_COST.getTxt());
+                //油量差价
                 String oilDifferenceCrash = oilAmt.getOilDifferenceCrash();
                 oilDifferenceCrash = StringUtil.isBlank(oilDifferenceCrash)?"0":oilDifferenceCrash;
                 // 兼容小数 小数部分舍弃 例如1.9 =》1
@@ -1023,6 +1024,10 @@ public class OrderSettleNoTService {
         orderStatusService.saveOrderStatusInfo(settleOrdersAccount.getOrderStatusDTO());
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_WZ_SETTLE);
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(settleOrdersAccount.getRenterOrderNo(), OrderStatusEnum.TO_WZ_SETTLE.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(settleOrdersAccount.getOwnerOrderNo(), OrderStatusEnum.TO_WZ_SETTLE.getStatus());
     }
 
 

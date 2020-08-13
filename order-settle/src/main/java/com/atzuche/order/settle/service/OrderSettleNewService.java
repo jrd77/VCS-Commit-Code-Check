@@ -32,9 +32,9 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPayReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
+import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
-import com.atzuche.order.commons.enums.cashcode.OwnerCashCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.PayLineEnum;
@@ -43,12 +43,15 @@ import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.atzuche.order.parentorder.entity.OrderSourceStatEntity;
+import com.atzuche.order.parentorder.service.OrderSourceStatService;
 import com.atzuche.order.rentercost.entity.ConsoleRenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleCostDetailEntity;
 import com.atzuche.order.rentercost.entity.OrderConsoleSubsidyDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderSubsidyDetailEntity;
+import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.settle.service.notservice.OrderSettleProxyService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.AccountOldDebtReqVO;
@@ -62,7 +65,6 @@ import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
-import com.autoyol.doc.util.StringUtil;
 import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderSettlementMq;
 import com.google.common.collect.ImmutableList;
@@ -89,6 +91,8 @@ public class OrderSettleNewService {
     private OrderSettleProxyService orderSettleProxyService;
     @Autowired
     private AccountDebtService accountDebtService;
+    @Autowired
+    OrderSourceStatService orderSourceStatService;
 
     /**
      *  先查询  发现 有结算数据停止结算 手动处理
@@ -501,6 +505,31 @@ public class OrderSettleNewService {
             accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
             settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
         }
+        
+        // 精准取车服务费
+        if(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCURATE_GET_SRV_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
+        // 精准还车服务费
+        if(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
+            int totalAmount = renterOrderCostDetail.getTotalAmount();
+            AccountPlatformProfitDetailEntity accountPlatformProfitDetail = new AccountPlatformProfitDetailEntity();
+            accountPlatformProfitDetail.setAmt(-totalAmount);
+            accountPlatformProfitDetail.setSourceCode(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getCashNo());
+            accountPlatformProfitDetail.setSourceDesc(RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT.getTxt());
+            accountPlatformProfitDetail.setUniqueNo(String.valueOf(renterOrderCostDetail.getId()));
+            accountPlatformProfitDetail.setOrderNo(renterOrderCostDetail.getOrderNo());
+            settleOrdersDefinition.addPlatformProfit(accountPlatformProfitDetail);
+        }
+        
         //2.2 取车运能加价
         if(RenterCashCodeEnum.GET_BLOCKED_RAISE_AMT.getCashNo().equals(renterOrderCostDetail.getCostCode())){
             int totalAmount = renterOrderCostDetail.getTotalAmount();
@@ -662,7 +691,7 @@ public class OrderSettleNewService {
      * flag  0：成功 1：失败
      * @param orderNo
      */
-    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status,String ownerMemNo) {
+    public void sendOrderSettleMq(String orderNo,String renterMemNo,RentCosts rentCosts,int status,String ownerMemNo,RenterOrderEntity renterOrder) {
         log.info("sendOrderSettleMq start [{}],[{}],[{}],[{}]",orderNo,renterMemNo,GsonUtils.toJson(rentCosts),status);
         AccountRenterCostSettleEntity entity=cashierSettleService.getAccountRenterCostSettleEntity(orderNo,renterMemNo);
         OrderSettlementMq orderSettlementMq = new OrderSettlementMq();
@@ -671,6 +700,7 @@ public class OrderSettleNewService {
             orderSettlementMq.setInsureTotalPrices(insureTotalPrices);
             String abatementInsure = Objects.nonNull(entity.getComprehensiveEnsureAmount())?String.valueOf(entity.getComprehensiveEnsureAmount()):"0";
             orderSettlementMq.setAbatementInsure(abatementInsure);
+            orderSettlementMq.setYingkouAmt(entity.getYingkouAmt());
         }
         int subsidyPlamtAmt=0;
         int subsidyOwnerAmt=0;
@@ -706,11 +736,27 @@ public class OrderSettleNewService {
             orderSettlementMq.setHolidayAverage(String.valueOf(price));
             orderSettlementMq.setRentAmt(String.valueOf(rentAmt));
         }
+     // 获取订单来源信息
+        OrderSourceStatEntity osse = orderSourceStatService.selectByOrderNo(orderNo);
+        if(osse != null) {
+	        orderSettlementMq.setBusinessParentType(osse.getBusinessParentType());
+	        orderSettlementMq.setBusinessChildType(osse.getBusinessChildType());
+	        orderSettlementMq.setPlatformParentType(osse.getPlatformParentType());
+	        orderSettlementMq.setPlatformChildType(osse.getPlatformChildType());
+        }
+		
         orderSettlementMq.setStatus(status);
         orderSettlementMq.setOrderNo(orderNo);
         ///增加租客会员号，车主会员号 200228
         orderSettlementMq.setRenterMemNo(Integer.valueOf(renterMemNo));
         orderSettlementMq.setOwnerMemNo(Integer.valueOf(ownerMemNo));
+        //补充字段
+        if(renterOrder != null) {
+	        orderSettlementMq.setCarNo(Integer.valueOf(renterOrder.getGoodsCode()));
+	        orderSettlementMq.setRentTime(LocalDateTimeUtils.localDateTimeToDate(renterOrder.getExpRentTime()));
+	        orderSettlementMq.setRevertTime(LocalDateTimeUtils.localDateTimeToDate(renterOrder.getExpRevertTime()));
+        }
+        
         OrderMessage orderMessage = OrderMessage.builder().build();
         orderMessage.setMessage(orderSettlementMq);
         NewOrderMQActionEventEnum eventEnum = null;

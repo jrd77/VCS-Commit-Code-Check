@@ -2,10 +2,12 @@ package com.atzuche.order.accountownerincome.service.notservice;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
+import com.atzuche.order.accountownerincome.entity.AddIncomeExamine;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeExamineRepeatException;
 import com.atzuche.order.accountownerincome.exception.AccountOwnerIncomeSettleException;
 import com.atzuche.order.accountownerincome.mapper.AccountOwnerIncomeExamineMapper;
+import com.atzuche.order.accountownerincome.service.AddIncomeExamineService;
 import com.atzuche.order.commons.entity.orderDetailDto.AccountOwnerIncomeExamineDTO;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineStatus;
 import com.atzuche.order.commons.enums.account.income.AccountOwnerIncomeExamineType;
@@ -15,6 +17,7 @@ import com.atzuche.order.commons.vo.req.AdjustmentOwnerIncomeExamVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ public class AccountOwnerIncomeExamineNoTService {
     private AccountOwnerIncomeExamineMapper accountOwnerIncomeExamineMapper;
     @Autowired
     private AccountOwnerIncomeNoTService accountOwnerIncomeNoTService;
+    @Autowired
+    private AddIncomeExamineService addIncomeExamineService;
 
     /**
      * 结算后产生待审核收益 落库
@@ -210,5 +215,26 @@ public class AccountOwnerIncomeExamineNoTService {
      **/
     public List<AccountOwnerIncomeExamineEntity> getAccountOwnerIncomeExamineByOrderNo(String orderNo){
         return accountOwnerIncomeExamineMapper.getAccountOwnerIncomeExamineByOrderNo(orderNo);
+    }
+
+    /**
+     * 获取会员历史总收益金额
+     *
+     * @param memNo 会员号
+     * @return int 总收益金额
+     */
+    public int getOwnerIncomeAmt(String memNo) {
+        int totalIncomeAmt = 0;
+        List<AccountOwnerIncomeExamineEntity> incomeList = getIncomByOwnerMemAndStatus(memNo, null);
+        if (CollectionUtils.isNotEmpty(incomeList)) {
+            totalIncomeAmt =
+                    totalIncomeAmt + incomeList.stream().mapToInt(AccountOwnerIncomeExamineEntity::getAmt).sum();
+        }
+
+        List<AddIncomeExamine> addIncomeList = addIncomeExamineService.queryListByMemNo(memNo);
+        if (CollectionUtils.isNotEmpty(addIncomeList)) {
+            totalIncomeAmt = totalIncomeAmt + addIncomeList.stream().mapToInt(AddIncomeExamine::getAmt).sum();
+        }
+        return totalIncomeAmt;
     }
 }

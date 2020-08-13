@@ -24,8 +24,10 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.flow.service.OrderFlowService;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
 import com.atzuche.order.settle.service.AccountDebtService;
@@ -61,6 +63,10 @@ public class OrderWzSettleNoTService {
     CashierNoTService cashierNoTService;
     @Autowired
     private AccountDebtService accountDebtService;
+    @Autowired
+    private RenterOrderService renterOrderService;
+    @Autowired
+    private OwnerOrderService ownerOrderService;
 
 
     
@@ -258,7 +264,7 @@ public class OrderWzSettleNoTService {
             AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
             BeanUtils.copyProperties(settleOrders,entity);
             entity.setMemNo(settleOrders.getRenterMemNo());
-            entity.setWzAmt(-amt);
+            entity.setWzAmt(-Math.abs(amt));
             entity.setCostCode(RenterCashCodeEnum.HISTORY_AMT.getCashNo());
             entity.setCostDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
             entity.setUniqueNo(String.valueOf(debtDetailId));
@@ -283,6 +289,10 @@ public class OrderWzSettleNoTService {
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.TO_CLAIM_SETTLE);
         //2记录订单流传信息
         orderFlowService.inserOrderStatusChangeProcessInfo(settleOrdersAccount.getOrderNo(), OrderStatusEnum.COMPLETED);
+        // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(settleOrdersAccount.getRenterOrderNo(), OrderStatusEnum.COMPLETED.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(settleOrdersAccount.getOwnerOrderNo(), OrderStatusEnum.COMPLETED.getStatus());
     }
 
     

@@ -39,10 +39,13 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.exceptions.*;
 import com.atzuche.order.commons.exceptions.NoEffectiveErrException;
 import com.atzuche.order.commons.vo.res.RenterCostVO;
+import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.delivery.entity.OwnerHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterHandoverCarInfoEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
+import com.atzuche.order.delivery.entity.RenterOrderDeliveryMode;
 import com.atzuche.order.delivery.enums.RenterHandoverCarTypeEnum;
+import com.atzuche.order.delivery.service.RenterOrderDeliveryModeService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarInfoPriceService;
 import com.atzuche.order.delivery.service.handover.OwnerHandoverCarService;
@@ -189,6 +192,8 @@ public class OrderDetailService {
     private OrderSettleService orderSettleService;
     @Autowired
     private OrderStopFreightInfoService orderStopFreightInfoService;
+    @Autowired
+    private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
     @Autowired
     private WzQueryDayConfService wzQueryDayConfService;
 
@@ -344,13 +349,28 @@ public class OrderDetailService {
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailRespDTO.wzQueryDayConfDTO = wzQueryDayConfDTO;
+        /**
+         * 订单详情的主入口
+         	* 入口
+         */
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
+        
         // 获取停运费信息
         OrderStopFreightInfo orderStopFreightInfo = orderStopFreightInfoService.getOrderStopFreightInfoByOrderNo(orderNo);
         if (orderStopFreightInfo != null) {
         	OrderStopFreightDTO orderStopFreightDTO = new OrderStopFreightDTO();
         	BeanUtils.copyProperties(orderStopFreightInfo, orderStopFreightDTO);
         	orderDetailRespDTO.orderStopFreightDTO = orderStopFreightDTO;
+        }
+        // 获取区间配送信息
+        int srvGetFlag = renterOrderEntity.getIsGetCar() == null ? 0:renterOrderEntity.getIsGetCar();
+        int srvReturnFlag = renterOrderEntity.getIsReturnCar() == null ? 0:renterOrderEntity.getIsReturnCar();
+        if (renterOrderEntity != null && (srvGetFlag == 1 || srvReturnFlag == 1)) {
+        	SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+        	orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
+        	// 获取区间配送信息
+            SectionDeliveryVO ownerSectionDeliveryVO = renterOrderDeliveryModeService.getOwnerSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+            orderDetailRespDTO.ownerSectionDelivery = ownerSectionDeliveryVO;
         }
         return orderDetailRespDTO;
 
@@ -414,14 +434,24 @@ public class OrderDetailService {
             renterOrderDTO = new RenterOrderDTO();
             BeanUtils.copyProperties(renterOrderEntity,renterOrderDTO);
         }
-
+        // 获取有效的租客子订单
+        RenterOrderEntity effective = renterOrderService.getRenterOrderByOrderNoAndIsEffective(orderNo);
+        // 获取区间配送信息
+        SectionDeliveryVO sectionDeliveryVO = renterOrderDeliveryModeService.getOwnerSectionDeliveryVO(effective.getRenterOrderNo(), effective.getExpRentTime(), effective.getExpRevertTime());
         OrderDetailRespDTO  orderDetailRespDTO = new OrderDetailRespDTO();
+        orderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
         orderDetailRespDTO.order = orderDTO;
         orderDetailRespDTO.ownerOrder = ownerOrderDTO;
         orderDetailRespDTO.renterOrder = renterOrderDTO;
         orderDetailRespDTO.ownerGoods = ownerGoodsDTO;
         orderDetailRespDTO.renterGoods = renterGoodsDTO;
         orderDetailProxy(orderDetailRespDTO,orderNo,renterOrderNo,ownerOrderNo);
+        // 订单状态转换
+        Integer ownerStatus = ownerOrderDTO.getOwnerStatus();
+        if (ownerStatus != null && ownerStatus.intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+        	// 车主端订单状态显示待确认
+        	orderDetailRespDTO.orderStatus.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+        }
         return orderDetailRespDTO;
 
     }
@@ -748,7 +778,7 @@ public class OrderDetailService {
     private RenterDeliveryAddrDTO initAddr(RenterOrderDeliveryDTO renterOrderDeliveryGet,
                                            RenterOrderDeliveryDTO renterOrderDeliveryReturn,
                                            RenterGoodsDTO renterGoodsDTO){
-
+    	Integer carAddrIndex = renterGoodsDTO.getCarAddrIndex();
         RenterDeliveryAddrDTO renterDeliveryAddrDTO = new RenterDeliveryAddrDTO();//取送车地址
         if(renterOrderDeliveryGet !=null && renterOrderDeliveryGet.getIsNotifyRenyun()!= null && renterOrderDeliveryGet.getIsNotifyRenyun() == 1){
             renterDeliveryAddrDTO.setOrderNo(renterOrderDeliveryGet.getOrderNo());
@@ -762,7 +792,8 @@ public class OrderDetailService {
         }else{
             renterDeliveryAddrDTO.setOrderNo(renterGoodsDTO.getOrderNo());
             renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDTO.getRenterOrderNo());
-            if(renterGoodsDTO.getCarShowAddr() != null && renterGoodsDTO.getCarShowAddr().trim().length()>0){
+            if(renterGoodsDTO.getCarShowAddr() != null && renterGoodsDTO.getCarShowAddr().trim().length()>0 
+            		&& carAddrIndex != null && carAddrIndex.intValue() != 0){
                 renterDeliveryAddrDTO.setExpGetCarAddr(renterGoodsDTO.getCarShowAddr());
                 renterDeliveryAddrDTO.setExpGetCarLon(renterGoodsDTO.getCarShowLon());
                 renterDeliveryAddrDTO.setExpGetCarLat(renterGoodsDTO.getCarShowLat());
@@ -773,6 +804,15 @@ public class OrderDetailService {
                 renterDeliveryAddrDTO.setExpGetCarAddr(renterGoodsDTO.getCarRealAddr());
                 renterDeliveryAddrDTO.setExpGetCarLon(renterGoodsDTO.getCarRealLon());
                 renterDeliveryAddrDTO.setExpGetCarLat(renterGoodsDTO.getCarRealLat());
+                if (renterOrderDeliveryGet.getRenterGetReturnAddr() != null) {
+            		renterDeliveryAddrDTO.setExpGetCarAddr(renterOrderDeliveryGet.getRenterGetReturnAddr());
+            	}
+                if (renterOrderDeliveryGet.getRenterGetReturnAddrLon() != null) {
+                	renterDeliveryAddrDTO.setExpGetCarLon(renterOrderDeliveryGet.getRenterGetReturnAddrLon());
+                }
+                if (renterOrderDeliveryGet.getRenterGetReturnAddrLat() != null) {
+                	renterDeliveryAddrDTO.setExpGetCarLat(renterOrderDeliveryGet.getRenterGetReturnAddrLat());
+                }
                 renterDeliveryAddrDTO.setActGetCarAddr(renterDeliveryAddrDTO.getExpGetCarAddr());
                 renterDeliveryAddrDTO.setActGetCarLon(renterDeliveryAddrDTO.getExpGetCarLon());
                 renterDeliveryAddrDTO.setActGetCarLat(renterDeliveryAddrDTO.getExpGetCarLat());
@@ -789,7 +829,8 @@ public class OrderDetailService {
         }else{
             renterDeliveryAddrDTO.setOrderNo(renterGoodsDTO.getOrderNo());
             renterDeliveryAddrDTO.setRenterOrderNo(renterGoodsDTO.getRenterOrderNo());
-            if(renterGoodsDTO.getCarShowAddr() != null && renterGoodsDTO.getCarShowAddr().trim().length()>0){
+            if(renterGoodsDTO.getCarShowAddr() != null && renterGoodsDTO.getCarShowAddr().trim().length()>0
+            		&& carAddrIndex != null && carAddrIndex.intValue() != 0){
                 renterDeliveryAddrDTO.setExpReturnCarAddr(renterGoodsDTO.getCarShowAddr());
                 renterDeliveryAddrDTO.setExpReturnCarLon(renterGoodsDTO.getCarShowLon());
                 renterDeliveryAddrDTO.setExpReturnCarLat(renterGoodsDTO.getCarShowLat());
@@ -800,6 +841,15 @@ public class OrderDetailService {
                 renterDeliveryAddrDTO.setExpReturnCarAddr(renterGoodsDTO.getCarRealAddr());
                 renterDeliveryAddrDTO.setExpReturnCarLon(renterGoodsDTO.getCarRealLon());
                 renterDeliveryAddrDTO.setExpReturnCarLat(renterGoodsDTO.getCarRealLat());
+                if (renterOrderDeliveryReturn.getRenterGetReturnAddr() != null) {
+            		renterDeliveryAddrDTO.setExpReturnCarAddr(renterOrderDeliveryReturn.getRenterGetReturnAddr());
+            	}
+                if (renterOrderDeliveryReturn.getRenterGetReturnAddrLon() != null) {
+                	renterDeliveryAddrDTO.setExpReturnCarLon(renterOrderDeliveryReturn.getRenterGetReturnAddrLon());
+                }
+                if (renterOrderDeliveryReturn.getRenterGetReturnAddrLat() != null) {
+                	renterDeliveryAddrDTO.setExpReturnCarLat(renterOrderDeliveryReturn.getRenterGetReturnAddrLat());
+                }
                 renterDeliveryAddrDTO.setActReturnCarAddr(renterDeliveryAddrDTO.getExpReturnCarAddr());
                 renterDeliveryAddrDTO.setActReturnCarLon(renterDeliveryAddrDTO.getExpReturnCarLon());
                 renterDeliveryAddrDTO.setActReturnCarLat(renterDeliveryAddrDTO.getExpReturnCarLat());
@@ -1035,7 +1085,14 @@ public class OrderDetailService {
             BeanUtils.copyProperties(x,renterOrderSubsidyDetailDTO);
             renterOrderSubsidyDetailDTOS.add(renterOrderSubsidyDetailDTO);
         });
+        // 获取区间配送信息
+        SectionDeliveryVO sectionDeliveryVO = null;
+        if (renterOrderEntity != null) {
+        	sectionDeliveryVO = renterOrderDeliveryModeService.getRenterSectionDeliveryVO(renterOrderEntity.getRenterOrderNo(), renterOrderEntity.getExpRentTime(), renterOrderEntity.getExpRevertTime());
+        }
+        
         RenterOrderDetailRespDTO renterOrderDetailRespDTO = new RenterOrderDetailRespDTO();
+        renterOrderDetailRespDTO.sectionDelivery = sectionDeliveryVO;
         renterOrderDetailRespDTO.order = orderDTO;
         renterOrderDetailRespDTO.renterOrder = renterOrderDTO;
         renterOrderDetailRespDTO.renterGoods = renterGoodsDTO;
@@ -1260,7 +1317,19 @@ public class OrderDetailService {
         orderDetailDTO.rentTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRentTime(),GlobalConstant.FORMAT_DATE_STR1);
         orderDetailDTO.revertTimeStr = LocalDateTimeUtils.localdateToString(orderEntity.getExpRevertTime(),GlobalConstant.FORMAT_DATE_STR1);
         orderDetailDTO.orderNo = orderNo;
-
+        // 处理待接单标识
+        // 获取车主订单信息
+        OwnerOrderEntity ownerOrderEntity = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
+        // 车主子订单状态
+        int ownerStatus = ownerOrderEntity == null || ownerOrderEntity.getOwnerStatus() == null ? 0:ownerOrderEntity.getOwnerStatus();
+        if ((orderStatusEntity.getStatus() != null && orderStatusEntity.getStatus().intValue() == OrderStatusEnum.TO_CONFIRM.getStatus()) 
+        		|| ownerStatus == OrderStatusEnum.TO_CONFIRM.getStatus()) {
+        	// 车主未处理
+        	orderDetailDTO.showConfirmButFlag = 1;
+        } else {
+        	// 车主已处理或当前状态不能处理
+        	orderDetailDTO.showConfirmButFlag = 0;
+        }
 
         //租客历史订单
         List<RenterDetailDTO> renterDetailDTOS = new ArrayList<>();
@@ -1273,6 +1342,10 @@ public class OrderDetailService {
                 renterOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
                 renterOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 renterOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                // 处理子订单状态
+                Integer renterStatus = x.getRenterStatus() == null ? orderStatusEntity.getStatus():x.getRenterStatus();
+                renterOrderDTO.setRenterStatus(renterStatus);
+                renterOrderDTO.setRenterStatusTxt(OrderStatusEnum.getDescByStatus(renterStatus));
                 RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(x.getRenterOrderNo(), false);
                 RenterMemberDTO renterMemberDTO = renterMemberService.selectrenterMemberByRenterOrderNo(x.getRenterOrderNo(), false);
                 renterDetailDTO.setRenterOrderDTO(renterOrderDTO);
@@ -1292,6 +1365,13 @@ public class OrderDetailService {
                 ownerOrderDTO.setIsEffectiveTxt(EffectiveEnum.getName(x.getIsEffective()));
                 ownerOrderDTO.setExpRevertTimeStr(x.getExpRevertTime()!=null? LocalDateTimeUtils.localdateToString(x.getExpRevertTime(), GlobalConstant.FORMAT_DATE_STR1):null);
                 ownerOrderDTO.setExpRentTimeStr(x.getExpRentTime()!=null?LocalDateTimeUtils.localdateToString(x.getExpRentTime(), GlobalConstant.FORMAT_DATE_STR1):null);
+                // 处理子订单状态
+                Integer ownerStatusx = x.getOwnerStatus() == null ? orderStatusEntity.getStatus():x.getOwnerStatus();
+                if (x.getChildStatus() != null && x.getChildStatus().intValue() == OwnerChildStatusEnum.END.getCode()) {
+                	ownerStatusx = OrderStatusEnum.CLOSED.getStatus();
+                }
+                ownerOrderDTO.setOwnerStatus(ownerStatusx);
+                ownerOrderDTO.setOwnerStatusTxt(OrderStatusEnum.getDescByStatus(ownerStatusx));
                 OwnerMemberDTO ownerMemberDTO = ownerMemberService.selectownerMemberByOwnerOrderNo(x.getOwnerOrderNo(), false);
                 OwnerGoodsDetailDTO ownerGoodsDetail = ownerGoodsService.getOwnerGoodsDetail(x.getOwnerOrderNo(), false);
                 ownerDetailDTO.setOwnerOrderDTO(ownerOrderDTO);

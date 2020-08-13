@@ -54,4 +54,8 @@ public class InsurAmtDTO {
 	 * 是否购买驾乘无忧保障服务
 	 */
 	private Integer driverInsurFlag;
+	/**
+	 * 车辆等级
+	 */
+	private Integer carLevel;
 }

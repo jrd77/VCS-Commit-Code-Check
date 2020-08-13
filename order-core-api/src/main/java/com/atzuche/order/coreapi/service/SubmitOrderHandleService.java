@@ -151,8 +151,8 @@ public class SubmitOrderHandleService {
                 context.getOwnerMemberDto().getMemNo(),
                 context.getOrderReqVO().getCarNo());
         // 主订单处理(订单:order、状态:order_status、统计:order_source_stat等)
-        boolean replyFlag = null != context.getRenterGoodsDetailDto().getReplyFlag() &&
-                context.getRenterGoodsDetailDto().getReplyFlag() == OrderConstant.YES;
+
+        boolean replyFlag = RenterOrderService.isAutoReplyFlag(context.getOrderReqVO().getRentTime(), context.getRenterGoodsDetailDto().getAdvanceOrderTime(), context.getRenterGoodsDetailDto().getReplyFlag());
         ParentOrderDTO parentOrderDTO = buildParentOrderDTO(
                 baseReqDTO.getOrderNo(),
                 context.getRiskAuditId(),
@@ -160,16 +160,24 @@ public class SubmitOrderHandleService {
                 context.getOrderReqVO(),context.getRenterGoodsDetailDto());
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
         // 订单流程处理(orderFlow)
-        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_CONFIRM);
+        orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.TO_PAY); // 支付接单分离，默认下单待支付
+        // 车主订单状态
+        int ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
         if (replyFlag) {
-            orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
+        	ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
+            //orderFlowService.inserOrderStatusChangeProcessInfo(baseReqDTO.getOrderNo(), OrderStatusEnum.from(parentOrderDTO.getOrderStatusDTO().getStatus()));
         }
+     // 更新租客订单状态
+        renterOrderService.updateRenterStatusByRenterOrderNo(baseReqDTO.getRenterOrderNo(), OrderStatusEnum.TO_PAY.getStatus());
+        // 更新车主订单状态
+        ownerOrderService.updateOwnerStatusByOwnerOrderNo(baseReqDTO.getOwnerOrderNo(), ownerStatus);
         // 保存停运费信息
         saveOrderStopFreightInfo(baseReqDTO.getOrderNo(), context.getOwnerGoodsDetailDto());
         // 换车记录初始化(orderTransferRecordService.saveOrderTransferRecord)
         orderTransferRecordService.saveOrderTransferRecord(convertToOrderTransferRecordEntity(context, baseReqDTO.getOrderNo()));
         return parentOrderDTO.getOrderStatusDTO().getStatus();
     }
+
 
     /**
      * 对象转换
@@ -189,7 +197,13 @@ public class SubmitOrderHandleService {
         OrderTransferRecordEntity orderTransferRecordEntity = new OrderTransferRecordEntity();
         orderTransferRecordEntity.setCarNo(renterGoodsDetailDto.getCarNo() == null ? null : String.valueOf(renterGoodsDetailDto.getCarNo()));
         orderTransferRecordEntity.setCarPlateNum(renterGoodsDetailDto.getCarPlateNum());
-        orderTransferRecordEntity.setOperator(OrderConstant.SYSTEM_OPERATOR);
+
+        String specialConsole = reqContext.getOrderReqVO().getSpecialConsole();
+        if("1".equals(specialConsole)){
+            orderTransferRecordEntity.setOperator(reqContext.getOrderReqVO().getOperator());
+        }else{
+            orderTransferRecordEntity.setOperator( OrderConstant.SYSTEM_OPERATOR);
+        }
         RenterMemberDTO renterMemberDto = reqContext.getRenterMemberDto();
         if (renterMemberDto != null) {
             orderTransferRecordEntity.setMemNo(renterMemberDto.getMemNo());
@@ -272,6 +286,7 @@ public class SubmitOrderHandleService {
                 Integer.valueOf(orderReqVO.getSpecialConsole()));
         orderSourceStatDTO.setReqSource(null == orderReqVO.getReqSource() ? null : orderReqVO.getReqSource().toString());
         orderSourceStatDTO.setLongRentCouponCode(orderReqVO.getLongOwnerCouponNo());
+        orderSourceStatDTO.setOilType(orderReqVO.getOilType());
         logger.info("Build order source stat dto,result is ,orderSourceStatDTO:[{}]", JSON.toJSONString(orderSourceStatDTO));
         return orderSourceStatDTO;
     }
@@ -294,13 +309,11 @@ public class SubmitOrderHandleService {
 
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
-        LocalDateTime rentTime = orderReqVO.getRentTime();
-
-        if (replyFlag && (renterGoodsDetailDto.getAdvanceOrderTime()==null || Duration.between(LocalDateTime.now(), rentTime).toHours() >= renterGoodsDetailDto.getAdvanceOrderTime())) {
+        if (replyFlag) {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
             renterGoodsDetailDto.setIsAutoReplayFlag(1);
         } else {
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_CONFIRM.getStatus());
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus()); // 支付接单分离，下单默认待支付
             renterGoodsDetailDto.setIsAutoReplayFlag(0);
         }
         parentOrderDTO.setOrderDTO(orderDTO);
@@ -431,6 +444,7 @@ public class SubmitOrderHandleService {
         ownerOrderReqDTO.setCategory(Integer.valueOf(reqContext.getOrderReqVO().getOrderCategory()));
 
         ownerOrderReqDTO.setReplyFlag(reqContext.getOwnerGoodsDetailDto().getReplyFlag());
+        ownerOrderReqDTO.setAutoReplyFlag(RenterOrderService.isAutoReplyFlag(reqContext.getOrderReqVO().getRentTime(),reqContext.getRenterGoodsDetailDto().getAdvanceOrderTime(),reqContext.getOwnerGoodsDetailDto().getReplyFlag()));
         ownerOrderReqDTO.setCarOwnerType(reqContext.getOwnerGoodsDetailDto().getCarOwnerType());
         ownerOrderReqDTO.setServiceRate(reqContext.getOwnerGoodsDetailDto().getServiceRate());
         ownerOrderReqDTO.setServiceProxyRate(reqContext.getOwnerGoodsDetailDto().getServiceProxyRate());

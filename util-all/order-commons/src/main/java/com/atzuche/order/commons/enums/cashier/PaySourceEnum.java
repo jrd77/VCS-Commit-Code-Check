@@ -11,7 +11,7 @@ public enum PaySourceEnum {
     WALLET_PAY("00","钱包支付"),
     UNIONPAY("01","银联"),
     AT_OFFLINE("02","线下支付"),
-    ALIPAY("06","支付宝普通预授权"),
+    ALIPAY("06","支付宝"),
     WEIXIN_APP("07","微信App"),
     BILL99("08","快钱支付(统一app和H5)"),
     APPLEPAY("12","Applepay"),

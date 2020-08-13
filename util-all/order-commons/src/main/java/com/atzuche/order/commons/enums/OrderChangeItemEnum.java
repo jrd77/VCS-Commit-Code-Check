@@ -23,6 +23,7 @@ public enum OrderChangeItemEnum {
 	MODIFY_TRANSFER("13", "管理后台换车"),
 	MODIFY_TYREINSUR("14", "修改轮胎保费服务标志"),
 	MODIFY_DRIVERINSUR("15", "修改驾乘无忧保障服务标志"),
+	MODIFY_ACCURATE_SRV("16", "修改区间配送模式"),
     ;
 
 

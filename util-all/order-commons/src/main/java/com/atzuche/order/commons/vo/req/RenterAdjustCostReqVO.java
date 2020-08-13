@@ -39,5 +39,16 @@ public class RenterAdjustCostReqVO {
     private String ownerToRenterAdjustAmt;
     // 操作人
     private String operateName;
+
+    @AutoDocProperty("调价原因类型")
+    @NotBlank(message = "调价原因类型不能为空")
+    private Integer adjustReasonType;
+
+    @AutoDocProperty("调价原因描述")
+    @NotBlank(message = "调价原因描述不能为空")
+    private String adjustReasonDesc;
+
+    @AutoDocProperty("当调价原因类型为【其他】时的备注内容")
+    private String remarkContent;
     
 }

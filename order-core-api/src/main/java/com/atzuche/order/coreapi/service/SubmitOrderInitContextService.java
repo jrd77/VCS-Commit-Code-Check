@@ -8,6 +8,7 @@ import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.service.remote.CarRentalTimeApiProxyService;
 import com.atzuche.order.mem.MemProxyService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
+import com.atzuche.order.renterorder.service.RenterOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,10 @@ public class SubmitOrderInitContextService {
         //租客商品明细
         RenterGoodsDetailDTO renterGoodsDetailDTO =
                 goodsService.getRenterGoodsDetail(orderCommonConver.buildCarDetailReqVO(orderReqVO));
+        boolean autoReplyFlag = RenterOrderService.isAutoReplyFlag(orderReqVO.getRentTime(), renterGoodsDetailDTO.getAdvanceOrderTime(), renterGoodsDetailDTO.getReplyFlag());
+        renterGoodsDetailDTO.setIsAutoReplayFlag(autoReplyFlag?1:0);
+
+
         reqContext.setRenterGoodsDetailDto(renterGoodsDetailDTO);
 
         //一天一价分组

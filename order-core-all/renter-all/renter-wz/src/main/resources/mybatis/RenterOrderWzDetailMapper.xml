@@ -309,8 +309,9 @@
 
 	<insert id ="addIllegalDetailFromRenyun" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO renter_order_wz_detail (order_no,car_plate_num,illegal_time,illegal_addr,illegal_reason,illegal_amt,illegal_deduct,create_time,
-		order_flag,is_sms,ry_wz_code)
-		VALUES (#{orderNo},#{carPlateNum},#{illegalTime},#{illegalAddr},#{illegalReason},#{illegalAmt},#{illegalDeduct},#{createTime},#{orderFlag},#{isSms},#{ryWzCode})
+		order_flag,is_sms,ry_wz_code, code)
+		VALUES
+		(#{orderNo},#{carPlateNum},#{illegalTime},#{illegalAddr},#{illegalReason},#{illegalAmt},#{illegalDeduct},#{createTime},#{orderFlag},#{isSms},#{ryWzCode}, #{code})
 	</insert >
 
 	<update id="updateFeeByWzCode" parameterType= "com.atzuche.order.renterwz.entity.RenterOrderWzDetailEntity">
@@ -374,7 +375,8 @@
 			illegal_reason,
 			illegal_amt,
 			illegal_deduct,
-			is_sms
+			is_sms,
+			illegal_supercer_cost
 		from renter_order_wz_detail where order_flag = 1 and order_no = #{orderNo} and car_plate_num = #{plateNum} and is_valid=1 and is_delete = 0
 	</select>
 

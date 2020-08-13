@@ -12,12 +12,12 @@ public class ResponseCheckUtil {
     private ResponseCheckUtil() {
     }
 
-    public static void  checkResponse(ResponseData responseObject){
-        if(responseObject==null||!ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())){
-            RemoteCallException remoteCallException = null;
-            if(responseObject!=null){
-                remoteCallException = new RemoteCallException(responseObject.getResCode(),responseObject.getResMsg(),responseObject.getData());
-            }else{
+    public static void checkResponse(ResponseData responseObject) {
+        if (responseObject == null || !ErrorCode.SUCCESS.getCode().equalsIgnoreCase(responseObject.getResCode())) {
+            RemoteCallException remoteCallException;
+            if (responseObject != null) {
+                remoteCallException = new RemoteCallException(responseObject.getResCode(), responseObject.getResMsg(), responseObject.getData());
+            } else {
                 remoteCallException = new RemoteCallException(com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getCode(),
                         com.atzuche.order.commons.enums.ErrorCode.REMOTE_CALL_FAIL.getText());
             }

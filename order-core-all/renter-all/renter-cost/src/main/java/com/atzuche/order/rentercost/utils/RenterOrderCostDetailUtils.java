@@ -3,7 +3,10 @@ package com.atzuche.order.rentercost.utils;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 从费用详情里分离出指定的费用
@@ -11,6 +14,15 @@ import java.util.List;
  * @date 2020/2/7 3:14 下午
  **/
 public class RenterOrderCostDetailUtils {
+
+
+    public static List<RenterOrderCostDetailEntity> filterByCashCode(List<RenterOrderCostDetailEntity> costDetailEntityList, RenterCashCodeEnum cashCodeEnum){
+        List<RenterOrderCostDetailEntity> collect = Optional.ofNullable(costDetailEntityList).orElseGet(ArrayList::new)
+                .stream()
+                .filter(x -> cashCodeEnum.getCashNo().equals(x.getCostCode()))
+                .collect(Collectors.toList());
+        return collect;
+    }
 
     /**
      * 从列表中返回指定编码的费用类型
@@ -138,7 +150,26 @@ public class RenterOrderCostDetailUtils {
      */
     public static int getDistributionCost(List<RenterOrderCostDetailEntity> costDetailEntityList){
         return getReturnBlockedRaiseAmt(costDetailEntityList) + getGetBlockedRaiseAmt(costDetailEntityList)
-                + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList);
+                + getSrvReturnCostAmt(costDetailEntityList) + getSrvGetCostAmt(costDetailEntityList)
+                + getAccurateGetSrvAmt(costDetailEntityList) + getAccurateReturnSrvAmt(costDetailEntityList);
+    }
+    
+    /**
+     * 精准取车服务费(负值）
+     * @param costDetailEntityList
+     * @return int
+     */
+    public static int getAccurateGetSrvAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.ACCURATE_GET_SRV_AMT);
+    }
+    
+    /**
+     * 精准还车服务费(负值）
+     * @param costDetailEntityList
+     * @return int
+     */
+    public static int getAccurateReturnSrvAmt(List<RenterOrderCostDetailEntity> costDetailEntityList){
+        return getAmt(costDetailEntityList,RenterCashCodeEnum.ACCURATE_RETURN_SRV_AMT);
     }
 
 }
