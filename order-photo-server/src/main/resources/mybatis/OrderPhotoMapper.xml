@@ -97,10 +97,8 @@
 	</select>
 
 	<update id="updateUploadRenYunOrderPhoto" parameterType="map">
-	update
-	<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
+		update
 		order_car_condition_photo set path = #{path},user_type = #{userType},serial_number = #{serialNumber},operator = #{operator},photo_type = #{photoType} where id = #{photoId};
-	</if>
 	</update>
 
 
