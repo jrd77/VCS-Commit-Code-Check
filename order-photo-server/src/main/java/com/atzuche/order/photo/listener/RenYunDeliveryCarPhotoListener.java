@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -59,7 +60,10 @@ public class RenYunDeliveryCarPhotoListener {
             OrderPhotoEntity orderPhoto = orderPhotoService.selectObjectByParams(orderPhotoEntity);
             if (Objects.nonNull(orderPhoto)) {
                 orderPhoto.setPath(orderPhotoEntity.getPath());
-                orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType(), orderPhoto.getSerialNumber());
+                String photoType = orderPhoto.getPhotoType();
+                if(!StringUtils.isEmpty(photoType)&&(photoType.equals("1")||photoType.equals("2")||photoType.equals("6")||photoType.equals("7"))){
+                    orderPhotoService.updateDeliveryCarPhotoInfo(orderPhoto.getId(), orderPhoto.getPath(), orderPhoto.getOperator(), orderPhoto.getUserType(), orderPhoto.getPhotoType(), orderPhoto.getSerialNumber());
+                }
             } else {
                 orderPhotoEntity.setPhotoOperator(deliveryCarConditionPhotoVO.getUserType());
                 orderPhotoService.recevieRenYunDeliveryCarPhoto(orderPhotoEntity);
