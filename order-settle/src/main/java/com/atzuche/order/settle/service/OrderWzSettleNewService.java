@@ -93,10 +93,11 @@ public class OrderWzSettleNewService {
     private static final String WZ_DEPOSIT_PAY_KIND = "02";
     // 虚拟支付
     private static final int PAY_LINE_VIRTUAL = 2;
+
     /**
      * 初始化结算对象
      *
-     * @param orderNo
+     * @param orderNo 订单号
      */
     public SettleOrdersWz initSettleOrders(String orderNo) {
         SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
@@ -123,11 +124,7 @@ public class OrderWzSettleNewService {
             settleOrdersWz.setOwnerMemNo("0");
             settleOrdersWz.setOwnerOrderNo("0");
         }
-        
-        //外置
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-//        this.check(renterOrder);
-        
+
         // 3 初始化数据
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
@@ -158,8 +155,6 @@ public class OrderWzSettleNewService {
 		// 1 先查询 发现 有结算数据停止结算 手动处理
 		boolean checkFlag = this.checkIsSettle(renterOrder.getOrderNo());
 		if(!checkFlag) {
-//			return checkFlag;
-			//通过异常来处理 200713
 			throw new RuntimeException("租客订单状态不是待结算，不能结算");
 		}
 		
@@ -227,32 +222,27 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.getRenterWzCostSettleDetail(settleOrders);
 		log.info("wz OrderSettleService getRenterWzCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 		Cat.logEvent("settleOrders", GsonUtils.toJson(settleOrders));
-
-		RentCostsWz rentCosts = settleOrders.getRentCostsWz();//违章费用对象
+        //违章费用对象
+		RentCostsWz rentCosts = settleOrders.getRentCostsWz();
 		if (Objects.nonNull(rentCosts)) {
 			// 1.1 查询违章费用
-
 			List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetails = rentCosts.getRenterOrderWzCostDetails();
 			if (!CollectionUtils.isEmpty(renterOrderWzCostDetails)) {
-
 				List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails = new ArrayList<AccountRenterWzDepositCostSettleDetailEntity>();
-
-				for (int i = 0; i < renterOrderWzCostDetails.size(); i++) {
-					RenterOrderWzCostDetailEntity renterOrderWzCostDetail = renterOrderWzCostDetails.get(i);
-					AccountRenterWzDepositCostSettleDetailEntity accountRenterWzDepositCostSettleDetail = new AccountRenterWzDepositCostSettleDetailEntity();
-					// 赋值
-					accountRenterWzDepositCostSettleDetail.setOrderNo(renterOrderWzCostDetail.getOrderNo());
-					accountRenterWzDepositCostSettleDetail.setMemNo(String.valueOf(renterOrderWzCostDetail.getMemNo()));
-					accountRenterWzDepositCostSettleDetail.setUniqueNo(String.valueOf(renterOrderWzCostDetail.getId()));
-					accountRenterWzDepositCostSettleDetail.setPrice(renterOrderWzCostDetail.getAmount());
-					accountRenterWzDepositCostSettleDetail.setWzAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount()));
-					accountRenterWzDepositCostSettleDetail.setUnit(1);
+                for (RenterOrderWzCostDetailEntity renterOrderWzCostDetail : renterOrderWzCostDetails) {
+                    AccountRenterWzDepositCostSettleDetailEntity accountRenterWzDepositCostSettleDetail = new AccountRenterWzDepositCostSettleDetailEntity();
+                    // 赋值
+                    accountRenterWzDepositCostSettleDetail.setOrderNo(renterOrderWzCostDetail.getOrderNo());
+                    accountRenterWzDepositCostSettleDetail.setMemNo(String.valueOf(renterOrderWzCostDetail.getMemNo()));
+                    accountRenterWzDepositCostSettleDetail.setUniqueNo(String.valueOf(renterOrderWzCostDetail.getId()));
+                    accountRenterWzDepositCostSettleDetail.setPrice(renterOrderWzCostDetail.getAmount());
+                    accountRenterWzDepositCostSettleDetail.setWzAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount()));
+                    accountRenterWzDepositCostSettleDetail.setUnit(1);
                     accountRenterWzDepositCostSettleDetail.setType(10);
                     accountRenterWzDepositCostSettleDetail.setCostCode(renterOrderWzCostDetail.getCostCode());
                     accountRenterWzDepositCostSettleDetail.setCostDetail(renterOrderWzCostDetail.getCostDesc());
-
-					accountRenterWzDepositCostSettleDetails.add(accountRenterWzDepositCostSettleDetail);
-				}
+                    accountRenterWzDepositCostSettleDetails.add(accountRenterWzDepositCostSettleDetail);
+                }
 
 				if (accountRenterWzDepositCostSettleDetails.size() > 0) {
 					// 落库

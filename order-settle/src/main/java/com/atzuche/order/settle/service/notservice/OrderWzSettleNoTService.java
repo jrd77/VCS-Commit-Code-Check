@@ -69,27 +69,24 @@ public class OrderWzSettleNoTService {
     private OwnerOrderService ownerOrderService;
 
 
-    
     /**
      * 查询租客费用明细
-     * @param settleOrders
+     *
+     * @param settleOrders 公共参数
      */
     public void getRenterWzCostSettleDetail(SettleOrdersWz settleOrders) {
-    	RentCostsWz rentCostsWz = new RentCostsWz();
-    	
+        RentCostsWz rentCostsWz = new RentCostsWz();
         //1 查询违章费用
         List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetails = renterOrderWzCostDetailService.queryInfosByOrderNo(settleOrders.getOrderNo());
-        //参考 com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService#querySettleInfoByOrder
 
-       
         int renterOrderCostWz = 0;
-        if(!CollectionUtils.isEmpty(renterOrderWzCostDetails)){
-        	for (RenterOrderWzCostDetailEntity renterOrderWzCostDetailEntity : renterOrderWzCostDetails) {
-        		renterOrderCostWz += renterOrderWzCostDetailEntity.getAmount();
-			}
+        if (!CollectionUtils.isEmpty(renterOrderWzCostDetails)) {
+            for (RenterOrderWzCostDetailEntity renterOrderWzCostDetailEntity : renterOrderWzCostDetails) {
+                renterOrderCostWz += renterOrderWzCostDetailEntity.getAmount();
+            }
         }
-        
         rentCostsWz.setRenterOrderWzCostDetails(renterOrderWzCostDetails);
+
         settleOrders.setRenterOrderCostWz(renterOrderCostWz);
         settleOrders.setRentCostsWz(rentCostsWz);
         settleOrders.setShouldTakeWzCost(renterOrderCostWz);
