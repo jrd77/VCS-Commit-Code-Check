@@ -331,46 +331,48 @@ public class CashierWzSettleService {
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
      *
-     * @param orderNo
-     * @param renterMemNo
-     * @param wzTotalAmt
-     * @return
+     * @param orderNo     订单号
+     * @param renterMemNo 租客会员号
+     * @param wzTotalAmt  违章总费用
+     * @return AccountRenterWzDepositCostEntity
      */
-    public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo,String renterMemNo,int wzTotalAmt) {
-    	//account_renter_wz_deposit
-    	AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
-    	if(Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())){
-            throw new RenterWZDepositCostException() ;
+    public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo, String renterMemNo, int wzTotalAmt) {
+        // 获取违章押金信息
+        AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
+        if (Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())) {
+            throw new RenterWZDepositCostException();
         }
-
-    	AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterMemNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getId())){
-//            throw new AccountRenterRentCostSettleException() ;
-        	entity = new AccountRenterWzDepositCostEntity();
-        	entity.setOrderNo(orderNo);
-        	entity.setMemNo(renterMemNo);
-        	entity.setYingfuAmt(wzTotalAmt);
-        	entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        	entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	entity.setIsDelete(0);
-
-        	//新增记录
-        	accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
-        }else {
-        	//修改记录
-        	entity.setYingfuAmt(wzTotalAmt);
-        	if(!(entity.getShifuAmt() != null && entity.getShifuAmt().intValue() != 0)) {
-        		//没有数据的时候才赋值。
-        		entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        		entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	}else { //存在的情况下，重新计算欠款。
-        		entity.setDebtAmt(wzTotalAmt-entity.getShifuAmt()>0?(wzTotalAmt-entity.getShifuAmt()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	}
-        	accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
+        // 获取违章押金费用信息
+        AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo, renterMemNo);
+        if (Objects.isNull(entity) || Objects.isNull(entity.getId())) {
+            entity = new AccountRenterWzDepositCostEntity();
+            entity.setOrderNo(orderNo);
+            entity.setMemNo(renterMemNo);
+            entity.setYingfuAmt(wzTotalAmt);
+            //需要获取实付金额
+            entity.setShifuAmt(depositEntity.getShishouDeposit());
+            //当前默认为0，后续产生欠款的时候，需要回写该字段。
+            entity.setDebtAmt(wzTotalAmt - depositEntity.getShishouDeposit() > 0 ? (wzTotalAmt - depositEntity.getShishouDeposit()) : 0);
+            entity.setIsDelete(0);
+            //新增记录
+            accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
+        } else {
+            //修改记录
+            entity.setYingfuAmt(wzTotalAmt);
+            if (!(entity.getShifuAmt() != null && entity.getShifuAmt() != 0)) {
+                //没有数据的时候才赋值。
+                //需要获取实付金额
+                entity.setShifuAmt(depositEntity.getShishouDeposit());
+                //当前默认为0，后续产生欠款的时候，需要回写该字段。
+                entity.setDebtAmt(wzTotalAmt - depositEntity.getShishouDeposit() > 0 ? (wzTotalAmt - depositEntity.getShishouDeposit()) : 0);
+            } else {
+                //存在的情况下，重新计算欠款。
+                //当前默认为0，后续产生欠款的时候，需要回写该字段。
+                entity.setDebtAmt(wzTotalAmt - entity.getShifuAmt() > 0 ? (wzTotalAmt - entity.getShifuAmt()) : 0);
+            }
+            accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
         }
         return entity;
-
-
     }
 
 

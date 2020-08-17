@@ -826,7 +826,7 @@ public class OrderSettleNoTService {
             reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
             yingkouAmt2 = orderSettleHandleService.accountRentetDepositHandle(reqVO);
         } else {
-	        // 10.1租客车辆押金/租客剩余租车费用 结余历史欠款
+	        // 10.1 租客车辆押金/租客剩余租车费用 结余历史欠款
 	        orderSettleNewService.repayHistoryDebtRent(settleOrdersAccount);
 	        // 10.2 抵扣老系统欠款
 	        totalOldRealDebtAmt = orderSettleNewService.oldRepayHistoryDebtRent(settleOrdersAccount);
