@@ -118,7 +118,8 @@ public class OwnerAgreeOrderService {
         RenterOrderEntity renterOrderEntity =
                 renterOrderService.getRenterOrderByOrderNoAndIsEffective(reqVO.getOrderNo());
         // 扣减库存
-        RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(reqVO.getOrderNo(), false);
+        RenterGoodsDetailDTO renterGoodsDetailDTO = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(),
+                false);
         OrderInfoDTO orderInfoDTO = buildReqVO(reqVO.getOrderNo(), ownerOrderEntity);
         // 自取自还并使用虚拟地址 特殊处理
         stockService.cutCarStockParamSpecialHandle(orderInfoDTO, renterGoodsDetailDTO,
