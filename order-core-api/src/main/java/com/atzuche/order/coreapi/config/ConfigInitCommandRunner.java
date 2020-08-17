@@ -21,6 +21,7 @@ public class ConfigInitCommandRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         logger.info("init the configSDK");
-        configSDKFactory.init();
+        //仅仅测试
+//        configSDKFactory.init();
     }
 }

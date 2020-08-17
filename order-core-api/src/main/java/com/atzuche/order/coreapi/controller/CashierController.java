@@ -1,14 +1,18 @@
 package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.PayRemoteService;
@@ -17,6 +21,7 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.ErrorCode;
+import com.atzuche.order.commons.vo.res.wallet.WalletBalanceVO;
 import com.atzuche.order.coreapi.service.PayCallbackService;
 import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.vo.req.PrePlatformRequest;
@@ -24,6 +29,7 @@ import com.autoyol.autopay.gateway.vo.res.PayResVo;
 import com.autoyol.commons.utils.GsonUtils;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
+
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -149,6 +155,16 @@ public class CashierController {
         return ResponseData.success(result);
 	}
     
+    
+    @AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletBalanceVO.class)
+	@GetMapping("/wallet/balance")
+	public ResponseData walletBalance(@RequestParam("memNo") String  memNo) {
+        int left = walletProxyService.getWalletByMemNo(memNo);
+        WalletBalanceVO walletResponseVO = new WalletBalanceVO();
+        walletResponseVO.setBalance(left);
+        walletResponseVO.setMemNo(memNo);
+		return ResponseData.success(walletResponseVO);
+	}
     
 
 }
