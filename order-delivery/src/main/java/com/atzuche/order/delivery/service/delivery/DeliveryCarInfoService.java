@@ -149,6 +149,8 @@ public class DeliveryCarInfoService {
         }
         getReturnCarCostReqDto.setCarShowLon(renterGoodsDetailDTO.getCarShowLon());
         getReturnCarCostReqDto.setCarShowLat(renterGoodsDetailDTO.getCarShowLat());
+        getReturnCarCostReqDto.setCarRealLat(renterGoodsDetailDTO.getCarRealLat());
+        getReturnCarCostReqDto.setCarRealLon(renterGoodsDetailDTO.getCarRealLon());
         GetReturnCostDTO getReturnCostDTO = getReturnCarCostProxyService.getReturnCarCost(getReturnCarCostReqDto);
         GetReturnResponseVO getReturnResponseVO = getReturnCostDTO.getGetReturnResponseVO();
         deliveryCarVO.getGetHandoverCarDTO().setGetCarCrash(String.valueOf(getReturnResponseVO.getGetFee()));
