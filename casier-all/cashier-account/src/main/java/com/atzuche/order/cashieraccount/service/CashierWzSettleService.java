@@ -229,13 +229,12 @@ public class CashierWzSettleService {
     }
     
     
-    /////从CashierService代码
     /**
      * 违章押金预授权退款方法
-     * @param rentSurplusWzDepositAmt
-     * @param cashierEntity
-     * @param cashierRefundApply
-     * @param cashCode
+     * @param rentSurplusWzDepositAmt 剩余违章押金信息
+     * @param cashierEntity 收银信息
+     * @param cashierRefundApply 退款信息
+     * @param cashCode 费用编码信息
      */
     public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
 		//是否存在预授权完成操作
@@ -251,8 +250,8 @@ public class CashierWzSettleService {
 			if(Math.abs(refundAmt) > cashierEntity.getPayAmt()) {
 				refundAmt = cashierEntity.getPayAmt();
 			}
-			
-			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+            //解冻
+			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID);
 			cashierRefundApply.setAmt(refundAmt);
 		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		    cashierRefundApply.setRemake(cashCode.getTxt());
@@ -290,15 +289,15 @@ public class CashierWzSettleService {
     
     /**
      * 违章押金的消费退货处理
-     * @param rentSurplusWzDepositAmt
-     * @param cashierEntity
-     * @param cashierRefundApply
-     * @param cashCode
+     * @param rentSurplusWzDepositAmt 剩余违章押金
+     * @param cashierEntity 收银信息
+     * @param cashierRefundApply 退款信息
+     * @param cashCode 费用编码信息
      */
 	public int refundWzDepositPurchase(int rentSurplusWzDepositAmt,
 			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
-        //缺少会员号,已经通过beanutils方式赋值。
-		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+        //退货
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN);
 		cashierRefundApply.setAmt(-rentSurplusWzDepositAmt);
 		cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		cashierRefundApply.setRemake(cashCode.getTxt());

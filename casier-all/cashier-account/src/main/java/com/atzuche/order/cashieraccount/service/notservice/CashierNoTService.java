@@ -153,13 +153,13 @@ public class CashierNoTService {
     
     /**
      * 根据会员号查询，to补付列表
-     * @param orderNo
-     * @return
+     * @param memNo 会员号
+     * @return List<RenterOrderEntity>
      */
     public List<RenterOrderEntity> getRenterOrderNoByMemNo(String memNo){
         List<RenterOrderEntity> listRenterOrderEntity =  renterOrderService.getRenterOrderByMemNoAndWaitPay(memNo);
         if(CollectionUtils.isEmpty(listRenterOrderEntity)){
-           return new ArrayList<RenterOrderEntity>();
+           return new ArrayList<>();
         }
         return listRenterOrderEntity;
     }
@@ -177,16 +177,14 @@ public class CashierNoTService {
      * 收银台支付记录
      */
     public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
-        return cashierEntity;
+        return cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
     }
     
     /**
      * 收银台支付记录，不含钱包支付记录
      */
     public CashierEntity getCashierEntityNoWallet(String orderNo,String memNo,String payKind){
-        CashierEntity cashierEntity = cashierMapper.getPayAmtByPayKindNoWallet(orderNo,memNo,payKind);
-        return cashierEntity;
+        return cashierMapper.getPayAmtByPayKindNoWallet(orderNo,memNo,payKind);
     }
     
     /**
