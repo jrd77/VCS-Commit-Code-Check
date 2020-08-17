@@ -49,26 +49,6 @@ public class SupplementController {
 	public ResponseData<?> addSupplement(@Valid @RequestBody OrderSupplementDetailDTO orderSupplementDetailDTO, BindingResult bindingResult) {
 		log.info("order/supplement/add orderSupplementDetailDTO=[{}]", orderSupplementDetailDTO);
 		BindingResultUtil.checkBindingResult(bindingResult);
-		// 获取订单结算状态
-		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderSupplementDetailDTO.getOrderNo());
-		if (orderStatus != null) {
-			if (orderStatus.getStatus() != null && orderStatus.getStatus().intValue() == OrderStatusEnum.CLOSED.getStatus()) {
-				orderSupplementDetailDTO.setCashType(2);
-			} else if (orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus() != 0) {
-				orderSupplementDetailDTO.setCashType(2);
-			} else if (orderStatus.getSettleStatus() != null && orderStatus.getSettleStatus() != 0) {
-				orderSupplementDetailDTO.setCashType(1);
-			} else {
-				throw new SupplementCanNotSupportException();
-			}
-		} else {
-			// 订单状态异常
-			log.error("order/supplement/add 订单状态异常");
-		}
-		if (orderSupplementDetailDTO.getAmt() >= 0 && 
-				orderSupplementDetailDTO.getCashType() != null && orderSupplementDetailDTO.getCashType() == 2) {
-			throw new SupplementAmtException();
-		}
 		supplementService.saveSupplement(orderSupplementDetailDTO);
 		return ResponseData.success();
     }
