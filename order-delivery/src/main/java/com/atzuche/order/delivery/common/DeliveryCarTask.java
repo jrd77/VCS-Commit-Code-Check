@@ -124,7 +124,7 @@ public class DeliveryCarTask {
         if (noticeRenYunFlag > OrderConstant.ZERO) {
             // 自取自还并使用虚拟地址特殊处理
             if (noticeRenYunFlag == OrderConstant.TWO) {
-                noServiceSpecialHandle(updateFlowOrderDTO, renterGoodsDetail, orderEntity.getCityCode());
+                noServiceSpecialHandle(updateFlowOrderDTO, renterGoodsDetail, orderEntity.getCityCode(), renterOrderEntity);
             }
             deliveryAsyncProxy.updateRenYunFlowOrderInfoProxy(updateFlowOrderDTO);
         }
@@ -505,7 +505,7 @@ public class DeliveryCarTask {
      * @param cityCode             城市编码
      */
     private void noServiceSpecialHandle(UpdateFlowOrderDTO renYunFlowOrderDTO,
-                                        RenterGoodsDetailDTO renterGoodsDetailDTO, String cityCode) {
+                                        RenterGoodsDetailDTO renterGoodsDetailDTO, String cityCode, RenterOrderEntity renterOrderEntity) {
 
         if (Objects.isNull(renYunFlowOrderDTO)) {
             return;
@@ -538,8 +538,8 @@ public class DeliveryCarTask {
         CarRentTimeRangeReqDTO reqDTO = new CarRentTimeRangeReqDTO();
         reqDTO.setCarNo(renterGoodsDetailDTO.getCarNo().toString());
         reqDTO.setCityCode(cityCode);
-        reqDTO.setRentTime(LocalDateTimeUtils.parseStringToDateTime(renYunFlowOrderDTO.getNewtermtime()));
-        reqDTO.setRevertTime(LocalDateTimeUtils.parseStringToDateTime(renYunFlowOrderDTO.getNewreturntime()));
+        reqDTO.setRentTime(renterOrderEntity.getExpRentTime());
+        reqDTO.setRevertTime(renterOrderEntity.getExpRevertTime());
         reqDTO.setSrvGetFlag(OrderConstant.YES);
         reqDTO.setSrvGetAddr(renYunFlowOrderDTO.getNewpickupcaraddr());
         reqDTO.setSrvGetLat(renYunFlowOrderDTO.getRealGetCarLat());
