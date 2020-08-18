@@ -23,8 +23,7 @@ public class GlobalExceptionAdvisor {
     @ExceptionHandler(Exception.class)
     public ResponseData handleException(Exception e){
         log.error("GlobalExceptionAdvisor.Exception",e);
-        ResponseData responseData = ResponseData.createErrorCodeResponse(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
-        return responseData;
+        return ResponseData.createErrorCodeResponse(ErrorCode.SYS_ERROR.getCode(),ErrorCode.SYS_ERROR.getText());
     }
 
     @ResponseBody
@@ -42,8 +41,7 @@ public class GlobalExceptionAdvisor {
     public ResponseData handleException(IllegalArgumentException exception){
         log.error("GlobalExceptionAdvisor.handleException",exception);
         Cat.logError(exception);
-        ResponseData responseData = ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(),ErrorCode.INPUT_ERROR.getText());
-        return responseData;
+        return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(),ErrorCode.INPUT_ERROR.getText());
     }
 
     @ResponseBody
@@ -51,8 +49,7 @@ public class GlobalExceptionAdvisor {
     public ResponseData handleException(BindException exception){
         log.error("GlobalExceptionAdvisor.handleException",exception);
         Cat.logError(exception);
-        ResponseData responseData = ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(),ErrorCode.INPUT_ERROR.getText());
-        return responseData;
+        return ResponseData.createErrorCodeResponse(ErrorCode.INPUT_ERROR.getCode(),ErrorCode.INPUT_ERROR.getText());
     }
 
 
