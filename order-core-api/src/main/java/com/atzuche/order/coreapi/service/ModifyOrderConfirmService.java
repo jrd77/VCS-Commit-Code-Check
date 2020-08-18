@@ -334,8 +334,8 @@ public class ModifyOrderConfirmService {
 				return;
 			}
 			OwnerOrderEntity ownerOrderEffective = modify.getOwnerOrderEffective();
-			Integer getMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getBeforeMinutes();
-			Integer returnMinutes = ownerOrderEffective == null ? 0:ownerOrderEffective.getAfterMinutes();
+			Integer getMinutes = ownerOrderEffective == null || ownerOrderEffective.getBeforeMinutes() == null ? 0:ownerOrderEffective.getBeforeMinutes();
+			Integer returnMinutes = ownerOrderEffective == null || ownerOrderEffective.getAfterMinutes() == null ? 0:ownerOrderEffective.getAfterMinutes();
 			if (modify.getTransferFlag() != null && modify.getTransferFlag()) {
 				// 换车操作先取消上笔仁云再新增当前订单
 				deliveryCarService.updateRenYunFlowOrderCarInfo(getMinutes, returnMinutes, reqContext, SrvGetReturnEnum.SRV_GET_TYPE.getCode(), true);
