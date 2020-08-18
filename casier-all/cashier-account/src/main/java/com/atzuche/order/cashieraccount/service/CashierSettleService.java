@@ -178,7 +178,7 @@ public class CashierSettleService {
 
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
-     * @param accountRenterCostSettleDetails
+     * @param accountRenterCostSettleDetails 租车费用明细
      */
     public AccountRenterCostSettleEntity updateRentSettleCost(String orderNo,String renterMemNo,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails) {
         AccountRenterCostSettleEntity entity = accountRenterCostSettleNoTService.getCostPaidRentSettle(orderNo,renterMemNo);
@@ -187,29 +187,17 @@ public class CashierSettleService {
         }
         if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
             // 平台补贴费用
-            int platformSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return CostTypeEnum.CONSOLE_SUBSIDY.getCode().equals(obj.getType());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int platformSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj -> CostTypeEnum.CONSOLE_SUBSIDY.getCode().equals(obj.getType())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //车主补贴费用
-            int carOwnerSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return CostTypeEnum.OWNER_SUBSIDY.getCode().equals(obj.getType());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int carOwnerSubsidyAmount = accountRenterCostSettleDetails.stream().filter(obj -> CostTypeEnum.OWNER_SUBSIDY.getCode().equals(obj.getType())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //附加驾驶人保证费用
-            int additionalDrivingEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int additionalDrivingEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.EXTRA_DRIVER_INSURE.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //补充保障服务费
-            int comprehensiveEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int comprehensiveEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.ABATEMENT_INSURE.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //基础保障费用
-            int basicEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int basicEnsureAmount = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.INSURE_TOTAL_PRICES.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //手续费
-            int yongjinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-                return RenterCashCodeEnum.FEE.getCashNo().equals(obj.getCostCode());
-            }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            int yongjinAmt = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.FEE.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //租车费用
             int rentAmt = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             entity.setYongjinAmt(yongjinAmt);
@@ -450,27 +438,27 @@ public class CashierSettleService {
 
     /**
      * 查询实付租车押金
-     * @param orderNo
-     * @param renterMemNo
-     * @return
+     *
+     * @param orderNo 订单号
+     * @param renterMemNo 租客订单号
+     * @return int 实付租车押金
      */
     public int getRentDepositRealPay(String orderNo, String renterMemNo) {
-        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo,renterMemNo);
-        if(Objects.isNull(vo) || Objects.isNull(vo.getShifuDepositAmt())){
+        AccountRenterDepositResVO vo = accountRenterDepositService.getAccountRenterDepositEntity(orderNo, renterMemNo);
+        if (Objects.isNull(vo) || Objects.isNull(vo.getShifuDepositAmt())) {
             return 0;
         }
-//        int depositAmt = vo.getShifuDepositAmt(); //默认值
-        int depositAmt = vo.getShifuDepositAmt()!=null?Math.abs(vo.getShifuDepositAmt()):0;
+        int depositAmt = vo.getShifuDepositAmt() != null ? Math.abs(vo.getShifuDepositAmt()) : 0;
         //普通预授权
-    	if(vo.getIsAuthorize() != null && vo.getIsAuthorize() == 1) {
-    		depositAmt = vo.getAuthorizeDepositAmt()!=null?Math.abs(vo.getAuthorizeDepositAmt()):0;
-    	}else if(vo.getIsAuthorize() != null && vo.getIsAuthorize() == 2){
-    		//信用预授权，一半一半的情况。
-    		int tmpAuthOri = vo.getAuthorizeDepositAmt()!=null?Math.abs(vo.getAuthorizeDepositAmt()):0;
-    		depositAmt = vo.getCreditPayAmt()!=null?Math.abs(vo.getCreditPayAmt()):0;
-    		//累加
-    		depositAmt += tmpAuthOri;
-    	}
+        if (vo.getIsAuthorize() != null && vo.getIsAuthorize() == 1) {
+            depositAmt = vo.getAuthorizeDepositAmt() != null ? Math.abs(vo.getAuthorizeDepositAmt()) : 0;
+        } else if (vo.getIsAuthorize() != null && vo.getIsAuthorize() == 2) {
+            //信用预授权，一半一半的情况。
+            int tmpAuthOri = vo.getAuthorizeDepositAmt() != null ? Math.abs(vo.getAuthorizeDepositAmt()) : 0;
+            depositAmt = vo.getCreditPayAmt() != null ? Math.abs(vo.getCreditPayAmt()) : 0;
+            //累加
+            depositAmt += tmpAuthOri;
+        }
         return depositAmt;
     }
 }

@@ -5,10 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
@@ -80,7 +80,6 @@ public class OrderSettleNewService {
     @Autowired AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired AccountPlatformSubsidyDetailNoTService accountPlatformSubsidyDetailNoTService;
     @Autowired AccountPlatformProfitDetailNotService accountPlatformProfitDetailNotService;
-//    @Autowired private OrderSettleNoTService orderSettleNoTService;  //相互
     @Autowired private CashierSettleService cashierSettleService;
     @Autowired private CashierPayService cashierPayService;
     @Autowired private BaseProducer baseProducer;
@@ -93,6 +92,8 @@ public class OrderSettleNewService {
     private AccountDebtService accountDebtService;
     @Autowired
     OrderSourceStatService orderSourceStatService;
+    @Autowired
+    OrderSettleWalletRefundHandleService orderSettleWalletRefundHandleService;
 
     /**
      *  先查询  发现 有结算数据停止结算 手动处理
@@ -120,7 +121,7 @@ public class OrderSettleNewService {
     
     /**
      * 租客费用结余 处理 （如果应付 大于实付，这个订单存在未支付信息，优先 押金抵扣，未支付信息）
-     * @param settleOrdersAccount
+     * @param settleOrdersAccount 公共参数
      */
     public void rentCostSettle(SettleOrders settleOrders , SettleOrdersAccount settleOrdersAccount,OrderPayCallBack callBack) {
         //1 如果租车费用计算应付总额大于 实际支付 车辆押金抵扣租车费用欠款
@@ -267,123 +268,112 @@ public class OrderSettleNewService {
     	}
     	return totalRealDebtAmt;
     }
-    
+
 
     /**
      * 退还多余费用
      * 退还优先级 钱包<消费
      *
-     * @param settleOrdersAccount
+     * @param settleOrdersAccount            公共参数
+     * @param accountRenterCostSettleDetails 租车费用列表
+     * @param orderStatusDTO                 订单状态信息
+     * @param settleOrders                   全局公共参数
      */
-    public void refundRentCost(SettleOrdersAccount settleOrdersAccount,List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails,OrderStatusDTO orderStatusDTO,SettleOrders settleOrders) {
+    public void refundRentCost(SettleOrdersAccount settleOrdersAccount, List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails, OrderStatusDTO orderStatusDTO, SettleOrders settleOrders) {
         List<AccountRenterCostSettleDetailEntity> renterCostSettleDetails = new ArrayList<>();
         //应退结余 租车费用 （包含 租车支付金额 和钱包抵扣）
         int rentCostSurplusAmt = settleOrdersAccount.getRentCostSurplusAmt();
-        if(rentCostSurplusAmt>0){
-            //退还租车费用
-            if(rentCostSurplusAmt>0){
-                //退还剩余 租车费用
-                RefundApplyVO refundApplyVO = new RefundApplyVO(settleOrders,-rentCostSurplusAmt,RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND,"结算订单退还");
-                List<CashierRefundApplyReqVO> cashierRefundApplyReqs = orderSettleProxyService.getCashierRefundApply(refundApplyVO);
-                if(!CollectionUtils.isEmpty(cashierRefundApplyReqs)){
-                    for(int i=0;i<cashierRefundApplyReqs.size();i++){
-                        CashierRefundApplyReqVO cashierRefundApplyReq = cashierRefundApplyReqs.get(i);
-                        int id =cashierService.refundRentCost(cashierRefundApplyReq);
-                        AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount,cashierRefundApplyReq.getAmt(),id);
-                        renterCostSettleDetails.add(entity);
-                    }
-                    
-                    //计算 实际支付 金额 退钱总额
-                    int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
-                    // 计算剩余待退
-                    rentCostSurplusAmt = rentCostSurplusAmt+returnAmt;
-                    Integer payLine = null;
-                    if (cashierRefundApplyReqs != null && cashierRefundApplyReqs.get(0) != null) {
-                    	payLine = cashierRefundApplyReqs.get(0).getPayLine();
-                    }
-                    // 0-线上支付，1-线下支付，2-虚拟支付
-                    if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
-                    		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
-                    	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+        log.info("OrderSettleNewService.refundRentCost >> rentCostSurplusAmt:[{}]", rentCostSurplusAmt);
+        if (rentCostSurplusAmt > 0) {
+            //退还剩余 租车费用
+            RefundApplyVO refundApplyVO = new RefundApplyVO(settleOrders, -rentCostSurplusAmt, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND, "结算订单退还");
+            List<CashierRefundApplyReqVO> cashierRefundApplyReqs = orderSettleProxyService.getCashierRefundApply(refundApplyVO);
+            if (!CollectionUtils.isEmpty(cashierRefundApplyReqs)) {
+                for (CashierRefundApplyReqVO cashierRefundApplyReq : cashierRefundApplyReqs) {
+                    int id = cashierService.refundRentCost(cashierRefundApplyReq);
+                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount, cashierRefundApplyReq.getAmt(), id);
+                    renterCostSettleDetails.add(entity);
+                }
+
+                //计算 实际支付 金额 退钱总额
+                int returnAmt = cashierRefundApplyReqs.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
+                // 计算剩余待退
+                rentCostSurplusAmt = rentCostSurplusAmt + returnAmt;
+                log.info("OrderSettleNewService.refundRentCost >> rentCostSurplusAmt:[{}]", rentCostSurplusAmt);
+                Integer payLine = null;
+                if (cashierRefundApplyReqs.get(0) != null) {
+                    payLine = cashierRefundApplyReqs.get(0).getPayLine();
+                }
+                // 0-线上支付，1-线下支付，2-虚拟支付
+                if (payLine != null) {
+                    if (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
+                        orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
                     } else {
-                    	orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+                        orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
                     }
+                } else {
+                    orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
                 }
             }
-
-            //2 查询钱包 比较
-            if(rentCostSurplusAmt>0){
-                int walletAmt = cashierSettleService.getRentCostPayByWallet(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo());
-                //计算应退钱包金额 并退还
-                int returnWalletAmt = rentCostSurplusAmt>walletAmt?walletAmt:rentCostSurplusAmt;
-                walletProxyService.returnOrChargeWallet(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),Math.abs(returnWalletAmt));
-                
-                //记录退还
-                AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO ();
-                accountRenterCostDetail.setMemNo(settleOrders.getRenterMemNo());
-                accountRenterCostDetail.setOrderNo(settleOrders.getOrderNo());
-                accountRenterCostDetail.setPaySource(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getText());
-                accountRenterCostDetail.setPaySourceCode(com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode());
-                accountRenterCostDetail.setRenterCashCodeEnum(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_REFUND);
-                accountRenterCostDetail.setAmt(-Math.abs(returnWalletAmt));
-                accountRenterCostDetail.setPayTypeCode(PayTypeEnum.PUR_RETURN.getCode());
-                accountRenterCostDetail.setPayType(PayTypeEnum.PUR_RETURN.getText());
-                
-                cashierService.refundRentCostWallet(accountRenterCostDetail);
-                
-                AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForWallet(settleOrdersAccount,-returnWalletAmt);
-                renterCostSettleDetails.add(entity);
+            // 钱包退还
+            List<CashierRefundApplyReqVO> walletRefundApplyReqList =
+                    orderSettleWalletRefundHandleService.walletRefundForRentCarCost(settleOrdersAccount.getOrderNo(),
+                            settleOrdersAccount.getRenterMemNo(), rentCostSurplusAmt);
+            if (CollectionUtils.isNotEmpty(walletRefundApplyReqList)) {
+                for (CashierRefundApplyReqVO cashierRefundApplyReq : cashierRefundApplyReqs) {
+                    int id = cashierService.refundRentCost(cashierRefundApplyReq);
+                    AccountRenterCostSettleDetailEntity entity = getAccountRenterCostSettleDetailEntityForRentCost(settleOrdersAccount, cashierRefundApplyReq.getAmt(), id);
+                    renterCostSettleDetails.add(entity);
+                }
+                int walletRefundTotalAmt = walletRefundApplyReqList.stream().mapToInt(CashierRefundApplyReqVO::getAmt).sum();
+                //重置剩余租车费用
+                rentCostSurplusAmt = rentCostSurplusAmt + walletRefundTotalAmt;
+                log.info("OrderSettleNewService.refundRentCost >> rentCostSurplusAmt:[{}]", rentCostSurplusAmt);
             }
-            
             //记录 凹凸币/钱包退还 流水
             cashierSettleService.insertAccountRenterCostSettleDetails(renterCostSettleDetails);
         }
-        //1 退还凹凸币 coinAmt为订单真实使用的凹凸币
-        int coinAmt = accountRenterCostSettleDetails.stream().filter(obj ->{
-            return RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode());
-        }).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
-        if(coinAmt>0){
+        // 退还凹凸币 coinAmt为订单真实使用的凹凸币
+        int coinAmt = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.AUTO_COIN_DEDUCT.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+        if (coinAmt > 0) {
             //退还多余凹凸币
-            accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(),settleOrdersAccount.getOrderNo(),coinAmt);
+            coinAmt = rentCostSurplusAmt >= coinAmt ? coinAmt : rentCostSurplusAmt;
+            accountRenterCostCoinService.settleAutoCoin(settleOrdersAccount.getRenterMemNo(), settleOrdersAccount.getOrderNo(), coinAmt);
         }
-
     }
-    
+
     /**
      * 退还剩余的 车辆押金
-     * @param settleOrdersAccount
+     *
+     * @param settleOrdersAccount 公共参数
      */
-    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount,OrderStatusDTO orderStatusDTO) {
-        if(settleOrdersAccount.getDepositSurplusAmt()>0){
+    public void refundDepositAmt(SettleOrdersAccount settleOrdersAccount, OrderStatusDTO orderStatusDTO) {
+        if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
             //1退还租车押金
             CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
-            BeanUtils.copyProperties(settleOrdersAccount,cashierRefundApply);
-//            cashierRefundApply.setMemNo(settleOrdersAccount.getRenterMemNo());
-//            cashierRefundApply.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
-//            cashierRefundApply.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
-//            cashierRefundApply.setRemake(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getTxt());
-//            cashierRefundApply.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT.getCashNo());
-//            cashierRefundApply.setType(SysOrHandEnum.SYSTEM.getStatus());
-//            int id =cashierService.refundDeposit(cashierRefundApply);
-            
-          
-          //方法重构
-          CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrdersAccount.getOrderNo(),settleOrdersAccount.getRenterMemNo(), DataPayKindConstant.RENT);
-          BeanUtils.copyProperties(cashierEntity,cashierRefundApply);
-          
-          //预授权处理
-          int id = 0;
-          if(cashierEntity != null && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
-          	id = cashierService.refundDepositPreAuthAll(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
-          }else {
-          	//消费
-          	//退货
-          	id = cashierService.refundDepositPurchase(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply,RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
-          }
-            
+            BeanUtils.copyProperties(settleOrdersAccount, cashierRefundApply);
+
+            //方法重构
+            List<CashierEntity> list = cashierNoTService.getCashierEntity(settleOrdersAccount.getOrderNo(),
+                    settleOrdersAccount.getRenterMemNo(), DataPayKindConstant.RENT);
+
+
+
+
+            BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
+
+            int id;
+            if (DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+                //预授权处理
+                id = cashierService.refundDepositPreAuthAll(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
+            } else {
+                //消费 退货
+                id = cashierService.refundDepositPurchase(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT);
+            }
+
             // 2记录退还 租车押金 结算费用明细
             AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
-            BeanUtils.copyProperties(settleOrdersAccount,entity);
+            BeanUtils.copyProperties(settleOrdersAccount, entity);
             entity.setMemNo(settleOrdersAccount.getRenterMemNo());
             entity.setAmt(-settleOrdersAccount.getDepositSurplusAmt());
             entity.setCostCode(RenterCashCodeEnum.SETTLE_RENT_DEPOSIT_TO_RETURN_AMT.getCashNo());
@@ -392,11 +382,15 @@ public class OrderSettleNewService {
             cashierSettleService.insertAccountRenterCostSettleDetail(entity);
             Integer payLine = cashierRefundApply.getPayLine();
             // 0-线上支付，1-线下支付，2-虚拟支付
-            if (payLine != null && (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) || 
-            		payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode()))) {
-            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+            if (payLine != null) {
+                if (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) ||
+                        payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
+                    orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
+                } else {
+                    orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+                }
             } else {
-            	orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
+                orderStatusDTO.setDepositRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
             }
 
         }

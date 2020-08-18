@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -176,7 +177,7 @@ public class CashierNoTService {
     /**
      * 收银台支付记录
      */
-    public CashierEntity getCashierEntity(String orderNo,String memNo,String payKind){
+    public List<CashierEntity> getCashierEntity(String orderNo,String memNo,String payKind){
         return cashierMapper.getPayAmtByPayKind(orderNo,memNo,payKind);
     }
     
@@ -1034,14 +1035,29 @@ public class CashierNoTService {
         baseProducer.sendTopicMessage(NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.exchange,NewOrderMQActionEventEnum.ORDER_REFUND_FAIL.routingKey,orderMessage);
     }
     
-    /*
-     * @Author ZhangBin
-     * @Date 2020/6/3 15:27 
-     * @Description: 根据订单号和交易流水好查询
-     * 
+    /**
+     *根据订单号和交易流水好查询
      **/
     public CashierEntity getCashierBypayTransNo(String orderNo,String payTransNo){
-        CashierEntity cashierEntity = cashierMapper.getCashierBypayTransNo(orderNo, payTransNo);
-        return cashierEntity;
+        return cashierMapper.getCashierBypayTransNo(orderNo, payTransNo);
     }
+
+
+
+    /**
+     * 获取钱包支付的租车费用收银记录
+     * <p>租车费用:paykind = 03|08|11|12</p>
+     * <p>钱包支付:paySource = 00</P>
+     *
+     * @param orderNo 订单号
+     * @param memNo   会员号
+     * @return List<CashierEntity>
+     */
+    public List<CashierEntity> queryWalletPayRentCarCostByOrderNoAndMemNo(String orderNo, String memNo) {
+        log.info("获取钱包支付的租车费用收银记录. orderNo:[{}], memNo:[{}]", orderNo, memNo);
+        List<CashierEntity> list = cashierMapper.selectWalletPayRentCarCostByOrderNoAndMemNo(orderNo, memNo);
+        log.info("获取钱包支付的租车费用收银记录. list:{}", JSON.toJSONString(list));
+        return list;
+    }
+
 }

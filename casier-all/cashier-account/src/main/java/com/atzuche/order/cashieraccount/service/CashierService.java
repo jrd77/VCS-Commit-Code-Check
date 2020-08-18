@@ -1,24 +1,10 @@
 package com.atzuche.order.cashieraccount.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomExamineVO;
-import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import com.atzuche.order.accountownercost.entity.AccountOwnerCostSettleDetailEntity;
 import com.atzuche.order.accountownercost.service.notservice.AccountOwnerCostSettleDetailNoTService;
 import com.atzuche.order.accountownerincome.entity.AccountOwnerIncomeExamineEntity;
 import com.atzuche.order.accountownerincome.service.AccountOwnerIncomeService;
-import com.atzuche.order.accountrenterdeposit.mapper.AccountRenterDepositMapper;
 import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
 import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
@@ -28,21 +14,14 @@ import com.atzuche.order.accountrenterdetain.service.AccountRenterDetainService;
 import com.atzuche.order.accountrenterdetain.vo.req.ChangeDetainRenterDepositReqVO;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleEntity;
-import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostDetailMapper;
-import com.atzuche.order.accountrenterrentcost.mapper.AccountRenterCostSettleMapper;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleDetailNoTService;
 import com.atzuche.order.accountrenterrentcost.service.notservice.AccountRenterCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostDetailReqVO;
 import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostReqVO;
-import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositMapper;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositCostService;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
-import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.OrderRenterDepositWZDetainReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterWZDepositReqVO;
-import com.atzuche.order.accountrenterwzdepost.vo.req.RenterWZDepositCostReqVO;
+import com.atzuche.order.accountrenterwzdepost.vo.req.*;
 import com.atzuche.order.accountrenterwzdepost.vo.res.AccountRenterWZDepositResVO;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
@@ -62,6 +41,8 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.CashierRefundApplyStatus;
 import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
 import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomExamineVO;
+import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpDTO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineOpReqVO;
 import com.atzuche.order.commons.vo.req.income.AccountOwnerIncomeExamineReqVO;
 import com.atzuche.order.commons.vo.res.account.income.AdjustOwnerIncomeResVO;
@@ -87,8 +68,17 @@ import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.autoyol.event.rabbit.neworder.OrderRenterPayAmtSuccessMq;
 import com.autoyol.event.rabbit.neworder.OrderRenterPaySuccessMq;
 import com.dianping.cat.Cat;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -382,11 +372,11 @@ public class CashierService {
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
         //1 记录退还记录
-        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
+        int id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
         //2 记录费用平账
         DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,detainRenterDepositReqVO);
-        detainRenterDepositReqVO.setUniqueNo(id.toString());
+        detainRenterDepositReqVO.setUniqueNo(Integer.toString(id));
         //2 押金账户资金转移接口
         int depositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
         // 3 更新押金结算状态
@@ -399,8 +389,7 @@ public class CashierService {
         Assert.notNull(cashierRefundApplyReq, ErrorCode.PARAMETER_ERROR.getText());
         cashierRefundApplyReq.check();
         //1 记录退还记录
-        Integer id = cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
-        return id;
+        return cashierRefundApplyNoTService.insertRefundDeposit(cashierRefundApplyReq);
     }
     
     
@@ -418,10 +407,10 @@ public class CashierService {
         //2 记录费用平账
         AccountRenterCostDetailReqVO accountRenterCostDetail = new AccountRenterCostDetailReqVO();
         BeanUtils.copyProperties(cashierRefundApplyReq,accountRenterCostDetail);
-        int accountRenterCostDetailId = accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
         //3 发消息通知 存在退款
-        return accountRenterCostDetailId;
+        return accountRenterCostSettleService.refundRenterCostDetail(accountRenterCostDetail);
     }
+
     /**
      * 结算退还租车费用 钱包
      */
@@ -527,7 +516,8 @@ public class CashierService {
      */
     public int refundDepositPurchase(int rentSurplusDepositAmt,
 			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
-		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+        //退货
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN);
 		cashierRefundApply.setAmt(-rentSurplusDepositAmt);
 		cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		cashierRefundApply.setRemake(cashCode.getTxt());
