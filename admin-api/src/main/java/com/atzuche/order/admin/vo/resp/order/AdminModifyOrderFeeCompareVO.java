@@ -26,4 +26,13 @@ public class AdminModifyOrderFeeCompareVO {
 	private Integer needSupplementAmt; 
     @AutoDocProperty(value = "平台给租客的补贴明细")
 	List<CostItemVO> platformToRenterSubsidyList;
+   
+    @AutoDocProperty(value = "钱包余额")
+	private Integer walletBalance;
+	
+    @AutoDocProperty(value = "是否使用钱包：0-否，1-是")
+	private Integer useWalletFlag;
+	
+    @AutoDocProperty(value = "是否可以使用钱包 ：0-不能使用，1-可以使用")
+	private Integer canUseWallet;
 }
