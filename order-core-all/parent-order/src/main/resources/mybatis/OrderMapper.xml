@@ -344,4 +344,46 @@
 
     </select>
 
+    <select id="getInvoiceOrderInfo" resultType="com.atzuche.order.commons.vo.UserInvoiceOrdersVO">
+        SELECT
+        o.`order_no` AS orderNo,
+        ro.renter_order_no AS renterOrderNo,
+        rg.`car_brand_txt` AS vehicleType,
+        rg.`car_type_txt` AS vehicleSeries,
+        IFNULL(CONCAT(rg.car_cylinder_capacity,rg.car_cc_unit,'0'),'')  AS vehicleDisplacement,
+        IFNULL(rg.car_gearbox_type, '') AS gearboxType,
+        IFNULL(rg.is_local, '') AS natives,
+        IFNULL(rg.car_plate_num, '') AS plateNumber,
+        IFNULL(rg.car_image_url, '') AS vehiclePic,
+        rg.car_day_mileage AS dayMileageLimited,
+        os.`settle_time` AS finishTime
+        FROM `order` o
+        INNER JOIN order_status os ON (o.`order_no` = os.`order_no` AND (os.`status` > 64<!-- || os.`status`=0-->))
+        INNER JOIN renter_order ro ON (o.`order_no` = ro.`order_no` AND ro.`is_effective`=1)
+        LEFT JOIN `renter_goods` rg ON (ro.`renter_order_no` = rg.renter_order_no)
+        WHERE 1=1
+        <if test="param.memberNo != null and param.memberNo != ''">
+            AND ro.`renter_mem_no` = #{param.memberNo}
+        </if>
+        <choose>
+            <when test="param.notIn!=null and param.notIn.size()>0">
+                AND o.`order_no` NOT IN
+                <foreach item="item" collection="param.notIn" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <when test="param.inOrders != null and param.inOrders.size() >0">
+                AND o.`order_no` IN
+                <foreach item="item" collection="param.inOrders" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+        </choose>
+        <if test="param.finishTimeBegin != null and param.finishTimeBegin!='' and param.finishTimeEnd != null and param.finishTimeEnd!='' " >
+            AND os.`settle_time` BETWEEN #{param.finishTimeBegin} AND #{param.finishTimeEnd}
+        </if>
+        order by o.id desc
+    </select>
+
+
 </mapper>
