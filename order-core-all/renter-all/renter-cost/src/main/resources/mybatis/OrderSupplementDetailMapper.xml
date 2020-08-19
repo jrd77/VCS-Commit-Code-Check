@@ -11,6 +11,7 @@
         <result property="cashNo" column="cash_no"/>
         <result property="title" column="title"/>
         <result property="amt" column="amt"/>
+        <result property="realAmt" column="real_amt"/>
         <result property="requestPayCode" column="request_pay_code"/>
         <result property="opStatus" column="op_status"/>
         <result property="supplementType" column="supplement_type"/>
@@ -34,6 +35,7 @@
         `cash_no`,
         `title`,
         `amt`,
+        real_amt,
         `request_pay_code`,
         `op_status`,
         `supplement_type`,
@@ -59,7 +61,8 @@
 				`mem_no`,		
 				`cash_no`,		
 				`title`,		
-				`amt`,		
+				`amt`,
+				real_amt,		
 				`op_status`,		
 				`supplement_type`,		
 				`op_type`,		
@@ -75,7 +78,8 @@
 				#{memNo}, 		
 				#{cashNo}, 		
 				#{title}, 		
-				#{amt}, 		
+				#{amt}, 
+				#{realAmt},		
 				#{opStatus}, 		
 				#{supplementType}, 		
 				#{opType}, 		
@@ -98,6 +102,7 @@
 				<if test="cashNo != null">`cash_no`, </if>
 				<if test="title != null">`title`, </if>
 				<if test="amt != null">`amt`, </if>
+				<if test="realAmt != null">`realAmt`, </if>
 				<if test="requestPayCode != null">`request_pay_code`, </if>
 				<if test="opStatus != null">`op_status`, </if>
 				<if test="supplementType != null">`supplement_type`, </if>
@@ -117,6 +122,7 @@
 				<if test="cashNo != null">#{cashNo},  </if>
 				<if test="title != null">#{title},  </if>
 				<if test="amt != null">#{amt},  </if>
+				<if test="realAmt != null">#{realAmt},  </if>
 				<if test="requestPayCode != null">#{requestPayCode},  </if>
 				<if test="opStatus != null">#{opStatus},  </if>
 				<if test="supplementType != null">#{supplementType},  </if>
@@ -140,6 +146,7 @@
 				<if test="cashNo != null">`cash_no` = #{cashNo}, </if>
 				<if test="title != null">`title` = #{title}, </if>
 				<if test="amt != null">`amt` = #{amt}, </if>
+				<if test="realAmt != null">`real_amt` = #{realAmt}, </if>
 				<if test="opStatus != null">`op_status` = #{opStatus}, </if>
 				<if test="supplementType != null">`supplement_type` = #{supplementType}, </if>
 				<if test="opType != null">`op_type` = #{opType}, </if>
@@ -162,6 +169,7 @@
 				`cash_no` = #{cashNo}, 		
 				`title` = #{title}, 		
 				`amt` = #{amt}, 		
+				`real_amt` = #{realAmt}, 	
 				`op_status` = #{opStatus}, 		
 				`supplement_type` = #{supplementType}, 		
 				`op_type` = #{opType}, 		
@@ -176,11 +184,13 @@
 		where id = #{id}
 	</update>
 	
+	<!-- and amt = #{amt} -->
 	<update id="updatePayFlagById">
 		update order_supplement_detail 
-		set `pay_flag` = #{payFlag}
+		set `pay_flag` = #{payFlag},
+		real_amt = #{realAmt}
 		<if test="payTime != null">, pay_time = #{payTime}</if>
-		where id = #{id} and amt = #{amt}
+		where id = #{id} 
 	</update>
 	
 	<update id="updatePayFlagNewById">

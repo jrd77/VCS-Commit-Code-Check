@@ -3,6 +3,7 @@ package com.atzuche.order.cashieraccount.service.notservice;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,7 +47,6 @@ import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.FineSubsidyCodeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
-import com.atzuche.order.commons.enums.cashier.PayTypeEnum;
 import com.atzuche.order.commons.vo.NotifyDataDTO;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
@@ -609,7 +609,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get());
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -619,7 +619,7 @@ public class CashierNoTService {
         
         //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource();
+	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get();
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
@@ -672,7 +672,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get());
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -682,7 +682,7 @@ public class CashierNoTService {
         
         //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource();
+	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get();
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
@@ -771,7 +771,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource());
+        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get());
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -781,7 +781,7 @@ public class CashierNoTService {
         
       //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource();
+	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().get();
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
@@ -909,53 +909,70 @@ public class CashierNoTService {
     /**
      * 钱包支付成功 收银台落库
      * @param orderPaySign
-     * @param amtWallet
+     * @param amtWallet   DataPayKindConstant.RENT_AMOUNT
      */
-    public void insertRenterCostByWallet(OrderPaySignReqVO orderPaySign, int amtWallet) {
+    public CashierEntity insertRenterCostByWallet(OrderPaySignReqVO orderPaySign, int amtWallet,RenterCashCodeEnum renterCashCodeEnum,String payKind) {
+    	CashierEntity cashier = null;
         if(amtWallet!=0){
 //1查询 收银台保存 钱包支付信息
-            CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+//            CashierEntity cashierEntity = cashierMapper.getPayDeposit(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),DataPayKindConstant.RENT_AMOUNT,DataPayTypeConstant.PAY_PUR);
+        	
             int result = 0;
             int cashierId=0;
-            RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
-            CashierEntity cashier = new CashierEntity ();
+//            RenterCashCodeEnum renterCashCodeEnum = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
+            cashier = new CashierEntity ();
             BeanUtils.copyProperties(orderPaySign,cashier);
+            ///add 200819
+            cashier.setOs(orderPaySign.getReqOs());
+            cashier.setPayEvn(env);
+            cashier.setInternalNo("1");
+            cashier.setQn("666666667777777788888888"+payKind);
+            cashier.setPayTime(LocalDateTimeUtils.dateToString(new Date()));
+            ///
             cashier.setMemNo(orderPaySign.getMenNo());
             cashier.setPayAmt(amtWallet);
             cashier.setPaySource(PaySourceEnum.WALLET_PAY.getCode());
             cashier.setPayTitle("订单号：" + orderPaySign.getOrderNo() + "钱包支付金额：" + amtWallet + "元");
-            cashier.setPayKind(DataPayKindConstant.RENT_AMOUNT);
+            cashier.setPayKind(payKind);
             cashier.setPayType(DataPayTypeConstant.PAY_PUR);
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
             cashier.setTransStatus("00");
             cashier.setPaySn(NumberUtils.INTEGER_ONE);
+            ///add 200819
+            String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(cashier));
+            cashier.setPayMd5(payMd5);
+            
             result = cashierMapper.insertSelective(cashier);
             cashierId = cashier.getId();
             if(result ==0){
                 throw new AccountRenterDepositDBException();
             }
 
+            /**
+             * 走异步通知来初始化数据，避免重复操作。
+             */
             //2 构造参数  记录个人 租车费用户头 记录 钱包支付信息
-            AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
-            BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
-            accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
-            accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
-
-            AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
-            BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
-            accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
-            accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
-            accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
-            accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
-            accountRenterCostDetailReq.setRenterCashCodeEnum(renterCashCodeEnum);
-            accountRenterCostDetailReq.setPaySource(PaySourceEnum.WALLET_PAY.getText());
-            accountRenterCostDetailReq.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
-            accountRenterCostDetailReq.setPayTypeCode(orderPaySign.getPayType());
-            accountRenterCostDetailReq.setPayType(PayTypeEnum.getFlagText(orderPaySign.getPayType()));
-            accountRenterCostReq.setAccountRenterCostDetailReqVO(accountRenterCostDetailReq);
-            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
+//            AccountRenterCostReqVO accountRenterCostReq = new AccountRenterCostReqVO();
+//            BeanUtils.copyProperties(orderPaySign,accountRenterCostReq);
+//            accountRenterCostReq.setShifuAmt(Math.abs(amtWallet));
+//            accountRenterCostReq.setMemNo(orderPaySign.getMenNo());
+//
+//            AccountRenterCostDetailReqVO accountRenterCostDetailReq = new AccountRenterCostDetailReqVO();
+//            BeanUtils.copyProperties(orderPaySign,accountRenterCostDetailReq);
+//            accountRenterCostDetailReq.setMemNo(orderPaySign.getMenNo());
+//            accountRenterCostDetailReq.setUniqueNo(String.valueOf(cashierId));
+//            accountRenterCostDetailReq.setAmt(Math.abs(amtWallet));
+//            accountRenterCostDetailReq.setTransTime(LocalDateTime.now());
+//            accountRenterCostDetailReq.setRenterCashCodeEnum(renterCashCodeEnum);
+//            accountRenterCostDetailReq.setPaySource(PaySourceEnum.WALLET_PAY.getText());
+//            accountRenterCostDetailReq.setPaySourceCode(PaySourceEnum.WALLET_PAY.getCode());
+//            accountRenterCostDetailReq.setPayTypeCode(orderPaySign.getPayType());
+//            accountRenterCostDetailReq.setPayType(PayTypeEnum.getFlagText(orderPaySign.getPayType()));
+//            accountRenterCostReq.setAccountRenterCostDetailReqVO(accountRenterCostDetailReq);
+//            accountRenterCostSettleService.insertRenterCostDetail(accountRenterCostReq);
         }
-
+        
+        return cashier;
     }
 
     /**

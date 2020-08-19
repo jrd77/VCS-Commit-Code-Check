@@ -58,6 +58,9 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 */
 	@AutoDocProperty(value="单项补付金额")
 	private Integer amt;
+	@AutoDocProperty(value="实际收款补付金额")
+	private Integer realAmt;
+	
 	/**
 	 * 备注
 	 */

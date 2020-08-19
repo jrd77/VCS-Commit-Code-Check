@@ -59,6 +59,7 @@ public class OrderPayCallBackRabbitListener {
             rabbitMsgLogService.insertRabbitMsgLog(message, RabbitBusinessTypeEnum.ORDER_PAY_CALL_BACK,orderPayAsynStr,md5);
             //回调处理
             cashierPayService.payCallBack(batchNotifyDataVo,payCallbackService);
+            
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderPayCallBack payCallBack,params message={},e={}",message,e);

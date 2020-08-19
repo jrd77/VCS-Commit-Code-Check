@@ -124,6 +124,7 @@ public class CashierController {
         	log.info("无需收银台参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
         }
         
+        log.info("getOrderPayableAmount result=[{}]",GsonUtils.toJson(result));
         return ResponseData.success(result);
     }
 
