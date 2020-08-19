@@ -24,9 +24,11 @@ import com.atzuche.order.commons.enums.SupplementOpTypeEnum;
 import com.atzuche.order.commons.enums.SupplementTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.coreapi.modifyorder.exception.ModifyOrderParentOrderNotFindException;
+import com.atzuche.order.coreapi.modifyorder.exception.SupplementAmtException;
 import com.atzuche.order.parentorder.entity.OrderEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderService;
+import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.RenterOrderFineDeatailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
@@ -37,7 +39,10 @@ import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.dianping.cat.Cat;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class SupplementService {
 
 	@Autowired
@@ -56,6 +61,8 @@ public class SupplementService {
 	private CashierService cashierService;
 	@Autowired
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
+	@Autowired
+	private OrderStatusService orderStatusService;
 	
 	/**
 	 * 保存补付记录
@@ -65,6 +72,31 @@ public class SupplementService {
 		if (orderSupplementDetailDTO == null) {
 			return;
 		}
+		// 获取订单结算状态
+		OrderStatusEntity orderStatus = orderStatusService.getByOrderNo(orderSupplementDetailDTO.getOrderNo());
+		if (orderStatus != null) {
+			if (orderStatus.getStatus() != null && orderStatus.getStatus().intValue() == OrderStatusEnum.CLOSED.getStatus()) {
+				orderSupplementDetailDTO.setCashType(2);
+			} else if (orderStatus.getWzSettleStatus() != null && orderStatus.getWzSettleStatus() != 0) {
+				orderSupplementDetailDTO.setCashType(2);
+			} else if (orderStatus.getSettleStatus() != null && orderStatus.getSettleStatus() != 0) {
+				orderSupplementDetailDTO.setCashType(1);
+			} else {
+				//throw new SupplementCanNotSupportException();
+				orderSupplementDetailDTO.setCashType(1);
+			}
+		} else {
+			// 订单状态异常
+			log.error("order/supplement/add 订单状态异常");
+		}
+		/*
+		 * if (orderSupplementDetailDTO.getAmt() >= 0 &&
+		 * orderSupplementDetailDTO.getCashType() != null &&
+		 * orderSupplementDetailDTO.getCashType() == 2) { throw new
+		 * SupplementAmtException(); }
+		 */
+		// 校验手动补付金额
+		checkSupplement(orderSupplementDetailDTO.getOrderNo(), orderStatus, orderSupplementDetailDTO.getAmt());
 		OrderSupplementDetailEntity supplementEntity = new OrderSupplementDetailEntity();
 		BeanUtils.copyProperties(orderSupplementDetailDTO, supplementEntity);
 		// 根据订单号获取主订单信息
@@ -81,6 +113,37 @@ public class SupplementService {
 		}
 		orderSupplementDetailService.saveOrderSupplementDetail(supplementEntity);
 	}
+	
+	
+	/**
+	 * 校验手动补付金额
+	 * @param orderNo
+	 * @param orderStatus
+	 * @param amt
+	 */
+	private void checkSupplement(String orderNo, OrderStatusEntity orderStatus, Integer amt) {
+		int curAmt = amt == null ? 0:amt;
+		if (curAmt == 0) {
+			throw new SupplementAmtException("手动添加补付不能为0");
+		}
+		// 获取补付列表
+		List<OrderSupplementDetailEntity> list = this.listOrderSupplementDetailEntityByOrderNo(orderNo,orderStatus);
+		if ((list == null || list.isEmpty()) && curAmt > 0) {
+			throw new SupplementAmtException("负数金额超过可添加的限额");
+		}
+		int totalSupAmt = 0;
+		for (OrderSupplementDetailEntity supp:list) {
+			int payFlag = supp.getPayFlag() == null ? -1:supp.getPayFlag();
+			if (payFlag == 0 || payFlag == 1 || payFlag == 4 || payFlag == 5) {
+				int cursupAmt = supp.getAmt() == null ? 0:supp.getAmt();
+				totalSupAmt += cursupAmt;
+			}
+		}
+		if ((curAmt + totalSupAmt) > 0) {
+			throw new SupplementAmtException("负数金额超过可添加的限额");
+		}
+	}
+	
 	
 	/**
 	 * 根据订单号获取补付记录
