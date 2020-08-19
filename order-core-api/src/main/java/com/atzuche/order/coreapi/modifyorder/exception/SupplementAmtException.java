@@ -16,4 +16,8 @@ public class SupplementAmtException extends OrderException {
 	public SupplementAmtException() {
 		super(ERROR_CODE, ERROR_MSG);
 	}
+	
+	public SupplementAmtException(String msg) {
+		super(ERROR_CODE, msg);
+	}
 }
