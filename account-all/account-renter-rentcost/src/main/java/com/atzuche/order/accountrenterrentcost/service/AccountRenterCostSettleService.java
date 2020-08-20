@@ -61,7 +61,7 @@ public class AccountRenterCostSettleService{
 
     /**
      * 退还多付的费用
-     * @param accountRenterCostDetail
+     * @param accountRenterCostDetail 租客费用明细
      */
     public int refundRenterCostDetail(AccountRenterCostDetailReqVO accountRenterCostDetail) {
         //1 校验
@@ -88,9 +88,7 @@ public class AccountRenterCostSettleService{
         //3 记录退款费用记录
         accountRenterCostDetail.setPaySourceCode(accountRenterCostDetail.getPaySourceCode());
         accountRenterCostDetail.setPaySource(PaySourceEnum.getFlagText(accountRenterCostDetail.getPaySourceCode()));
-        int renterCostDetail = accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
-
-        return renterCostDetail;
+        return accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostDetail);
     }
 
     public List<AccountRenterCostDetailEntity> getAccountRenterCostDetailsByOrderNo(String orderNo){
@@ -99,7 +97,7 @@ public class AccountRenterCostSettleService{
 
     /**
      * 插入租客资金进出明细
-     * @param accountRenterCostChangeReqVO
+     * @param accountRenterCostChangeReqVO 请求参数
      */
     public int deductDepositToRentCost(AccountRenterCostDetailReqVO accountRenterCostChangeReqVO) {
         return accountRenterCostDetailNoTService.insertAccountRenterCostDetail(accountRenterCostChangeReqVO);
@@ -108,7 +106,7 @@ public class AccountRenterCostSettleService{
 
     /**
      * 租车费用转 罚金 记录 租车费用资金流水
-     * @param vo
+     * @param vo 请求参数
      */
     public void deductRentCostToRentFine(AccountRenterCostToFineReqVO vo) {
         AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
@@ -124,7 +122,7 @@ public class AccountRenterCostSettleService{
     }
     /**
      * 钱包支付金额 抵扣 罚金 记录 租车费用资金流水
-     * @param vo
+     * @param vo 请求参数
      */
     public void deductWalletCostToRentFine(AccountRenterCostToFineReqVO vo) {
         AccountRenterCostDetailEntity accountRenterCostDetail = new AccountRenterCostDetailEntity();
@@ -142,9 +140,9 @@ public class AccountRenterCostSettleService{
     
     /**
      * 查询结算对象
-     * @param orderNo
-     * @param memNo
-     * @return
+     * @param orderNo 订单号
+     * @param memNo 会员号
+     * @return AccountRenterCostSettleEntity
      */
     public AccountRenterCostSettleEntity selectByOrderNo(String orderNo,String memNo) {
     	return accountRenterCostSettleMapper.selectByOrderNo(orderNo, memNo);

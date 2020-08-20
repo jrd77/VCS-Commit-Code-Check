@@ -245,6 +245,9 @@ public class AdminOrderService {
 
 
             AdminModifyOrderFeeCompareVO adminModifyOrderFeeCompareVO = new AdminModifyOrderFeeCompareVO();
+            adminModifyOrderFeeCompareVO.setWalletBalance(modifyOrderCompareVO.getWalletBalance());
+            adminModifyOrderFeeCompareVO.setCanUseWallet(modifyOrderCompareVO.getCanUseWallet());
+            adminModifyOrderFeeCompareVO.setUseWalletFlag(modifyOrderCompareVO.getUseWalletFlag());
             adminModifyOrderFeeCompareVO.setNeedSupplementAmt(modifyOrderCompareVO.getNeedSupplementAmt());
             adminModifyOrderFeeCompareVO.setPlatformToRenterSubsidyList(handInvertData(modifyOrderCompareVO.getPlatformToRenterSubsidyList()));
             AdminModifyOrderFeeVO before = new AdminModifyOrderFeeVO();

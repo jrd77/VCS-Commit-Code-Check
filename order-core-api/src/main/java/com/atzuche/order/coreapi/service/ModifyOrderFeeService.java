@@ -43,10 +43,12 @@ import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderFineDeatailService;
 import com.atzuche.order.rentercost.service.RenterOrderSubsidyDetailService;
+import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.renterorder.entity.dto.RenterOrderCostRespDTO;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
+import com.atzuche.order.wallet.WalletProxyService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +80,10 @@ public class ModifyOrderFeeService {
 	private AccountRenterCostSettleService accountRenterCostSettleService;
 	@Autowired
 	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
+	@Autowired
+	private WalletProxyService walletProxyService;
+	@Autowired
+	private RenterMemberService renterMemberService;
 
 	/**
 	 * 获取修改订单前后费用
@@ -166,6 +172,21 @@ public class ModifyOrderFeeService {
 
 		//驾驶行为评分和各项系数
         modifyOrderCompareVO.setRenterInsureCoefficientDTO(renterOrderCostRespDTO.getRenterInsureCoefficientDTO());
+        // 钱包余额
+        int walletBalance = walletProxyService.getWalletByMemNo(modifyOrderDTO.getMemNo());
+        modifyOrderCompareVO.setWalletBalance(walletBalance);
+        // 是否企业用户
+        boolean isEnterpriseUser = renterMemberService.isEnterpriseUserOrder(initRenterOrder.getRenterOrderNo());
+        modifyOrderCompareVO.setCanUseWallet(1);
+        modifyOrderCompareVO.setUseWalletFlag(0);
+        if (isEnterpriseUser) {
+        	modifyOrderCompareVO.setCanUseWallet(0);
+        	modifyOrderCompareVO.setUseWalletFlag(1);
+        }
+        if (modifyOrderCompareVO.getNeedSupplementAmt() == 0 || walletBalance <= 0) {
+        	modifyOrderCompareVO.setCanUseWallet(0);
+        	modifyOrderCompareVO.setUseWalletFlag(0);
+        }
 		return modifyOrderCompareVO;
 	}
 

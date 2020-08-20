@@ -10,6 +10,7 @@ import com.atzuche.order.accountrenterrentcost.vo.req.AccountRenterCostToFineReq
 import com.atzuche.order.accountrenterwzdepost.vo.req.RenterCancelWZDepositCostReqVO;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.OwnerChildStatusEnum;
 import com.atzuche.order.commons.enums.cashcode.FineTypeCashCodeEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
@@ -65,27 +66,24 @@ public class RenterOrderSettleService {
     @Autowired
     private AccountRenterCostSettleNoTService accountRenterCostSettleNoTService;
 
-    /*
-     * @Author ZhangBin
-     * @Date 2020/3/5 10:20
-     * @Description: 订单取消-车主结算
-     * @param orderNo 主订单号
-     * @param ownerOrderNo 租客子订单号
-     * @param ownerMemNo 租客会员号
-     * @return
+    /**
+     * 订单取消-结算
+     *
+     * @param orderNo       主订单号
+     * @param renterOrderNo 租客子订单号
      **/
-    public void settleRenterOrderCancel(String orderNo,String renterOrderNo){
+    public void settleRenterOrderCancel(String orderNo, String renterOrderNo) {
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
         orderStatusDTO.setOrderNo(orderNo);
         RenterOrderEntity renterOrder = null;
-        try{
+        try {
             renterOrder = renterOrderService.getRenterOrderByRenterOrderNo(renterOrderNo);
-            if(renterOrder == null){
-                log.error("车租客子订单获取为空 renterOrderNo={}",renterOrderNo);
+            if (renterOrder == null) {
+                log.error("车租客子订单获取为空 renterOrderNo={}", renterOrderNo);
                 throw new RenterOrderNotFoundException(renterOrderNo);
             }
-            if(RenterChildStatusEnum.SETTLED.getCode() ==  renterOrder.getChildStatus()){
-                log.info("租客子订单号renterOrderNo={}已经结算过",renterOrderNo);
+            if (RenterChildStatusEnum.SETTLED.getCode() == renterOrder.getChildStatus()) {
+                log.info("租客子订单号renterOrderNo={}已经结算过", renterOrderNo);
                 return;
             }
             //1、获取子订单信息
@@ -97,31 +95,31 @@ public class RenterOrderSettleService {
 
             //2 查询租客罚金明细  及 凹凸币补贴
             orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
-            log.info("订单取消结算-租客-settleOrders={}",JSON.toJSONString(settleOrders));
+            log.info("订单取消结算-租客-settleOrders={}", JSON.toJSONString(settleOrders));
 
 
             //3、获取租客罚金、收益、钱包、租车费用、车辆押金，违章押金
             SettleCancelOrdersAccount settleCancelOrdersAccount = this.initRenterSettleCancelOrdersAccount(settleOrders);
-            log.info("订单取消结算-租客-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
+            log.info("订单取消结算-租客-settleOrders={},settleCancelOrdersAccount={}", JSON.toJSONString(settleOrders), JSON.toJSONString(settleCancelOrdersAccount));
 
             //4、租客、罚金与收益处理
-            this.rentFinehandler(settleOrders,settleCancelOrdersAccount);
-            log.info("订单取消结算-租客-罚金收益处理-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
+            this.rentFinehandler(settleOrders, settleCancelOrdersAccount);
+            log.info("订单取消结算-租客-罚金收益处理-settleOrders={},settleCancelOrdersAccount={}", JSON.toJSONString(settleOrders), JSON.toJSONString(settleCancelOrdersAccount));
 
             //5、租客、历史欠款处理
-            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
-            log.info("订单取消结算-租客-历史欠款处理-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
+            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders, settleCancelOrdersAccount);
+            log.info("订单取消结算-租客-历史欠款处理-settleOrders={},settleCancelOrdersAccount={}", JSON.toJSONString(settleOrders), JSON.toJSONString(settleCancelOrdersAccount));
 
             //6、租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 ->不在结算中做,在取消订单中完成）
-            orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
-            log.info("订单取消结算-租客-退款-settleOrders={},settleCancelOrdersAccount={}",JSON.toJSONString(settleOrders),JSON.toJSONString(settleCancelOrdersAccount));
+            orderSettleNoTService.refundCancelCost(settleOrders, settleCancelOrdersAccount, orderStatusDTO);
+            log.info("订单取消结算-租客-退款-settleOrders={},settleCancelOrdersAccount={}", JSON.toJSONString(settleOrders), JSON.toJSONString(settleCancelOrdersAccount));
 
             //10 修改订单状态表
-            updateOrderStatus(orderStatusDTO,settleOrders,settleCancelOrdersAccount);
+            updateOrderStatus(orderStatusDTO, settleOrders, settleCancelOrdersAccount);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            log.error("订单取消-车主端结算异常orderNo={}，renterOrderNo={}，renterMemNo={}",orderNo,renterOrderNo,renterOrder.getRenterMemNo(),e);
+            log.error("订单取消-车主端结算异常orderNo={}，renterOrderNo={}，renterMemNo={}", orderNo, renterOrderNo, renterOrder.getRenterMemNo(), e);
             throw new RenterCancelSettleException();
         }
     }
@@ -171,8 +169,6 @@ public class RenterOrderSettleService {
         SettleCancelOrdersAccount settleCancelOrdersAccount = new SettleCancelOrdersAccount();
         // 实付车俩押金金额
         int rentDepositAmt = cashierSettleService.getRentDeposit(orderNo, renterMemNo);
-        // 实付钱包金额
-        int rentWalletAmt = cashierSettleService.getRentCostPayByWallet(orderNo, renterMemNo);
         // 实付违章押金金额
         int rentWzDepositAmt = cashierSettleService.getSurplusWZDepositCostAmt(orderNo, renterMemNo);
         // 查询实付租车费用金额
@@ -250,8 +246,6 @@ public class RenterOrderSettleService {
         settleCancelOrdersAccount.setRentSurplusDepositAmt(rentDepositAmt);
         settleCancelOrdersAccount.setRentWzDepositAmt(rentWzDepositAmt);
         settleCancelOrdersAccount.setRentSurplusWzDepositAmt(rentWzDepositAmt);
-        settleCancelOrdersAccount.setRenWalletAmt(rentWalletAmt);
-        settleCancelOrdersAccount.setRentSurplusWalletAmt(rentWalletAmt);
         settleCancelOrdersAccount.setRenCoinAmt(renCoinAmt);
         settleCancelOrdersAccount.setPlatformFineImconeAmt(platformFineImconeAmt);
 
@@ -260,35 +254,16 @@ public class RenterOrderSettleService {
 
     /**
      租客存在罚金 （抵扣优先级 钱包》租车费用》车辆押金》违章押金）
-     * @param settleOrders
-     * @param settleCancelOrdersAccount
+     * @param settleOrders 初始化值
+     * @param settleCancelOrdersAccount 公共参数
      */
     public void rentFinehandler(SettleOrders settleOrders, SettleCancelOrdersAccount settleCancelOrdersAccount) {
         int rentCostAmt = settleCancelOrdersAccount.getRentCostAmt();
         int rentDepositAmt =  settleCancelOrdersAccount.getRentDepositAmt();
         int rentWzDepositAmt = settleCancelOrdersAccount.getRentWzDepositAmt();
-        int renWalletAmt =  settleCancelOrdersAccount.getRenWalletAmt();
 
         //2 租客收益与罚金对冲值
         int rentFineTotal = settleCancelOrdersAccount.getRentFineTotal();
-        //收益进入钱包
-        if(rentFineTotal > 0){
-            settleCancelOrdersAccount.setRentSurplusWalletAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt() + rentFineTotal);
-        }
-        //2.1 钱包抵罚金
-        if(renWalletAmt>0 && rentFineTotal<0){
-            AccountRenterCostToFineReqVO vo = new AccountRenterCostToFineReqVO();
-            BeanUtils.copyProperties(settleOrders,vo);
-            vo.setMemNo(settleOrders.getRenterMemNo());
-            int debtAmt = renWalletAmt + rentFineTotal;
-            //计算抵扣金额
-            int amt = debtAmt>=0?rentFineTotal:-renWalletAmt;
-            vo.setAmt(amt);
-            //钱包支付金额抵扣 罚金 insert account_renter_cost_detail
-            cashierSettleService.deductWalletCostToRentFine(vo);
-            rentFineTotal = renWalletAmt + rentFineTotal;
-            settleCancelOrdersAccount.setRentSurplusWalletAmt(settleCancelOrdersAccount.getRentSurplusWalletAmt()+amt);
-        }
         //2.2 租车费用抵罚金
         if(rentCostAmt>0 && rentFineTotal<0){
             AccountRenterCostToFineReqVO vo = new AccountRenterCostToFineReqVO();
@@ -350,6 +325,8 @@ public class RenterOrderSettleService {
             accountInsertDebt.setAmt(rentFineTotal);
             //历史欠款 有就跟心欠款总额，没有就插入历史欠款。都需要添加欠款流水记录
             cashierService.createDebt(accountInsertDebt);
+            //租客罚金清零
+            settleCancelOrdersAccount.setRentFineTotal(OrderConstant.ZERO);
         }
 
 

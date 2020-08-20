@@ -30,9 +30,9 @@ public class AdminModifyOrderFeeCompareVO {
     @AutoDocProperty(value = "钱包余额")
 	private Integer walletBalance;
 	
-    @AutoDocProperty(value = "是否使用钱包：0-否，1-是")
+    @AutoDocProperty(value = "是否默认使用钱包：0-否，1-是")
 	private Integer useWalletFlag;
 	
-    @AutoDocProperty(value = "是否可以使用钱包 ：0-不能使用，1-可以使用")
+    @AutoDocProperty(value = "是否可以编辑复选框 ：0-不能，1-可以")
 	private Integer canUseWallet;
 }

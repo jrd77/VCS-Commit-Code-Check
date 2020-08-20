@@ -2,10 +2,14 @@ package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierPayService;
+import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.coin.service.AccountRenterCostCoinService;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
+import com.atzuche.order.commons.enums.cashier.PaySourceEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
@@ -52,6 +56,10 @@ import com.atzuche.order.renterorder.service.*;
 import com.atzuche.order.renterorder.vo.RenterOrderReqVO;
 import com.atzuche.order.renterorder.vo.owner.OwnerCouponGetAndValidReqVO;
 import com.atzuche.order.renterorder.vo.platform.MemAvailCouponRequestVO;
+import com.atzuche.order.wallet.WalletProxyService;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
+import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.autopay.gateway.vo.req.PayVo;
 import com.autoyol.coupon.api.CouponSettleRequest;
 import com.autoyol.platformcost.CommonUtils;
 import com.dianping.cat.Cat;
@@ -147,6 +155,12 @@ public class ModifyOrderService {
 	private SubmitOrderService submitOrderService;
 	@Autowired
 	private RenterInsureCoefficientService renterInsureCoefficientService;
+	@Autowired
+	private CashierPayService cashierPayService;
+	@Autowired
+	private WalletProxyService walletProxyService;
+	@Autowired 
+	private PayCallbackService payCallbackService;
 	
 	/**
 	 * 修改订单主逻辑（含换车）
@@ -260,11 +274,64 @@ public class ModifyOrderService {
 		bindPlatformCoupon(modifyOrderDTO);
 		// 补扣凹凸币 
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
+		// 抵扣钱包
+		int deductWallet = walletPayForConsole(modifyOrderDTO, needSupplement);
 		// 发送mq
 		sendModifyMQ(modifyOrderDTO);
 		OrderModifyConsoleResultVO resultVO = new OrderModifyConsoleResultVO();
+		resultVO.setWalletPayAmt(deductWallet);
 		return resultVO;
 	}
+	
+	
+	/**
+	 * 抵扣钱包
+	 * @param modifyOrderDTO
+	 * @param needSupplement
+	 * @return int
+	 */
+	public int walletPayForConsole(ModifyOrderDTO modifyOrderDTO, Integer needSupplement) {
+		// 管理后台操作标记
+		Boolean consoleFlag = modifyOrderDTO.getConsoleFlag();
+		// 管理后台是否使用钱包：0-否，1-是
+		Integer useWalletFlag = modifyOrderDTO.getUseWalletFlag();
+		if (consoleFlag == null || !consoleFlag || useWalletFlag == null || 
+				!useWalletFlag.equals(YesNoEnum.YES.getCode()) || 
+				needSupplement == null || needSupplement <= 0) {
+			return 0;
+		}
+		// 钱包余额
+        int payBalance = walletProxyService.getWalletByMemNo(modifyOrderDTO.getMemNo());
+        if (payBalance <= 0) {
+        	return 0;
+        }
+        int deductWallet = 0;
+        if (payBalance >= needSupplement) {
+        	deductWallet = needSupplement;
+        } else {
+        	deductWallet = payBalance;
+        }
+		OrderPaySignReqVO orderPaySign = new OrderPaySignReqVO();
+		List<String> payKind = new ArrayList<String>();
+		payKind.add(DataPayKindConstant.RENT_INCREMENT);
+		orderPaySign.setPayKind(payKind);
+		List<String> paySource = new ArrayList<String>();
+		paySource.add(PaySourceEnum.WALLET_PAY.getCode());
+		orderPaySign.setPaySource(paySource);
+		orderPaySign.setIsUseWallet(useWalletFlag);
+		orderPaySign.setMenNo(modifyOrderDTO.getMemNo());
+		orderPaySign.setOperatorName(modifyOrderDTO.getOperator());
+		orderPaySign.setOrderNo(modifyOrderDTO.getOrderNo());
+		orderPaySign.setReqOs("CONSOLE");
+		orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
+		// 收银台抵扣钱包
+		CashierEntity cashier = cashierPayService.commonWalletDebt(orderPaySign, deductWallet, DataPayKindConstant.RENT_INCREMENT);
+		deductWallet = cashier == null || cashier.getPayAmt() == null ? 0:cashier.getPayAmt();
+		List<PayVo> payVOList = cashierPayService.getPayVOListForConsoleUseWallet(orderPaySign, deductWallet);
+		cashierPayService.commonNoticePayCallBack(payCallbackService, payVOList, cashier, DataPayKindConstant.RENT_INCREMENT);
+		return deductWallet;
+	}
+	
 	
 	/**
 	 * 发mq
