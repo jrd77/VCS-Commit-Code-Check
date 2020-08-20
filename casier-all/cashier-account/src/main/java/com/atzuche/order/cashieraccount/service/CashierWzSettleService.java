@@ -237,7 +237,7 @@ public class CashierWzSettleService {
      * @param cashierRefundApply 退款信息
      * @param cashCode 费用编码信息
      */
-    public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
+	public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
 		//是否存在预授权完成操作
 		boolean isExistsPreAuthFinish = (cashierEntity.getPayAmt() - Math.abs(rentSurplusWzDepositAmt) > 0);
 		int id = 0;
