@@ -291,6 +291,7 @@
         <foreach collection="statusList" item="status" open="(" separator="," close=")">
             #{status}
         </foreach>
+        <![CDATA[AND update_time >= CURRENT_TIMESTAMP - INTERVAL 10 MINUTE ]]>
     </select>
 
     <select id = "selectByWzSettleStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
