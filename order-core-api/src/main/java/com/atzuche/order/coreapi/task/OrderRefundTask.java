@@ -1,18 +1,27 @@
 package com.atzuche.order.coreapi.task;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
+import com.atzuche.order.cashieraccount.vo.res.pay.OrderPayCallBackSuccessVO;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
+import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
+import com.atzuche.order.parentorder.dto.OrderStatusDTO;
+import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.utils.GsonUtils;
+import com.autoyol.event.rabbit.neworder.NewOrderMQActionEventEnum;
 import com.dianping.cat.Cat;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,30 +61,31 @@ public class OrderRefundTask extends IJobHandler {
         if (CollectionUtils.isNotEmpty(list)) {
 
             Map<String, List<CashierRefundApplyEntity>> dataMap =
-                    list.stream().collect(Collectors.groupingBy(CashierRefundApplyEntity::getOrderNo));
-            for (String key : dataMap.keySet()) {
-                logger.info("Order [{}] begins to refund.", key);
-                List<CashierRefundApplyEntity> records = dataMap.get(key);
+                    list.stream().collect(Collectors.groupingBy(OrderRefundTask::fetchGroupKey));
+            XxlJobLogger.log("分组后的数据 >> dataMap:" + JSON.toJSONString(dataMap));
+            logger.info("分组后的数据 >> dataMap:[{}]", JSON.toJSONString(dataMap));
 
+            for (String key : dataMap.keySet()) {
+                logger.info("Order_paykind [{}] begins to refund.", key);
+                XxlJobLogger.log("Order_paykind begins to refund. key=" + key);
+                List<CashierRefundApplyEntity> records = dataMap.get(key);
+                int sum = 0;
+                String memNo = "";
                 for (CashierRefundApplyEntity cashierRefundApplyEntity : records) {
-                    AutoPayResultVo result = cashierPayService.refundOrderPay(cashierRefundApplyEntity);
-                    if(Objects.nonNull(result)) {
-                        cashierService.refundCallBackSuccess(result);
+                    AutoPayResultVo result = cashierPayService.orderRefundHandle(cashierRefundApplyEntity);
+                    if (StringUtils.isBlank(memNo)) {
+                        memNo = result.getMemNo();
+                    }
+                    if (Objects.nonNull(result) && StringUtils.equals(result.getTransStatus(), TransStatusEnum.PAY_SUCCESS.getCode())) {
+                        sum = sum + OrderConstant.ONE;
                     }
                 }
 
-
-            }
-
-
-            for (CashierRefundApplyEntity cashierRefundApplyEntity : list) {
-                Cat.logEvent(CatConstants.XXL_JOB_PARAM, GsonUtils.toJson(cashierRefundApplyEntity));
-                try {
-                    cashierPayService.refundOrderPay(cashierRefundApplyEntity);
-                } catch (Exception e) {
-                    logger.error("执行 退款操作异常 异常", e);
-                    Cat.logError("执行 退款操作异常 异常", e);
-                    XxlJobLogger.log("执行 退款操作异常 异常,params:" + GsonUtils.toJson(cashierRefundApplyEntity));
+                logger.info("refund handle result >> sum:[{}], total:[{}]", sum, records.size());
+                XxlJobLogger.log("refund handle result >> sum = " + sum + " total=" + records.size());
+                //后续处理
+                if (records.size() == sum && sum > OrderConstant.ZERO) {
+                    cashierPayService.refundResultHandle(key, memNo);
                 }
             }
         } else {
@@ -87,4 +97,17 @@ public class OrderRefundTask extends IJobHandler {
         return SUCCESS;
 
     }
+
+    /**
+     * 組合鍵
+     *
+     * @param entity 申請記錄
+     * @return String
+     */
+    private static String fetchGroupKey(CashierRefundApplyEntity entity) {
+        return entity.getOrderNo() + ":" + entity.getPayKind();
+    }
+
+
+
 }

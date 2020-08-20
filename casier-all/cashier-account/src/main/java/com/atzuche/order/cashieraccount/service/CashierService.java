@@ -975,7 +975,7 @@ public class CashierService {
         vo.setOrderNo(notifyDataVo.getOrderNo());
         vo.setMemNo(notifyDataVo.getMemNo());
         //1.1 租车押金 01
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
+        if(DataPayKindConstant.RENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换,在退款的地方押金增加了资金进出明细。
 //            PayedOrderRenterDepositReqVO payedOrderRenterDeposit = cashierNoTService.getPayedOrderRenterDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_DEPOSIT);
             //2 收银台记录更新
@@ -987,7 +987,7 @@ public class CashierService {
         }
         
         //1.2 违章押金 02
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
+        if(DataPayKindConstant.DEPOSIT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换,在退款的地方押金增加了资金进出明细。
 //            PayedOrderRenterWZDepositReqVO payedOrderRenterWZDeposit = cashierNoTService.getPayedOrderRenterWZDepositReq(notifyDataVo,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT);
             //2 收银台记录更新
@@ -998,7 +998,7 @@ public class CashierService {
         }
         
         //1.3 租车费用
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind()) ){
+        if(DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
 //            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST);
             //2 收银台记录更新
@@ -1009,7 +1009,7 @@ public class CashierService {
         }
         
         //1.4 补付租车费用
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
+        if(DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
 //            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
@@ -1022,7 +1022,7 @@ public class CashierService {
         
         //已核实，支付的时候没有发送MQ，退款的也不发送。
         //1.5 补充
-        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind()) ){
+        if(DataPayKindConstant.RENT_AMOUNT_AFTER.equals(notifyDataVo.getPayKind())){
             //1 对象初始化转换
 //            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER);
             //2 收银台记录更新
