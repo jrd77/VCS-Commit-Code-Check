@@ -94,7 +94,7 @@ public class AdminDeliveryCarService {
         // 获取修改前数据
   		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(createModifyOrderInfoParams(deliveryCarVO));
         try {
-            ResponseData responseData = remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
+            remoteFeignService.modifyOrder(createModifyOrderInfoParams(deliveryCarVO));
         } catch (OrderException e) {
             if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("400504")) {
                 logger.info("修改配送订单租客失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());
@@ -102,11 +102,11 @@ public class AdminDeliveryCarService {
             }
         }
         // 保存操作日志
-        modificationOrderService.saveModifyOrderLog(createModifyOrderInfoParams(deliveryCarVO), modifyOrderConsoleDTO);
+        modificationOrderService.saveModifyOrderLog(createModifyOrderInfoParams(deliveryCarVO), modifyOrderConsoleDTO, null);
         OwnerTransAddressReqVO ownerTransAddressReqVO = createModifyOrderOwnerInfoParams(deliveryCarVO);
         if (Objects.nonNull(ownerTransAddressReqVO)) {
             try {
-                ResponseData ownerResponseData = remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
+                remoteFeignService.updateOwnerAddrInfoFromRemote(ownerTransAddressReqVO);
             } catch (OrderException e) {
                 if (!e.getErrorCode().equals(ErrorCode.SUCCESS.getCode()) && !e.getErrorCode().equals("510004")) {
                     logger.info("修改配送订单车主失败，orderNo：[{}],cause:[{}]", deliveryCarVO.getOrderNo(), e.getErrorCode() + "--" + e.getErrorMsg());

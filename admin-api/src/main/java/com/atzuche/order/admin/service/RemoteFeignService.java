@@ -16,6 +16,7 @@ import com.atzuche.order.commons.vo.req.consolecost.GetTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.req.consolecost.SaveTempCarDepositInfoReqVO;
 import com.atzuche.order.commons.vo.res.*;
 import com.atzuche.order.commons.vo.res.consolecost.GetTempCarDepositInfoResVO;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.open.service.*;
 import com.autoyol.autopay.gateway.vo.Response;
 import com.autoyol.commons.web.ResponseData;
@@ -692,8 +693,8 @@ public class RemoteFeignService {
      * @Description: 修改订单
      *
      **/
-    public ResponseData modifyOrder(ModifyOrderReqVO modifyOrderReq) {
-        ResponseData<?> responseObject = null;
+    public OrderModifyConsoleResultVO modifyOrder(ModifyOrderReqVO modifyOrderReq) {
+        ResponseData<OrderModifyConsoleResultVO> responseObject = null;
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "修改订单");
         try{
             Cat.logEvent(CatConstants.FEIGN_METHOD,"feignOrderModifyService.modifyOrderForConsole");
@@ -703,7 +704,7 @@ public class RemoteFeignService {
             Cat.logEvent(CatConstants.FEIGN_RESULT,JSON.toJSONString(responseObject));
             ResponseCheckUtil.checkResponse(responseObject);
             t.setStatus(Transaction.SUCCESS);
-            return responseObject;
+            return responseObject.getData();
         }catch (Exception e){
             log.error("Feign 修改订单异常,responseObject={},modifyOrderReq={}",JSON.toJSONString(responseObject),JSON.toJSONString(modifyOrderReq),e);
             Cat.logError("Feign 修改订单异常",e);

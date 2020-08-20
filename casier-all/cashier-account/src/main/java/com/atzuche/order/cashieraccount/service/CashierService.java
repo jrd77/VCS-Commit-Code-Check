@@ -902,10 +902,14 @@ public class CashierService {
             AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN);
             //2 收银台记录更新
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
-            //支付状态(callback需更新状态)
-	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
-	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
+            
+            //需要检测实收和资金流水实付的金额。
+            if(cashierShishouService.checkRentAmountShishou(accountRenterCostReq.getOrderNo(), accountRenterCostReq.getMemNo())) {
+	            //支付状态(callback需更新状态)
+		        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+		        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+		        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
+            }
         }
         
         // -------------------------------------------------------- 三大补付组合,  DataPayKindConstant.RENT_AMOUNT_AFTER 更新的是实收
@@ -924,17 +928,22 @@ public class CashierService {
          * 这一块的收款不能计入 租车费用的实收,否则欠款的金额重复使用了。200403
          */
         //1.5管理后台补付 add 200312 
-//        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT_CONSOLE.equals(notifyDataVo.getPayKind())){
-//            //1 对象初始化转换
-//            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN);
-//            //2 收银台记录更新
-//            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
-//            
-//            //支付状态(callback需更新状态)
-////	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
-////	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
-////	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
-//        }
+        //需求放开，结算前计入，结算后不计入
+        //只处理未结算的订单。 200819
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(notifyDataVo.getOrderNo());
+        if(orderStatusEntity != null && orderStatusEntity.getSettleStatus() == 0 && orderStatusEntity.getCarDepositSettleStatus() == 0) {
+	        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT_CONSOLE.equals(notifyDataVo.getPayKind())){
+	            //1 对象初始化转换
+	            AccountRenterCostReqVO accountRenterCostReq = cashierNoTService.getAccountRenterCostReq(notifyDataVo, RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN);
+	            //2 收银台记录更新
+	            cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
+	            
+	            //支付状态(callback需更新状态)
+	//	        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
+	//	        vo.setIsPayAgain(YesNoEnum.YES.getCode());
+	//	        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,2);
+	        }
+        }
         
         /**
          * 这一块的收款不能计入 租车费用的实收,否则欠款的金额重复使用了。200403

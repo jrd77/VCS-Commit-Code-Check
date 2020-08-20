@@ -96,6 +96,8 @@ public class AccountRenterWzDepositNoTService {
         }
         
         BeanUtils.copyProperties(payedOrderWZRenterDeposit,accountRenterDepositEntity);
+        //更新实收
+        accountRenterDepositEntity.setShishouDeposit(accountRenterDepositEntity.getShishouDeposit() + payedOrderWZRenterDeposit.getShishouDeposit());
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

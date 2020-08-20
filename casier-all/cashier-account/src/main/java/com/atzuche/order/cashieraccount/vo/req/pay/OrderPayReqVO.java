@@ -53,6 +53,8 @@ public class OrderPayReqVO {
 	private String atappId;
 	private String payType;
 	
+	//支付来源  add  200819
+	private List<String> paySource;
 	
     /**
      * 参数校验

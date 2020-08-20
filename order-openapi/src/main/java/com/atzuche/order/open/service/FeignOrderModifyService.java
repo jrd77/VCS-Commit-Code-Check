@@ -12,6 +12,7 @@ import com.atzuche.order.commons.vo.req.ModifyOrderQueryReqVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderMainResVO;
 import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.open.vo.ModifyOrderAppReqVO;
 import com.atzuche.order.open.vo.ModifyOrderCompareVO;
 import com.atzuche.order.open.vo.request.TransferReq;
@@ -48,7 +49,7 @@ public interface FeignOrderModifyService {
 
 
     @PostMapping("/order/modifyconsole")
-    ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
+    ResponseData<OrderModifyConsoleResultVO> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReqVO modifyOrderReqVO);
 
 	/**
 	 * 同意或者拒绝租客的订单申请

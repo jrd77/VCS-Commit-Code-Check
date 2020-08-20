@@ -10,6 +10,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.rentercost.entity.dto.RenterOrderSubsidyDetailDTO;
 import com.atzuche.order.renterorder.entity.OrderCouponEntity;
 import com.atzuche.order.renterorder.entity.dto.OrderChangeItemDTO;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -196,4 +197,8 @@ public class ModifyOrderDTO {
 	 * 修改前区间配送
 	 */
 	private RenterOrderDeliveryMode initDeliveryMode;
+	/**
+	 * 管理后台是否使用钱包：0-否，1-是
+	 */
+	private Integer useWalletFlag;
 }

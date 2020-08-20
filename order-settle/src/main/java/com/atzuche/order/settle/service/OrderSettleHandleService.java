@@ -118,7 +118,7 @@ public class OrderSettleHandleService {
         }
 
         deductionAmt = Math.abs(deductionAmt);
-        int realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt);
+        int realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, deductionAmt,"");
         if (realDeductionAmt == OrderConstant.ZERO) {
             //扣减失败,重新计算抵扣金额并再次扣减
             int balance = walletProxyService.getWalletByMemNo(memNo);
@@ -129,7 +129,7 @@ public class OrderSettleHandleService {
             int newDeductionAmt = balance >= deductionAmt ? deductionAmt : balance;
             log.info("Deduction wallet.realDeductionAmt:[{}],balance:[{}],deductionAmt:[{}]", realDeductionAmt, balance, deductionAmt);
             //按新的钱包金额来抵扣。
-            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, newDeductionAmt);
+            realDeductionAmt = walletProxyService.orderDeduct(memNo, orderNo, newDeductionAmt,"");
         }
         log.info("Deduction wallet.result is,realDeductionAmt:[{}]", realDeductionAmt);
         return realDeductionAmt;

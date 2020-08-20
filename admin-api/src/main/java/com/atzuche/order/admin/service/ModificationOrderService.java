@@ -28,6 +28,7 @@ import com.atzuche.order.commons.vo.res.ModifyOrderResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderCostDetailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderFineDeatailResVO;
 import com.atzuche.order.commons.vo.res.cost.RenterOrderSubsidyDetailResVO;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.commons.vo.res.order.RenterOrderResVO;
 import com.atzuche.order.open.service.FeignOrderModifyService;
 import com.atzuche.order.open.service.FeignOrderService;
@@ -400,7 +401,7 @@ public class ModificationOrderService {
 	 * @param modifyOrderReqVO
 	 */
 	@SuppressWarnings("unlikely-arg-type")
-	public void saveModifyOrderLog(ModifyOrderReqVO modifyOrderReqVO, ModifyOrderConsoleDTO modifyOrderConsoleDTO) {
+	public void saveModifyOrderLog(ModifyOrderReqVO modifyOrderReqVO, ModifyOrderConsoleDTO modifyOrderConsoleDTO, OrderModifyConsoleResultVO resultVO) {
 		if (modifyOrderReqVO == null) {
 			return;
 		}
@@ -422,7 +423,10 @@ public class ModificationOrderService {
 				String strAfterRevertTime = CommonUtils.formatTime(CommonUtils.parseTime(modifyOrderReqVO.getRevertTime(), CommonUtils.FORMAT_STR_LONG), CommonUtils.FORMAT_STR_DEFAULT);
 				String strBeforeRentTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRentTime(), CommonUtils.FORMAT_STR_DEFAULT);
 				String strBeforeRevertTime = CommonUtils.formatTime(modifyOrderConsoleDTO.getRevertTime(), CommonUtils.FORMAT_STR_DEFAULT);
-				desc = "将【租期】从'"+strBeforeRentTime+"~"+strBeforeRevertTime+"'改成'"+strAfterRentTime+"~"+strAfterRevertTime+"',修改原因："+modifyOrderReqVO.getModifyReason()+";";
+				desc = "1、将【租期】从'"+strBeforeRentTime+"~"+strBeforeRevertTime+"'改成'"+strAfterRentTime+"~"+strAfterRevertTime+"',修改原因："+modifyOrderReqVO.getModifyReason()+";";
+				if (resultVO != null && resultVO.getWalletPayAmt() != null && resultVO.getWalletPayAmt() > 0) {
+					desc += "2、钱包余额抵扣：已抵扣，抵扣金额："+resultVO.getWalletPayAmt()+";";
+				}
 			} else {
 				ModifyOrderReqVO oldObj = new ModifyOrderReqVO();
 				BeanUtils.copyProperties(modifyOrderConsoleDTO, oldObj);
