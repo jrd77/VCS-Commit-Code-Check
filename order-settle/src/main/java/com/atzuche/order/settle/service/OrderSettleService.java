@@ -489,6 +489,44 @@ public class OrderSettleService{
     }
     
     /**
+     * 平台补贴，范围界定，平台补贴不能大于基础费用-优惠抵扣的情况
+     * 平台给租客的补贴不计算在内。 同preRenterSettleOrder
+     * @param orderNo
+     * @param renterOrderNo
+     * @return
+     */
+    public RentCosts preRenterSettleOrderPlatformSubsidy(String orderNo,String renterOrderNo) {
+    	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
+    	//3.4 查询所有租客费用明细
+        orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
+        
+        SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
+    	//2统计 车主结算费用明细， 补贴，费用总额
+        //平台给租客的补贴不计算在内。 同handleRentAndPlatform
+    	orderSettleNoTService.handleRentAndPlatformSubsidy(settleOrdersDefinition, settleOrders);
+    	log.info("preRenterSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
+    	
+    	//租客总账
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
+        for (AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity : accountRenterCostSettleDetails) {
+			log.info("打印租客费用清单:"+accountRenterCostSettleDetailEntity.toString());
+		}
+        
+        //1租客总账
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+        	//租客结算的总费用
+            int renterCostAmtFinalPlatformSubsidy = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+//            settleOrdersDefinition.setRenterCostAmtFinal(renterCostAmtFinal);
+            settleOrders.getRentCosts().setRenterCostAmtFinalPlatformSubsidy(renterCostAmtFinalPlatformSubsidy);
+        }
+        
+        //封装租客的会员号
+        settleOrders.getRentCosts().setRenterNo(settleOrders.getRenterMemNo());
+        return settleOrders.getRentCosts();
+    }
+    
+    
+    /**
      * 获取车主预结算数据 huangjing
      * @param orderNo
      */
@@ -567,7 +605,7 @@ public class OrderSettleService{
                 updateFailStatusFlag(orderNo,ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getText());
                 throw new OrderSettleFlatAccountException();
             }
-
+            
             // 事务操作结算主逻辑  //开启事务
             orderSettleNoTService.settleOrderAfter(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfter [{}]",GsonUtils.toJson(settleOrdersDefinition));
