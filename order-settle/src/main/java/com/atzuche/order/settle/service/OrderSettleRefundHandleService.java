@@ -21,6 +21,9 @@ import com.atzuche.order.settle.vo.req.RefundApplyVO;
 import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
+import com.autoyol.commons.utils.GsonUtils;
+
+import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -130,17 +133,21 @@ public class OrderSettleRefundHandleService {
     public OrderSettleCommonResultDTO rentCarDepositRefundHandle(OrderSettleCommonParamDTO common, int surplusDepositAmt) {
         log.info("OrderSettleRefundHandleService.rentCarDepositRefundHandle >> param is, common:[{}]," +
                 "surplusDepositAmt:[{}].", JSON.toJSONString(common), surplusDepositAmt);
-        List<CashierEntity> list = cashierNoTService.getCashierEntity(common.getOrderNo(),
-                common.getMemNo(), DataPayKindConstant.RENT);
+        
+        //支付记录
+        List<CashierEntity> list = cashierNoTService.getCashierEntity(common.getOrderNo(), common.getMemNo(), DataPayKindConstant.RENT);
+        
         if (CollectionUtils.isEmpty(list)) {
             log.info("OrderSettleRefundHandleService.rentCarDepositRefundHandle >> Not found pay records.");
             return new OrderSettleCommonResultDTO(OrderRefundStatusEnum.REFUNDING.getStatus());
         }
+        
         int totalAmt =
                 list.stream().filter(c -> Objects.nonNull(c.getPayAmt())).mapToInt(CashierEntity::getPayAmt).sum();
         int walletPayTotalAmt =
                 list.stream().filter(c -> StringUtils.equalsIgnoreCase(c.getPaySource(),
                         PaySourceEnum.WALLET_PAY.getCode()) && Objects.nonNull(c.getPayAmt())).mapToInt(CashierEntity::getPayAmt).sum();
+        
         log.info("OrderSettleRefundHandleService.rentCarDepositRefundHandle >> surplusDepositAmt:[{}], totalAmt:[{}], " +
                 "walletPayTotalAmt:[{}]", surplusDepositAmt, totalAmt, walletPayTotalAmt);
 
@@ -155,6 +162,7 @@ public class OrderSettleRefundHandleService {
                     list.stream().filter(c -> !StringUtils.equalsIgnoreCase(c.getPaySource(),
                             PaySourceEnum.WALLET_PAY.getCode()) && Objects.nonNull(c.getPayAmt())).findFirst();
             if (cashierEntityOptional.isPresent()) {
+            	//仅仅一条记录,除开钱包之外的。
                 CashierEntity cashierEntity = cashierEntityOptional.get();
                 CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
                 BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
@@ -177,6 +185,35 @@ public class OrderSettleRefundHandleService {
                 entity.setUniqueNo(String.valueOf(id));
                 cashierSettleService.insertAccountRenterCostSettleDetail(entity);
                 payLine = cashierRefundApply.getPayLine();
+            }
+        }else if(refundableAmtForNotWallet == OrderConstant.ZERO){  // ==0 的情况
+        	//bugfix:处理无退款的支付宝预授权完成的情况。200820
+        	Optional<CashierEntity> cashierEntityOptional =
+                    list.stream().filter(c -> !StringUtils.equalsIgnoreCase(c.getPaySource(),
+                            PaySourceEnum.WALLET_PAY.getCode()) && Objects.nonNull(c.getPayAmt())).findFirst();
+            if (cashierEntityOptional.isPresent()) {
+            	//仅仅一条记录,除开钱包之外的。
+                CashierEntity cashierEntity = cashierEntityOptional.get();
+                //仅仅处理预授权完成的情况(无退款的情况)
+                if(Objects.nonNull(cashierEntity) && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+	                CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
+	                BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
+	                //预授权处理
+	                int id = cashierService.refundDepositPreAuthAll(refundableAmtForNotWallet, cashierEntity, cashierRefundApply, common.getCashCodeEnum());
+	                log.info("处理无退款的支付宝预授权完成的情况,params=[{}],result=[{}]",GsonUtils.toJson(cashierEntity),id);
+	                
+	                // 记录退还 租车押金 结算费用明细， refundableAmtForNotWallet金额为0无需记录
+//	                AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+//	                entity.setOrderNo(common.getOrderNo());
+//	                entity.setRenterOrderNo(common.getRenterOrderNo());
+//	                entity.setMemNo(common.getMemNo());
+//	                entity.setAmt(-refundableAmtForNotWallet);
+//	                entity.setCostCode(common.getCashCodeEnum().getCashNo());
+//	                entity.setCostDetail(common.getCashCodeEnum().getTxt());
+//	                entity.setUniqueNo(String.valueOf(id));
+//	                cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+//	                payLine = cashierRefundApply.getPayLine();
+                }
             }
         }
 
@@ -256,6 +293,23 @@ public class OrderSettleRefundHandleService {
                 entity.setType(10);
                 cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
                 payLine = cashierRefundApply.getPayLine();
+            }
+        } else if(refundableAmtForNotWallet == OrderConstant.ZERO){  // ==0 的情况
+        	//bugfix:处理无退款的支付宝预授权完成的情况。200820
+        	 Optional<CashierEntity> cashierEntityOptional =
+                     list.stream().filter(c -> !StringUtils.equalsIgnoreCase(c.getPaySource(),
+                             PaySourceEnum.WALLET_PAY.getCode()) && Objects.nonNull(c.getPayAmt())).findFirst();
+             if (cashierEntityOptional.isPresent()) {
+            	//仅仅一条记录,除开钱包之外的。
+                CashierEntity cashierEntity = cashierEntityOptional.get();
+                //仅仅处理预授权完成的情况(无退款的情况)
+                if(Objects.nonNull(cashierEntity) && DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
+	                CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
+	                BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
+	                //预授权处理
+	                int id = cashierWzSettleService.refundWzDepositPreAuthAll(refundableAmtForNotWallet, cashierEntity, cashierRefundApply, common.getCashCodeEnum());
+	                log.info("处理WZ无退款的支付宝预授权完成的情况,params=[{}],result=[{}]",GsonUtils.toJson(cashierEntity),id);
+                }
             }
         }
 

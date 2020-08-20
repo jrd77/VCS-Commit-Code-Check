@@ -266,6 +266,7 @@ public class CashierPayService{
         	//转换为集合的概念
             for(int i=0;i<notifyDataVos.size();i++){
                 NotifyDataVo notifyDataVo = notifyDataVos.get(i);
+                //扩展参数
                 String extendParams = notifyDataVo.getExtendParams();
                 if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
                     //返回应付 （包含补付） 费用列表
@@ -540,6 +541,7 @@ public class CashierPayService{
 			vo.setTransStatus("00");
 			vo.setTotalFreezeFundAmount(x.getPayAmt());
 			vo.setTotalFreezeCreditAmount("0");
+			//构造
 			vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
             String atpayNewTransId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
             vo.setAtpayNewTransId(atpayNewTransId);
