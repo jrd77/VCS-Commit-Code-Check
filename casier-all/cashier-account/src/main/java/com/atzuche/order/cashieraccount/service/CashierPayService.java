@@ -543,9 +543,8 @@ public class CashierPayService{
 			vo.setTotalFreezeCreditAmount("0");
 			//构造
 			vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-			String atpayNewTransId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
-			vo.setAtpayNewTransId(atpayNewTransId);
-
+            String atpayNewTransId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
+            vo.setAtpayNewTransId(atpayNewTransId);
 			//封装
 			lstVo.add(vo);
 			batchNotifyDataVo.setLstNotifyDataVo(lstVo);
