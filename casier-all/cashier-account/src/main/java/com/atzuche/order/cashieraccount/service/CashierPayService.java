@@ -838,12 +838,21 @@ public class CashierPayService{
 //        	isUseWallet = 0;
 //        }else {
         	//renterOrderEntity 如果该对象为空，则上面已经返回。
-        	if(renterOrderEntity != null) {
-        		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
+        
+        
+        	//兼容之前的处理。
+        	if(CollectionUtils.isEmpty(orderPayReqVO.getPaySource())) {
+            	if(renterOrderEntity != null) {
+            		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?renterOrderEntity.getIsUseWallet():orderPayReqVO.getIsUseWallet();
+            	}else {
+            		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?0:orderPayReqVO.getIsUseWallet(); //默认否
+            	}
         	}else {
-        		isUseWallet = Objects.isNull(orderPayReqVO.getIsUseWallet())?0:orderPayReqVO.getIsUseWallet(); //默认否
+	        	String paySourceConvert = orderPayReqVO.getPaySource().stream().filter(x -> "00".equals(x)).findFirst().orElse("");  //默认值
+	        	if("00".equals(paySourceConvert)) {
+	        		isUseWallet = 1;
+	        	}
         	}
-        	
         	
 //        	if(isEnterpriseUserOrder==false) {
 //	        	//如果已经使用过钱包抵扣，不允许再次做抵扣。
@@ -864,6 +873,8 @@ public class CashierPayService{
         		log.info("当前订单企业用户钱包允许多次抵扣。orderNo=[{}]",orderPayReqVO.getOrderNo());
         	}
         	
+
+        	
 //        }
         result.setIsUseWallet(isUseWallet);
         
@@ -876,6 +887,10 @@ public class CashierPayService{
         int amtWallet07 =0;
         //查询钱包余额外置
         int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+        //查询当前的订单状态
+        OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(orderPayReqVO.getOrderNo());
+        //未结算标记
+        boolean noSettleFlag = (orderStatusEntity != null && orderStatusEntity.getRentCarPayStatus() == 0 && orderStatusEntity.getSettleStatus() == 0);
         
         //待支付金额明细
         List<AccountPayAbleResVO> accountPayAbles = new ArrayList<>();
@@ -895,21 +910,21 @@ public class CashierPayService{
                }
            }
            
+         //钱包抵扣
+           if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//               int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+               int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+               if(payBalance - realAmtWallet > 0) {
+               	payBalance = (payBalance - realAmtWallet);
+   	            //预计钱包抵扣金额 = amtWallet
+   	            amtWallet01 = amtDeposit + payBalance < 0 ? payBalance : Math.abs(amtDeposit);
+   	            // 抵扣钱包后  应付租车费用金额
+   	            amtDeposit =  amtDeposit + amtWallet01;
+               }
+//               accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet01,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+           }
         }
         
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            //预计钱包抵扣金额 = amtWallet
-	            amtWallet01 = amtDeposit + payBalance < 0 ? payBalance : Math.abs(amtDeposit);
-	            // 抵扣钱包后  应付租车费用金额
-	            amtDeposit =  amtDeposit + amtWallet01;
-            }
-//            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet01,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
-        }
         
         
         //违章押金 是否选择违章押金
@@ -926,19 +941,21 @@ public class CashierPayService{
 	                accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWZDeposit, RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT,RenterCashCodeEnum.ACCOUNT_RENTER_WZ_DEPOSIT.getTxt()));
 	            }
             }
-        }
-        
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEPOSIT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet02 = amtWZDeposit + payBalance < 0 ? payBalance : Math.abs(amtWZDeposit);
-	            amtWZDeposit =  amtWZDeposit + amtWallet02;
+            
+          //钱包抵扣
+            if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//                int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+                //预计钱包抵扣金额 = amtWallet
+                int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+                if(payBalance - realAmtWallet > 0) {
+                	payBalance = (payBalance - realAmtWallet);
+    	            amtWallet02 = amtWZDeposit + payBalance < 0 ? payBalance : Math.abs(amtWZDeposit);
+    	            amtWZDeposit =  amtWZDeposit + amtWallet02;
+                }
             }
         }
+        
+        
         
         
         //已付租车费用(shifu  租车费用的实付)
@@ -951,24 +968,34 @@ public class CashierPayService{
         int rentAmtPayed = 0;
       //实际待支付租车费用总额 即真实应付租车费用
         int amtRent = 0;
+        int outsideAmt = 0;
+        
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT)){  //修改订单的补付
 //            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
         	//考虑到支付租车费用，不考虑管理后台补贴的方式。
         	//会导致租客支付第一笔租车费用为0的情况。管理后台补贴在结算的时候处理。200409 
         	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
         	
-            if(result.getPayableVOs() != null) {
-            	result.getPayableVOs().addAll(payableVOs);
-            }else {
-            	result.setPayableVOs(payableVOs);
-            }
             //应付租车费用（已经求和）
             rentAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             
             //已付租车费用(shifu  租车费用的实付)
             //该情况只会有一种情况：钱包 shifu
             rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-            if(!CollectionUtils.isEmpty(payableVOs) && rentAmt+rentAmtPayed < 0){   // 
+            
+            if(noSettleFlag) {
+            	//外部来金(无需支付的管理后台补付记录)
+            	List<PayableVO> payableVOsOutSide = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            	outsideAmt = cashierNoTService.sumRentOrderCost(payableVOsOutSide);
+            }
+            
+            if(!CollectionUtils.isEmpty(payableVOs) && (rentAmt+rentAmtPayed+outsideAmt) < 0){   // 
+                if(result.getPayableVOs() != null) {
+                	result.getPayableVOs().addAll(payableVOs);
+                }else {
+                	result.setPayableVOs(payableVOs);
+                }
+                
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -979,41 +1006,41 @@ public class CashierPayService{
 //                    }
                     result.setIsPayAgain(YesNoEnum.NO.getCode());
                     //抵扣掉钱包的部分，下单的时候抵扣钱包金额。钱包部分抵扣的情况。
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayed),type,payableVO.getTitle()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayed+outsideAmt),type,payableVO.getTitle()));
                 }
+                
+                amtRent = rentAmt + rentAmtPayed + outsideAmt;
             }
             
-            amtRent = rentAmt + rentAmtPayed;
-        }
-
-        // 计算钱包 支付 目前支付抵扣租费费用
-        //租车费用
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet11 = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
-	            // 抵扣钱包后  应付租车费用金额
-	            amtRent =  amtRent + amtWallet11;
-	            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet11,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+            
+            
+            
+         // 计算钱包 支付 目前支付抵扣租费费用
+            //租车费用
+            if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//                int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+                //预计钱包抵扣金额 = amtWallet
+                int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+                if(payBalance - realAmtWallet > 0) {
+                	payBalance = (payBalance - realAmtWallet);
+    	            amtWallet11 = amtRent + payBalance < 0 ? payBalance : Math.abs(amtRent);
+    	            // 抵扣钱包后  应付租车费用金额
+    	            amtRent =  amtRent + amtWallet11;
+    	            accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),amtWallet11,RenterCashCodeEnum.ACCOUNT_WALLET_COST,RenterCashCodeEnum.ACCOUNT_WALLET_COST.getTxt()));
+                }
             }
         }
+ 
         
         
         //APP修改订单补付
         int rentIncrementAmt = 0;
         int rentAmtPayedIncrement = 0;
         int amtIncrementRent = 0;
+        int outsideAmtIncrement = 0;
+        
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT)){  //修改订单的补付
             List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
-//            result.setPayableVOs(payableVOs);
-            if(result.getPayableVOs() != null) {
-            	result.getPayableVOs().addAll(payableVOs);
-            }else {
-            	result.setPayableVOs(payableVOs);
-            }
             
             //应付租车费用
             rentIncrementAmt = cashierNoTService.sumRentOrderCost(payableVOs);
@@ -1022,7 +1049,20 @@ public class CashierPayService{
     		rentIncrementAmt = rentIncrementAmt + platformToRenterAmt;
             //已付租车费用(shifu  租车费用的实付)
             rentAmtPayedIncrement = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-            if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementAmt+rentAmtPayedIncrement < 0){   // +rentAmtPayed
+            if(noSettleFlag) {
+            	//外部来金(无需支付的管理后台补付记录)
+            	List<PayableVO> payableVOsOutSide = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            	outsideAmtIncrement = cashierNoTService.sumRentOrderCost(payableVOsOutSide);
+            }
+            
+            if(!CollectionUtils.isEmpty(payableVOs) && (platformToRenterAmt+rentIncrementAmt+rentAmtPayedIncrement+outsideAmtIncrement) < 0){   // +rentAmtPayed  （加上平台补贴）
+//              result.setPayableVOs(payableVOs);
+                if(result.getPayableVOs() != null) {
+                	result.getPayableVOs().addAll(payableVOs);
+                }else {
+                	result.setPayableVOs(payableVOs);
+                }
+                
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -1030,25 +1070,28 @@ public class CashierPayService{
                     if(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.equals(type)){
                         result.setIsPayAgain(YesNoEnum.YES.getCode());
                     }
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(platformToRenterAmt+payableVO.getAmt()+rentAmtPayedIncrement),type,payableVO.getTitle()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(platformToRenterAmt+payableVO.getAmt()+rentAmtPayedIncrement+outsideAmtIncrement),type,payableVO.getTitle()));
                 }
+                
+              //补付修改订单（加上平台补贴）
+                amtIncrementRent = platformToRenterAmt + rentIncrementAmt + rentAmtPayedIncrement + outsideAmtIncrement;
             }
             
-           //补付修改订单
-           amtIncrementRent = rentIncrementAmt + rentAmtPayedIncrement;
+           
+         //钱包抵扣
+           if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//               int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+               //预计钱包抵扣金额 = amtWallet
+               int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+               if(payBalance - realAmtWallet > 0) {
+               	payBalance = (payBalance - realAmtWallet);
+   	            amtWallet03 = amtIncrementRent + payBalance < 0 ? payBalance : Math.abs(amtIncrementRent);
+   	            amtIncrementRent =  amtIncrementRent + amtWallet03;
+               }
+           }
         }
         
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet03 = amtIncrementRent + payBalance < 0 ? payBalance : Math.abs(amtIncrementRent);
-	            amtIncrementRent =  amtIncrementRent + amtWallet03;
-            }
-        }
+        
         
         
         //---------------------------------------------------------------------------------------- 与RENT_AMOUNT分离 ---------------------------------- 三大块
@@ -1056,63 +1099,91 @@ public class CashierPayService{
         int rentAmtAfter = 0;
         int rentAmtPayedAfter = 0;
         int amtRentAfter = 0;
+        int outsideAmtAfter = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER)){  //管理后台修改订单的补付
 //            List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableGlobalVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
             List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
-            
-//            result.setPayableVOs(payableVOs);
-            if(result.getPayableVOs() != null) {
-            	result.getPayableVOs().addAll(payableVOs);
-            }else {
-            	result.setPayableVOs(payableVOs);
-            }
-            
+
             //应付租车费用（已经求和）
             rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
             
             //已付租车费用(shifu  租车费用的实付)
             rentAmtPayedAfter = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-            if(!CollectionUtils.isEmpty(payableVOs) && rentAmtAfter+rentAmtPayedAfter < 0){   // 
+            
+            if(noSettleFlag) {
+            	//外部来金(无需支付的管理后台补付记录)
+            	List<PayableVO> payableVOsOutSide = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            	outsideAmtAfter = cashierNoTService.sumRentOrderCost(payableVOsOutSide);
+            }
+            
+            if(!CollectionUtils.isEmpty(payableVOs) && (rentAmtAfter+rentAmtPayedAfter+outsideAmtAfter) < 0){   // 
+            	
+                
+//              result.setPayableVOs(payableVOs);
+              if(result.getPayableVOs() != null) {
+              	result.getPayableVOs().addAll(payableVOs);
+              }else {
+              	result.setPayableVOs(payableVOs);
+              }
+              
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
 //                    RenterCashCodeEnum type = rentAmtPayed>0?RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN:RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST;
                     RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;
                     result.setIsPayAgain(YesNoEnum.NO.getCode());
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayedAfter),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayedAfter+outsideAmtAfter),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+                }
+                
+              //在方法体内统计
+                amtRentAfter = rentAmtAfter + rentAmtPayedAfter + outsideAmtAfter;
+            }
+            
+            
+            
+          //钱包抵扣
+            if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//                int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+                //预计钱包抵扣金额 = amtWallet
+                int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+                if(payBalance - realAmtWallet > 0) {
+                	payBalance = (payBalance - realAmtWallet);
+    	            amtWallet12 = amtRentAfter + payBalance < 0 ? payBalance : Math.abs(amtRentAfter);
+    	            amtRentAfter =  amtRentAfter + amtWallet12;
                 }
             }
-            //在方法体内统计
-            amtRentAfter = rentAmtAfter + rentAmtPayedAfter;
         }
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_AMOUNT_AFTER) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet12 = amtRentAfter + payBalance < 0 ? payBalance : Math.abs(amtRentAfter);
-	            amtRentAfter =  amtRentAfter + amtWallet12;
-            }
-        }
+        
         
         
         //管理后台补付，等于管理后台的补付   08  order_supplement_detail
         int rentIncrementSupplementAmt = 0;
+        int rentAmtPayedSupplement = 0;
         int amtRentIncrementSupplement = 0;
+        int outsideAmtSupplement = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE)){  //修改订单的补付
         	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableSupplementVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-//            result.setPayableVOs(payableVOs);
-        	if(result.getPayableVOs() != null) {
-            	result.getPayableVOs().addAll(payableVOs);
-            }else {
-            	result.setPayableVOs(payableVOs);
-            }
+
             //应付租车费用,保存为负数
             rentIncrementSupplementAmt = cashierNoTService.sumRentOrderCost(payableVOs);  
             //已付租车费用(shifu  租车费用的实付)
-            if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementSupplementAmt < 0){    //大于0的情况就不考虑了。兼容负数的情况。
+            //仅仅未结算的时候才处理。租车押金结算后，只收不退，跟实收无关。200819
+            if(noSettleFlag) {
+            	//外部来金(动态记录)
+            	List<PayableVO> payableVOsOutSide = renterOrderCostCombineService.listPayableIncrementVO(orderPayReqVO.getOrderNo(),renterOrderEntity.getRenterOrderNo(),orderPayReqVO.getMenNo());
+            	outsideAmtSupplement = cashierNoTService.sumRentOrderCost(payableVOsOutSide);
+            	
+            	rentAmtPayedSupplement = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
+            }
+            
+            if(!CollectionUtils.isEmpty(payableVOs) && (rentIncrementSupplementAmt + rentAmtPayedSupplement + outsideAmtSupplement) < 0){    //大于0的情况就不考虑了。兼容负数的情况。
+//              result.setPayableVOs(payableVOs);
+            	if(result.getPayableVOs() != null) {
+                	result.getPayableVOs().addAll(payableVOs);
+                }else {
+                	result.setPayableVOs(payableVOs);
+                }
+            	
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -1120,23 +1191,27 @@ public class CashierPayService{
 //                    if(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.equals(type)){
                         result.setIsPayAgain(YesNoEnum.NO.getCode());
 //                    }
-                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+                    accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),(payableVO.getAmt()+rentAmtPayedSupplement+outsideAmtSupplement),type,payableVO.getTitle(),payableVO.getUniqueNo()));
+                }
+                
+                amtRentIncrementSupplement = rentIncrementSupplementAmt + rentAmtPayedSupplement + outsideAmtSupplement;
+            }
+
+            
+            //钱包抵扣
+            if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//                int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+                //预计钱包抵扣金额 = amtWallet
+                int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+                if(payBalance - realAmtWallet > 0) {
+                	payBalance = (payBalance - realAmtWallet);
+    	            amtWallet08 = amtRentIncrementSupplement + payBalance < 0 ? payBalance : Math.abs(amtRentIncrementSupplement);
+    	            amtRentIncrementSupplement =  amtRentIncrementSupplement + amtWallet08;
                 }
             }
-            amtRentIncrementSupplement = rentIncrementSupplementAmt;
         }
         
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.RENT_INCREMENT_CONSOLE) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet08 = amtRentIncrementSupplement + payBalance < 0 ? payBalance : Math.abs(amtRentIncrementSupplement);
-	            amtRentIncrementSupplement =  amtRentIncrementSupplement + amtWallet08;
-            }
-        }
+       
         
         
         //支付欠款 
@@ -1144,18 +1219,19 @@ public class CashierPayService{
         int amtRentIncrementDebt = 0;
         if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEBT)){  //修改订单的补付
             List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableDebtPayVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
-//            result.setPayableVOs(payableVOs);
-            if(result.getPayableVOs() != null) {
-            	result.getPayableVOs().addAll(payableVOs);
-            }else {
-            	result.setPayableVOs(payableVOs);
-            }
             
             //应付租车费用（已经求和）
             rentIncrementDebtAmt = cashierNoTService.sumRentOrderCost(payableVOs);
             
             //已付租车费用(shifu  租车费用的实付)
             if(!CollectionUtils.isEmpty(payableVOs) && rentIncrementDebtAmt < 0){
+//              result.setPayableVOs(payableVOs);
+                if(result.getPayableVOs() != null) {
+                	result.getPayableVOs().addAll(payableVOs);
+                }else {
+                	result.setPayableVOs(payableVOs);
+                }
+                
                 for(int i=0;i<payableVOs.size();i++){
                     PayableVO payableVO = payableVOs.get(i);
                     //判断是租车费用、还是补付 租车费用 并记录 详情
@@ -1163,20 +1239,24 @@ public class CashierPayService{
                     result.setIsPayAgain(YesNoEnum.NO.getCode());
                     accountPayAbles.add(new AccountPayAbleResVO(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo(),payableVO.getAmt(),type,payableVO.getTitle(),payableVO.getUniqueNo()));
                 }
+                
+                amtRentIncrementDebt = rentIncrementDebtAmt;
             }
-            amtRentIncrementDebt = rentIncrementDebtAmt;
-        }
-        //钱包抵扣
-        if(orderPayReqVO.getPayKind().contains(DataPayKindConstant.DEBT) && YesNoEnum.YES.getCode()==result.getIsUseWallet()){
-//            int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
-            //预计钱包抵扣金额 = amtWallet
-            int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
-            if(payBalance - realAmtWallet > 0) {
-            	payBalance = (payBalance - realAmtWallet);
-	            amtWallet07 = amtRentIncrementDebt + payBalance < 0 ? payBalance : Math.abs(amtRentIncrementDebt);
-	            amtRentIncrementDebt =  amtRentIncrementDebt + amtWallet07;
+            
+            
+          //钱包抵扣
+            if(YesNoEnum.YES.getCode()==result.getIsUseWallet()){
+//                int payBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+                //预计钱包抵扣金额 = amtWallet
+                int realAmtWallet = amtWallet01 + amtWallet02 + amtWallet11 + amtWallet03 + amtWallet12 + amtWallet08 + amtWallet07;
+                if(payBalance - realAmtWallet > 0) {
+                	payBalance = (payBalance - realAmtWallet);
+    	            amtWallet07 = amtRentIncrementDebt + payBalance < 0 ? payBalance : Math.abs(amtRentIncrementDebt);
+    	            amtRentIncrementDebt =  amtRentIncrementDebt + amtWallet07;
+                }
             }
         }
+        
         
         //管理后台补付
         //支付欠款
