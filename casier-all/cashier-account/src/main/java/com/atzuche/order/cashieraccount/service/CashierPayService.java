@@ -647,6 +647,14 @@ public class CashierPayService{
         	RenterCashCodeEnum renterCashCodeEnum = getRenterCashCodeNumByPayKind(payKind);
             //5 抵扣钱包落库 （收银台落库、费用落库）
             amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), needAmtWallet,renterCashCodeEnum.getTxt());
+            /**
+             * 钱包服务的异常处理，抛出异常处理
+             */
+            if(amtWallet == 0 || amtWallet != needAmtWallet) {
+            	RuntimeException e = new RuntimeException("remote order wallet exception:mem_no="+orderPaySign.getMenNo()+",orderNo="+orderPaySign.getOrderNo()+",amt="+needAmtWallet);
+            	throw e;
+            }
+            
             //6收银台 钱包支付落库
             cashier = cashierNoTService.insertRenterCostByWallet(orderPaySign, amtWallet,renterCashCodeEnum,payKind);
         }
