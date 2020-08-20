@@ -192,10 +192,10 @@ public class CashierRefundApplyNoTService {
 
     /**
      *
-     * @param orderNo
-     * @return
+     * @param orderNo 订单号
+     * @return List<CashierRefundApplyEntity>
      */
-    public CashierRefundApplyEntity selectorderNo(String orderNo,String payKind) {
+    public List<CashierRefundApplyEntity> selectorderNo(String orderNo,String payKind) {
         return cashierRefundApplyMapper.selectRefundByType(orderNo,payKind);
     }
     /**

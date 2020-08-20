@@ -311,10 +311,15 @@ public class ModifyOrderService {
         } else {
         	deductWallet = payBalance;
         }
+        OrderStatusEntity orderStatusEntity = modifyOrderDTO.getOrderStatusEntity();
+        String payKind = DataPayKindConstant.RENT_AMOUNT;
+        if (orderStatusEntity.getRentCarPayStatus() != null && orderStatusEntity.getRentCarPayStatus().intValue() == OrderPayStatusEnum.PAYED.getStatus()) {
+        	payKind = DataPayKindConstant.RENT_INCREMENT;
+        }
 		OrderPaySignReqVO orderPaySign = new OrderPaySignReqVO();
-		List<String> payKind = new ArrayList<String>();
-		payKind.add(DataPayKindConstant.RENT_INCREMENT);
-		orderPaySign.setPayKind(payKind);
+		List<String> payKinds = new ArrayList<String>();
+		payKinds.add(payKind);
+		orderPaySign.setPayKind(payKinds);
 		List<String> paySource = new ArrayList<String>();
 		paySource.add(PaySourceEnum.WALLET_PAY.getCode());
 		orderPaySign.setPaySource(paySource);
@@ -325,10 +330,10 @@ public class ModifyOrderService {
 		orderPaySign.setReqOs("CONSOLE");
 		orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
 		// 收银台抵扣钱包
-		CashierEntity cashier = cashierPayService.commonWalletDebt(orderPaySign, deductWallet, DataPayKindConstant.RENT_INCREMENT);
+		CashierEntity cashier = cashierPayService.commonWalletDebt(orderPaySign, deductWallet, payKind);
 		deductWallet = cashier == null || cashier.getPayAmt() == null ? 0:cashier.getPayAmt();
-		List<PayVo> payVOList = cashierPayService.getPayVOListForConsoleUseWallet(orderPaySign, deductWallet);
-		cashierPayService.commonNoticePayCallBack(payCallbackService, payVOList, cashier, DataPayKindConstant.RENT_INCREMENT);
+		List<PayVo> payVOList = cashierPayService.getPayVOListForConsoleUseWallet(orderPaySign, deductWallet, payKind);
+		cashierPayService.commonNoticePayCallBack(payCallbackService, payVOList, cashier, payKind);
 		return deductWallet;
 	}
 	

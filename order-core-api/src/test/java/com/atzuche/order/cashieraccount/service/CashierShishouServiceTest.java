@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.coreapi.TemplateApplication;
 import com.atzuche.order.coreapi.service.CashierNoTServiceTest;
 
@@ -32,7 +33,7 @@ public class CashierShishouServiceTest {
 	
 	@Test
 	public void testCheckRentAmountShishou() {
-		boolean f = cashierShishouService.checkRentAmountShishou(orderNo, memNo);
+		boolean f = cashierShishouService.checkRentAmountShishou(orderNo, memNo,YesNoEnum.YES.getCode());
 		assertTrue(f);
 	}
 
