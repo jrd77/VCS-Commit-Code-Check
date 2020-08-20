@@ -205,13 +205,13 @@ public class PaymentService {
                 }
             }
         }
-        CashierRefundApplyDTO cashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PRE_FINISH, null, wzSettleTimeRefound);
+        CashierRefundApplyDTO cashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PRE_FINISH, null, null);
         PaymentResponseVO voFailure = convertPaymentFromCashierRefundApply(cashierRefundApplyDTOFailure);
-        if(voFailure != null)afterDepositSettlementPaymentList.add(voFailure);
+        if(voFailure != null)violationDepositSettlementPaymentList.add(voFailure);
 
-        CashierRefundApplyDTO rentcashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.RENT, PayTypeEnum.PRE_FINISH, null, wzSettleTimeRefound);
+        CashierRefundApplyDTO rentcashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.RENT, PayTypeEnum.PRE_FINISH, null, null);
         PaymentResponseVO rentvoFailure = convertPaymentFromCashierRefundApply(rentcashierRefundApplyDTOFailure);
-        if(rentvoFailure != null)afterDepositSettlementPaymentList.add(rentvoFailure);
+        if(rentvoFailure != null)violationDepositSettlementPaymentList.add(rentvoFailure);
 		/**
 		 * 数据封装
 		 */
