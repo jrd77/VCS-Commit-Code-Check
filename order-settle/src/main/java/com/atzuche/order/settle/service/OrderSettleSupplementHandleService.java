@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package com.atzuche.order.settle.service;
 
 import java.util.ArrayList;
@@ -13,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
-import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
+import com.atzuche.order.accountrenterdeposit.service.AccountRenterDepositService;
+import com.atzuche.order.accountrenterdeposit.vo.req.DetainRenterDepositReqVO;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.vo.req.PayedOrderRenterDepositWZDetailReqVO;
-import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
+import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.service.CashierSettleService;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.enums.SupplemOpStatusEnum;
 import com.atzuche.order.commons.enums.SupplementOpTypeEnum;
@@ -27,27 +32,25 @@ import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
+import com.atzuche.order.settle.vo.req.SettleOrders;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
-import com.atzuche.order.settle.vo.req.SettleOrdersWz;
 
 /**
- * 违章押金结算,补付记录处理
+ * @author jing.huang
  *
- * @author pengcheng.fu
- * @date 2020/3/18 16:15
  */
-
 @Service
-public class OrderWzSettleSupplementHandleService {
-
-    private static Logger logger = LoggerFactory.getLogger(OrderWzSettleSupplementHandleService.class);
+public class OrderSettleSupplementHandleService {
+	private static Logger logger = LoggerFactory.getLogger(OrderSettleSupplementHandleService.class);
 
     @Autowired
     private OrderSupplementDetailService orderSupplementDetailService;
     @Autowired
-    private CashierWzSettleService cashierWzSettleService;
+    private CashierSettleService cashierSettleService;
     @Autowired
-    private AccountRenterWzDepositService accountRenterWzDepositService;
+    private CashierService cashierService;
+    @Autowired
+    private AccountRenterDepositService accountRenterDepositService;
 
     /**
      * 处理订单未支付的补付记录
@@ -55,50 +58,52 @@ public class OrderWzSettleSupplementHandleService {
      * @param settleOrders        订单信息
      * @param settleOrdersAccount 结算信息
      */
-    public void supplementCostHandle(SettleOrdersWz settleOrders, SettleOrdersAccount settleOrdersAccount) {
-        logger.info("Illegal settlement of orders, supplementary payment of fees. settleOrdersAccount:[{}]", JSON.toJSONString(settleOrdersAccount));
-        List<OrderSupplementDetailEntity> entityList =
-                orderSupplementDetailService.queryNotPaySupplementByOrderNoAndMemNo(settleOrdersAccount.getOrderNo());
+    public void supplementCostHandle(SettleOrders settleOrders, SettleOrdersAccount settleOrdersAccount) {
+        logger.info("settlement of orders, supplementary payment of fees. settleOrdersAccount:[{}]", JSON.toJSONString(settleOrdersAccount));
+        List<OrderSupplementDetailEntity> entityList = orderSupplementDetailService.queryNotPaySupplementByOrderNoAndMemNo(settleOrdersAccount.getOrderNo());
         if (CollectionUtils.isEmpty(entityList)) {
             logger.warn("No record of supplement was found.");
         } else {
             List<OrderSupplementDetailEntity> debtList= new ArrayList<>();
             List<OrderSupplementDetailEntity> deductList = new ArrayList<>();
+            
             int needPayAmt = handleSupplementDetail(entityList, debtList, deductList, settleOrdersAccount);
-            settleOrders.setShouldTakeWzCost(settleOrders.getShouldTakeWzCost() + needPayAmt);
+            
+            //应扣
+//            settleOrders.setShouldTakeCost(settleOrders.getShouldTakeCost() + needPayAmt);
+            
             if (CollectionUtils.isNotEmpty(debtList)) {
                 debtList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
-                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), null);
+                            SupplementPayFlagEnum.PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_INTO_DEBT.getCode(), null);
                     AccountInsertDebtReqVO accountInsertDebt = buildAccountInsertDebtReqVO(settleOrders, entity.getAmt());
-                    cashierWzSettleService.createWzDebt(accountInsertDebt);
+                    cashierService.createDebt(accountInsertDebt);
                 });
             }
+            
             if (CollectionUtils.isNotEmpty(deductList)) {
                 deductList.forEach(entity -> {
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
-                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
+                            SupplementPayFlagEnum.PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_DEDUCT.getCode(), null);
                     // 更新违章押金抵扣信息
                     if(null != entity.getPayFlag() && entity.getPayFlag() != OrderConstant.ZERO) {
-                        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterWzDepositDetail =
-                                buildPayedOrderRenterDepositWzDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
-                        payedOrderRenterWzDepositDetail.setUniqueNo(String.valueOf(entity.getId()));
-                        int renterWzDepositDetailId =
-                                accountRenterWzDepositService.updateRenterWZDepositChange(payedOrderRenterWzDepositDetail);
+                    	
+                    	DetainRenterDepositReqVO detainRenterDepositReqVO = buildPayedOrderRenterDepositDetailReqVO(settleOrders, Math.abs(entity.getAmt()));
+                        detainRenterDepositReqVO.setUniqueNo(String.valueOf(entity.getId()));
+                        
+                        int renterDepositDetailId = accountRenterDepositService.detainRenterDeposit(detainRenterDepositReqVO);
 
                         // 添加结算明细
-                        AccountRenterWzDepositCostSettleDetailEntity settleDetail =
-                                new AccountRenterWzDepositCostSettleDetailEntity();
+                        AccountRenterCostSettleDetailEntity settleDetail = new AccountRenterCostSettleDetailEntity();   //WzDeposit
                         settleDetail.setOrderNo(settleOrders.getOrderNo());
                         settleDetail.setRenterOrderNo(settleOrders.getRenterOrderNo());
                         settleDetail.setMemNo(settleOrders.getRenterMemNo());
-                        settleDetail.setWzAmt(-Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
-                        settleDetail.setPrice(Math.abs(payedOrderRenterWzDepositDetail.getAmt()));
-                        settleDetail.setCostCode(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getCashNo());
-                        settleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT.getTxt());
-                        settleDetail.setType(10);
-                        settleDetail.setUniqueNo(String.valueOf(renterWzDepositDetailId));
-                        cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(settleDetail);
+                        settleDetail.setAmt(-Math.abs(detainRenterDepositReqVO.getAmt()));
+                        settleDetail.setCostCode(RenterCashCodeEnum.SETTLE_ZUCHE_TO_SUPPLEMENT_AMT.getCashNo());
+                        settleDetail.setCostDetail(RenterCashCodeEnum.SETTLE_ZUCHE_TO_SUPPLEMENT_AMT.getTxt());
+                        settleDetail.setType(1);
+                        settleDetail.setUniqueNo(String.valueOf(renterDepositDetailId));
+                        cashierSettleService.insertAccountRenterCostSettleDetail(settleDetail); //wzDeposit
                     }
                 });
             }
@@ -125,17 +130,8 @@ public class OrderWzSettleSupplementHandleService {
         List<OrderSupplementDetailEntity> noPayList =
                 entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() != OrderConstant.ZERO).collect(Collectors.toList());
         
-//        int noNeedPayAmt = 0;//noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-//        if(!CollectionUtils.isEmpty(noNeedPayList)) {
-//        	noNeedPayAmt = noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-//        }
         //无需支付
         int noNeedPayAmt = Optional.ofNullable(noNeedPayList).orElseGet(ArrayList::new).stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-        
-//        int noPayAmt = 0; //noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-//        if(!CollectionUtils.isEmpty(noNeedPayList)) {
-//        	noPayAmt = noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-//        }
         //未支付
         int noPayAmt = Optional.ofNullable(noPayList).orElseGet(ArrayList::new).stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
         
@@ -144,7 +140,7 @@ public class OrderWzSettleSupplementHandleService {
             logger.warn("No need handle.noNeedPayAmt:[{}],noPayAmt:[{}]", noNeedPayAmt, noPayAmt);
             entityList.forEach(entity ->
                     orderSupplementDetailService.updatePayFlagById(entity.getId(),
-                            SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), null)
+                            SupplementPayFlagEnum.PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_DEDUCT.getCode(), null)
             );
         } else {
             int depositSurplusAmt = settleOrdersAccount.getDepositSurplusAmt() + noNeedPayAmt;
@@ -172,13 +168,13 @@ public class OrderWzSettleSupplementHandleService {
                                         OrderSupplementDetailEntity supplementMeet =
                                                 buildOrderSupplementDetailEntity(splitCriticalPoint,
                                                         depositSurplusAmt,
-                                                        SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_DEDUCT.getCode(), "违章押金结算抵扣");
+                                                        SupplementPayFlagEnum.PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_DEDUCT.getCode(), "租车押金结算抵扣");
                                         orderSupplementDetailService.saveOrderSupplementDetail(supplementMeet);
                                         //需要转入欠款的部分
                                         int debtAmt = Math.abs(splitCriticalPoint.getAmt()) - depositSurplusAmt;
                                         OrderSupplementDetailEntity supplementNotMeet =
                                                 buildOrderSupplementDetailEntity(splitCriticalPoint, debtAmt,
-                                                        SupplementPayFlagEnum.PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT.getCode(), "违章押金结算转欠款");
+                                                        SupplementPayFlagEnum.PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_INTO_DEBT.getCode(), "租车押金结算转欠款");
                                         orderSupplementDetailService.saveOrderSupplementDetail(supplementNotMeet);
 
                                         debtList.add(supplementNotMeet);
@@ -242,8 +238,7 @@ public class OrderWzSettleSupplementHandleService {
      * @param debtAmt      欠款金额
      * @return AccountInsertDebtReqVO
      */
-    private AccountInsertDebtReqVO buildAccountInsertDebtReqVO(SettleOrdersWz settleOrders, int debtAmt) {
-
+    private AccountInsertDebtReqVO buildAccountInsertDebtReqVO(SettleOrders settleOrders, int debtAmt) {
         AccountInsertDebtReqVO accountInsertDebt = new AccountInsertDebtReqVO();
         BeanUtils.copyProperties(settleOrders, accountInsertDebt);
         accountInsertDebt.setMemNo(settleOrders.getRenterMemNo());
@@ -253,7 +248,6 @@ public class OrderWzSettleSupplementHandleService {
         accountInsertDebt.setSourceDetail(RenterCashCodeEnum.HISTORY_AMT.getTxt());
         return accountInsertDebt;
     }
-
 
     /**
      * 临界点拆分
@@ -272,24 +266,24 @@ public class OrderWzSettleSupplementHandleService {
         supplement.setRemark(remark);
         supplement.setPayFlag(payFlag);
         supplement.setSupplementType(SupplementTypeEnum.SYSTEM_CREATE.getCode());
-        supplement.setOpType(SupplementOpTypeEnum.ILLEGALSETTLE_CREATE.getCode());
+        supplement.setOpType(SupplementOpTypeEnum.RENTSETTLE_CREATE.getCode());
         return supplement;
     }
 
     /**
-     * 违章抵扣信息
+     * 租车押金抵扣信息
      *
      * @param settleOrders 结算订单信息
      * @param amt 抵扣金额
      * @return PayedOrderRenterDepositWZDetailReqVO
      */
-    private PayedOrderRenterDepositWZDetailReqVO buildPayedOrderRenterDepositWzDetailReqVO(SettleOrdersWz settleOrders, int amt){
-        PayedOrderRenterDepositWZDetailReqVO payedOrderRenterDepositWzDetailReqVO =
-                new PayedOrderRenterDepositWZDetailReqVO();
-        payedOrderRenterDepositWzDetailReqVO.setOrderNo(settleOrders.getOrderNo());
-        payedOrderRenterDepositWzDetailReqVO.setMemNo(settleOrders.getRenterMemNo());
-        payedOrderRenterDepositWzDetailReqVO.setAmt(-amt);
-        payedOrderRenterDepositWzDetailReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_TO_SUPPLEMENT_AMT);
-        return payedOrderRenterDepositWzDetailReqVO;
+    private DetainRenterDepositReqVO buildPayedOrderRenterDepositDetailReqVO(SettleOrders settleOrders, int amt){
+    	DetainRenterDepositReqVO detainRenterDepositReqVO = new DetainRenterDepositReqVO();
+    	detainRenterDepositReqVO.setOrderNo(settleOrders.getOrderNo());
+    	detainRenterDepositReqVO.setMemNo(settleOrders.getRenterMemNo());
+    	detainRenterDepositReqVO.setAmt(-amt);
+    	detainRenterDepositReqVO.setRenterCashCodeEnum(RenterCashCodeEnum.SETTLE_ZUCHE_TO_SUPPLEMENT_AMT);
+        return detainRenterDepositReqVO;
     }
+    
 }

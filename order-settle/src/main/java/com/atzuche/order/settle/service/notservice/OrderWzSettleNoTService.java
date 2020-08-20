@@ -154,7 +154,8 @@ public class OrderWzSettleNoTService {
     public void refundWzDepositAmt(SettleOrdersAccount settleOrdersAccount, OrderStatusDTO orderStatusDTO) {
         log.info("OrderWzSettleNoTService.refundWzDepositAmt >> param is,settleOrdersAccount:[{}],orderStatusDTO:[{}]",
                 JSON.toJSONString(settleOrdersAccount), JSON.toJSONString(orderStatusDTO));
-        if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
+        //bugfix:处理无退款的支付宝预授权完成的情况。200820   >=  加上条件
+        if (settleOrdersAccount.getDepositSurplusAmt() >= 0) {  
             OrderSettleCommonParamDTO common = new OrderSettleCommonParamDTO();
             common.setOrderNo(settleOrdersAccount.getOrderNo());
             common.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());

@@ -44,6 +44,7 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
+import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
@@ -268,6 +269,7 @@ public class CashierPayService{
         	//转换为集合的概念
             for(int i=0;i<notifyDataVos.size();i++){
                 NotifyDataVo notifyDataVo = notifyDataVos.get(i);
+                //扩展参数
                 String extendParams = notifyDataVo.getExtendParams();
                 if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
                     //返回应付 （包含补付） 费用列表
@@ -543,9 +545,9 @@ public class CashierPayService{
 			vo.setTotalFreezeFundAmount(x.getPayAmt());
 			vo.setTotalFreezeCreditAmount("0");
 			//构造
-			String atappId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
-			vo.setAtappId(atappId);
-
+			vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+            String atpayNewTransId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
+            vo.setAtpayNewTransId(atpayNewTransId);
 			//封装
 			lstVo.add(vo);
 			batchNotifyDataVo.setLstNotifyDataVo(lstVo);
@@ -650,6 +652,14 @@ public class CashierPayService{
         	RenterCashCodeEnum renterCashCodeEnum = getRenterCashCodeNumByPayKind(payKind);
             //5 抵扣钱包落库 （收银台落库、费用落库）
             amtWallet = walletProxyService.orderDeduct(orderPaySign.getMenNo(), orderPaySign.getOrderNo(), needAmtWallet,renterCashCodeEnum.getTxt());
+            /**
+             * 钱包服务的异常处理，抛出异常处理
+             */
+            if(amtWallet == 0 || amtWallet != needAmtWallet) {
+            	RuntimeException e = new RuntimeException("remote order wallet exception:mem_no="+orderPaySign.getMenNo()+",orderNo="+orderPaySign.getOrderNo()+",amt="+needAmtWallet);
+            	throw e;
+            }
+            
             //6收银台 钱包支付落库
             cashier = cashierNoTService.insertRenterCostByWallet(orderPaySign, amtWallet,renterCashCodeEnum,payKind);
         }
@@ -2158,16 +2168,12 @@ public class CashierPayService{
 	 * @param amt
 	 * @return List<PayVo>
 	 */
-	public List<PayVo> getPayVOListForConsoleUseWallet(OrderPaySignReqVO orderPaySign,int amt) {
+	public List<PayVo> getPayVOListForConsoleUseWallet(OrderPaySignReqVO orderPaySign,int amt,String payKind) {
 		//待支付金额明细
         List<PayVo> payVo = new ArrayList<PayVo>();
 		//统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
         //默认消费
         orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
-
-        //去掉该条件，根据入参来。
-//                    String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
-        String payKind = DataPayKindConstant.RENT_INCREMENT;
         AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
         Integer payId = Objects.isNull(entity)?0:entity.getId();
         String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);

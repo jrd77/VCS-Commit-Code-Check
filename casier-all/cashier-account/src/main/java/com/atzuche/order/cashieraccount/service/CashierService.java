@@ -880,7 +880,7 @@ public class CashierService {
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             
             //需要检测实收和资金流水实付的金额。
-            if(cashierShishouService.checkRentAmountShishou(accountRenterCostReq.getOrderNo(), accountRenterCostReq.getMemNo())) {
+            if(cashierShishouService.checkRentAmountShishou(accountRenterCostReq.getOrderNo(), accountRenterCostReq.getMemNo(), YesNoEnum.NO.getCode())) {
 	            //支付状态
 		        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
 		        sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.RENTER_ORDER_PAYSUCCESS,vo,1);
@@ -896,7 +896,7 @@ public class CashierService {
             cashierNoTService.updataCashierAndRenterCost(notifyDataVo,accountRenterCostReq);
             
             //需要检测实收和资金流水实付的金额。
-            if(cashierShishouService.checkRentAmountShishou(accountRenterCostReq.getOrderNo(), accountRenterCostReq.getMemNo())) {
+            if(cashierShishouService.checkRentAmountShishou(accountRenterCostReq.getOrderNo(), accountRenterCostReq.getMemNo(), YesNoEnum.YES.getCode())) {
 	            //支付状态(callback需更新状态)
 		        vo.setRentCarPayStatus(OrderPayStatusEnum.PAYED.getStatus());
 		        vo.setIsPayAgain(YesNoEnum.YES.getCode());

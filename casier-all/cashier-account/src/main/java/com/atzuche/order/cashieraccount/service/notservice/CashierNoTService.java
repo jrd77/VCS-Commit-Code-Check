@@ -368,6 +368,10 @@ public class CashierNoTService {
 	            if(result == 0){
 	                throw new OrderPayCallBackAsnyException();
 	            }
+	            //未成功到成功的状态。200820 钱包入库的时候是01，异步通知修改为00
+	            if(DataPaySourceConstant.WALLETPAY.equals(notifyDataVo.getPaySource())) {
+	            	return true;
+	            }
         	}else {
         		log.info("当前状态已经为成功,orderNo=[{}],payMd5=[{}]",notifyDataVo.getOrderNo(),notifyDataVo.getPayMd5());
         	}
@@ -935,7 +939,8 @@ public class CashierNoTService {
             cashier.setPayKind(payKind);
             cashier.setPayType(DataPayTypeConstant.PAY_PUR);
             cashier.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
-            cashier.setTransStatus("00");
+            //在异步通知中修改为00，刚开始添加的时候为01 进行中状态。
+            cashier.setTransStatus("01"); 
             cashier.setPaySn(NumberUtils.INTEGER_ONE);
             ///add 200819
             String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(cashier));
