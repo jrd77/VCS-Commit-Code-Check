@@ -368,8 +368,10 @@ public class CashierNoTService {
 	            if(result == 0){
 	                throw new OrderPayCallBackAsnyException();
 	            }
-	            //未成功到成功的状态。
-	            return true;
+	            //未成功到成功的状态。200820 钱包入库的时候是01，异步通知修改为00
+	            if(DataPaySourceConstant.WALLETPAY.equals(notifyDataVo.getPaySource())) {
+	            	return true;
+	            }
         	}else {
         		log.info("当前状态已经为成功,orderNo=[{}],payMd5=[{}]",notifyDataVo.getOrderNo(),notifyDataVo.getPayMd5());
         	}

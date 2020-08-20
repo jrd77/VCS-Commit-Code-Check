@@ -97,7 +97,8 @@ public enum RenterCashCodeEnum {
     SETTLE_RENT_WALLET_TO_HISTORY_AMT("11130022","租车钱包费用转历史欠款"),
     SETTLE_WZ_TO_HISTORY_AMT("11130023","违章押金转历史欠款"),
     SETTLE_WZ_TO_SUPPLEMENT_AMT("11130029","违章押金抵扣补付金额"),
-
+    SETTLE_ZUCHE_TO_SUPPLEMENT_AMT("11130037","租车押金抵扣补付金额"),
+    
     ACCOUNT_DEPOSIT_DETAIN_CAR_AMT("11130024","暂扣租车押金"),
     ACCOUNT_WZ_DEPOSIT_DETAIN_CAR_AMT("11130025","暂扣违章押金"),
 

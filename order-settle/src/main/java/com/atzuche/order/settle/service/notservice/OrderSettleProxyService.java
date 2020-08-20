@@ -267,7 +267,7 @@ public class OrderSettleProxyService {
         log.info("OrderSettleProxyService.getCashierRefundApply. param is,refundApplyVO:[{}]", JSON.toJSONString(refundApplyVO));
         int refundAmt = refundApplyVO.getRefundAmt();
         List<CashierRefundApplyReqVO> cashierRefundApplys = new ArrayList<>();
-        //1 租车费用
+        //11 租车费用
         CashierEntity cashierEntity = cashierNoTService.getCashierEntityNoWallet(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
         if (Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId()) && refundAmt < 0) {
             CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();

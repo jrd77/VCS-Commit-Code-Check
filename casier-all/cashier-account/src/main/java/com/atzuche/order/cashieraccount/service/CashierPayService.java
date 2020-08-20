@@ -42,6 +42,7 @@ import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 import com.atzuche.order.wallet.WalletProxyService;
+import com.autoyol.autopay.gateway.constant.DataAppIdConstant;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.autopay.gateway.constant.DataPaySourceConstant;
 import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
@@ -265,6 +266,7 @@ public class CashierPayService{
         	//转换为集合的概念
             for(int i=0;i<notifyDataVos.size();i++){
                 NotifyDataVo notifyDataVo = notifyDataVos.get(i);
+                //扩展参数
                 String extendParams = notifyDataVo.getExtendParams();
                 if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_AMOUNT.equals(notifyDataVo.getPayKind())){
                     //返回应付 （包含补付） 费用列表
@@ -540,8 +542,9 @@ public class CashierPayService{
 			vo.setTotalFreezeFundAmount(x.getPayAmt());
 			vo.setTotalFreezeCreditAmount("0");
 			//构造
-			String atappId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
-			vo.setAtappId(atappId);
+			vo.setAtappId(DataAppIdConstant.APPID_SHORTRENT);
+			String atpayNewTransId = PayTransIdCreator.getPayTransId(vo.getOrderNo(), vo.getAtappId(), vo.getPayKind(), vo.getPayType(), vo.getPaySource(), vo.getPayEnv());
+			vo.setAtpayNewTransId(atpayNewTransId);
 
 			//封装
 			lstVo.add(vo);
