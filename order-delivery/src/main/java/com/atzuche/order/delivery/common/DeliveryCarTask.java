@@ -236,6 +236,10 @@ public class DeliveryCarTask {
         renYunFlowOrderDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus() == null ? "0" : String.valueOf(orderStatusEntity.getDepositPayStatus()));
 
         renYunFlowOrderDTO.setEngineType(EngineTypeEnum.getName(renterGoodsDetailDTO.getCarEngineType()));
+        // 油表总刻度
+        if (renterGoodsDetailDTO.getOilTotalCalibration() != null) {
+        	renYunFlowOrderDTO.setOilScaleDenominator(String.valueOf(renterGoodsDetailDTO.getOilTotalCalibration()));
+        }
         return renYunFlowOrderDTO;
     }
 
