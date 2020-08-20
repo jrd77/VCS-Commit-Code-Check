@@ -10,6 +10,7 @@ import com.atzuche.order.commons.exceptions.NotAllowedEditException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.vo.req.ModifyApplyHandleReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderConsoleCheckReq;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.DispatchCarInfoVO;
@@ -98,7 +99,7 @@ public class ModifyOrderController {
      * @return ResponseData
      */
     @PostMapping("/order/modifyconsole")
-    public ResponseData<?> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
+    public ResponseData<OrderModifyConsoleResultVO> modifyOrderForConsole(@Valid @RequestBody ModifyOrderReq modifyOrderReq, BindingResult bindingResult) {
         log.info("修改订单（管理后台）modifyOrderReq=[{}] ", modifyOrderReq);
 		BindingResultUtil.checkBindingResult(bindingResult);
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(modifyOrderReq.getOrderNo());
@@ -109,9 +110,8 @@ public class ModifyOrderController {
 
 		// 设置为管理后台修改
         modifyOrderReq.setConsoleFlag(true);
-        modifyOrderService.modifyOrder(modifyOrderReq);
-
-        return ResponseData.success();
+        OrderModifyConsoleResultVO resultVO = modifyOrderService.modifyOrder(modifyOrderReq);
+        return ResponseData.success(resultVO);
     }
 
     /**

@@ -49,4 +49,16 @@ public class ModifyOrderCompareVO implements Serializable{
     * 驾驶行为评分和各项系数
     * */
 	private RenterInsureCoefficientDTO renterInsureCoefficientDTO;
+	/**
+	 * 钱包余额
+	 */
+	private Integer walletBalance;
+	/**
+	 * 是否使用钱包：0-否，1-是
+	 */
+	private Integer useWalletFlag;
+	/**
+	 * 是否可以使用钱包
+	 */
+	private Integer canUseWallet;
 }

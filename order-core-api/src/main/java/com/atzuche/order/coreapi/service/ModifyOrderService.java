@@ -7,6 +7,7 @@ import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.*;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.coreapi.entity.dto.ModifyOrderDTO;
 import com.atzuche.order.coreapi.entity.request.ModifyOrderReq;
 import com.atzuche.order.coreapi.entity.vo.CostDeductVO;
@@ -153,7 +154,7 @@ public class ModifyOrderService {
 	 * @return ResponseData
 	 */
 	@Transactional(rollbackFor=Exception.class)
-	public void modifyOrder(ModifyOrderReq modifyOrderReq) {
+	public OrderModifyConsoleResultVO modifyOrder(ModifyOrderReq modifyOrderReq) {
 		log.info("modifyOrder修改订单主逻辑入参modifyOrderReq=[{}]", modifyOrderReq);
 		// 主单号
 		String orderNo = modifyOrderReq.getOrderNo();
@@ -261,6 +262,8 @@ public class ModifyOrderService {
 		againAutoCoinDeduct(modifyOrderDTO, costDeductVO.getRenterSubsidyList());
 		// 发送mq
 		sendModifyMQ(modifyOrderDTO);
+		OrderModifyConsoleResultVO resultVO = new OrderModifyConsoleResultVO();
+		return resultVO;
 	}
 	
 	/**
