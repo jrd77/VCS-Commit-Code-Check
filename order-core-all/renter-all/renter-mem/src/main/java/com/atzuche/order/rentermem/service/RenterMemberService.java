@@ -41,7 +41,19 @@ public class RenterMemberService{
     @Autowired
     private RenterMemberRightMapper renterMemberRightMapper;
 
-
+    /*
+     * @Author ZhangBin
+     * @Date 2020/8/20 11:10
+     * @Description: 判断是否是企业用户
+     *
+     **/
+    public boolean isEnterpriseByRenterMemberRight(List<RenterMemberRightDTO> renterMemberRightDTOS){
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
+        if(renterMemberRightDTO == null){
+            return false;
+        }
+        return true;
+    }
     /*
      * @Author ZhangBin
      * @Date 2020/4/17 10:45
