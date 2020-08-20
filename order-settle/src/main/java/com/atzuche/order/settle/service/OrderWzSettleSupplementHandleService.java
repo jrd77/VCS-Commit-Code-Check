@@ -116,8 +116,10 @@ public class OrderWzSettleSupplementHandleService {
                                        List<OrderSupplementDetailEntity> debtList,
                                        List<OrderSupplementDetailEntity> deductList,
                                        SettleOrdersAccount settleOrdersAccount) {
+    	//无需支付
         List<OrderSupplementDetailEntity> noNeedPayList =
                 entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() == OrderConstant.ZERO).collect(Collectors.toList());
+        //补付未支付
         List<OrderSupplementDetailEntity> noPayList =
                 entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() != OrderConstant.ZERO).collect(Collectors.toList());
         int noNeedPayAmt = noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
