@@ -1124,7 +1124,7 @@ public class OrderSettleNoTService {
         //4车辆押金退还
         if(settleCancelOrdersAccount.getRentSurplusDepositAmt()>0){
             common.setCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_DEPOSIT_TO_RETURN_AMT);
-            OrderSettleCommonResultDTO result = orderSettleRefundHandleService.rentCarCostRefundHandle(common,
+            OrderSettleCommonResultDTO result = orderSettleRefundHandleService.rentCarDepositRefundHandle(common,
                     settleCancelOrdersAccount.getRentSurplusDepositAmt());
             orderStatusDTO.setDepositRefundStatus(result.getStatus());
         }
@@ -1132,7 +1132,7 @@ public class OrderSettleNoTService {
         //5违章押金退还
         if (settleCancelOrdersAccount.getRentSurplusWzDepositAmt() > 0) {
             common.setCashCodeEnum(RenterCashCodeEnum.CANCEL_RENT_WZ_DEPOSIT_TO_RETURN_AMT);
-            OrderSettleCommonResultDTO result = orderSettleRefundHandleService.rentCarCostRefundHandle(common,
+            OrderSettleCommonResultDTO result = orderSettleRefundHandleService.wzDepositRefundHandle(common,
                     settleCancelOrdersAccount.getRentSurplusWzDepositAmt());
             orderStatusDTO.setWzRefundStatus(result.getStatus());
         }
