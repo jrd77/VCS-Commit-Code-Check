@@ -86,6 +86,7 @@ import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1451,7 +1452,7 @@ public class OrderDetailService {
         //租车费用流水
         List<AccountRenterCostDetailEntity> accountRenterCostDetailsByOrderNo = accountRenterCostDetailNoTService.getAccountRenterCostDetailsByOrderNo(orderNo);
         List<AccountRenterCostDetailDTO> accountRenterCostDetailDTOList = new ArrayList<>();
-        accountRenterCostDetailsByOrderNo.stream().forEach(x->{
+        accountRenterCostDetailsByOrderNo.forEach(x->{
             AccountRenterCostDetailDTO accountRenterCostDetailDTO = new AccountRenterCostDetailDTO();
             BeanUtils.copyProperties(x,accountRenterCostDetailDTO);
             accountRenterCostDetailDTOList.add(accountRenterCostDetailDTO);
@@ -1459,14 +1460,23 @@ public class OrderDetailService {
         //入账的历史欠款
         List<AccountDebtReceivableaDetailEntity> accountDebtReceivableaDetailEntities = accountDebtReceivableaDetailNoTService.getByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
         List<AccountDebtReceivableaDetailDTO> accountDebtReceivableaDetailDTOist = new ArrayList<>();
-        accountDebtReceivableaDetailEntities.stream().forEach(x->{
+        accountDebtReceivableaDetailEntities.forEach(x->{
             AccountDebtReceivableaDetailDTO accountDebtReceivableaDetailDTO = new AccountDebtReceivableaDetailDTO();
             BeanUtils.copyProperties(x,accountDebtReceivableaDetailDTO);
             accountDebtReceivableaDetailDTOist.add(accountDebtReceivableaDetailDTO);
         });
 
         //收银台
-        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo, accountRenterDepositEntity.getMemNo(), DataPayKindConstant.RENT);
+        List<CashierEntity> records = cashierNoTService.getCashierEntity(orderNo,
+                accountRenterDepositEntity.getMemNo(), DataPayKindConstant.RENT);
+        Optional<CashierEntity> cashierEntityOptional =
+                records.stream().filter(c -> !StringUtils.equalsIgnoreCase(c.getPaySource(),
+                        com.atzuche.order.commons.enums.cashier.PaySourceEnum.WALLET_PAY.getCode())).findFirst();
+        CashierEntity cashierEntity = null;
+        if(cashierEntityOptional.isPresent()) {
+            cashierEntity = cashierEntityOptional.get();
+        }
+
         CashierDTO cashierDTO = null;
         if(cashierEntity != null){
             cashierDTO = new CashierDTO();

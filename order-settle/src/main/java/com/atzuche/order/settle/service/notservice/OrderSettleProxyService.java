@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -263,6 +264,7 @@ public class OrderSettleProxyService {
      * @return List<CashierRefundApplyReqVO>
      */
     public List<CashierRefundApplyReqVO> getCashierRefundApply(RefundApplyVO refundApplyVO) {
+        log.info("OrderSettleProxyService.getCashierRefundApply. param is,refundApplyVO:[{}]", JSON.toJSONString(refundApplyVO));
         int refundAmt = refundApplyVO.getRefundAmt();
         List<CashierRefundApplyReqVO> cashierRefundApplys = new ArrayList<>();
         //1 租车费用
@@ -329,6 +331,33 @@ public class OrderSettleProxyService {
                 }
             }
         }
+
+
+        //08
+        if (refundAmt < 0) {
+            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT_CONSOLE);
+            if (!CollectionUtils.isEmpty(cashierEntitys)) {
+                for (CashierEntity entity : cashierEntitys) {
+                    if (refundAmt < 0) {
+                        CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
+                        BeanUtils.copyProperties(entity, vo);
+                        vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.getCashNo());
+                        vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
+                        vo.setPaySource(entity.getPaySource());
+                        //固定04 退货 200410
+                        vo.setPayType(DataPayTypeConstant.PUR_RETURN);
+                        vo.setRemake(refundApplyVO.getRemarke());
+                        int amt = refundAmt + entity.getPayAmt();
+                        vo.setAmt(amt >= 0 ? refundAmt : -entity.getPayAmt());
+                        cashierRefundApplys.add(vo);
+                        refundAmt = refundAmt + entity.getPayAmt();
+                    }
+
+                }
+            }
+        }
+        log.info("OrderSettleProxyService.getCashierRefundApply. result is,cashierRefundApplys:[{}]",
+                JSON.toJSONString(cashierRefundApplys));
         return cashierRefundApplys;
     }
     

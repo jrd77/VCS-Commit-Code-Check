@@ -1,18 +1,15 @@
 package com.atzuche.order.settle.service.notservice;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
-import com.atzuche.order.cashieraccount.entity.CashierEntity;
 import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierDeductDebtReqVO;
-import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.cashieraccount.vo.req.DeductDepositToRentCostReqVO;
 import com.atzuche.order.cashieraccount.vo.res.CashierDeductDebtResVO;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.debt.DebtTypeEnum;
 import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
-import com.atzuche.order.commons.enums.cashier.OrderRefundStatusEnum;
-import com.atzuche.order.commons.enums.cashier.PayLineEnum;
 import com.atzuche.order.flow.service.OrderFlowService;
 import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
@@ -20,17 +17,18 @@ import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.renterwz.entity.RenterOrderWzCostDetailEntity;
 import com.atzuche.order.renterwz.service.RenterOrderWzCostDetailService;
+import com.atzuche.order.settle.dto.OrderSettleCommonParamDTO;
+import com.atzuche.order.settle.dto.OrderSettleCommonResultDTO;
 import com.atzuche.order.settle.service.AccountDebtService;
+import com.atzuche.order.settle.service.OrderSettleRefundHandleService;
 import com.atzuche.order.settle.vo.req.*;
 import com.atzuche.order.settle.vo.res.AccountOldDebtResVO;
-import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
-import com.autoyol.autopay.gateway.constant.DataPayTypeConstant;
 import com.autoyol.commons.utils.GsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +57,8 @@ public class OrderWzSettleNoTService {
     private RenterOrderService renterOrderService;
     @Autowired
     private OwnerOrderService ownerOrderService;
+    @Autowired
+    private OrderSettleRefundHandleService orderSettleRefundHandleService;
 
 
     /**
@@ -152,48 +152,20 @@ public class OrderWzSettleNoTService {
      * @param orderStatusDTO      订单状态信息
      */
     public void refundWzDepositAmt(SettleOrdersAccount settleOrdersAccount, OrderStatusDTO orderStatusDTO) {
+        log.info("OrderWzSettleNoTService.refundWzDepositAmt >> param is,settleOrdersAccount:[{}],orderStatusDTO:[{}]",
+                JSON.toJSONString(settleOrdersAccount), JSON.toJSONString(orderStatusDTO));
         if (settleOrdersAccount.getDepositSurplusAmt() > 0) {
-            //1退还违章押金
-            CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
-            BeanUtils.copyProperties(settleOrdersAccount, cashierRefundApply);
+            OrderSettleCommonParamDTO common = new OrderSettleCommonParamDTO();
+            common.setOrderNo(settleOrdersAccount.getOrderNo());
+            common.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());
+            common.setMemNo(settleOrdersAccount.getRenterMemNo());
+            common.setCashCodeEnum(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+            OrderSettleCommonResultDTO result = orderSettleRefundHandleService.wzDepositRefundHandle(common,
+                    settleOrdersAccount.getDepositSurplusAmt());
 
-            //方法重构
-            CashierEntity cashierEntity = cashierNoTService.getCashierEntity(settleOrdersAccount.getOrderNo(), settleOrdersAccount.getRenterMemNo(), DataPayKindConstant.DEPOSIT);
-            BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
-
-            int id;
-            if (DataPayTypeConstant.PAY_PRE.equals(cashierEntity.getPayType())) {
-                //预授权处理
-                id = cashierWzSettleService.refundWzDepositPreAuthAll(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
-            } else {
-                //消费 退货
-                id = cashierWzSettleService.refundWzDepositPurchase(settleOrdersAccount.getDepositSurplusAmt(), cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
-            }
-
-            // 结算费用明细
-            AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
-            BeanUtils.copyProperties(settleOrdersAccount, entity);
-            entity.setMemNo(settleOrdersAccount.getRenterMemNo());
-            entity.setWzAmt(-settleOrdersAccount.getDepositSurplusAmt());
-            entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
-            entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
-            entity.setUniqueNo(String.valueOf(id));
-            entity.setType(10);
-            cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
-            log.info("(记录租客费用总账明细)新增租客COST明细表(退款费用)，accountRenterCostSettleDetailEntity. entity:[{}]",
-                    GsonUtils.toJson(entity));
-            Integer payLine = cashierRefundApply.getPayLine();
-            // 0-线上支付，1-线下支付，2-虚拟支付
-            if (payLine != null) {
-                if (payLine.equals(PayLineEnum.OFF_LINE_PAY.getCode()) ||
-                        payLine.equals(PayLineEnum.VIRTUAL_PAY.getCode())) {
-                    orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
-                } else {
-                    orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-                }
-            } else {
-                orderStatusDTO.setWzRefundStatus(OrderRefundStatusEnum.REFUNDING.getStatus());
-            }
+            log.info("OrderWzSettleNoTService.refundWzDepositAmt >> result is,result:[{}]",
+                    JSON.toJSONString(result));
+            orderStatusDTO.setWzRefundStatus(result.getStatus());
         }
     }
     

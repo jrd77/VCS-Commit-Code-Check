@@ -77,9 +77,6 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
                 for (String orderNo : orderNos) {
                     try {
                         logger.info("执行 还车4小时后，自动结算 orderNo:[{}]",orderNo);
-                        /**
-                         * 结算失败通知邮件列表
-                         */
                         orderSettle.settleOrder(orderNo,listOrderNos);
                     } catch (Exception e) {
                         XxlJobLogger.log("执行 还车4小时后，自动结算 异常:" + e);
@@ -91,15 +88,15 @@ public class RevertCar4HoursAutoSettleTask extends IJobHandler{
                 
                 
                 //发送邮件通知。
-                if(listOrderNos != null && listOrderNos.size() > 0) {
+                if(listOrderNos.size() > 0) {
                 	ExceptionEmailServerVo email = exceptionEmailService.getEmailServer();
                     String[] emails = this.exceptionEmail();
-                    String content = "订单号列表如下：";
+                    StringBuilder content = new StringBuilder("订单号列表如下：");
                     for (String orderno : listOrderNos) {
-                    	content += " " + orderno + ", ";
+                    	content.append(" ").append(orderno).append(", ");
 					}
                     logger.info("邮件发送内容:"+content);
-                	new ExceptionGPSMail(email.getHostName(),email.getFromAddr(),email.getFromName(),email.getFromPwd(),emails).send("请关注取还车油表或里程刻度异常结算被拦截",content);
+                	new ExceptionGPSMail(email.getHostName(),email.getFromAddr(),email.getFromName(),email.getFromPwd(),emails).send("请关注取还车油表或里程刻度异常结算被拦截", content.toString());
                 }
                 
             }

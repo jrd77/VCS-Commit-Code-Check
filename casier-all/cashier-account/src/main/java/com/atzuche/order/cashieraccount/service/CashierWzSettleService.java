@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
@@ -394,6 +395,7 @@ public class CashierWzSettleService {
      * @return 成功记录数
      */
     public int insertAccountRenterWzDepositCostSettleDetail(AccountRenterWzDepositCostSettleDetailEntity record) {
+        log.info("新增违章费用结算信息. param is,record:[{}]", JSON.toJSONString(record));
         return accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetail(record);
     }
 

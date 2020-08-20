@@ -1,7 +1,12 @@
 package com.atzuche.order.settle.service;
 
 import com.alibaba.fastjson.JSON;
+import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
+import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.cashieraccount.entity.CashierEntity;
+import com.atzuche.order.cashieraccount.service.CashierService;
+import com.atzuche.order.cashieraccount.service.CashierSettleService;
+import com.atzuche.order.cashieraccount.service.CashierWzSettleService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.cashieraccount.vo.req.CashierRefundApplyReqVO;
 import com.atzuche.order.commons.constant.OrderConstant;
@@ -34,6 +39,12 @@ public class OrderSettleWalletRefundHandleService {
 
     @Autowired
     private CashierNoTService cashierNoTService;
+    @Autowired
+    private CashierService cashierService;
+    @Autowired
+    private CashierSettleService cashierSettleService;
+    @Autowired
+    private CashierWzSettleService cashierWzSettleService;
 
 
     /**
@@ -45,7 +56,7 @@ public class OrderSettleWalletRefundHandleService {
      */
     public List<CashierRefundApplyReqVO> walletRefundForRentCarCost(String orderNo, String renterMemNo, int surplusRentCarCost) {
         log.info("OrderSettleWalletRefundHandleService.walletRefundForRentCarCost >> orderNo:[{}],renterMemNo:[{}]," +
-                        "surplusRentCarCost:[{}]", orderNo, renterMemNo, surplusRentCarCost);
+                "surplusRentCarCost:[{}]", orderNo, renterMemNo, surplusRentCarCost);
         if (surplusRentCarCost <= OrderConstant.ZERO) {
             log.info("Surplus rental fee is zero.");
             return null;
@@ -86,35 +97,86 @@ public class OrderSettleWalletRefundHandleService {
     /**
      * 车辆押金使用钱包结算退回
      *
+     * @param renterOrderNo        租客会员号
      * @param surplusCarDepositAmt 剩余车辆押金
+     * @param walletPayRecords     钱包支付记录
      */
-    public void walletRefundForCarDeposit(int surplusCarDepositAmt) {
+    public void walletRefundForCarDeposit(String renterOrderNo, int surplusCarDepositAmt,
+                                          List<CashierEntity> walletPayRecords) {
 
-        if (surplusCarDepositAmt <= OrderConstant.ZERO) {
+        log.info("OrderSettleWalletRefundHandleService.walletRefundForCarDeposit >> renterOrderNo:[{}], " +
+                "surplusCarDepositAmt:[{}], walletPayRecords:[{}]", renterOrderNo, surplusCarDepositAmt, JSON.toJSONString(walletPayRecords));
+        if (surplusCarDepositAmt <= OrderConstant.ZERO || CollectionUtils.isEmpty(walletPayRecords)) {
             log.info("Surplus car deposit is zero.");
             return;
         }
+        int surplusAmt = surplusCarDepositAmt;
+        for (CashierEntity cashierEntity : walletPayRecords) {
+            if (surplusAmt > OrderConstant.ZERO) {
+                int amt = surplusAmt >= cashierEntity.getPayAmt() ? cashierEntity.getPayAmt() : surplusAmt;
+                CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
+                BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
+                int id = cashierWzSettleService.refundWzDepositPurchase(amt, cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
 
-
-
-
-
-
+                // 结算费用明细
+                AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
+                entity.setOrderNo(cashierEntity.getOrderNo());
+                entity.setRenterOrderNo(renterOrderNo);
+                entity.setMemNo(cashierEntity.getMemNo());
+                entity.setWzAmt(-amt);
+                entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
+                entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                entity.setUniqueNo(String.valueOf(id));
+                entity.setType(10);
+                cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
+                //重置余额
+                surplusAmt = surplusAmt + entity.getWzAmt();
+                log.info("Reset surplusAmt:[{}]", surplusAmt);
+            }
+        }
     }
 
 
     /**
      * 违章押金使用钱包结算退回
-     *
+     * @param renterOrderNo        租客会员号
      * @param surplusWzDepositAmt 剩余违章押金
+     * @param walletPayRecords     钱包支付记录
      */
-    public void walletRefundForWzDeposit(int surplusWzDepositAmt) {
+    public void walletRefundForWzDeposit(String renterOrderNo, int surplusWzDepositAmt,
+                                         List<CashierEntity> walletPayRecords) {
 
-        if (surplusWzDepositAmt <= OrderConstant.ZERO) {
+        log.info("OrderSettleWalletRefundHandleService.walletRefundForWzDeposit >> renterOrderNo:[{}], " +
+                "surplusWzDepositAmt:[{}], walletPayRecords:[{}]", renterOrderNo, surplusWzDepositAmt, JSON.toJSONString(walletPayRecords));
+        if (surplusWzDepositAmt <= OrderConstant.ZERO || CollectionUtils.isEmpty(walletPayRecords)) {
             log.info("Surplus wz deposit is zero.");
             return;
         }
 
+        int surplusAmt = surplusWzDepositAmt;
+        for (CashierEntity cashierEntity : walletPayRecords) {
+            if (surplusAmt > OrderConstant.ZERO) {
+                int amt = surplusAmt >= cashierEntity.getPayAmt() ? cashierEntity.getPayAmt() : surplusAmt;
+                CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
+                BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
+                int id = cashierService.refundDepositPurchase(amt, cashierEntity,
+                        cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+
+                // 结算费用明细
+                AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+                entity.setOrderNo(cashierEntity.getOrderNo());
+                entity.setRenterOrderNo(renterOrderNo);
+                entity.setMemNo(cashierEntity.getMemNo());
+                entity.setAmt(-amt);
+                entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
+                entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                entity.setUniqueNo(String.valueOf(id));
+                cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+                //重置余额
+                surplusAmt = surplusAmt + entity.getAmt();
+                log.info("Reset surplusAmt:[{}]", surplusAmt);
+            }
+        }
     }
 
     /**
