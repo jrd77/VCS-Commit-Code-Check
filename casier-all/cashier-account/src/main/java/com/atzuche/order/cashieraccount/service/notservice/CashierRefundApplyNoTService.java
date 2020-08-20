@@ -61,7 +61,7 @@ public class CashierRefundApplyNoTService {
 
     /**
      * 记录待退款信息
-     * @param cashierRefundApplyReq
+     * @param cashierRefundApplyReq 退款申请
      */
     public int insertRefundDeposit(CashierRefundApplyReqVO cashierRefundApplyReq) {
         CashierRefundApplyEntity cashierRefundApplyEntity = new CashierRefundApplyEntity();
@@ -91,7 +91,6 @@ public class CashierRefundApplyNoTService {
         	//updateOrderStatusRefundStatus(cashierRefundApplyReq);
         	return virtualId;
         }
-//        CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByQn(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),cashierRefundApplyReq.getQn());
         CashierRefundApplyEntity entity = cashierRefundApplyMapper.selectRefundByMd5(cashierRefundApplyReq.getMemNo(),cashierRefundApplyReq.getOrderNo(),payMd5);
         //判断是否已经存在。
         if(Objects.nonNull(entity) && Objects.nonNull(entity.getId())){

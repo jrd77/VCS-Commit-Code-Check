@@ -35,7 +35,7 @@ public class OrderSettle {
 	
     /**
      * order-core-api 入口 车辆押金结算
-     * @param orderNo
+     * @param orderNo 订单号
      */
     public void settleOrder(String orderNo){
         orderSettleService.settleOrder(orderNo,payCallbackService);

@@ -1,5 +1,6 @@
 package com.atzuche.order.cashieraccount.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterclaim.entity.AccountRenterClaimCostSettleEntity;
 import com.atzuche.order.accountrenterclaim.service.notservice.AccountRenterClaimCostSettleNoTService;
 import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostSettleDetailEntity;
@@ -229,13 +230,12 @@ public class CashierWzSettleService {
     }
     
     
-    /////从CashierService代码
     /**
      * 违章押金预授权退款方法
-     * @param rentSurplusWzDepositAmt
-     * @param cashierEntity
-     * @param cashierRefundApply
-     * @param cashCode
+     * @param rentSurplusWzDepositAmt 剩余违章押金信息
+     * @param cashierEntity 收银信息
+     * @param cashierRefundApply 退款信息
+     * @param cashCode 费用编码信息
      */
     public int refundWzDepositPreAuthAll(int rentSurplusWzDepositAmt,CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
 		//是否存在预授权完成操作
@@ -251,8 +251,8 @@ public class CashierWzSettleService {
 			if(Math.abs(refundAmt) > cashierEntity.getPayAmt()) {
 				refundAmt = cashierEntity.getPayAmt();
 			}
-			
-			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID); //解冻
+            //解冻
+			cashierRefundApply.setPayType(DataPayTypeConstant.PRE_VOID);
 			cashierRefundApply.setAmt(refundAmt);
 		    cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		    cashierRefundApply.setRemake(cashCode.getTxt());
@@ -290,15 +290,15 @@ public class CashierWzSettleService {
     
     /**
      * 违章押金的消费退货处理
-     * @param rentSurplusWzDepositAmt
-     * @param cashierEntity
-     * @param cashierRefundApply
-     * @param cashCode
+     * @param rentSurplusWzDepositAmt 剩余违章押金
+     * @param cashierEntity 收银信息
+     * @param cashierRefundApply 退款信息
+     * @param cashCode 费用编码信息
      */
 	public int refundWzDepositPurchase(int rentSurplusWzDepositAmt,
 			CashierEntity cashierEntity, CashierRefundApplyReqVO cashierRefundApply,RenterCashCodeEnum cashCode) {
-        //缺少会员号,已经通过beanutils方式赋值。
-		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN); //退货
+        //退货
+		cashierRefundApply.setPayType(DataPayTypeConstant.PUR_RETURN);
 		cashierRefundApply.setAmt(-rentSurplusWzDepositAmt);
 		cashierRefundApply.setRenterCashCodeEnum(cashCode);
 		cashierRefundApply.setRemake(cashCode.getTxt());
@@ -331,46 +331,48 @@ public class CashierWzSettleService {
     /**
      * 计算租客 租车费用  平台补贴费用  车主补贴费用 手续费 基础保障费用 等 并落库
      *
-     * @param orderNo
-     * @param renterMemNo
-     * @param wzTotalAmt
-     * @return
+     * @param orderNo     订单号
+     * @param renterMemNo 租客会员号
+     * @param wzTotalAmt  违章总费用
+     * @return AccountRenterWzDepositCostEntity
      */
-    public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo,String renterMemNo,int wzTotalAmt) {
-    	//account_renter_wz_deposit
-    	AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
-    	if(Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())){
-            throw new RenterWZDepositCostException() ;
+    public AccountRenterWzDepositCostEntity updateWzRentSettleCost(String orderNo, String renterMemNo, int wzTotalAmt) {
+        // 获取违章押金信息
+        AccountRenterWzDepositEntity depositEntity = accountRenterWzDepositNoTService.getAccountRenterWZDeposit(orderNo, renterMemNo);
+        if (Objects.isNull(depositEntity) || Objects.isNull(depositEntity.getId())) {
+            throw new RenterWZDepositCostException();
         }
-
-    	AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo,renterMemNo);
-        if(Objects.isNull(entity) || Objects.isNull(entity.getId())){
-//            throw new AccountRenterRentCostSettleException() ;
-        	entity = new AccountRenterWzDepositCostEntity();
-        	entity.setOrderNo(orderNo);
-        	entity.setMemNo(renterMemNo);
-        	entity.setYingfuAmt(wzTotalAmt);
-        	entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        	entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	entity.setIsDelete(0);
-
-        	//新增记录
-        	accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
-        }else {
-        	//修改记录
-        	entity.setYingfuAmt(wzTotalAmt);
-        	if(!(entity.getShifuAmt() != null && entity.getShifuAmt().intValue() != 0)) {
-        		//没有数据的时候才赋值。
-        		entity.setShifuAmt(depositEntity.getShishouDeposit()); //需要获取实付金额
-        		entity.setDebtAmt(wzTotalAmt-depositEntity.getShishouDeposit()>0?(wzTotalAmt-depositEntity.getShishouDeposit()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	}else { //存在的情况下，重新计算欠款。
-        		entity.setDebtAmt(wzTotalAmt-entity.getShifuAmt()>0?(wzTotalAmt-entity.getShifuAmt()):0); //当前默认为0，后续产生欠款的时候，需要回写该字段。
-        	}
-        	accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
+        // 获取违章押金费用信息
+        AccountRenterWzDepositCostEntity entity = accountRenterWzDepositCostNoTService.queryWzDeposit(orderNo, renterMemNo);
+        if (Objects.isNull(entity) || Objects.isNull(entity.getId())) {
+            entity = new AccountRenterWzDepositCostEntity();
+            entity.setOrderNo(orderNo);
+            entity.setMemNo(renterMemNo);
+            entity.setYingfuAmt(wzTotalAmt);
+            //需要获取实付金额
+            entity.setShifuAmt(depositEntity.getShishouDeposit());
+            //当前默认为0，后续产生欠款的时候，需要回写该字段。
+            entity.setDebtAmt(wzTotalAmt - depositEntity.getShishouDeposit() > 0 ? (wzTotalAmt - depositEntity.getShishouDeposit()) : 0);
+            entity.setIsDelete(0);
+            //新增记录
+            accountRenterWzDepositCostNoTService.insertAccountRenterWzDepositCost(entity);
+        } else {
+            //修改记录
+            entity.setYingfuAmt(wzTotalAmt);
+            if (!(entity.getShifuAmt() != null && entity.getShifuAmt() != 0)) {
+                //没有数据的时候才赋值。
+                //需要获取实付金额
+                entity.setShifuAmt(depositEntity.getShishouDeposit());
+                //当前默认为0，后续产生欠款的时候，需要回写该字段。
+                entity.setDebtAmt(wzTotalAmt - depositEntity.getShishouDeposit() > 0 ? (wzTotalAmt - depositEntity.getShishouDeposit()) : 0);
+            } else {
+                //存在的情况下，重新计算欠款。
+                //当前默认为0，后续产生欠款的时候，需要回写该字段。
+                entity.setDebtAmt(wzTotalAmt - entity.getShifuAmt() > 0 ? (wzTotalAmt - entity.getShifuAmt()) : 0);
+            }
+            accountRenterWzDepositCostNoTService.updateAccountRenterWzDepositCost(entity);
         }
         return entity;
-
-
     }
 
 
@@ -393,6 +395,7 @@ public class CashierWzSettleService {
      * @return 成功记录数
      */
     public int insertAccountRenterWzDepositCostSettleDetail(AccountRenterWzDepositCostSettleDetailEntity record) {
+        log.info("新增违章费用结算信息. param is,record:[{}]", JSON.toJSONString(record));
         return accountRenterWzDepositCostSettleDetailNoTService.insertAccountRenterWzDepositCostSettleDetail(record);
     }
 
