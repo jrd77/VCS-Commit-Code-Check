@@ -274,7 +274,7 @@ public class OrderBusinessService {
             String orderNo = x.getOrderNo();
             String renterOrderNo = x.getRenterOrderNo();
             RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo, renterOrderNo);
-            RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo, renterOrderNo,userInvoiceOrdersParamsVO.getMemberNo(),rentCost.getRenterCostAmtFinal());
+            RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo, renterOrderNo,x.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
             int renterCostFeeYingkou = renterCostVO.getRenterCostFeeYingkou();
             x.setInvoiceAmountGross(String.valueOf(renterCostFeeYingkou));
             x.setOrderMoney(String.valueOf(renterCostFeeYingkou));

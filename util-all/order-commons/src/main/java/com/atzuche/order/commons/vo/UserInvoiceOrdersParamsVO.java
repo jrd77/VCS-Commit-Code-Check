@@ -17,7 +17,6 @@ import java.util.List;
 @Data
 public class UserInvoiceOrdersParamsVO {
     @AutoDocProperty(value = "会员号")
-    @Pattern(regexp = "^[0-9]*$", message = "用户不存在")
     private String memberNo;
 
     @AutoDocProperty(value = "根据传入的订单集合,查询这些订单信息")

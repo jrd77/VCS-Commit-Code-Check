@@ -356,7 +356,8 @@
         IFNULL(rg.car_plate_num, '') AS plateNumber,
         IFNULL(rg.car_image_url, '') AS vehiclePic,
         rg.car_day_mileage AS dayMileageLimited,
-        os.`settle_time` AS finishTime
+        os.`settle_time` AS finishTime,
+        ro.renter_mem_no as renterMemNo
         FROM `order` o
         INNER JOIN order_status os ON (o.`order_no` = os.`order_no` AND (os.`status` > 64<!-- || os.`status`=0-->))
         INNER JOIN renter_order ro ON (o.`order_no` = ro.`order_no` AND ro.`is_effective`=1)
