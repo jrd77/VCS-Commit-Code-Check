@@ -204,7 +204,7 @@ public class AccountOwnerIncomeNoTService {
         if (CollectionUtils.isNotEmpty(accountOwnerIncomeEntities)) {
             for (AccountOwnerIncomeEntity accountOwnerIncomeEntity : accountOwnerIncomeEntities) {
                 AccountOwnerIncomeListDTO accountOwnerIncomeListDTO = new AccountOwnerIncomeListDTO();
-                accountOwnerIncomeListDTO.setIncomeAmt(calOwnerTotalIncomeAmt(accountOwnerIncomeEntity));
+                accountOwnerIncomeListDTO.setIncomeAmt(keTiXianOwnerTotalIncomeAmt(accountOwnerIncomeEntity));
                 accountOwnerIncomeListDTO.setMemNo(accountOwnerIncomeEntity.getMemNo());
                 accountOwnerIncomeList.add(accountOwnerIncomeListDTO);
             }
@@ -257,6 +257,25 @@ public class AccountOwnerIncomeNoTService {
 
         if (Objects.nonNull(incomeEntity.getSecondaryFreezeIncomeAmt())) {
             totalIncomeAmt = totalIncomeAmt + incomeEntity.getSecondaryFreezeIncomeAmt();
+        }
+        return totalIncomeAmt;
+    }
+
+    /**
+     * 可提现
+     * @param incomeEntity
+     * @return
+     */
+    private int keTiXianOwnerTotalIncomeAmt(AccountOwnerIncomeEntity incomeEntity) {
+        if (Objects.isNull(incomeEntity)) {
+            return OrderConstant.ZERO;
+        }
+        int totalIncomeAmt = 0;
+        if (Objects.nonNull(incomeEntity.getIncomeAmt())) {
+            totalIncomeAmt = totalIncomeAmt + incomeEntity.getIncomeAmt();
+        }
+        if (Objects.nonNull(incomeEntity.getSecondaryIncomeAmt())) {
+            totalIncomeAmt = totalIncomeAmt + incomeEntity.getSecondaryIncomeAmt();
         }
         return totalIncomeAmt;
     }
