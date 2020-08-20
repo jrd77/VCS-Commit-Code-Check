@@ -54,11 +54,11 @@ public class ModifyOrderCompareVO implements Serializable{
 	 */
 	private Integer walletBalance;
 	/**
-	 * 是否使用钱包：0-否，1-是
+	 * 是否默认使用钱包：0-否，1-是
 	 */
 	private Integer useWalletFlag;
 	/**
-	 * 是否可以使用钱包
+	 * 是否可以编辑复选框
 	 */
 	private Integer canUseWallet;
 }

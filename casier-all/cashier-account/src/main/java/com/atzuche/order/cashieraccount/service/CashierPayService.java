@@ -530,7 +530,7 @@ public class CashierPayService{
 	 * @param cashier
 	 * @param payKind
 	 */
-	private void commonNoticePayCallBack(OrderPayCallBack payCallbackService, List<PayVo> payVo,CashierEntity cashier,String payKind) {
+	public void commonNoticePayCallBack(OrderPayCallBack payCallbackService, List<PayVo> payVo,CashierEntity cashier,String payKind) {
 		List<PayVo> filterPayVo = payVo.stream().filter(x -> payKind.equals(x.getPayKind())).collect(Collectors.toList());
 		if(CollectionUtils.isEmpty(filterPayVo)) {
 			return;
@@ -1975,6 +1975,39 @@ public class CashierPayService{
 
 	public int getWalletDeductAmt(String orderNo, List<String> payKind) {
 		return cashierService.getWalletDeductAmt(orderNo,payKind);
+	}
+	
+	
+	/**
+	 * 管理后台修改订单使用钱包组装支付数据
+	 * @param orderPaySign
+	 * @param amt
+	 * @param title
+	 * @return List<PayVo>
+	 */
+	public List<PayVo> getPayVOListForConsoleUseWallet(OrderPaySignReqVO orderPaySign,int amt) {
+		//待支付金额明细
+        List<PayVo> payVo = new ArrayList<PayVo>();
+		//统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
+        //默认消费
+        orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
+        
+        //去掉该条件，根据入参来。
+//                    String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
+        String payKind = DataPayKindConstant.RENT_INCREMENT;
+        AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
+        Integer payId = Objects.isNull(entity)?0:entity.getId();
+        String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
+        PayVo vo = cashierNoTService.getPayVO(orderPaySign.getOrderNo(),null,orderPaySign,amt,"",payKind,payIdStr,GsonUtils.toJson(entity),3);
+        String paySn = cashierNoTService.getCashierRentCostPaySn(orderPaySign.getOrderNo(),orderPaySign.getMenNo(),payKind);
+        vo.setPaySn(paySn);
+        //String renterOrderNo = getExtendParamsRentOrderNo(payVO);
+        //vo.setExtendParams(renterOrderNo);
+        vo.setPayTitle("待支付金额："+Math.abs(amt)+"，订单号："+vo.getOrderNo());
+        String payMd5 = MD5.MD5Encode(FasterJsonUtil.toJson(vo));
+        vo.setPayMd5(payMd5);
+        payVo.add(vo);
+        return payVo;
 	}
 
 }
