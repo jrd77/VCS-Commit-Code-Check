@@ -2097,16 +2097,12 @@ public class CashierPayService{
 	 * @param amt
 	 * @return List<PayVo>
 	 */
-	public List<PayVo> getPayVOListForConsoleUseWallet(OrderPaySignReqVO orderPaySign,int amt) {
+	public List<PayVo> getPayVOListForConsoleUseWallet(OrderPaySignReqVO orderPaySign,int amt,String payKind) {
 		//待支付金额明细
         List<PayVo> payVo = new ArrayList<PayVo>();
 		//统一按消费来处理(忽略前端的来值),消费考虑到车主拒绝修改订单会退款。仍然保持老系统的。 考虑收款及补充租车费用。
         //默认消费
         orderPaySign.setPayType(DataPayTypeConstant.PAY_PUR);
-
-        //去掉该条件，根据入参来。
-//                    String payKind = YesNoEnum.YES.getCode().equals(payVO.getIsPayAgain())?DataPayKindConstant.RENT_INCREMENT:DataPayKindConstant.RENT_AMOUNT;
-        String payKind = DataPayKindConstant.RENT_INCREMENT;
         AccountRenterCostSettleEntity entity = cashierService.getAccountRenterCostSettle(orderPaySign.getOrderNo(),orderPaySign.getMenNo());
         Integer payId = Objects.isNull(entity)?0:entity.getId();
         String payIdStr = Objects.isNull(payId)?"":String.valueOf(payId);
