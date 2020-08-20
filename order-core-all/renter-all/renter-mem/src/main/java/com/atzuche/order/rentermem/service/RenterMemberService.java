@@ -45,7 +45,7 @@ public class RenterMemberService{
      * @Author ZhangBin
      * @Date 2020/8/20 11:10
      * @Description: 判断是否是企业用户
-     *
+     * renterMemberRightDTOS：权益列表
      **/
     public boolean isEnterpriseByRenterMemberRight(List<RenterMemberRightDTO> renterMemberRightDTOS){
         RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
