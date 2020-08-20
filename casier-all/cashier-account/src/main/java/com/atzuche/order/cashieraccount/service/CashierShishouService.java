@@ -21,6 +21,7 @@ import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositDeta
 import com.atzuche.order.accountrenterwzdepost.mapper.AccountRenterWzDepositMapper;
 import com.atzuche.order.cashieraccount.service.notservice.CashierNoTService;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
 
@@ -51,6 +52,8 @@ public class CashierShishouService {
     private CashierNoTService cashierNoTService;
     @Autowired
     private RenterOrderCostCombineService renterOrderCostCombineService;
+    @Autowired
+    private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     
     /**
      * 租车费用实收统计
@@ -67,7 +70,9 @@ public class CashierShishouService {
     	List<PayableVO> payableVOs = renterOrderCostCombineService.listPayableIncrementVO(orderNo,renterOrderEntity.getRenterOrderNo(),memNo);
         //应付租车费用（已经求和）
         int rentCarAmt = cashierNoTService.sumRentOrderCost(payableVOs);
-        
+        // 平台给租客的补贴总额
+		int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderNo, memNo);
+		rentCarAmt += platformToRenterAmt;
         //已付租车费用(shifu  租车费用的实付)
         //该情况只会有一种情况：钱包 shifu
 //        rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderPayReqVO.getOrderNo(),orderPayReqVO.getMenNo());
