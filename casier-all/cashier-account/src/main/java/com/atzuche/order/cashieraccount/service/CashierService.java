@@ -929,7 +929,7 @@ public class CashierService {
          */
         //1.5管理后台补付 add 200312 
         //需求放开，结算前计入，结算后不计入
-        //只处理未结算的订单。
+        //只处理未结算的订单。 200819
         OrderStatusEntity orderStatusEntity = orderStatusService.getByOrderNo(notifyDataVo.getOrderNo());
         if(orderStatusEntity != null && orderStatusEntity.getSettleStatus() == 0 && orderStatusEntity.getCarDepositSettleStatus() == 0) {
 	        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT_CONSOLE.equals(notifyDataVo.getPayKind())){
