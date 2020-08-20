@@ -697,33 +697,32 @@ public class CashierService {
     public OrderPayCallBackSuccessVO callBackSuccess(List<NotifyDataVo> lstNotifyDataVo) {
         OrderPayCallBackSuccessVO vo = new OrderPayCallBackSuccessVO();
         if(!CollectionUtils.isEmpty(lstNotifyDataVo)){
-            for(int i=0;i<lstNotifyDataVo.size();i++){
-                NotifyDataVo notifyDataVo = lstNotifyDataVo.get(i);
+            for (NotifyDataVo notifyDataVo : lstNotifyDataVo) {
                 //2支付成功回调
-                if(DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())){
-                	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
-                	//负数1 特殊情况。
-                	//企业用户金额为0,允许通过。
-                	if(settleAmount.intValue() == -1) {
-                		//金额为0的异常情况。
-                		Cat.logError("params="+GsonUtils.toJson(notifyDataVo),new SettleAmountException());
-                		log.error("支付异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));
-                	}else {
-                		payOrderCallBackSuccess(notifyDataVo,vo);
-                	}
+                if (DataPayTypeConstant.PAY_PUR.equals(notifyDataVo.getPayType()) || DataPayTypeConstant.PAY_PRE.equals(notifyDataVo.getPayType())) {
+                    int settleAmount = notifyDataVo.getSettleAmount() == null ? 0 : Integer.parseInt(notifyDataVo.getSettleAmount());
+                    //负数1 特殊情况。
+                    //企业用户金额为0,允许通过。
+                    if (settleAmount == -1) {
+                        //金额为0的异常情况。
+                        Cat.logError("params=" + GsonUtils.toJson(notifyDataVo), new SettleAmountException());
+                        log.error("支付异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。", GsonUtils.toJson(notifyDataVo));
+                    } else {
+                        payOrderCallBackSuccess(notifyDataVo, vo);
+                    }
                 } else { //退款
-                	Integer settleAmount = notifyDataVo.getSettleAmount()==null?0:Integer.parseInt(notifyDataVo.getSettleAmount());
-                	if(settleAmount.intValue() <= 0) {  //含-1的情况
-                		//金额为0的异常情况。
-                		Cat.logError("params="+GsonUtils.toJson(notifyDataVo),new SettleAmountException());
-                		log.error("退款异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。",GsonUtils.toJson(notifyDataVo));
-                	}else {
-                		//更新收银台数据和发送mq
-                    	CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
-                    	if(cashierEntity == null || !"00".equals(cashierEntity.getTransStatus())) {
-                    		refundOrderCallBackSuccess(notifyDataVo,vo);
-                    	}
-                	}
+                    int settleAmount = notifyDataVo.getSettleAmount() == null ? 0 : Integer.parseInt(notifyDataVo.getSettleAmount());
+                    if (settleAmount <= 0) {  //含-1的情况
+                        //金额为0的异常情况。
+                        Cat.logError("params=" + GsonUtils.toJson(notifyDataVo), new SettleAmountException());
+                        log.error("退款异步通知rabbitmq接收到的金额为0异常,params=[{}],程序终止。", GsonUtils.toJson(notifyDataVo));
+                    } else {
+                        //更新收银台数据和发送mq
+                        CashierEntity cashierEntity = cashierMapper.selectCashierEntity(notifyDataVo.getPayMd5());
+                        if (cashierEntity == null || !"00".equals(cashierEntity.getTransStatus())) {
+                            refundOrderCallBackSuccess(notifyDataVo, vo);
+                        }
+                    }
                 }
             }
         }
@@ -752,7 +751,7 @@ public class CashierService {
         }
         
         //退款成功。//32预授权解冻不算成功。 全额算,优先预授权完成，后预授权解冻。
-        if(CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())) {  //&& !"32".equals(notifyDataVo.getPayType())
+        if(CashierRefundApplyStatus.RECEIVED_REFUND.getCode().equals(notifyDataVo.getTransStatus())) {
 	        //更新退款状态
 	        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
 	        orderStatusDTO.setOrderNo(notifyDataVo.getOrderNo());
@@ -773,17 +772,10 @@ public class CashierService {
 	            orderStatusDTO.setRentCarRefundStatus(OrderRefundStatusEnum.REFUNDED.getStatus());
 	            sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,3);
 	        }
-	        if(Objects.nonNull(notifyDataVo) && DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind()) ){
+	        if(DataPayKindConstant.RENT_INCREMENT.equals(notifyDataVo.getPayKind())){
 	        	sendOrderPayRentCostSuccess(NewOrderMQActionEventEnum.ORDER_REFUND_SUCCESS,vo,4);
 	        }
 	        saveCancelOrderStatusInfo(orderStatusDTO);
-	        
-	        //TODO 退款回调成功 push/或者短信 怎么处理
-	        /**
-	         * 暂时去掉，没有根据类型来退款，一个订单涉及到多次退款，消息接收会重复。
-	         * 不能按租客或车主的退款来！！！ 200417
-	         */
-//	        cashierNoTService.sendOrderRefundSuccessMq(notifyDataVo.getOrderNo(), FineSubsidyCodeEnum.RENTER,notifyDataVo);
         }
     }
 
