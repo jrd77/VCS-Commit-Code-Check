@@ -7,12 +7,10 @@ import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
-import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.HolidayTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
@@ -68,7 +66,8 @@ public class AdminPreOrderController {
 
     @Autowired
     private AutoCoinProxyService coinProxyService;
-    
+
+
     private static final Integer[] CAN_BUT_DRIVERINSURE_SEATNUMS = {2,4,5,6,7};
 
     @AutoDocVersion(version = "下单前确定页面")
@@ -168,8 +167,8 @@ public class AdminPreOrderController {
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
 
-
-        responseVO.setTotalWallet(walletProxyService.getWalletByMemNo(memNo));
+        int totalWallet = walletProxyService.getWalletByMemNo(memNo);
+        responseVO.setTotalWallet(totalWallet);
         responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
 
         NormalOrderCostCalculateReqVO normalOrderCostCalculateReqVO = new NormalOrderCostCalculateReqVO();
@@ -200,6 +199,16 @@ public class AdminPreOrderController {
         if (accurateGetReturnSrvVO != null) {
         	responseVO.setAccurateGetSrvAmt(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
         	responseVO.setAccurateReturnSrvAmt(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
+        }
+
+        if(totalWallet > 0){
+            responseVO.setUserWalletStatus(3);
+            List<RenterMemberRightDTO> renterMemberRightDTOList = renterMember.getRenterMemberRightDTOList();
+            if(RenterMemUtils.isEnterpriseByRenterMemberRight(renterMemberRightDTOList)){
+                responseVO.setUserWalletStatus(1);
+            }
+        }else{
+            responseVO.setUserWalletStatus(2);
         }
         return ResponseData.success(responseVO);
 

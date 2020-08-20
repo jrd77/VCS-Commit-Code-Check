@@ -10,7 +10,7 @@ import com.atzuche.order.rentermem.entity.RenterMemberEntity;
 import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 import com.atzuche.order.rentermem.mapper.RenterMemberMapper;
 import com.atzuche.order.rentermem.mapper.RenterMemberRightMapper;
-import com.atzuche.order.rentermem.utils.RenterMemUtils;
+import com.atzuche.order.commons.RenterMemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,19 +41,6 @@ public class RenterMemberService{
     @Autowired
     private RenterMemberRightMapper renterMemberRightMapper;
 
-    /*
-     * @Author ZhangBin
-     * @Date 2020/8/20 11:10
-     * @Description: 判断是否是企业用户
-     * renterMemberRightDTOS：权益列表
-     **/
-    public boolean isEnterpriseByRenterMemberRight(List<RenterMemberRightDTO> renterMemberRightDTOS){
-        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
-        if(renterMemberRightDTO == null){
-            return false;
-        }
-        return true;
-    }
     /*
      * @Author ZhangBin
      * @Date 2020/4/17 10:45

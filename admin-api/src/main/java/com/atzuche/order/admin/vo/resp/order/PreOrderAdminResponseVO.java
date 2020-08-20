@@ -65,6 +65,9 @@ public class PreOrderAdminResponseVO {
     @AutoDocProperty(value = "精准还车服务费")
     private Integer accurateReturnSrvAmt;
 
+    @AutoDocProperty("勾选钱包，1：必须勾选，2：不能勾选，3：可选可不选")
+    private Integer userWalletStatus;
+
 
     @Data
     @ToString
