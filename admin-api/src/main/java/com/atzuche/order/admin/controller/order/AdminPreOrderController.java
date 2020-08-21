@@ -40,10 +40,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -216,28 +213,7 @@ public class AdminPreOrderController {
         return ResponseData.success(responseVO);
 
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/4/17 10:56
-     * @Description:
-     *
-     **/
-    public static RenterMemberRightDTO filterRight(List<RenterMemberRightDTO> list, RightTypeEnum rightTypeEnum, List<MemberFlagEnum> memberFlagEnumList, String rightValue){
-        if(rightValue == null||rightValue.trim().length()<=0)return null;
-        if(memberFlagEnumList==null|| memberFlagEnumList.size()<=0)return null;
-        List<String> rightCodeList = memberFlagEnumList.stream().map(x -> x.getRightCode()).collect(Collectors.toList());
-        Optional<RenterMemberRightDTO> first = Optional.ofNullable(list)
-                .orElseGet(ArrayList::new)
-                .stream()
-                .filter(x -> rightTypeEnum.getCode() == x.getRightType()
-                        && rightCodeList.contains(x.getRightCode())
-                        && rightValue.equals(x.getRightValue()))
-                .findFirst();
-        if(first.isPresent()){
-            return first.get();
-        }
-        return null;
-    }
+   
     private int isDriverInsure(CarProxyService.CarPriceDetail carPriceDetail) {
         if(carPriceDetail == null || carPriceDetail.getSeatNum() == null){
             return 0;
