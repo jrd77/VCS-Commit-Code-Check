@@ -54,7 +54,7 @@ public class CashierBatchPayService {
     @Autowired
     private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
     
-    
+    @Deprecated
 	public OrderPayableAmountResVO getOrderPayableAmount(OrderPayBatchReqVO orderPayReqVO) {
 		Assert.notNull(orderPayReqVO, ErrorCode.PARAMETER_ERROR.getText());
 		orderPayReqVO.check();
