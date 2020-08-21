@@ -207,9 +207,21 @@ public interface FeignOrderCostService {
     @GetMapping("/order/admin/getAccurateGetReturnSrvAmt")
     public ResponseData<AccurateGetReturnSrvVO> getAccurateGetReturnSrvAmt();
 
+    /**
+     * 计算租客子订单费用-保费弹窗
+     * @param orderNo
+     * @param renterOwnerNo
+     * @return
+     */
     @GetMapping("/order/renter/cost/getBaoFeiInfo")
     ResponseData<List<RenterOrderCostDetailDTO>> getBaoFeiInfo(@RequestParam("orderNo") String orderNo, @RequestParam("renterOwnerNo") String renterOwnerNo);
 
+    /**
+     * 保费系数弹窗
+     * @param renterOrderNo
+     * @return
+     */
     @GetMapping("/order/renter/insurecoefficient/list")
     public ResponseData<List<RenterInsureCoefficientVO>> insureCoefficient(@RequestParam("renterOrderNo") String renterOrderNo);
+
 }
