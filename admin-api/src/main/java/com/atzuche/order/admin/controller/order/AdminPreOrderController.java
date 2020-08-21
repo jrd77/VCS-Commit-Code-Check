@@ -8,10 +8,7 @@ import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
-import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
@@ -43,10 +40,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,8 +70,6 @@ public class AdminPreOrderController {
     
     private static final Integer[] CAN_BUT_DRIVERINSURE_SEATNUMS = {2,4,5,6,7};
 
-
-
     @AutoDocVersion(version = "下单前确定页面")
     @AutoDocGroup(group = "下单前确定页面")
     @AutoDocMethod(description = "下单前确定页面展示", value = "下单前确定页面展示",response = PreOrderAdminResponseVO.class)
@@ -107,6 +98,8 @@ public class AdminPreOrderController {
         responseVO.setRenterName(renterMember.getRealName());
         responseVO.setCityCode(request.getCityCode());
         responseVO.setRentCity(request.getRentCity());
+
+
 
         CarProxyService.CarDetailReqVO carDetailReqVO = new CarProxyService.CarDetailReqVO();
         carDetailReqVO.setAddrIndex(0);
@@ -173,14 +166,8 @@ public class AdminPreOrderController {
         }
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
+
         int totalWallet = walletProxyService.getWalletByMemNo(memNo);
-        if(totalWallet<=0){
-            responseVO.setIsUseWallet(0);
-        }else if(filterRight(renterMember.getRenterMemberRightDTOList(), RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1") != null && totalWallet > 0){
-            responseVO.setIsUseWallet(1);
-        }else{
-            responseVO.setIsUseWallet(-1);
-        }
         responseVO.setTotalWallet(totalWallet);
         responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
 
@@ -213,31 +200,20 @@ public class AdminPreOrderController {
         	responseVO.setAccurateGetSrvAmt(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
         	responseVO.setAccurateReturnSrvAmt(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
         }
+
+        if(totalWallet > 0){
+            responseVO.setUserWalletStatus(3);
+            List<RenterMemberRightDTO> renterMemberRightDTOList = renterMember.getRenterMemberRightDTOList();
+            if(RenterMemUtils.isEnterpriseByRenterMemberRight(renterMemberRightDTOList)){
+                responseVO.setUserWalletStatus(1);
+            }
+        }else{
+            responseVO.setUserWalletStatus(2);
+        }
         return ResponseData.success(responseVO);
 
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/4/17 10:56
-     * @Description:
-     *
-     **/
-    public static RenterMemberRightDTO filterRight(List<RenterMemberRightDTO> list, RightTypeEnum rightTypeEnum, List<MemberFlagEnum> memberFlagEnumList, String rightValue){
-        if(rightValue == null||rightValue.trim().length()<=0)return null;
-        if(memberFlagEnumList==null|| memberFlagEnumList.size()<=0)return null;
-        List<String> rightCodeList = memberFlagEnumList.stream().map(x -> x.getRightCode()).collect(Collectors.toList());
-        Optional<RenterMemberRightDTO> first = Optional.ofNullable(list)
-                .orElseGet(ArrayList::new)
-                .stream()
-                .filter(x -> rightTypeEnum.getCode() == x.getRightType()
-                        && rightCodeList.contains(x.getRightCode())
-                        && rightValue.equals(x.getRightValue()))
-                .findFirst();
-        if(first.isPresent()){
-            return first.get();
-        }
-        return null;
-    }
+   
     private int isDriverInsure(CarProxyService.CarPriceDetail carPriceDetail) {
         if(carPriceDetail == null || carPriceDetail.getSeatNum() == null){
             return 0;

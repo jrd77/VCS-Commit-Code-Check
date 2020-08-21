@@ -123,6 +123,8 @@ public class RenterCostFacadeService {
     private OrderSettleNoTService orderSettleNoTService;
     @Autowired
     private RenterInsureCoefficientService renterInsureCoefficientService;
+    @Autowired
+    private OrderCostService orderCostService;
 
     private final static Logger logger = LoggerFactory.getLogger(RenterCostFacadeService.class);
 
@@ -424,6 +426,7 @@ public class RenterCostFacadeService {
         platformSubsidyDTO.ServiceSubsidy = renterSubsidyDetail.getFeeSubsidyAmt();
         platformSubsidyDTO.otherSubsidy = renterSubsidyDetail.getOtherSubsidyAmt();
         platformSubsidyDTO.longGetReturnCarCostSubsidy = renterSubsidyDetail.getLongGetReturnCarCostSubsidy();
+        platformSubsidyDTO.platformSubsidyRealAmt = orderCostService.getRealConsoleSubsidyList(orderNo, renterOrderNo);
         rentCarCostDTO.platformSubsidyDTO = platformSubsidyDTO;
         //1.4、车主给租客的补贴
         rentCarCostDTO.rentAmtSubsidy =  renterSubsidyDetail.getOwner2RenterRentSubsidyAmt();

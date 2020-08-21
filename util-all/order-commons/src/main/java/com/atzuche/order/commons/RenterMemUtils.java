@@ -1,11 +1,11 @@
-package com.atzuche.order.rentermem.utils;
+package com.atzuche.order.commons;
 
 import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.MemberFlagEnum;
 import com.atzuche.order.commons.enums.RightTypeEnum;
-import com.atzuche.order.rentermem.entity.RenterMemberRightEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,5 +32,19 @@ public class RenterMemUtils {
             return first.get();
         }
         return null;
+    }
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/8/20 11:10
+     * @Description: 判断是否是企业用户
+     * renterMemberRightDTOS：权益列表
+     **/
+    public static boolean isEnterpriseByRenterMemberRight(List<RenterMemberRightDTO> renterMemberRightDTOS){
+        RenterMemberRightDTO renterMemberRightDTO = RenterMemUtils.filterRight(renterMemberRightDTOS, RightTypeEnum.MEMBER_FLAG, Arrays.asList(MemberFlagEnum.QYYH,MemberFlagEnum.QYXYYH), "1");
+        if(renterMemberRightDTO == null){
+            return false;
+        }
+        return true;
     }
 }

@@ -377,7 +377,7 @@ public class OrderCostService {
 		ownerSubsidyRentAmt = String.valueOf( NumberUtils.convertNumberToFushu(ownerSubsidyRentAmount));
 
 		realVo.setPlatformSubsidyTotalAmt(platformSubsidyTotalAmt);
-		realVo.setPlatformSubsidyRealAmt(platformSubsidyRealAmt);
+		realVo.setPlatformSubsidyRealAmt(data.getRealConsoleSubsidyAmt()==null?"0":String.valueOf(data.getRealConsoleSubsidyAmt()));
 		realVo.setPlatformSubsidyAmt(platformSubsidyAmt);
 		///
 		realVo.setOwnerSubsidyTotalAmt(ownerSubsidyTotalAmt);

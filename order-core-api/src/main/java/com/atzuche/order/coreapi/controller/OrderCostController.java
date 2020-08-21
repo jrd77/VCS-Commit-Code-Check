@@ -103,7 +103,15 @@ public class OrderCostController {
 	private OrderSettleService orderSettleService;
 	@Autowired
 	private RenterInsureCoefficientService renterInsureCoefficientService;
-	
+
+
+    @RequestMapping("/order/cost/renter/getRealConsoleSubsidyAmt")
+	public ResponseData<Integer> getRealConsoleSubsidyAmt(@RequestParam("orderNo") String orderNo,@RequestParam("renterOrderNo")String renterOrderNo){
+        log.info("获取平台给租客的实际补贴金额 getRealConsoleSubsidyList orderNo=[{}]，renterOrderNo=[{}]", orderNo,renterOrderNo);
+        int realConsoleSubsidyAmt = orderCostService.getRealConsoleSubsidyList(orderNo, renterOrderNo);
+        return ResponseData.success(realConsoleSubsidyAmt);
+    }
+
 	@PostMapping("/order/cost/renter/get")
 	public ResponseData<OrderRenterCostResVO> orderCostRenterGet(@Valid @RequestBody OrderCostReqVO req, BindingResult bindingResult) {
 		log.info("租客子订单费用详细 orderCostRenterGet params=[{}]", req.toString());

@@ -92,8 +92,8 @@ public class OrderPaySignReqVO {
             "\t\t14.连连支付\n" +
             "\t\t15. 微信支付(H5)")
     @NotNull(message = "paySource不能为空")
-//    private String paySource;
-    private List<String> paySource         ;
+    private String paySource;
+    private List<String> paySources         ;
 
     /**
      * 参数校验

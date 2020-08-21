@@ -157,6 +157,8 @@ public class OrderCostService {
     private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired
     private OwnerRenterAdjustReasonService ownerRenterAdjustReasonService;
+    @Autowired
+    private OrderCostService orderCostService;
 
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
@@ -463,6 +465,9 @@ public class OrderCostService {
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
         resVo.setRenterGoodsDetailDTO(renterGoodsDetail);
 
+        //平台给租客的实际补贴
+        int realConsoleSubsidyAmt = orderCostService.getRealConsoleSubsidyList(orderNo, renterOrderNo);
+        resVo.setRealConsoleSubsidyAmt(realConsoleSubsidyAmt);
         return resVo;
 	}
 
