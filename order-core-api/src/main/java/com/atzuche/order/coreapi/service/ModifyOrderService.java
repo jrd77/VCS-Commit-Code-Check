@@ -322,7 +322,7 @@ public class ModifyOrderService {
 		orderPaySign.setPayKind(payKinds);
 		List<String> paySource = new ArrayList<String>();
 		paySource.add(PaySourceEnum.WALLET_PAY.getCode());
-		orderPaySign.setPaySource(paySource);
+		orderPaySign.setPaySources(paySource);
 		orderPaySign.setIsUseWallet(useWalletFlag);
 		orderPaySign.setMenNo(modifyOrderDTO.getMemNo());
 		orderPaySign.setOperatorName(modifyOrderDTO.getOperator());

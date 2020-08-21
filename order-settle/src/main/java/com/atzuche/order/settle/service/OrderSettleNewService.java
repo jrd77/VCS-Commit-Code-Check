@@ -311,7 +311,8 @@ public class OrderSettleNewService {
                 JSON.toJSONString(settleOrdersAccount), JSON.toJSONString(orderStatusDTO));
         
         //bugfix:处理无退款的支付宝预授权完成的情况。200820
-        if (settleOrdersAccount.getDepositSurplusAmt() >= OrderConstant.ZERO) {  //加上等于0的情况
+        //加上等于0的情况
+        if (settleOrdersAccount.getDepositSurplusAmt() >= OrderConstant.ZERO) {
             OrderSettleCommonParamDTO common = new OrderSettleCommonParamDTO();
             common.setOrderNo(settleOrdersAccount.getOrderNo());
             common.setRenterOrderNo(settleOrdersAccount.getRenterOrderNo());

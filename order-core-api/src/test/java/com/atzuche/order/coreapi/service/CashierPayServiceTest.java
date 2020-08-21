@@ -104,7 +104,7 @@ public class CashierPayServiceTest {
 		String paySource = "06";
 		List<String> paySources = new ArrayList<String>();
 		paySources.add(paySource);
-		vo.setPaySource(paySources);
+		vo.setPaySources(paySources);
 		
 		String result = cashierPayService.getPaySignStr(vo,payCallbackService);
 		System.out.println("result="+result);
