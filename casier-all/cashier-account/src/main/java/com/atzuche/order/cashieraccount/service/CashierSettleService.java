@@ -200,6 +200,13 @@ public class CashierSettleService {
             int yongjinAmt = accountRenterCostSettleDetails.stream().filter(obj -> RenterCashCodeEnum.FEE.getCashNo().equals(obj.getCostCode())).mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
             //租车费用
             int rentAmt = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+            /**
+             	* 补贴大于费用的情况
+             */
+            if(rentAmt > 0) {
+            	rentAmt = 0;   //按0处理
+            }
+            
             entity.setYongjinAmt(yongjinAmt);
             entity.setRentAmt(rentAmt);
             entity.setPlatformSubsidyAmount(platformSubsidyAmount);
