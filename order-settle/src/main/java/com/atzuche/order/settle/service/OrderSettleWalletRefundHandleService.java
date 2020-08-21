@@ -100,12 +100,14 @@ public class OrderSettleWalletRefundHandleService {
      * @param renterOrderNo        租客会员号
      * @param surplusCarDepositAmt 剩余车辆押金
      * @param walletPayRecords     钱包支付记录
+     * @param cashCodeEnum         费用项
      */
     public void walletRefundForCarDeposit(String renterOrderNo, int surplusCarDepositAmt,
-                                          List<CashierEntity> walletPayRecords) {
+                                          List<CashierEntity> walletPayRecords, RenterCashCodeEnum cashCodeEnum) {
 
         log.info("OrderSettleWalletRefundHandleService.walletRefundForCarDeposit >> renterOrderNo:[{}], " +
-                "surplusCarDepositAmt:[{}], walletPayRecords:[{}]", renterOrderNo, surplusCarDepositAmt, JSON.toJSONString(walletPayRecords));
+                        "surplusCarDepositAmt:[{}], walletPayRecords:[{}], cashCodeEnum:[{}]", renterOrderNo,
+                surplusCarDepositAmt, JSON.toJSONString(walletPayRecords), JSON.toJSONString(cashCodeEnum));
         if (surplusCarDepositAmt <= OrderConstant.ZERO || CollectionUtils.isEmpty(walletPayRecords)) {
             log.info("Surplus car deposit is zero.");
             return;
@@ -116,7 +118,7 @@ public class OrderSettleWalletRefundHandleService {
                 int amt = surplusAmt >= cashierEntity.getPayAmt() ? cashierEntity.getPayAmt() : surplusAmt;
                 CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
                 BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
-                int id = cashierWzSettleService.refundWzDepositPurchase(amt, cashierEntity, cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+                int id = cashierWzSettleService.refundWzDepositPurchase(amt, cashierEntity, cashierRefundApply, cashCodeEnum);
 
                 // 结算费用明细
                 AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
@@ -124,8 +126,8 @@ public class OrderSettleWalletRefundHandleService {
                 entity.setRenterOrderNo(renterOrderNo);
                 entity.setMemNo(cashierEntity.getMemNo());
                 entity.setWzAmt(-amt);
-                entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
-                entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                entity.setCostCode(cashCodeEnum.getCashNo());
+                entity.setCostDetail(cashCodeEnum.getTxt());
                 entity.setUniqueNo(String.valueOf(id));
                 entity.setType(10);
                 cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
@@ -139,15 +141,18 @@ public class OrderSettleWalletRefundHandleService {
 
     /**
      * 违章押金使用钱包结算退回
-     * @param renterOrderNo        租客会员号
+     *
+     * @param renterOrderNo       租客会员号
      * @param surplusWzDepositAmt 剩余违章押金
-     * @param walletPayRecords     钱包支付记录
+     * @param walletPayRecords    钱包支付记录
+     * @param cashCodeEnum        费用项
      */
     public void walletRefundForWzDeposit(String renterOrderNo, int surplusWzDepositAmt,
-                                         List<CashierEntity> walletPayRecords) {
+                                         List<CashierEntity> walletPayRecords, RenterCashCodeEnum cashCodeEnum) {
 
         log.info("OrderSettleWalletRefundHandleService.walletRefundForWzDeposit >> renterOrderNo:[{}], " +
-                "surplusWzDepositAmt:[{}], walletPayRecords:[{}]", renterOrderNo, surplusWzDepositAmt, JSON.toJSONString(walletPayRecords));
+                        "surplusWzDepositAmt:[{}], walletPayRecords:[{}], cashCodeEnum:[{}]", renterOrderNo,
+                surplusWzDepositAmt, JSON.toJSONString(walletPayRecords), JSON.toJSONString(cashCodeEnum));
         if (surplusWzDepositAmt <= OrderConstant.ZERO || CollectionUtils.isEmpty(walletPayRecords)) {
             log.info("Surplus wz deposit is zero.");
             return;
@@ -160,7 +165,7 @@ public class OrderSettleWalletRefundHandleService {
                 CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
                 BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
                 int id = cashierService.refundDepositPurchase(amt, cashierEntity,
-                        cashierRefundApply, RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT);
+                        cashierRefundApply, cashCodeEnum);
 
                 // 结算费用明细
                 AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
@@ -168,8 +173,8 @@ public class OrderSettleWalletRefundHandleService {
                 entity.setRenterOrderNo(renterOrderNo);
                 entity.setMemNo(cashierEntity.getMemNo());
                 entity.setAmt(-amt);
-                entity.setCostCode(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getCashNo());
-                entity.setCostDetail(RenterCashCodeEnum.SETTLE_WZ_DEPOSIT_TO_RETURN_AMT.getTxt());
+                entity.setCostCode(cashCodeEnum.getCashNo());
+                entity.setCostDetail(cashCodeEnum.getTxt());
                 entity.setUniqueNo(String.valueOf(id));
                 cashierSettleService.insertAccountRenterCostSettleDetail(entity);
                 //重置余额
