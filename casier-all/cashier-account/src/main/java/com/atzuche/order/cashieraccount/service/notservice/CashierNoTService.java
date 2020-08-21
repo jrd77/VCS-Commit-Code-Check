@@ -612,7 +612,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
+        vo.setPaySource(orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -622,7 +622,7 @@ public class CashierNoTService {
         
         //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
+	        String sourceType = orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
@@ -675,7 +675,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
+        vo.setPaySource(orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -685,7 +685,7 @@ public class CashierNoTService {
         
         //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
+	        String sourceType = orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 
@@ -774,7 +774,7 @@ public class CashierNoTService {
         vo.setPayId(payIdStr);
         vo.setPayKind(payKind);
         vo.setPaySn(String.valueOf(paySn));
-        vo.setPaySource(orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
+        vo.setPaySource(orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00"));
         vo.setPayTitle(title);
 //        if(freeDepositType == 2) {
 //        	vo.setPayType(DataPayTypeConstant.PAY_PRE); //预授权的方式。
@@ -784,7 +784,7 @@ public class CashierNoTService {
         
       //只有押金才有预授权的情况
         if(DataPayKindConstant.RENT.equals(payKind) || DataPayKindConstant.DEPOSIT.equals(payKind)) {
-	        String sourceType = orderPaySign.getPaySource().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
+	        String sourceType = orderPaySign.getPaySources().stream().filter(x -> !"00".equals(x)).findFirst().orElse("00");
 	        if(DataPaySourceConstant.ALIPAY.equals(sourceType)){
 				//只有押金的时候才有是预授权，其他的情况都是消费
 				vo.setPayType(DataPayTypeConstant.PAY_PRE); 

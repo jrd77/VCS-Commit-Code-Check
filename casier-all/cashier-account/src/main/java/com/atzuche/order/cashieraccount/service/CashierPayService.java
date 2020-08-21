@@ -421,6 +421,16 @@ public class CashierPayService{
         //1校验
         Assert.notNull(orderPaySign, ErrorCode.PARAMETER_ERROR.getText());
         orderPaySign.check();
+        
+        //跟原来的字段区分一下，直接替换到时候上线的时间段会有问题，需要兼容一下  200821
+        if(CollectionUtils.isEmpty(orderPaySign.getPaySources())) {
+        	if(StringUtils.isNotBlank(orderPaySign.getPaySource())) {
+        		List<String> paySources = new ArrayList<String>();
+        		paySources.add(orderPaySign.getPaySource());
+        		orderPaySign.setPaySources(paySources);
+        	}
+        }
+        
         //3 查询应付
         OrderPayReqVO orderPayReqVO = new OrderPayReqVO();
         BeanUtils.copyProperties(orderPaySign,orderPayReqVO);
@@ -2073,7 +2083,7 @@ public class CashierPayService{
 
 		List<String> paySources = new ArrayList<String>();
 		paySources.add(DataPaySourceConstant.WALLETPAY);
-		vo.setPaySource(paySources);
+		vo.setPaySources(paySources);
 //		vo.setPaySource(DataPaySourceConstant.ALIPAY);  //默认
 //		vo.setPaySource(DataPaySourceConstant.WEIXIN_APP);
 
@@ -2115,7 +2125,7 @@ public class CashierPayService{
 
 		List<String> paySources = new ArrayList<>();
 		paySources.add(DataPaySourceConstant.WALLETPAY);
-		vo.setPaySource(paySources);
+		vo.setPaySources(paySources);
 		return vo;
 	}
 
@@ -2152,7 +2162,7 @@ public class CashierPayService{
 
 		List<String> paySources = new ArrayList<String>();
 		paySources.add(DataPaySourceConstant.WALLETPAY);
-		vo.setPaySource(paySources);
+		vo.setPaySources(paySources);
 		return vo;
 	}
 
