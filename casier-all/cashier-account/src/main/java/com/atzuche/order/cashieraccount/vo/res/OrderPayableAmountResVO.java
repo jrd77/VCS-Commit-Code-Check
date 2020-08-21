@@ -99,11 +99,34 @@ public class OrderPayableAmountResVO {
     @AutoDocProperty("应付租车违章押金")
     private int amtWzDeposit;
 
+    //兼容
+    @AutoDocProperty("钱包抵扣金额")
+    private int amtWallet;
     /**
      * 钱包抵扣金额
      */
-    @AutoDocProperty("钱包抵扣金额")
-    private int amtWallet;
+    @AutoDocProperty("钱包抵扣金额-租车押金")
+    private int amtWallet01;
+    @AutoDocProperty("钱包抵扣金额-违章押金")
+    private int amtWallet02;
+    @AutoDocProperty("钱包抵扣金额-APP修改订单补付")
+    private int amtWallet03;
+    @AutoDocProperty("钱包抵扣金额-租车费用")
+    private int amtWallet11;
+    @AutoDocProperty("钱包抵扣金额-动态租车费用补充")
+    private int amtWallet12;
+    @AutoDocProperty("钱包抵扣金额-管理后台补付")
+    private int amtWallet08;
+    @AutoDocProperty("钱包抵扣金额-欠款")
+    private int amtWallet07;
+    
+    
+    // ------------------------------------- 200701
+    @AutoDocProperty("钱包余额")
+    private int walletBalance;
+    @AutoDocProperty("钱包已抵扣金额")
+    private int walletDeductAmt;
+    // -------------------------------------
 
     /**
      * 是否使用钱包 0-否，1-是
@@ -135,6 +158,8 @@ public class OrderPayableAmountResVO {
     private String hints;
     
     // ---------------------------------支付收银台的扩展参数，兼容APP对接 ---------------------------------
+    //钱包支付对象独立 200817
+  	private PayInfoVo walletPay = new PayInfoVo();
     private List<PayInfoVo> pays = new ArrayList<PayInfoVo>();  //支付渠道，列表集合。
 	private String amount; //支付金额(元)
 	private String payTitle; //支付订金/支付租车押金/支付违章押金，app显示用
@@ -143,6 +168,8 @@ public class OrderPayableAmountResVO {
 	
 	//去掉订单号，该字段已经存在。
 //	private String orderNo; //订单号
+	
+	
 	
     
 	public int getAmtIncrementRent() {
@@ -247,14 +274,6 @@ public class OrderPayableAmountResVO {
 
 	public void setAmtWzDeposit(int amtWzDeposit) {
 		this.amtWzDeposit = amtWzDeposit;
-	}
-
-	public int getAmtWallet() {
-		return amtWallet;
-	}
-
-	public void setAmtWallet(int amtWallet) {
-		this.amtWallet = amtWallet;
 	}
 
 	public int getIsUseWallet() {
@@ -376,6 +395,94 @@ public class OrderPayableAmountResVO {
 
 	public void setEnterpriseUserOrder(boolean isEnterpriseUserOrder) {
 		this.isEnterpriseUserOrder = isEnterpriseUserOrder;
+	}
+
+	public int getWalletBalance() {
+		return walletBalance;
+	}
+
+	public void setWalletBalance(int walletBalance) {
+		this.walletBalance = walletBalance;
+	}
+
+	public int getWalletDeductAmt() {
+		return walletDeductAmt;
+	}
+
+	public void setWalletDeductAmt(int walletDeductAmt) {
+		this.walletDeductAmt = walletDeductAmt;
+	}
+
+	public PayInfoVo getWalletPay() {
+		return walletPay;
+	}
+
+	public void setWalletPay(PayInfoVo walletPay) {
+		this.walletPay = walletPay;
+	}
+
+	public int getAmtWallet01() {
+		return amtWallet01;
+	}
+
+	public void setAmtWallet01(int amtWallet01) {
+		this.amtWallet01 = amtWallet01;
+	}
+
+	public int getAmtWallet02() {
+		return amtWallet02;
+	}
+
+	public void setAmtWallet02(int amtWallet02) {
+		this.amtWallet02 = amtWallet02;
+	}
+
+	public int getAmtWallet03() {
+		return amtWallet03;
+	}
+
+	public void setAmtWallet03(int amtWallet03) {
+		this.amtWallet03 = amtWallet03;
+	}
+
+	public int getAmtWallet11() {
+		return amtWallet11;
+	}
+
+	public void setAmtWallet11(int amtWallet11) {
+		this.amtWallet11 = amtWallet11;
+	}
+
+	public int getAmtWallet12() {
+		return amtWallet12;
+	}
+
+	public void setAmtWallet12(int amtWallet12) {
+		this.amtWallet12 = amtWallet12;
+	}
+
+	public int getAmtWallet08() {
+		return amtWallet08;
+	}
+
+	public void setAmtWallet08(int amtWallet08) {
+		this.amtWallet08 = amtWallet08;
+	}
+
+	public int getAmtWallet07() {
+		return amtWallet07;
+	}
+
+	public void setAmtWallet07(int amtWallet07) {
+		this.amtWallet07 = amtWallet07;
+	}
+
+	public int getAmtWallet() {
+		return amtWallet;
+	}
+
+	public void setAmtWallet(int amtWallet) {
+		this.amtWallet = amtWallet;
 	}
     
     

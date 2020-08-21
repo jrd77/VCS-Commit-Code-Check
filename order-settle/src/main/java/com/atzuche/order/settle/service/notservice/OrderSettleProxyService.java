@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,20 +144,14 @@ public class OrderSettleProxyService {
     }
     /**
      * 结算查询确认里程数是否完善。
-     * @param renterOrderNo
+     * @param orderNo 订单号
      * @return
      */
     public boolean checkMileageData(String orderNo,List<String> listOrderNos) {
-//    	HandoverCarReqVO handoverCarReq = new HandoverCarReqVO();
-//    	handoverCarReq.setRenterOrderNo(renterOrderNo);
-//    	//取送车里程数
-//        HandoverCarRepVO handoverCarRep = handoverCarService.getRenterHandover(handoverCarReq);
         //更新：按主订单号查询。
         HandoverCarRespVO handoverCarRep = handoverCarService.getHandoverCarInfoByOrderNo(orderNo);
 
-
-        
-        List<RenterHandoverCarInfoVO> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoVOS();//.getRenterHandoverCarInfoEntities();
+        List<RenterHandoverCarInfoVO> renterHandoverCarInfos = handoverCarRep.getRenterHandoverCarInfoVOS();
         if(CollectionUtils.isEmpty(renterHandoverCarInfos)) {
         	return false;
         }
@@ -265,50 +260,48 @@ public class OrderSettleProxyService {
     
     /**
      *   返回可退还租车费用,租车费用是消费的方式。
-     * @param refundApplyVO
-     * @return
+     * @param refundApplyVO 退款申请公共参数
+     * @return List<CashierRefundApplyReqVO>
      */
     public List<CashierRefundApplyReqVO> getCashierRefundApply(RefundApplyVO refundApplyVO) {
+        log.info("OrderSettleProxyService.getCashierRefundApply. param is,refundApplyVO:[{}]", JSON.toJSONString(refundApplyVO));
         int refundAmt = refundApplyVO.getRefundAmt();
         List<CashierRefundApplyReqVO> cashierRefundApplys = new ArrayList<>();
-        //1 租车费用
-        //11
-        CashierEntity cashierEntity = cashierNoTService.getCashierEntityNoWallet(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
-        if(Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId()) && refundAmt<0){
+        //11 租车费用
+        CashierEntity cashierEntity = cashierNoTService.getCashierEntityNoWallet(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT);
+        if (Objects.nonNull(cashierEntity) && Objects.nonNull(cashierEntity.getId()) && refundAmt < 0) {
             CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
-            BeanUtils.copyProperties(cashierEntity,vo);
+            BeanUtils.copyProperties(cashierEntity, vo);
             vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST.getCashNo());
             vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
             vo.setPaySource(cashierEntity.getPaySource());
-//            vo.setPayType(cashierEntity.getPayType());  
             //固定04 退货 200407
             vo.setPayType(DataPayTypeConstant.PUR_RETURN);
             vo.setRemake(refundApplyVO.getRemarke());
             int amt = refundAmt + cashierEntity.getPayAmt();
-            vo.setAmt(amt>=0?refundAmt:-cashierEntity.getPayAmt());
+            vo.setAmt(amt >= 0 ? refundAmt : -cashierEntity.getPayAmt());
             cashierRefundApplys.add(vo);
             refundAmt = refundAmt + cashierEntity.getPayAmt();
         }
         
         //03
-        if(refundAmt<0){
-            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
-            if(!CollectionUtils.isEmpty(cashierEntitys)){
-                for(int i=0;i<cashierEntitys.size();i++){
-                    if(refundAmt<0){
-                        CashierEntity cashierElement = cashierEntitys.get(i);
+        if (refundAmt < 0) {
+            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT);
+            if (!CollectionUtils.isEmpty(cashierEntitys)) {
+                for (CashierEntity entity : cashierEntitys) {
+                    if (refundAmt < 0) {
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
-                        BeanUtils.copyProperties(cashierElement,vo);
+                        BeanUtils.copyProperties(entity, vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AGAIN.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-                        vo.setPaySource(cashierElement.getPaySource());
+                        vo.setPaySource(entity.getPaySource());
                         //固定04 退货 200410
                         vo.setPayType(DataPayTypeConstant.PUR_RETURN);
                         vo.setRemake(refundApplyVO.getRemarke());
-                        int amt = refundAmt + cashierElement.getPayAmt();
-                        vo.setAmt(amt>=0?refundAmt:-cashierElement.getPayAmt());
+                        int amt = refundAmt + entity.getPayAmt();
+                        vo.setAmt(amt >= 0 ? refundAmt : -entity.getPayAmt());
                         cashierRefundApplys.add(vo);
-                        refundAmt = refundAmt + cashierElement.getPayAmt();
+                        refundAmt = refundAmt + entity.getPayAmt();
                     }
 
                 }
@@ -316,31 +309,55 @@ public class OrderSettleProxyService {
         }
         
         //12  ADD 200407 
-        if(refundAmt<0){
-            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(),refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT_AFTER);
-            if(!CollectionUtils.isEmpty(cashierEntitys)){
-                for(int i=0;i<cashierEntitys.size();i++){
-                    if(refundAmt<0){
-                        CashierEntity cashierElement = cashierEntitys.get(i);
+        if (refundAmt < 0) {
+            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_AMOUNT_AFTER);
+            if (!CollectionUtils.isEmpty(cashierEntitys)) {
+                for (CashierEntity entity : cashierEntitys) {
+                    if (refundAmt < 0) {
                         CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
-                        BeanUtils.copyProperties(cashierElement,vo);
+                        BeanUtils.copyProperties(entity, vo);
                         vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER.getCashNo());
                         vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
-                        vo.setPaySource(cashierElement.getPaySource());
+                        vo.setPaySource(entity.getPaySource());
                         //固定04 退货 200410
                         vo.setPayType(DataPayTypeConstant.PUR_RETURN);
                         vo.setRemake(refundApplyVO.getRemarke());
-                        int amt = refundAmt + cashierElement.getPayAmt();
-                        vo.setAmt(amt>=0?refundAmt:-cashierElement.getPayAmt());
+                        int amt = refundAmt + entity.getPayAmt();
+                        vo.setAmt(amt >= 0 ? refundAmt : -entity.getPayAmt());
                         cashierRefundApplys.add(vo);
-                        refundAmt = refundAmt + cashierElement.getPayAmt();
+                        refundAmt = refundAmt + entity.getPayAmt();
                     }
 
                 }
             }
         }
-        
 
+
+        //08
+        if (refundAmt < 0) {
+            List<CashierEntity> cashierEntitys = cashierNoTService.getCashierEntitys(refundApplyVO.getSettleOrders().getOrderNo(), refundApplyVO.getSettleOrders().getRenterMemNo(), DataPayKindConstant.RENT_INCREMENT_CONSOLE);
+            if (!CollectionUtils.isEmpty(cashierEntitys)) {
+                for (CashierEntity entity : cashierEntitys) {
+                    if (refundAmt < 0) {
+                        CashierRefundApplyReqVO vo = new CashierRefundApplyReqVO();
+                        BeanUtils.copyProperties(entity, vo);
+                        vo.setFlag(RenterCashCodeEnum.ACCOUNT_RENTER_SUPPLEMENT_COST_AGAIN.getCashNo());
+                        vo.setRenterCashCodeEnum(refundApplyVO.getRenterCashCodeEnum());
+                        vo.setPaySource(entity.getPaySource());
+                        //固定04 退货 200410
+                        vo.setPayType(DataPayTypeConstant.PUR_RETURN);
+                        vo.setRemake(refundApplyVO.getRemarke());
+                        int amt = refundAmt + entity.getPayAmt();
+                        vo.setAmt(amt >= 0 ? refundAmt : -entity.getPayAmt());
+                        cashierRefundApplys.add(vo);
+                        refundAmt = refundAmt + entity.getPayAmt();
+                    }
+
+                }
+            }
+        }
+        log.info("OrderSettleProxyService.getCashierRefundApply. result is,cashierRefundApplys:[{}]",
+                JSON.toJSONString(cashierRefundApplys));
         return cashierRefundApplys;
     }
     

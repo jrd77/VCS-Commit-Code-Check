@@ -53,6 +53,8 @@ public class OrderSupplementDetailEntity implements Serializable {
 	 * 单项补付金额
 	 */
 	private Integer amt;
+	//真实金额
+	private Integer realAmt;
 	/**
 	 * 请款码
 	 */

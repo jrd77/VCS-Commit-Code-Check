@@ -9,6 +9,8 @@ import com.autoyol.commons.web.ErrorCode;
 import com.autoyol.commons.web.ResponseData;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +35,13 @@ public class WalletProxyService {
      * @param amt 正值
      * @return 真实的抵扣金额
      */
-    public int orderDeduct(String memNo,String orderNo,int amt){
+    public int orderDeduct(String memNo,String orderNo,int amt,String expDesc){
         LOGGER.info("订单钱包服务 remote call start param  [{},{},{}]", memNo,orderNo,amt);
         Transaction t = Cat.newTransaction(CatConstants.FEIGN_CALL, "订单钱包服务");
         try {
             Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderWalletService.deductWallet");
             Cat.logEvent(CatConstants.FEIGN_PARAM, "memNo=" + memNo+",orderNo="+orderNo+",amt="+amt);
-            DeductWalletVO vo = buildRequestVO(memNo, orderNo, amt);
+            DeductWalletVO vo = buildRequestVO(memNo, orderNo, amt, expDesc);
             ResponseData<DeductWalletVO> result = walletFeignService.deductWallet(vo);
             LOGGER.info("OrderWalletService.deductWallet remote call end result result: [{}]", JSON.toJSONString(result));
             Cat.logEvent(CatConstants.FEIGN_RESULT, JSON.toJSONString(result));
@@ -97,12 +99,25 @@ public class WalletProxyService {
             t.complete();
         }
     }
-
+    
+    //兼容
     private DeductWalletVO buildRequestVO(String memNo, String orderNo, int amt) {
         DeductWalletVO vo = new DeductWalletVO();
         vo.setAmt(amt);
         vo.setMemNo(memNo);
         vo.setOrderNo(orderNo);
+        return vo;
+    }
+    
+    private DeductWalletVO buildRequestVO(String memNo, String orderNo, int amt,String expDesc) {
+        DeductWalletVO vo = new DeductWalletVO();
+        vo.setAmt(amt);
+        vo.setMemNo(memNo);
+        vo.setOrderNo(orderNo);
+        //一笔订单多笔消费记录,需要根据备注来区分
+        if(StringUtils.isNoneBlank(expDesc)) {
+        	vo.setExpDesc(expDesc);
+        }
         return vo;
     }
 

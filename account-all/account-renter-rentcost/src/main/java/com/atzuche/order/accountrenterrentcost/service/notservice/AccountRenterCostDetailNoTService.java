@@ -1,6 +1,7 @@
 package com.atzuche.order.accountrenterrentcost.service.notservice;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,17 +93,14 @@ public class AccountRenterCostDetailNoTService {
     
     /**
      * 根据订单号 和会员号 查询 订单 消费支付金额     非钱包支付
-     * @param orderNo
-     * @param renterMemNo
+     * @param orderNo 订单号
+     * @param renterMemNo 租客会员号
      */
     public int getRentCostPayByPay(String orderNo, String renterMemNo) {
         List<AccountRenterCostDetailEntity> result = accountRenterCostDetailMapper.getAccountRenterCostDetailsByOrderNo(orderNo);
         if(CollectionUtils.isEmpty(result)){
             return 0;
         }
-        int amt = result.stream().filter(obj ->{
-            return !PaySourceEnum.WALLET_PAY.getCode().equals(obj.getPaySourceCode());
-        }).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
-        return amt;
+        return result.stream().filter(o -> Objects.nonNull(o.getAmt())).mapToInt(AccountRenterCostDetailEntity::getAmt).sum();
     }
 }

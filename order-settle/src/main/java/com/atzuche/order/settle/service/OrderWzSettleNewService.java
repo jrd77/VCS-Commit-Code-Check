@@ -93,10 +93,11 @@ public class OrderWzSettleNewService {
     private static final String WZ_DEPOSIT_PAY_KIND = "02";
     // 虚拟支付
     private static final int PAY_LINE_VIRTUAL = 2;
+
     /**
      * 初始化结算对象
      *
-     * @param orderNo
+     * @param orderNo 订单号
      */
     public SettleOrdersWz initSettleOrders(String orderNo) {
         SettleOrdersWz settleOrdersWz = new SettleOrdersWz();
@@ -111,6 +112,7 @@ public class OrderWzSettleNewService {
 
         //是否企业级用户订单
         settleOrdersWz.setEnterpriseUserOrder(renterMemberService.isEnterpriseUserOrder(renterOrder.getRenterOrderNo()));
+        settleOrdersWz.setUseWallet(Objects.nonNull(renterOrder.getIsUseWallet()) && renterOrder.getIsUseWallet() == OrderConstant.YES);
         //发送mq发送车主会员号信息预留。
         OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(orderNo);
         if (!Objects.isNull(ownerOrder)) {
@@ -122,11 +124,7 @@ public class OrderWzSettleNewService {
             settleOrdersWz.setOwnerMemNo("0");
             settleOrdersWz.setOwnerOrderNo("0");
         }
-        
-        //外置
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-//        this.check(renterOrder);
-        
+
         // 3 初始化数据
         // 3.1获取租客子订单 和 租客会员号
         String renterOrderNo = renterOrder.getRenterOrderNo();
@@ -157,8 +155,6 @@ public class OrderWzSettleNewService {
 		// 1 先查询 发现 有结算数据停止结算 手动处理
 		boolean checkFlag = this.checkIsSettle(renterOrder.getOrderNo());
 		if(!checkFlag) {
-//			return checkFlag;
-			//通过异常来处理 200713
 			throw new RuntimeException("租客订单状态不是待结算，不能结算");
 		}
 		
@@ -226,32 +222,27 @@ public class OrderWzSettleNewService {
 		orderWzSettleNoTService.getRenterWzCostSettleDetail(settleOrders);
 		log.info("wz OrderSettleService getRenterWzCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 		Cat.logEvent("settleOrders", GsonUtils.toJson(settleOrders));
-
-		RentCostsWz rentCosts = settleOrders.getRentCostsWz();//违章费用对象
+        //违章费用对象
+		RentCostsWz rentCosts = settleOrders.getRentCostsWz();
 		if (Objects.nonNull(rentCosts)) {
 			// 1.1 查询违章费用
-
 			List<RenterOrderWzCostDetailEntity> renterOrderWzCostDetails = rentCosts.getRenterOrderWzCostDetails();
 			if (!CollectionUtils.isEmpty(renterOrderWzCostDetails)) {
-
 				List<AccountRenterWzDepositCostSettleDetailEntity> accountRenterWzDepositCostSettleDetails = new ArrayList<AccountRenterWzDepositCostSettleDetailEntity>();
-
-				for (int i = 0; i < renterOrderWzCostDetails.size(); i++) {
-					RenterOrderWzCostDetailEntity renterOrderWzCostDetail = renterOrderWzCostDetails.get(i);
-					AccountRenterWzDepositCostSettleDetailEntity accountRenterWzDepositCostSettleDetail = new AccountRenterWzDepositCostSettleDetailEntity();
-					// 赋值
-					accountRenterWzDepositCostSettleDetail.setOrderNo(renterOrderWzCostDetail.getOrderNo());
-					accountRenterWzDepositCostSettleDetail.setMemNo(String.valueOf(renterOrderWzCostDetail.getMemNo()));
-					accountRenterWzDepositCostSettleDetail.setUniqueNo(String.valueOf(renterOrderWzCostDetail.getId()));
-					accountRenterWzDepositCostSettleDetail.setPrice(renterOrderWzCostDetail.getAmount());
-					accountRenterWzDepositCostSettleDetail.setWzAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount()));
-					accountRenterWzDepositCostSettleDetail.setUnit(1);
+                for (RenterOrderWzCostDetailEntity renterOrderWzCostDetail : renterOrderWzCostDetails) {
+                    AccountRenterWzDepositCostSettleDetailEntity accountRenterWzDepositCostSettleDetail = new AccountRenterWzDepositCostSettleDetailEntity();
+                    // 赋值
+                    accountRenterWzDepositCostSettleDetail.setOrderNo(renterOrderWzCostDetail.getOrderNo());
+                    accountRenterWzDepositCostSettleDetail.setMemNo(String.valueOf(renterOrderWzCostDetail.getMemNo()));
+                    accountRenterWzDepositCostSettleDetail.setUniqueNo(String.valueOf(renterOrderWzCostDetail.getId()));
+                    accountRenterWzDepositCostSettleDetail.setPrice(renterOrderWzCostDetail.getAmount());
+                    accountRenterWzDepositCostSettleDetail.setWzAmt(NumberUtils.convertNumberToFushu(renterOrderWzCostDetail.getAmount()));
+                    accountRenterWzDepositCostSettleDetail.setUnit(1);
                     accountRenterWzDepositCostSettleDetail.setType(10);
                     accountRenterWzDepositCostSettleDetail.setCostCode(renterOrderWzCostDetail.getCostCode());
                     accountRenterWzDepositCostSettleDetail.setCostDetail(renterOrderWzCostDetail.getCostDesc());
-
-					accountRenterWzDepositCostSettleDetails.add(accountRenterWzDepositCostSettleDetail);
-				}
+                    accountRenterWzDepositCostSettleDetails.add(accountRenterWzDepositCostSettleDetail);
+                }
 
 				if (accountRenterWzDepositCostSettleDetails.size() > 0) {
 					// 落库
@@ -268,14 +259,12 @@ public class OrderWzSettleNewService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public void settleOrderAfter(SettleOrdersWz settleOrders) {
-		// 7.1 违章费用 总费用 信息落库 并返回最新租车费用 实付
-        // 违章费用总表及其结算总表 account_renter_wz_deposit_cost
+		// 违章费用 总费用 信息落库 并返回最新租车费用 实付  违章费用总表及其结算总表 account_renter_wz_deposit_cost
 		AccountRenterWzDepositCostEntity accountRenterCostSettle = cashierWzSettleService.updateWzRentSettleCost(settleOrders.getOrderNo(), settleOrders.getRenterMemNo(), settleOrders.getRenterOrderCostWz());
 		log.info("OrderSettleService updateRentSettleCost 更新违章费用总表的应收，实收，欠款。 [{}]", GsonUtils.toJson(accountRenterCostSettle));
 		Cat.logEvent("updateWzRentSettleCost", GsonUtils.toJson(accountRenterCostSettle));
 
-		// 8 获取租客 实付 违章押金
-		// account_renter_wz_deposit_detail 动态统计。
+		// 获取租客 实付 违章押金 account_renter_wz_deposit_detail 动态统计。
 		int wzDepositAmt = cashierWzSettleService.getSurplusWZDepositCostAmt(settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		log.info("(统计违章押金的资金明细表)当前订单和会员的累计支付的违章押金金额 [{}], orderNo=[{}],renterMemNo=[{}]",wzDepositAmt,settleOrders.getOrderNo(),settleOrders.getRenterMemNo());
 		
@@ -287,34 +276,29 @@ public class OrderWzSettleNewService {
 		settleOrdersAccount.setRentCostPayAmt(OrderConstant.ZERO);
 		settleOrdersAccount.setDepositAmt(wzDepositAmt);
 		settleOrdersAccount.setDepositSurplusAmt(wzDepositAmt);
-
 		// 按0处理，违章费用没有单独支付。
 		settleOrdersAccount.setRentCostSurplusAmt(OrderConstant.ZERO);
-
 		log.info("(各费用赋值，应付，实收，违章押金，剩余违章押金) OrderSettleService settleOrderAfter settleOrdersAccount one [{}]",GsonUtils.toJson(settleOrdersAccount));
 		Cat.logEvent("settleOrdersAccount", GsonUtils.toJson(settleOrdersAccount));
 
 		OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
 		orderStatusDTO.setOrderNo(settleOrders.getOrderNo());
-		/// add
 		orderStatusDTO.setWzSettleTime(LocalDateTime.now());
 		orderStatusDTO.setStatus(OrderStatusEnum.COMPLETED.getStatus());
 		orderStatusDTO.setWzSettleStatus(SettleStatusEnum.SETTLED.getCode());
 
-		// 1 租客违章费用 结余处理
+		// 租客违章费用 结余处理
 		log.info("OrderSettleService wzCostSettle 抵扣违章费用或产生违章欠款。settleOrders [{}], settleOrdersAccount [{}]", GsonUtils.toJson(settleOrders),GsonUtils.toJson(settleOrdersAccount));
 		orderWzSettleNoTService.wzCostSettle(settleOrders, settleOrdersAccount);
-
 
 		// 抵扣未支付的补付费用
         log.info("OrderSettleService supplementCostHandle 抵扣补付记录。settleOrdersAccount [{}]",
                 GsonUtils.toJson(settleOrdersAccount));
         orderWzSettleSupplementHandleService.supplementCostHandle(settleOrders, settleOrdersAccount);
-
         log.info("OrderSettleService repayWzHistoryDebtRent 抵扣历史欠款。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));
+
         int totalwzDebtAmt;
         int yingkouAmt;
-        
         if(Objects.nonNull(settleOrders.getEnterpriseUserOrder()) && settleOrders.getEnterpriseUserOrder()) {
             OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
                     settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_WZ_SETTLE_TYPE);
@@ -330,11 +314,23 @@ public class OrderWzSettleNewService {
             reqVO.setRealDeductAmt(resVO.getNewTotalRealDebtAmt() + resVO.getOldTotalRealDebtAmt());
             yingkouAmt = orderSettleHandleService.accountRentetDepositHandle(reqVO);
         } else {
-            // 2.1租客剩余违章押金 结余历史欠款
+            // 2.1 租客剩余违章押金 结余历史欠款
             orderWzSettleNoTService.repayWzHistoryDebtRent(settleOrdersAccount);
-            // 2.2违章押金抵扣老系统欠款
+            // 2.2 违章押金抵扣老系统欠款
             totalwzDebtAmt = orderWzSettleNoTService.oldRepayWzHistoryDebtRent(settleOrdersAccount);
-            yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+            // 2.3 钱包余额抵扣欠款
+            if (settleOrdersAccount.getDepositSurplusAmt() <= OrderConstant.ZERO
+                    && Objects.nonNull(settleOrders.getUseWallet()) && settleOrders.getUseWallet()) {
+                //使用钱包抵扣欠款
+                OrderSettleResVO resVO = orderSettleHandleService.commonDeductionDebtHandle(settleOrdersAccount.getRenterMemNo(),
+                        settleOrdersAccount.getOrderNo(), OrderSettleHandleService.DEPOSIT_WZ_SETTLE_TYPE);
+
+                totalwzDebtAmt = totalwzDebtAmt + resVO.getOldTotalRealDebtAmt();
+                yingkouAmt =
+                        settleOrdersAccount.getDepositAmt() + resVO.getOldTotalRealDebtAmt() + resVO.getNewTotalRealDebtAmt();
+            } else {
+                yingkouAmt = settleOrdersAccount.getDepositAmt() - settleOrdersAccount.getDepositSurplusAmt();
+            }
         }
 		settleOrders.setTotalWzDebtAmt(totalwzDebtAmt);
 		log.info("OrderSettleService refundWzDepositAmt 退还违章押金。settleOrdersAccount [{}]", GsonUtils.toJson(settleOrdersAccount));

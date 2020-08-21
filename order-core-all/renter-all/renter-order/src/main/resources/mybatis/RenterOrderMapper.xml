@@ -301,6 +301,17 @@
 		limit 1
 	</select>
 	
+	<!-- 
+			and is_effective = 1
+			order by id desc
+		limit 1
+	 -->
+	<update id="updateRenterOrderUseWalletByOrderNo">
+		update renter_order set is_use_wallet = #{isUseWallet} where order_no = #{orderNo}
+		and is_delete = 0
+	</update>
+	
+	
 	<!-- 去掉 		and is_effective = 1 -->
 	<select id="queryRenterOrderByOrderNo" resultMap="BaseResultMap">
 		select <include refid="Base_Column_List" /> from renter_order where order_no = #{orderNo}

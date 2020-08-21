@@ -489,6 +489,44 @@ public class OrderSettleService{
     }
     
     /**
+     * 平台补贴，范围界定，平台补贴不能大于基础费用-优惠抵扣的情况
+     * 平台给租客的补贴不计算在内。 同preRenterSettleOrder
+     * @param orderNo
+     * @param renterOrderNo
+     * @return
+     */
+    public RentCosts preRenterSettleOrderPlatformSubsidy(String orderNo,String renterOrderNo) {
+    	SettleOrders settleOrders =  orderSettleNoTService.preInitSettleOrders(orderNo,renterOrderNo,null);
+    	//3.4 查询所有租客费用明细
+        orderSettleNoTService.getRenterCostSettleDetail(settleOrders);
+        
+        SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
+    	//2统计 车主结算费用明细， 补贴，费用总额
+        //平台给租客的补贴不计算在内。 同handleRentAndPlatform
+    	orderSettleNoTService.handleRentAndPlatformSubsidy(settleOrdersDefinition, settleOrders);
+    	log.info("preRenterSettleOrder settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
+    	
+    	//租客总账
+        List<AccountRenterCostSettleDetailEntity> accountRenterCostSettleDetails = settleOrdersDefinition.getAccountRenterCostSettleDetails();
+        for (AccountRenterCostSettleDetailEntity accountRenterCostSettleDetailEntity : accountRenterCostSettleDetails) {
+			log.info("打印租客费用清单:"+accountRenterCostSettleDetailEntity.toString());
+		}
+        
+        //1租客总账
+        if(!CollectionUtils.isEmpty(accountRenterCostSettleDetails)){
+        	//租客结算的总费用
+            int renterCostAmtFinalPlatformSubsidy = accountRenterCostSettleDetails.stream().mapToInt(AccountRenterCostSettleDetailEntity::getAmt).sum();
+//            settleOrdersDefinition.setRenterCostAmtFinal(renterCostAmtFinal);
+            settleOrders.getRentCosts().setRenterCostAmtFinalPlatformSubsidy(renterCostAmtFinalPlatformSubsidy);
+        }
+        
+        //封装租客的会员号
+        settleOrders.getRentCosts().setRenterNo(settleOrders.getRenterMemNo());
+        return settleOrders.getRentCosts();
+    }
+    
+    
+    /**
      * 获取车主预结算数据 huangjing
      * @param orderNo
      */
@@ -533,7 +571,7 @@ public class OrderSettleService{
         SettleOrders settleOrders = new SettleOrders();
         try {
             Cat.logEvent("settleOrder",orderNo);
-            //1 初始化操作 校验操作
+            // 初始化操作 校验操作
             orderSettleNoTService.initSettleOrders(orderNo,settleOrders);
             log.info("OrderSettleService settleOrders settleOrders [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
@@ -541,27 +579,22 @@ public class OrderSettleService{
             orderOwnerSettleNoTService.initSettleOrdersSeparateOwner(orderNo,settleOrders);
             log.info("OrderSettleService settleOrders settleOrdersSeparateOwner [{}]",GsonUtils.toJson(settleOrders));
             Cat.logEvent("settleOrdersSeparateOwner",GsonUtils.toJson(settleOrders));
-            //检查是否可以结算。 外置。
-//            boolean checkFlag = orderSettleNoTService.check(settleOrders,listOrderNos);
+            // 检查是否可以结算。 外置。
             orderSettleNoTService.check(settleOrders,listOrderNos);
-//            if(!checkFlag) {
-//            	log.info("提前终止结算，当前结算状态不符合。orderNo [{}]",orderNo);
-//            	return;
-//            }
-            
-            //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
+
+            // 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             SettleOrdersDefinition settleOrdersDefinition = new SettleOrdersDefinition();
             orderSettleNoTService.settleOrderFirst(settleOrders,settleOrdersDefinition);
             log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrdersDefinition));
             
-            //2 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
+            // 无事务操作 查询租客车主费用明细 ，处理费用明细到 结算费用明细  并落库   然后平账校验
             orderOwnerSettleNoTService.settleOrderFirstSeparateOwner(settleOrders,settleOrdersDefinition);
             log.info("OrderSettleService settleOrdersDefinition [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderSeparateOwner",GsonUtils.toJson(settleOrdersDefinition));
             
-            //平账检测
-            //6 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
+            // 平账检测
+            // 费用平账 平台收入 + 平台补贴 + 车主费用 + 车主补贴 + 租客费用 + 租客补贴 = 0
             int totleAmt = settleOrdersDefinition.getPlatformProfitAmt() + settleOrdersDefinition.getPlatformSubsidyAmt()
                     + settleOrdersDefinition.getOwnerCostAmt() + settleOrdersDefinition.getOwnerSubsidyAmt()
                     + settleOrdersDefinition.getRentCostAmt() + settleOrdersDefinition.getRentSubsidyAmt();
@@ -570,13 +603,10 @@ public class OrderSettleService{
                 log.error("平账失败");
                 //更新标识。
                 updateFailStatusFlag(orderNo,ErrorCode.ORDER_SETTLE_FLAT_ACCOUNT.getText());
-                
-                //TODO 走Cat告警
                 throw new OrderSettleFlatAccountException();
             }
             
-
-            //3 事务操作结算主逻辑  //开启事务
+            // 事务操作结算主逻辑  //开启事务
             orderSettleNoTService.settleOrderAfter(settleOrders,settleOrdersDefinition,callBack);
             log.info("OrderSettleService settleOrderAfter [{}]",GsonUtils.toJson(settleOrdersDefinition));
             Cat.logEvent("settleOrderAfter",GsonUtils.toJson(settleOrdersDefinition));
@@ -600,26 +630,8 @@ public class OrderSettleService{
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             log.error("OrderSettleService settleOrder,orderNo={},",orderNo, e);
-            
             //更新标识。
             updateFailStatusFlag(orderNo,e.getMessage());
-            
-//            OrderStatusEntity entity = orderStatusService.getByOrderNo(orderNo);
-            
-//            if(null != entity && entity.getIsDetain() != OrderConstant.YES) {  //去掉暂扣标识
-//                OrderStatusEntity record = new OrderStatusEntity();
-//                record.setId(entity.getId());
-//                record.setSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-//                record.setSettleTime(LocalDateTime.now());
-//                //车辆押金状态
-//                record.setCarDepositSettleStatus(SettleStatusEnum.SETTL_FAIL.getCode());
-//                record.setCarDepositSettleTime(LocalDateTime.now());
-//                //记录结算消息，错误码
-//                record.setSettleMsg(e.getMessage());
-//                
-//                orderStatusService.updateByPrimaryKeySelective(record);
-//            }
-              
             t.setStatus(e);
             Cat.logError("结算失败  :orderNo="+orderNo, e);
             orderSettleNewService.sendOrderSettleMq(orderNo,settleOrders.getRenterMemNo(),settleOrders.getRentCosts(),1,settleOrders.getOwnerMemNo(),settleOrders.getRenterOrder());
@@ -647,79 +659,7 @@ public class OrderSettleService{
     
 
     /**
-     * 取消订单结算
-     * @param orderNo
-     * @return
-     */
-    @Transactional(rollbackFor=Exception.class)
-    public boolean settleOrderCancel(String orderNo) {
-        Transaction t = Cat.getProducer().newTransaction(CatConstants.FEIGN_CALL, "取消订单结算服务");
-        try {
-            Cat.logEvent(CatConstants.FEIGN_METHOD, "OrderSettleService.settleOrderCancel");
-            Cat.logEvent(CatConstants.FEIGN_PARAM, orderNo);
-            OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
-            orderStatusDTO.setOrderNo(orderNo);
-            // 1 取消订单初始化
-            SettleOrders settleOrders =  orderSettleNoTService.initCancelSettleOrders(orderNo);
-            Cat.logEvent("settleOrderCancel",GsonUtils.toJson(settleOrders));
-            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //2 查询租客罚金明细  及 凹凸币补贴
-            orderSettleNoTService.getCancelRenterCostSettleDetail(settleOrders);
-            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
-            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //3 查询车主罚金明细
-            orderSettleNoTService.getCancelOwnerCostSettleDetail(settleOrders);
-            Cat.logEvent("settleOrdersFine",GsonUtils.toJson(settleOrders));
-            log.info("OrderPayCallBack settleOrderCancel settleOrders [{}] ",GsonUtils.toJson(settleOrders));
-            //4 查询 租客实际 付款金额（包含 租车费用，车俩押金，违章押金，钱包，罚金） 车主
-            SettleCancelOrdersAccount settleCancelOrdersAccount = orderSettleNoTService.initSettleCancelOrdersAccount(settleOrders);
-            Cat.logEvent("settleCancelOrdersAccount",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack settleCancelOrdersAccount settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
-            //5 处理 租客 车主 平台 罚金收入（将三方金额统计到结算表中）
-            orderSettleNoTService.handleIncomeFine(settleOrders,settleCancelOrdersAccount);
-            Cat.logEvent("handleIncomeFine",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack handleIncomeFine handleIncomeFine [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
-            //6 车主罚金走历史欠款
-            orderSettleNoTService.handleOwnerFine(settleOrders,settleCancelOrdersAccount);
-            Cat.logEvent("handleOwnerFine",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack handleOwnerFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-            
-            //7 租客罚金抵扣 钱包 > 租车费用 > 车辆押金 > 违章押金
-            orderSettleNoTService.handleRentFine(settleOrders,settleCancelOrdersAccount);
-            Cat.logEvent("handleRentFine",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack handleRentFine settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
-            //8 租客历史欠款抵扣 钱包 > 租车费用 > 车辆押金 > 违章押金
-            orderSettleNoTService.repayHistoryDebtRentCancel(settleOrders,settleCancelOrdersAccount);
-            Cat.logEvent("repayHistoryDebtRentCancel",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack repayHistoryDebtRentCancel settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
-            //9 租客金额 退还 包含 凹凸币，钱包 租车费用 押金 违章押金 退还 （优惠券退还 ->不在结算中做,在取消订单中完成）
-            orderSettleNoTService.refundCancelCost(settleOrders,settleCancelOrdersAccount,orderStatusDTO);
-            Cat.logEvent("refundCancelCost",GsonUtils.toJson(settleCancelOrdersAccount));
-            log.info("OrderPayCallBack refundCancelCost settleCancelOrdersAccount [{}] ",GsonUtils.toJson(settleCancelOrdersAccount));
-
-            //10 修改订单状态表
-            cashierService.saveCancelOrderStatusInfo(orderStatusDTO);
-            log.info("OrderSettleService initSettleOrders settleOrders [{}]", GsonUtils.toJson(settleOrders));
-            Cat.logEvent("settleOrders",GsonUtils.toJson(settleOrders));
-
-        } catch (Exception e) {
-            log.error("OrderSettleService settleOrderCancel,e={},",e);
-            t.setStatus(e);
-            Cat.logError("结算失败  :{}",e);
-            throw new RuntimeException("结算失败 ,不能结算");
-        } finally {
-            t.complete();
-        }
-        return true;
-    }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/3/6 11:47
-     * @Description: 订单取消-组合结算
+     * 订单取消-组合结算
      *
      **/
     @Transactional(rollbackFor=Exception.class)

@@ -64,6 +64,8 @@ public class AccountRenterDepositNoTService {
         }
         
         BeanUtils.copyProperties(payedOrderRenterDeposit,accountRenterDepositEntity);
+        //更新实收
+        accountRenterDepositEntity.setShifuDepositAmt(accountRenterDepositEntity.getShifuDepositAmt() + payedOrderRenterDeposit.getShifuDepositAmt());
         int result = accountRenterDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
             throw new PayOrderRenterDepositDBException();

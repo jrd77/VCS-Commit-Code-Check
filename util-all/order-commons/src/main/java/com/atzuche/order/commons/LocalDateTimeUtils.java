@@ -431,6 +431,12 @@ public class LocalDateTimeUtils {
         return localDate.format(formatter);
     }
     
+    public static String dateToString(Date date) {
+    	LocalDateTime localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(YYYYMMDDHHMMSSS_PATTERN);
+        return localDate.format(formatter);
+    }
+    
     
 
     /**

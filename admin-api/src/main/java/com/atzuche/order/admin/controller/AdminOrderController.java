@@ -24,6 +24,7 @@ import com.atzuche.order.commons.vo.req.ModifyInsurFlagVO;
 import com.atzuche.order.commons.vo.req.ModifyOrderConsoleCheckReq;
 import com.atzuche.order.commons.vo.req.ModifyOrderReqVO;
 import com.atzuche.order.commons.vo.res.AdminOrderJudgeDutyResVO;
+import com.atzuche.order.commons.vo.res.order.OrderModifyConsoleResultVO;
 import com.atzuche.order.open.service.FeignOrderDetailService;
 import com.atzuche.order.open.vo.request.TransferReq;
 import com.autoyol.commons.web.ErrorCode;
@@ -97,9 +98,10 @@ public class AdminOrderController {
         //adminOrderService.modifyOrder(modifyOrderReqVO);
         // 获取修改前数据
  		ModifyOrderConsoleDTO modifyOrderConsoleDTO = remoteFeignService.getInitModifyOrderDTO(modifyOrderReqVO);
-        remoteFeignService.modifyOrder(modifyOrderReqVO);
+ 		// 修改订单
+ 		OrderModifyConsoleResultVO resultVO = remoteFeignService.modifyOrder(modifyOrderReqVO);
         // 保存操作日志
-        modificationOrderService.saveModifyOrderLog(modifyOrderReqVO, modifyOrderConsoleDTO);
+        modificationOrderService.saveModifyOrderLog(modifyOrderReqVO, modifyOrderConsoleDTO, resultVO);
 
         //记录日志
         adminlog(modifyOrderReqVO);
