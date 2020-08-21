@@ -118,21 +118,21 @@ public class OrderSettleWalletRefundHandleService {
                 int amt = surplusAmt >= cashierEntity.getPayAmt() ? cashierEntity.getPayAmt() : surplusAmt;
                 CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
                 BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
-                int id = cashierWzSettleService.refundWzDepositPurchase(amt, cashierEntity, cashierRefundApply, cashCodeEnum);
+                int id = cashierService.refundDepositPurchase(amt, cashierEntity,
+                        cashierRefundApply, cashCodeEnum);
 
                 // 结算费用明细
-                AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
+                AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
                 entity.setOrderNo(cashierEntity.getOrderNo());
                 entity.setRenterOrderNo(renterOrderNo);
                 entity.setMemNo(cashierEntity.getMemNo());
-                entity.setWzAmt(-amt);
+                entity.setAmt(-amt);
                 entity.setCostCode(cashCodeEnum.getCashNo());
                 entity.setCostDetail(cashCodeEnum.getTxt());
                 entity.setUniqueNo(String.valueOf(id));
-                entity.setType(10);
-                cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
+                cashierSettleService.insertAccountRenterCostSettleDetail(entity);
                 //重置余额
-                surplusAmt = surplusAmt + entity.getWzAmt();
+                surplusAmt = surplusAmt + entity.getAmt();
                 log.info("Reset surplusAmt:[{}]", surplusAmt);
             }
         }
@@ -164,21 +164,21 @@ public class OrderSettleWalletRefundHandleService {
                 int amt = surplusAmt >= cashierEntity.getPayAmt() ? cashierEntity.getPayAmt() : surplusAmt;
                 CashierRefundApplyReqVO cashierRefundApply = new CashierRefundApplyReqVO();
                 BeanUtils.copyProperties(cashierEntity, cashierRefundApply);
-                int id = cashierService.refundDepositPurchase(amt, cashierEntity,
-                        cashierRefundApply, cashCodeEnum);
+                int id = cashierWzSettleService.refundWzDepositPurchase(amt, cashierEntity, cashierRefundApply, cashCodeEnum);
 
                 // 结算费用明细
-                AccountRenterCostSettleDetailEntity entity = new AccountRenterCostSettleDetailEntity();
+                AccountRenterWzDepositCostSettleDetailEntity entity = new AccountRenterWzDepositCostSettleDetailEntity();
                 entity.setOrderNo(cashierEntity.getOrderNo());
                 entity.setRenterOrderNo(renterOrderNo);
                 entity.setMemNo(cashierEntity.getMemNo());
-                entity.setAmt(-amt);
+                entity.setWzAmt(-amt);
                 entity.setCostCode(cashCodeEnum.getCashNo());
                 entity.setCostDetail(cashCodeEnum.getTxt());
                 entity.setUniqueNo(String.valueOf(id));
-                cashierSettleService.insertAccountRenterCostSettleDetail(entity);
+                entity.setType(10);
+                cashierWzSettleService.insertAccountRenterWzDepositCostSettleDetail(entity);
                 //重置余额
-                surplusAmt = surplusAmt + entity.getAmt();
+                surplusAmt = surplusAmt + entity.getWzAmt();
                 log.info("Reset surplusAmt:[{}]", surplusAmt);
             }
         }
