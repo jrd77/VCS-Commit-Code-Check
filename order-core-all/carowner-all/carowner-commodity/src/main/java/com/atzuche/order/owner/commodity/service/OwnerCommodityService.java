@@ -181,7 +181,8 @@ public class OwnerCommodityService {
                         List<LocalDateTime> collect = localDateTimesSet.stream().sorted((x,y)->x.compareTo(y)).collect(Collectors.toList());
                         if(collect.size()>=2){
                             OwnerGoodsPriceDetailEntity ownerGoodsPriceDetailEntity = dbRevertTimeGroup.get(collect.get(collect.size() - 2)).get(0);
-                            if(revertTime.isEqual(ownerGoodsPriceDetailEntity.getRevertTime())){
+                            if(revertTime.toLocalDate().isEqual(ownerGoodsPriceDetailEntity.getRevertTime().toLocalDate()) &&
+                                    (revertTime.isBefore(ownerGoodsPriceDetailEntity.getRevertTime()) || ownerGoodsPriceDetailEntity.getRevertTime().isEqual(revertTime))){
                                 log.info("恰好到分组的交界点上，跳过此条数据ownerGoodsPriceDetailEntity={}",JSON.toJSONString(ownerGoodsPriceDetailEntity));
                                 ownerGoodsPriceDetailList.clear();
                             }
