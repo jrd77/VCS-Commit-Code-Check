@@ -15,10 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author <a href="mailto:lianglin.sjtu@gmail.com">AndySjtu</a>
@@ -33,6 +35,20 @@ public class ConfigSDKFactory implements ConfigService {
     private ConfigFeignService configFeignService;
 
     private volatile  boolean inited = false;
+
+    private ScheduledExecutorService scheduledExecutorService= Executors.newScheduledThreadPool(2);
+
+    @PostConstruct
+    public void start(){
+        init();
+        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                logger.info("start to refresh config");
+                init();
+            }
+        },300,300,TimeUnit.SECONDS);
+    }
     
 
     /**
