@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -170,12 +168,26 @@ public class OwnerCommodityService {
             log.info("combination-时间提前-dbRevertTimeGroup={}", JSON.toJSONString(dbRevertTimeGroup));
             OwnerGoodsPriceDetailEntity lastGroup = dbGoodsPriceList.stream()
                     .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
-                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay())).findFirst().get();
+                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay()))
+                    .sorted((x,y) -> y.getRevertTime().compareTo(x.getRevertTime()))
+                    .findFirst().get();
+
             log.info("combination-时间提前-lastGroup={}", JSON.toJSONString(lastGroup));
             dbRevertTimeGroup.forEach((k,v)->{
                 if(lastGroup.getRevertTime().isEqual(k)){//最后的一段
-                    log.info("combination-时间提前-最后一段跟revert相等的情况 k={},v={}",k,JSON.toJSONString(v));
                     List<OwnerGoodsPriceDetailEntity> ownerGoodsPriceDetailList = dbRevertTimeGroup.get(lastGroup.getRevertTime());
+                    if(revertTime.toLocalDate().isEqual(ownerGoodsPriceDetailList.get(0).getCarDay())){
+                        Set<LocalDateTime> localDateTimesSet = dbRevertTimeGroup.keySet();
+                        List<LocalDateTime> collect = localDateTimesSet.stream().sorted((x,y)->x.compareTo(y)).collect(Collectors.toList());
+                        if(collect.size()>=2){
+                            OwnerGoodsPriceDetailEntity ownerGoodsPriceDetailEntity = dbRevertTimeGroup.get(collect.get(collect.size() - 2)).get(0);
+                            if(revertTime.isEqual(ownerGoodsPriceDetailEntity.getRevertTime())){
+                                log.info("恰好到分组的交界点上，跳过此条数据ownerGoodsPriceDetailEntity={}",JSON.toJSONString(ownerGoodsPriceDetailEntity));
+                                ownerGoodsPriceDetailList.clear();
+                            }
+                        }
+                    }
+                    log.info("combination-时间提前-最后一段跟revert相等的情况 k={},v={}",k,JSON.toJSONString(v));
                     ownerGoodsPriceDetailList.stream().forEach(x->{
                         log.info("combination-时间提前-最后一段跟revert相等的情况dbRevertTimeGroup.value={}",JSON.toJSONString(x));
                         if(x.getCarDay().isEqual(revertTime.toLocalDate())){
