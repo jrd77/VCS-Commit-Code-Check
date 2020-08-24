@@ -32,10 +32,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -54,7 +51,7 @@ public class OrderPhotoService {
 	public String aliyunOssUrl;
 
 
-	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, String type) {
+	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, List<Integer> type) {
 		List<OrderPhotoEntity> photoList = orderPhotoMapper.queryGetSrvCarList(orderNo,type);
 		List<OrderPhotoDTO> carPhotoList = new ArrayList();
 		if(CollectionUtils.isNotEmpty(photoList)) {
@@ -222,7 +219,7 @@ public class OrderPhotoService {
     }
 
     public void downLoadImgs(String orderNo,Integer photoType,HttpServletResponse response) throws IOException {
-        List<OrderPhotoDTO> getCarList =queryGetSrvCarList(orderNo, String.valueOf(photoType));
+        List<OrderPhotoDTO> getCarList =queryGetSrvCarList(orderNo, Arrays.asList(photoType));
         String zipName = orderNo;
         if(PhotoTypeEnum.GET_CAR_SERVICE_VOUCHER.getType() == photoType){
             zipName += "取车服务凭证";
