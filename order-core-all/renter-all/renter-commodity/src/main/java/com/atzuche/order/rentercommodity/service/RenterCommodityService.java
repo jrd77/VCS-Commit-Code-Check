@@ -7,14 +7,13 @@ import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.rentercommodity.entity.RenterGoodsPriceDetailEntity;
 import com.atzuche.order.rentercommodity.mapper.RenterGoodsPriceDetailMapper;
 import com.autoyol.platformcost.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
  * @Description: 租客商品 - 对外模块提供接口类
  * 
  **/
+@Slf4j
 @Service
 public class RenterCommodityService {
     @Autowired
@@ -150,10 +150,25 @@ public class RenterCommodityService {
                     .collect(Collectors.groupingBy(RenterGoodsPriceDetailEntity::getRevertTime));
             RenterGoodsPriceDetailEntity lastGroup = dbGoodsPriceList.stream()
                     .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
-                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay())).findFirst().get();
+                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay()))
+                    .sorted((x,y) -> y.getRevertTime().compareTo(x.getRevertTime()))
+                    .findFirst().get();
             dbRevertTimeGroup.forEach((k,v)->{
                 if(lastGroup.getRevertTime().isEqual(k)){//最后的一段
                     List<RenterGoodsPriceDetailEntity> renterGoodsPriceDetailList = dbRevertTimeGroup.get(lastGroup.getRevertTime());
+                    if(revertTime.toLocalDate().isEqual(renterGoodsPriceDetailList.get(0).getCarDay())){
+                        Set<LocalDateTime> localDateTimesSet = dbRevertTimeGroup.keySet();
+                        List<LocalDateTime> collect = localDateTimesSet.stream().sorted((x,y)->x.compareTo(y)).collect(Collectors.toList());
+                        if(collect.size()>=2){
+                            RenterGoodsPriceDetailEntity renterGoodsPriceDetailEntity = dbRevertTimeGroup.get(collect.get(collect.size() - 2)).get(0);
+                            if(revertTime.toLocalDate().isEqual(renterGoodsPriceDetailEntity.getRevertTime().toLocalDate()) &&
+                                    (revertTime.isBefore(renterGoodsPriceDetailEntity.getRevertTime()) || renterGoodsPriceDetailEntity.getRevertTime().isEqual(revertTime))){
+                                log.info("恰好到分组的交界点上，跳过此条数据ownerGoodsPriceDetailEntity={}",JSON.toJSONString(renterGoodsPriceDetailEntity));
+                                renterGoodsPriceDetailList.clear();
+                            }
+                        }
+                    }
+
                     renterGoodsPriceDetailList.stream().forEach(x->{
                         if(x.getCarDay().isEqual(revertTime.toLocalDate())){
                             float Hlast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(revertTime.toLocalDate()));
@@ -184,10 +199,8 @@ public class RenterCommodityService {
                 }
             });
 
-            List<RenterGoodsPriceDetailDTO> collect = newRenterGoodsPriceList.stream()
-                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
-                    .collect(Collectors.toList());
-            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(collect);
+            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
+            log.info("combination-renterGoodsDetailDTO.renterGoodsPriceDetailDTOList={}",JSON.toJSONString(newRenterGoodsPriceList));
         }
     }
 
