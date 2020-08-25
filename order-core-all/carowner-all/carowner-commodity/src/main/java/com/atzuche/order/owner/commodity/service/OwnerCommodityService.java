@@ -222,11 +222,8 @@ public class OwnerCommodityService {
                 }
             });
 
-            List<OwnerGoodsPriceDetailDTO> collect = newOwnerGoodsPriceList.stream()
-                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
-                    .collect(Collectors.toList());
-            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(collect);
-            log.info("combination-ownerGoodsDetailDTO.ownerGoodsPriceDetailDTOList={}",JSON.toJSONString(collect));
+            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
+            log.info("combination-ownerGoodsDetailDTO.ownerGoodsPriceDetailDTOList={}",JSON.toJSONString(newOwnerGoodsPriceList));
         }
     }
     //初始化设置小时数和分组日期

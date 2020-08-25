@@ -199,10 +199,8 @@ public class RenterCommodityService {
                 }
             });
 
-            List<RenterGoodsPriceDetailDTO> collect = newRenterGoodsPriceList.stream()
-                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
-                    .collect(Collectors.toList());
-            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(collect);
+            renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
+            log.info("combination-renterGoodsDetailDTO.renterGoodsPriceDetailDTOList={}",JSON.toJSONString(newRenterGoodsPriceList));
         }
     }
 
