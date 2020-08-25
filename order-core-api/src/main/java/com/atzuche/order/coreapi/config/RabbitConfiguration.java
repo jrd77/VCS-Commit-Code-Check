@@ -260,6 +260,20 @@ public class RabbitConfiguration {
 		return BindingBuilder.bind(orderWzSettlementFailQueue()).to(orderWzSettlementFailExchange()).with(RabbitMqEnums.ORDER_WZ_SETTLEMENT_FAIL.getRoutingKey());
 	}
 
+    @Bean
+    public Queue wzHoldFeedBackQueue() {
+        return new Queue(RabbitMqEnums.WZ_HOLD_FEEDBACK.getQueueName(), true);
+    }
+
+    @Bean
+    public DirectExchange wzHoldFeedBackExchange() {
+        return new DirectExchange(RabbitMqEnums.WZ_HOLD_FEEDBACK.getExchange());
+    }
+
+    @Bean
+    public Binding wzHoldFeedBackBind() {
+        return BindingBuilder.bind(wzHoldFeedBackQueue()).to(wzHoldFeedBackExchange()).with(RabbitMqEnums.WZ_HOLD_FEEDBACK.getRoutingKey());
+    }
 
 
     /**
