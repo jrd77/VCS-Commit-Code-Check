@@ -42,10 +42,9 @@ public class WzHoldFeedbackListener {
         try {
             Cat.logEvent(CatConstants.RABBIT_MQ_METHOD, "WzHoldFeedbackListener.process");
             Cat.logEvent(CatConstants.RABBIT_MQ_PARAM, jsonStr);
-            JSONObject jsonObject = JSONObject.fromObject(jsonStr);
-            if (Objects.nonNull(jsonObject)) {
-                messageHandle(jsonObject.get("orderNo").toString());
-            }
+            
+            messageHandle(jsonStr);
+
             t.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
             logger.error("对违章超6分暂扣押金.异常,jsonStr:[{}] , e :[{}]", jsonStr, e);
