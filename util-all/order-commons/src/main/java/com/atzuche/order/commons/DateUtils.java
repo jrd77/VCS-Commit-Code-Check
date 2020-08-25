@@ -226,14 +226,16 @@ public class DateUtils {
     				tmpD = String.valueOf(start_day);
     			}else {
     				tmpY = String.valueOf(end_year);
-    				if (end_month < 10) {
-    					tmpM = "0" + (end_month - 1);
-    				} else {
-    					tmpM = String.valueOf(end_month - 1);
-    				}
+    				tmpM = String.valueOf(end_month - 1);
     				tmpD = String.valueOf(start_day);
     			}
-    			String tmpTime = tmpY + tmpM + tmpD;
+    			if (StringUtils.isNotBlank(tmpM) && tmpM.length() == 1) {
+    				tmpM = "0"+tmpM;
+    			}
+    			if (StringUtils.isNotBlank(tmpD) && tmpD.length() == 1) {
+    				tmpD = "0"+tmpD;
+    			}
+    			String tmpTime = tmpY + "-" + tmpM + "-" + tmpD;
     			LocalDate tmpDate = LocalDate.parse(tmpTime, formatter);
     			d = ChronoUnit.DAYS.between(tmpDate, endDate);
     		}
@@ -241,6 +243,9 @@ public class DateUtils {
     			m = m - y * 12;
     		}
     		term = (y == 0 ? "" : y + "年") + (m == 0 ? "" : +m + "个月");
+    		if (y == 0 && m == 0) {
+    			term = "0个月";
+    		}
     	} catch (Exception e) {
     		term = startTime + "-" + endTime;
     		logger.error("getYearMonthDayFormate exception:", e);
