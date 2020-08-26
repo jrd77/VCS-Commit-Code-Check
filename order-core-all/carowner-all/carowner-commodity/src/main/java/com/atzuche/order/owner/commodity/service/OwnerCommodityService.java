@@ -170,7 +170,6 @@ public class OwnerCommodityService {
             //判断new_revert_time跟哪一个一天一价是临界点，移除当前组不需要的数据
             List<OwnerGoodsPriceDetailDTO> filterList = criticalCarDay(dbRevertTimeGroup,revertTime,belongGroup);
             //将dbRevertTimeGroup分组剩下的数据转化为集合
-
             newOwnerGoodsPriceList.addAll(filterList);
             ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
         }

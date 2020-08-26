@@ -158,8 +158,8 @@ public class RenterCommodityService {
             /*filterList = filterList.stream()
                     .sorted((y,x)->y.getRevertTime().compareTo(x.getRevertTime()))
                     .sorted((y,x)->y.getCarDay().compareTo(x.getCarDay()))
-                    .collect(Collectors.toList());
-            newRenterGoodsPriceList.addAll(filterList);*/
+                    .collect(Collectors.toList());*/
+            newRenterGoodsPriceList.addAll(filterList);
             renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
         }
     }
