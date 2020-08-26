@@ -42,7 +42,7 @@ public class RenterHandoverCarService{
         if(CollectionUtils.isEmpty(renterHandoverCarInfoEntityList)){
             return;
         }
-        renterHandoverCarInfoEntityList.stream().forEach(r -> {
+        renterHandoverCarInfoEntityList.forEach(r -> {
             if (r.getType().intValue() == RenterHandoverCarTypeEnum.OWNER_TO_RENTER.getValue() || r.getType().intValue() == RenterHandoverCarTypeEnum.RENYUN_TO_RENTER.getValue()) {
                 if (StringUtils.isNotBlank(handoverCarInfoReqDTO.getRenterReturnOil())) {
                     r.setOilNum(Integer.valueOf(handoverCarInfoReqDTO.getRenterReturnOil()));

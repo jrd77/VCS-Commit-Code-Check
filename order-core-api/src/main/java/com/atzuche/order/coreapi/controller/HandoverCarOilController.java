@@ -43,7 +43,7 @@ public class HandoverCarOilController {
     public ResponseData<?> updateHandoverCarInfo(@RequestBody HandoverCarInfoReqVO handoverCarReqVO) {
 
         logger.info("updateHandoverCarInfo param is {}",handoverCarReqVO);
-        handoverCarInfoService.updateNewHandoverCarInfo(handoverCarReqVO);
+        handoverCarInfoService.updateNewHandoverCarInfoForApp(handoverCarReqVO);
         return ResponseData.success();
 
     }

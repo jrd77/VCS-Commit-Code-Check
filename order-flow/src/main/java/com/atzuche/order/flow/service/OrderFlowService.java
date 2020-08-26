@@ -46,8 +46,8 @@ public class OrderFlowService {
 
     /**
      *获取订单状态流转列表
-     * @param orderFlowRequestVO
-     * @return
+     * @param orderFlowRequestVO 请求参数
+     * @return OrderFlowListResponseDTO
      */
     public OrderFlowListResponseDTO selectOrderFlowListByOrderNo(OrderFlowRequestDTO orderFlowRequestVO) {
         LOGGER.info("orderFlow list. param is >> [{}]", orderFlowRequestVO);
@@ -66,11 +66,8 @@ public class OrderFlowService {
         LOGGER.info("orderFlow list result is: [{}]", orderFlowList);
         return orderFlowListResponseVO;
     }
-    /*
-     * @Author ZhangBin
-     * @Date 2020/1/16 19:37
-     * @Description: 通过订单号获取流程状态
-     *
+    /**
+     * 通过订单号获取流程状态
      **/
     public OrderFlowEntity getByOrderNoAndStatus(String oderNo,Integer orderStatus){
         return orderFlowMapper.getByOrderNoAndStatus(oderNo,orderStatus);

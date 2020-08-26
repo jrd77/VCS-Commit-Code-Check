@@ -2,10 +2,13 @@ package com.atzuche.order.coreapi.service.remote;
 
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.CatConstants;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.exceptions.RemoteCallException;
 import com.atzuche.order.coreapi.submit.exception.*;
 import com.autoyol.car.api.CarRentalTimeApi;
 import com.autoyol.car.api.CarRentalTimeWriteApi;
+import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.dto.OwnerCancelDTO;
 import com.autoyol.car.api.model.vo.ResponseObject;
@@ -15,6 +18,8 @@ import com.dianping.cat.message.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /*
  * @Author ZhangBin
@@ -191,5 +196,43 @@ public class StockProxyService {
             }
             throw remoteCallException;
         }
+    }
+
+    /**
+     * 自取自还并使用虚拟地址 特殊处理
+     *
+     * @param param         扣除库存请求参数
+     * @param goods         商品信息
+     * @param srvGetFlag    取车服务标识:0-否 1-是
+     * @param srvReturnFlag 还车服务标识:0-否 1-是
+     */
+    public void cutCarStockParamSpecialHandle(OrderInfoDTO param, RenterGoodsDetailDTO goods,
+                                              Integer srvGetFlag, Integer srvReturnFlag) {
+        log.info("Special handle req param. param is, param:[{}], goods:[{}], srvGetFlag:[{}], srvReturnFlag:[{}]",
+                JSON.toJSONString(param), JSON.toJSONString(goods), srvGetFlag, srvReturnFlag);
+        if (Objects.isNull(goods)) {
+            return;
+        }
+
+        Integer carAddrIndex = goods.getCarAddrIndex();
+        if (Objects.isNull(carAddrIndex) || carAddrIndex == OrderConstant.ZERO) {
+            return;
+        }
+
+        if (srvGetFlag == OrderConstant.NO) {
+            param.getGetCarAddress().setFlag(OrderConstant.YES);
+            param.getGetCarAddress().setCarAddress(goods.getCarShowAddr());
+            param.getGetCarAddress().setLon(Double.valueOf(goods.getCarShowLon()));
+            param.getGetCarAddress().setLat(Double.valueOf(goods.getCarShowLat()));
+        }
+
+        if (srvReturnFlag == OrderConstant.NO) {
+            param.getReturnCarAddress().setFlag(OrderConstant.YES);
+            param.getReturnCarAddress().setCarAddress(goods.getCarShowAddr());
+            param.getReturnCarAddress().setLon(Double.valueOf(goods.getCarShowLon()));
+            param.getReturnCarAddress().setLat(Double.valueOf(goods.getCarShowLat()));
+        }
+
+        log.info("Special handle req param. result is, param:[{}]", JSON.toJSONString(param));
     }
 }

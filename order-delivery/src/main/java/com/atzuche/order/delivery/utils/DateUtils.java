@@ -116,7 +116,6 @@ public class DateUtils extends org.apache.commons.lang.time.DateUtils {
 			date = calendar.getTime();   //这个时间就是日期往后推一天的结果 
 			return formate(date,format);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

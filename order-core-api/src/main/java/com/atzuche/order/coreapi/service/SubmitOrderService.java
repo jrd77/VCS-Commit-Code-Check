@@ -1,11 +1,9 @@
 package com.atzuche.order.coreapi.service;
 
 import com.alibaba.fastjson.JSON;
-import com.atzuche.config.client.api.CarChargeLevelConfigSDK;
 import com.atzuche.config.client.api.CityConfigSDK;
 import com.atzuche.config.client.api.DefaultConfigContext;
 import com.atzuche.config.client.api.SysConfigSDK;
-import com.atzuche.config.common.entity.CarChargeLevelConfigEntity;
 import com.atzuche.config.common.entity.CityEntity;
 import com.atzuche.config.common.entity.SysConfigEntity;
 import com.atzuche.order.accountrenterdeposit.vo.req.CreateOrderRenterDepositReqVO;
@@ -13,19 +11,15 @@ import com.atzuche.order.accountrenterwzdepost.vo.req.CreateOrderRenterWZDeposit
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.cashieraccount.service.CashierService;
 import com.atzuche.order.commons.CommonUtils;
-import com.atzuche.order.commons.DateUtils;
 import com.atzuche.order.commons.GlobalConstant;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.OrderReqContext;
-import com.atzuche.order.commons.SectionDeliveryUtils;
 import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.account.FreeDepositTypeEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.commons.vo.res.OrderResVO;
-import com.atzuche.order.commons.vo.res.SectionDeliveryVO;
 import com.atzuche.order.coreapi.common.conver.OrderCommonConver;
 import com.atzuche.order.coreapi.entity.dto.cost.OrderCostContext;
 import com.atzuche.order.coreapi.entity.vo.req.AutoCoinDeductReqVO;
@@ -49,12 +43,9 @@ import com.atzuche.order.parentorder.dto.OrderDTO;
 import com.atzuche.order.parentorder.dto.OrderSourceStatDTO;
 import com.atzuche.order.parentorder.dto.OrderStatusDTO;
 import com.atzuche.order.parentorder.dto.ParentOrderDTO;
-import com.atzuche.order.parentorder.entity.OrderStopFreightInfo;
-import com.atzuche.order.parentorder.service.OrderStopFreightInfoService;
 import com.atzuche.order.parentorder.service.ParentOrderService;
 import com.atzuche.order.rentercommodity.service.RenterCommodityService;
 import com.atzuche.order.rentercommodity.service.RenterGoodsService;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentermem.service.RenterMemberService;
 import com.atzuche.order.renterorder.service.OrderTransferRecordService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
@@ -66,8 +57,6 @@ import com.atzuche.order.renterwz.service.RenterOrderWzStatusService;
 import com.autoyol.car.api.model.dto.LocationDTO;
 import com.autoyol.car.api.model.dto.OrderInfoDTO;
 import com.autoyol.car.api.model.enums.OrderOperationTypeEnum;
-import com.autoyol.platformcost.model.FeeResult;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +67,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -268,17 +256,17 @@ public class SubmitOrderService {
             orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         } else {
             context.getRenterGoodsDetailDto().setIsAutoReplayFlag(0);
-            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus()); // 支付接单分离，默认下单待支付
+            // 支付接单分离，默认下单待支付
+            orderStatusDTO.setStatus(OrderStatusEnum.TO_PAY.getStatus());
         }
         parentOrderDTO.setOrderStatusDTO(orderStatusDTO);
 
         parentOrderService.saveParentOrderInfo(parentOrderDTO);
 
         //6.4 order_flow
-        Integer ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
+        int ownerStatus = OrderStatusEnum.TO_CONFIRM.getStatus();
         orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
         if (null != renterGoodsDetailDTO.getIsAutoReplayFlag() && renterGoodsDetailDTO.getIsAutoReplayFlag() == OrderConstant.YES) {
-            //orderFlowService.inserOrderStatusChangeProcessInfo(orderNo, OrderStatusEnum.TO_PAY);
             ownerStatus = OrderStatusEnum.TO_GET_CAR.getStatus();
         }
 
@@ -302,6 +290,9 @@ public class SubmitOrderService {
         if (AUTO_REPLY_FLAG.equals(context.getRenterGoodsDetailDto().getIsAutoReplayFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(context.getOrderReqVO());
             orderInfoDTO.setOrderNo(orderNo);
+            // 自取自还并使用虚拟地址 特殊处理
+            stockService.cutCarStockParamSpecialHandle(orderInfoDTO, context.getRenterGoodsDetailDto(),
+                    orderReqVO.getSrvGetFlag(), orderReqVO.getSrvReturnFlag());
             stockService.cutCarStock(orderInfoDTO);
         }
         
@@ -349,7 +340,7 @@ public class SubmitOrderService {
         // 配送订单处理
         deliveryCarService.addFlowOrderInfo(context);
         // 扣减车辆库存
-        cutStockHandle(orderNo, context.getRenterGoodsDetailDto().getIsAutoReplayFlag(), orderReqVO);
+        cutStockHandle(orderNo, context.getRenterGoodsDetailDto(), orderReqVO);
         return new OrderResVO(orderNo, String.valueOf(status), context.getRenterGoodsDetailDto().getIsAutoReplayFlag());
     }
 
@@ -358,14 +349,17 @@ public class SubmitOrderService {
      * 车辆库存扣减处理
      * <p>是自动应答的车辆才能锁库存，其他类型车辆要车主同意时才能锁库存。</p>
      *
-     * @param orderNo    订单号
-     * @param replyFlag  自动应答
-     * @param orderReqVO 请求参数
+     * @param orderNo     订单号
+     * @param goodsDetail 商品信息
+     * @param orderReqVO  请求参数
      */
-    private void cutStockHandle(String orderNo, Integer replyFlag, OrderReqVO orderReqVO) {
-        if (AUTO_REPLY_FLAG.equals(replyFlag)) {
+    private void cutStockHandle(String orderNo, RenterGoodsDetailDTO goodsDetail, OrderReqVO orderReqVO) {
+        if (AUTO_REPLY_FLAG.equals(goodsDetail.getReplyFlag())) {
             OrderInfoDTO orderInfoDTO = initOrderInfoDTO(orderReqVO);
             orderInfoDTO.setOrderNo(orderNo);
+            // 自取自还并使用虚拟地址 特殊处理
+            stockService.cutCarStockParamSpecialHandle(orderInfoDTO, goodsDetail,
+                    orderReqVO.getSrvGetFlag(), orderReqVO.getSrvReturnFlag());
             stockService.cutCarStock(orderInfoDTO);
         }
     }
@@ -572,19 +566,19 @@ public class SubmitOrderService {
     
     /**
      * 保存区间配送信息
-     * @param orderReqVO
-     * @param orderNo
-     * @param renterOrderNo
+     * @param orderReqVO 请求参数
+     * @param orderNo 订单号
+     * @param renterOrderNo 租客订单号
      */
     public void saveSectionDelivery(OrderReqVO orderReqVO, String orderNo, String renterOrderNo, RenterOrderDeliveryMode initMode) {
     	if (orderReqVO == null) {
     		return;
     	}
     	// 是否使用取车服务:0.否 1.是
-    	Integer srvGetFlag = orderReqVO.getSrvGetFlag() == null ? 0:orderReqVO.getSrvGetFlag();
+    	int srvGetFlag = orderReqVO.getSrvGetFlag() == null ? 0:orderReqVO.getSrvGetFlag();
     	// 是否使用还车服务:0.否 1.是
-    	Integer srvReturnFlag = orderReqVO.getSrvReturnFlag() == null ? 0:orderReqVO.getSrvReturnFlag();
-    	if (srvGetFlag.intValue() == 0 && srvReturnFlag.intValue() == 0) {
+    	int srvReturnFlag = orderReqVO.getSrvReturnFlag() == null ? 0:orderReqVO.getSrvReturnFlag();
+    	if (srvGetFlag == 0 && srvReturnFlag == 0) {
     		// 未使用取还车服务不需要计算
     		return;
     	}
@@ -601,17 +595,27 @@ public class SubmitOrderService {
                 .stream()
                 .filter(x -> GlobalConstant.GET_RETURN_ACCURATE_SRV.equals(x.getAppType()))
                 .collect(Collectors.toList());
-        SysConfigEntity sysGetAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-    	LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",JSON.toJSONString(sysGetAccurateAmt));
-        Integer getAccurateCost = (sysGetAccurateAmt==null||sysGetAccurateAmt.getItemValue()==null) ? null : Integer.valueOf(sysGetAccurateAmt.getItemValue());
-        SysConfigEntity sysReturnAccurateAmt = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst().get();
-    	LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",JSON.toJSONString(sysReturnAccurateAmt));
-        Integer returnAccurateCost = (sysReturnAccurateAmt==null||sysReturnAccurateAmt.getItemValue()==null) ? 30 : Integer.valueOf(sysReturnAccurateAmt.getItemValue());
+        Optional<SysConfigEntity> sysGetAccurateAmtOptional =
+                sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_GET_SRV_UNIT.equals(x.getItemKey())).findFirst();
+        if (sysGetAccurateAmtOptional.isPresent()) {
+            LOGGER.info("config-从配置中获取精准取车服务费单价sysGetAccurateAmt=[{}]",
+                    JSON.toJSONString(sysGetAccurateAmtOptional.get()));
+            Integer getAccurateCost = sysGetAccurateAmtOptional.get().getItemValue() == null ? 30 :
+                    Integer.valueOf(sysGetAccurateAmtOptional.get().getItemValue());
+            mode.setAccurateGetSrvUnit(getAccurateCost);
+        }
+
+
+        Optional<SysConfigEntity> sysReturnAccurateAmtOptional = sysConfigEntityList.stream().filter(x -> GlobalConstant.ACCURATE_RETURN_SRV_UNIT.equals(x.getItemKey())).findFirst();
+        if (sysReturnAccurateAmtOptional.isPresent()) {
+            LOGGER.info("config-从配置中获取精准还车服务费单价sysReturnAccurateAmt=[{}]",
+                    JSON.toJSONString(sysReturnAccurateAmtOptional.get()));
+            Integer returnAccurateCost = sysReturnAccurateAmtOptional.get().getItemValue() == null ? 30 : Integer.valueOf(sysReturnAccurateAmtOptional.get().getItemValue());
+            mode.setAccurateReturnSrvUnit(returnAccurateCost);
+        }
         mode.setId(null);
         mode.setOrderNo(orderNo);
         mode.setRenterOrderNo(renterOrderNo);
-        mode.setAccurateGetSrvUnit(getAccurateCost);
-        mode.setAccurateReturnSrvUnit(returnAccurateCost);
         mode.setDistributionMode(distributionMode);
         if (initMode != null) {
         	mode.setRenterProposalGetTime(initMode.getRenterProposalGetTime());

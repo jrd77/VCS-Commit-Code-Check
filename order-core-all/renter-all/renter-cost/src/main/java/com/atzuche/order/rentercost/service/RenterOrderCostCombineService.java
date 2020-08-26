@@ -1037,9 +1037,12 @@ public class RenterOrderCostCombineService {
         // 还车纬度
         String srvReturnLat = getReturnCarCostReqDto.getSrvReturnLat();
         // 车辆经度
-        String carLon = getReturnCarCostReqDto.getCarShowLon();
+        String carLon = StringUtils.isBlank(getReturnCarCostReqDto.getCarRealLon()) ?
+                getReturnCarCostReqDto.getCarShowLon() : getReturnCarCostReqDto.getCarRealLon();
         // 车辆纬度
-        String carLat = getReturnCarCostReqDto.getCarShowLat();
+        String carLat = StringUtils.isBlank(getReturnCarCostReqDto.getCarRealLat()) ?
+                getReturnCarCostReqDto.getCarShowLat() : getReturnCarCostReqDto.getCarRealLat();
+
         boolean getFlag = StringUtils.isBlank(srvGetLon) || StringUtils.isBlank(srvGetLat) || "0.0".equalsIgnoreCase(srvGetLon) || "0.0".equalsIgnoreCase(srvGetLat);
         boolean returnFlag = StringUtils.isBlank(srvReturnLon) || StringUtils.isBlank(srvReturnLat) || "0.0".equalsIgnoreCase(srvReturnLon) || "0.0".equalsIgnoreCase(srvReturnLat);
         CityDTO cityDTO = null;
