@@ -160,6 +160,7 @@ public class RenterCommodityService {
                     .sorted((y,x)->y.getCarDay().compareTo(x.getCarDay()))
                     .collect(Collectors.toList());*/
             newRenterGoodsPriceList.addAll(filterList);
+            log.info("一天一价列表实践提前filterList={}",JSON.toJSONString(filterList));
             renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
         }
     }
