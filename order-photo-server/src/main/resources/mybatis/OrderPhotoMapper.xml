@@ -86,9 +86,9 @@
 
 	<insert id="addRenYunUploadOrderPhoto" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity">
 		INSERT INTO
-		<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
-			order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator) VALUES(#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator});
-		</if>
+		order_car_condition_photo(photo_type,path,user_type,order_no,serial_number,operator)
+        VALUES
+        (#{photoType},#{path},#{userType},#{orderNo},#{serialNumber},#{operator})
 	</insert>
 
 	<select id="selectObjectByParams" parameterType="com.atzuche.order.photo.entity.OrderPhotoEntity" resultType="com.atzuche.order.photo.entity.OrderPhotoEntity">
@@ -97,10 +97,8 @@
 	</select>
 
 	<update id="updateUploadRenYunOrderPhoto" parameterType="map">
-	update
-	<if test="photoType==1||photoType==2 || photoType==6 || photoType==7">
+		update
 		order_car_condition_photo set path = #{path},user_type = #{userType},serial_number = #{serialNumber},operator = #{operator},photo_type = #{photoType} where id = #{photoId};
-	</if>
 	</update>
 
 

@@ -4,6 +4,8 @@ import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
+import com.atzuche.order.commons.vo.UserInvoiceOrdersParamsVO;
+import com.atzuche.order.commons.vo.UserInvoiceOrdersVO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
 import com.atzuche.order.coreapi.service.OrderBusinessService;
@@ -135,5 +137,12 @@ public class OrderBusinessController {
     public ResponseData<List<OwnerOrderSubsidyDetailDTO>> queryOwnerSubsidyByownerOrderNo(@RequestParam(name = "orderNo")String orderNo,@RequestParam(name = "ownerOrderNo")String ownerOrderNo){
         List<OwnerOrderSubsidyDetailDTO> ownerOrderSubsidyDetailDTOList = orderBusinessService.queryOwnerSubsidyByownerOrderNo(orderNo,ownerOrderNo);
         return ResponseData.success(ownerOrderSubsidyDetailDTOList);
+    }
+
+    @PostMapping("/orderBusiness/getInvoiceOrderInfo")
+    public ResponseData<List<UserInvoiceOrdersVO>> getInvoiceOrderInfo(@RequestBody UserInvoiceOrdersParamsVO userInvoiceOrdersParamsVO,BindingResult bindingResult){
+        BindingResultUtil.checkBindingResult(bindingResult);
+        List<UserInvoiceOrdersVO>  userInvoiceOrdersVOS = orderBusinessService.getInvoiceOrderInfo(userInvoiceOrdersParamsVO);
+        return ResponseData.success(userInvoiceOrdersVOS);
     }
 }

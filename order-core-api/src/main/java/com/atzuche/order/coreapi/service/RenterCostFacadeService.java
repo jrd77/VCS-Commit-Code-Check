@@ -210,6 +210,7 @@ public class RenterCostFacadeService {
         //获取驾驶行为评分和各项系数
         List<RenterInsureCoefficientVO> renterInsureCoefficientVOS = renterInsureCoefficientService.listRenterInsureCoefficientVO(renterOrderNo);
         basicCostDetailVO.setRenterInsureCoefficientVOS(renterInsureCoefficientVOS);
+        basicCostDetailVO.setRenterOrderNo(renterOrderNo);
         return basicCostDetailVO;
     }
     /*

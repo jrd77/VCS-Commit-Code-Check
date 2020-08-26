@@ -18,6 +18,7 @@ import com.atzuche.order.renterwz.mapper.RenterOrderWzCostDetailMapper;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzDetailMapper;
 import com.atzuche.order.renterwz.mapper.RenterOrderWzStatusMapper;
 import com.atzuche.order.renterwz.service.RenterOrderWzDetailService;
+import com.atzuche.order.renterwz.service.RenterOrderWzSettleFlagService;
 import com.atzuche.violation.common.AdminUserUtil;
 import com.atzuche.violation.common.AnnotationHandler;
 import com.atzuche.violation.common.CommonUtil;
@@ -76,6 +77,8 @@ public class ViolationInfoService {
     RenterOrderWzDetailLogService renterOrderWzDetailLogService;
     @Autowired
     RenterOrderWzDetailService renterOrderWzDetailService;
+    @Autowired
+    private RenterOrderWzSettleFlagService renterOrderWzSettleFlagService;
 
     private static final String ORDER_CENTER_WZ_WITHHOLD_EXCHANGE = "auto-order-center-wz";
     private static final String ORDER_CENTER_WZ_WITHHOLD_ROUTING_KEY = "order.center.wz.with.hold.feedback";
@@ -130,7 +133,11 @@ public class ViolationInfoService {
         for (ViolationResVO violationResVO: violationResDesVOList) {
             violationResVO.setOrderType("普通订单");
             if (org.apache.commons.lang3.StringUtils.isNotBlank(violationResVO.getWzInfo())) {
-                violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(Integer.valueOf(violationResVO.getWzInfo())));
+                if(org.apache.commons.lang3.StringUtils.equals(violationResVO.getWzInfo(), "2")) {
+                    violationResVO.setWzInfo("有违章");
+                } else {
+                    violationResVO.setWzInfo("无违章");
+                }
             }else {
                 violationResVO.setWzInfo(WzInfoStatusEnum.getStatusDesc(3));
             }
@@ -353,6 +360,12 @@ public class ViolationInfoService {
                 } else {
                     b++;
                 }
+                /**
+                 * 有违章修改违章状态
+                 */
+                renterOrderWzSettleFlagService.updateIsIllegal(renterOrderWzDetail.getOrderNo(),renterOrderWzDetail.getCarPlateNum(),2, "管理后台违章导入");
+                renterOrderWzSettleFlagService.updateIsIllegalCost(renterOrderWzDetail.getOrderNo(),1,AdminUserUtil.getAdminUser().getAuthName(),renterOrderWzDetail.getCarPlateNum());
+
                 RenterOrderWzDetailLogEntity entity = new RenterOrderWzDetailLogEntity();
                 try{
                     String wzContent = RenterOrderWzDetailLogEntity.getWzContent(DateUtils.formate(renterOrderWzDetailEntity.getIllegalTime(), DateUtils.DATE_DEFAUTE1),

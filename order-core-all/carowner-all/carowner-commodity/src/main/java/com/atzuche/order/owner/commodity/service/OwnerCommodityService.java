@@ -1,21 +1,22 @@
 package com.atzuche.order.owner.commodity.service;
 
+import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.OwnerGoodsPriceDetailDTO;
 import com.atzuche.order.owner.commodity.entity.OwnerGoodsPriceDetailEntity;
 import com.atzuche.order.owner.commodity.mapper.OwnerGoodsPriceDetailMapper;
 import com.autoyol.platformcost.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class OwnerCommodityService {
     @Autowired
@@ -57,8 +58,10 @@ public class OwnerCommodityService {
      * @param orderContextDto
      */
     public OwnerGoodsDetailDTO setPriceAndGroup(OwnerGoodsDetailDTO ownerGoodsDetailDTO){
+        log.info("setPriceAndGroup.ownerGoodsDetailDTO={}",JSON.toJSONString(ownerGoodsDetailDTO));
         init(ownerGoodsDetailDTO);
         combination(ownerGoodsDetailDTO);
+
         return ownerGoodsDetailDTO;
     }
 
@@ -107,11 +110,13 @@ public class OwnerCommodityService {
 
 
         if(dbPriceMaxCarDay.getRevertTime().isBefore(revertTime)){//时间延后
+
             //过滤出revert_time时间最大的一个分组，比数据库中revert_time大的数据用新的，比据库中revert_time小的数据用数据库的，库中的最后一条数据特殊处理
             //使用carday分组
             Map<LocalDate, List<OwnerGoodsPriceDetailEntity>> carDayGroupMap = dbGoodsPriceList
                     .stream()
                     .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getCarDay));
+            log.info("combination-时间延后carDayGroupMap={}",JSON.toJSONString(carDayGroupMap));
             ownerGoodsPriceDetailDTOList.forEach(x->{
                 LocalDate carDay = x.getCarDay();
                 List<OwnerGoodsPriceDetailEntity> dbMapValue = carDayGroupMap.get(carDay);
@@ -124,8 +129,12 @@ public class OwnerCommodityService {
                         ownerGoods.setRevertTime(y.getRevertTime());
                         newOwnerGoodsPriceList.add(ownerGoods);
                     });
-
-                    float HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    float HFirst = 0;
+                    if(x.isMaxDay()){
+                        HFirst = CommonUtils.getTotalHoursByRentAveragePrice(dbPriceMaxCarDay.getRevertTime(),x.getRevertTime());
+                    }else{
+                        HFirst = CommonUtils.getHolidayTopHours(dbPriceMaxCarDay.getRevertTime(), LocalDateTimeUtils.localdateToString(carDay));
+                    }
                     OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
                     ownerGoods.setCarHourCount(HFirst);
                     ownerGoods.setCarDay(x.getCarDay());
@@ -156,13 +165,32 @@ public class OwnerCommodityService {
                     .stream()
                     .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
                     .collect(Collectors.groupingBy(OwnerGoodsPriceDetailEntity::getRevertTime));
+            log.info("combination-时间提前-dbRevertTimeGroup={}", JSON.toJSONString(dbRevertTimeGroup));
             OwnerGoodsPriceDetailEntity lastGroup = dbGoodsPriceList.stream()
                     .filter(x->(x.getCarDay().isBefore(revertTime.toLocalDate()) || x.getCarDay().isEqual(revertTime.toLocalDate())))
-                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay())).findFirst().get();
+                    .sorted((x, y) -> y.getCarDay().compareTo(x.getCarDay()))
+                    .sorted((x,y) -> y.getRevertTime().compareTo(x.getRevertTime()))
+                    .findFirst().get();
+
+            log.info("combination-时间提前-lastGroup={}", JSON.toJSONString(lastGroup));
             dbRevertTimeGroup.forEach((k,v)->{
                 if(lastGroup.getRevertTime().isEqual(k)){//最后的一段
                     List<OwnerGoodsPriceDetailEntity> ownerGoodsPriceDetailList = dbRevertTimeGroup.get(lastGroup.getRevertTime());
+                    if(revertTime.toLocalDate().isEqual(ownerGoodsPriceDetailList.get(0).getCarDay())){
+                        Set<LocalDateTime> localDateTimesSet = dbRevertTimeGroup.keySet();
+                        List<LocalDateTime> collect = localDateTimesSet.stream().sorted((x,y)->x.compareTo(y)).collect(Collectors.toList());
+                        if(collect.size()>=2){
+                            OwnerGoodsPriceDetailEntity ownerGoodsPriceDetailEntity = dbRevertTimeGroup.get(collect.get(collect.size() - 2)).get(0);
+                            if(revertTime.toLocalDate().isEqual(ownerGoodsPriceDetailEntity.getRevertTime().toLocalDate()) &&
+                                    (revertTime.isBefore(ownerGoodsPriceDetailEntity.getRevertTime()) || ownerGoodsPriceDetailEntity.getRevertTime().isEqual(revertTime))){
+                                log.info("恰好到分组的交界点上，跳过此条数据ownerGoodsPriceDetailEntity={}",JSON.toJSONString(ownerGoodsPriceDetailEntity));
+                                ownerGoodsPriceDetailList.clear();
+                            }
+                        }
+                    }
+                    log.info("combination-时间提前-最后一段跟revert相等的情况 k={},v={}",k,JSON.toJSONString(v));
                     ownerGoodsPriceDetailList.stream().forEach(x->{
+                        log.info("combination-时间提前-最后一段跟revert相等的情况dbRevertTimeGroup.value={}",JSON.toJSONString(x));
                         if(x.getCarDay().isEqual(revertTime.toLocalDate())){
                             float Hlast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(revertTime.toLocalDate()));
                             OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
@@ -181,6 +209,7 @@ public class OwnerCommodityService {
                         }
                     });
                 }else{//其他的
+                    log.info("combination-时间提前-其他的情况-k={},v={}",k,JSON.toJSONString(v));
                     v.forEach(x->{
                         OwnerGoodsPriceDetailDTO ownerGoods = new OwnerGoodsPriceDetailDTO();
                         ownerGoods.setCarHourCount(x.getCarHourCount());
@@ -189,13 +218,12 @@ public class OwnerCommodityService {
                         ownerGoods.setRevertTime(x.getRevertTime());
                         newOwnerGoodsPriceList.add(ownerGoods);
                     });
+
                 }
             });
 
-            List<OwnerGoodsPriceDetailDTO> collect = newOwnerGoodsPriceList.stream()
-                    .filter(x -> x.getRevertTime().isEqual(revertTime) || x.getRevertTime().isBefore(revertTime))
-                    .collect(Collectors.toList());
-            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(collect);
+            ownerGoodsDetailDTO.setOwnerGoodsPriceDetailDTOList(newOwnerGoodsPriceList);
+            log.info("combination-ownerGoodsDetailDTO.ownerGoodsPriceDetailDTOList={}",JSON.toJSONString(newOwnerGoodsPriceList));
         }
     }
     //初始化设置小时数和分组日期
@@ -230,6 +258,7 @@ public class OwnerCommodityService {
             float HLast = CommonUtils.getHolidayFootHours(revertTime, LocalDateTimeUtils.localdateToString(dateLast));
             ownerGoodsPriceDetailDto.setRevertTime(revertTime);
             ownerGoodsPriceDetailDto.setCarHourCount(HLast);
+            ownerGoodsPriceDetailDto.setMaxDay(true);
         }
     }
 

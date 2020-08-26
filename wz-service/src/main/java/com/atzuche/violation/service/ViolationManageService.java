@@ -103,6 +103,7 @@ public class ViolationManageService {
             updateTransWzDisposeStatus(violationHandleRequestVO.getOrderNo(),violationHandleRequestVO.getPlateNum(),RENTER_HANDLE_WZ_DISPOSE_STATUS);
         } else {
             renterOrderWzSettleFlagService.updateIsIllegal(violationHandleRequestVO.getOrderNo(),violationHandleRequestVO.getPlateNum(),HAS_ILLEGAL_NO, AdminUserUtil.getAdminUser().getAuthName());
+            renterOrderWzSettleFlagService.updateIsIllegalCost(violationHandleRequestVO.getOrderNo(),0,AdminUserUtil.getAdminUser().getAuthName(),violationHandleRequestVO.getPlateNum());
         }
     }
 

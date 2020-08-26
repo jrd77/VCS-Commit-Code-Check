@@ -18,7 +18,8 @@ public enum  RabbitMqEnums {
     ORDER_PRESETTLEMENT("auto-order-status","status.order.preSettlement","status.order.preSettlement.queue"),
     ORDER_END("auto-order-status","status.order.end","status.order.end.queue"),
     ORDER_WZ_SETTLEMENT_SUCCESS("auto-order-action","action.order.wz.settlement.success","action.order.wz.settlement.success.queue"),
-    ORDER_WZ_SETTLEMENT_FAIL("auto-order-action","action.order.wz.settlement.fail","action.order.wz.settlement.fail.queue");
+    ORDER_WZ_SETTLEMENT_FAIL("auto-order-action","action.order.wz.settlement.fail","action.order.wz.settlement.fail.queue"),
+    WZ_HOLD_FEEDBACK("auto-order-center-wz","order.center.wz.with.hold.feedback","order.center.wz.with.hold.feedback.queue");
 
     private String exchange;
 

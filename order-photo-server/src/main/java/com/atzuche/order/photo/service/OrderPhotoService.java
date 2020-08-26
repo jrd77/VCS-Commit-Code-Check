@@ -6,6 +6,7 @@ import com.atzuche.order.photo.dto.OrderPhotoDTO;
 import com.atzuche.order.photo.dto.TransIllegalPhotoDTO;
 import com.atzuche.order.photo.entity.OrderPhotoEntity;
 import com.atzuche.order.photo.dto.PhotoPathDTO;
+import com.atzuche.order.photo.enums.PhotoTypeEnum;
 import com.atzuche.order.photo.enums.UserTypeEnum;
 import com.atzuche.order.photo.mapper.OrderPhotoMapper;
 import com.atzuche.order.photo.mq.AliyunMnsService;
@@ -19,15 +20,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class OrderPhotoService {
@@ -39,6 +50,8 @@ public class OrderPhotoService {
 
 	@Autowired
 	private RenterGoodsService renterGoodsService;
+	@Value("${aliyun.oss.url}")
+	public String aliyunOssUrl;
 
 
 	public List<OrderPhotoDTO> queryGetSrvCarList(String orderNo, String type) {
@@ -208,7 +221,62 @@ public class OrderPhotoService {
         orderPhotoMapper.updateUploadRenYunOrderPhoto(photoId,path,operator,userType,photoType,serialNumber);
     }
 
+    public void downLoadImgs(String orderNo,Integer photoType,HttpServletResponse response) throws IOException {
+        List<OrderPhotoDTO> getCarList =queryGetSrvCarList(orderNo, String.valueOf(photoType));
+        String zipName = orderNo;
+        if(PhotoTypeEnum.GET_CAR_SERVICE_VOUCHER.getType() == photoType){
+            zipName += "取车服务凭证";
+        }else if(PhotoTypeEnum.RETURN_CAR_SERVICE_VOUCHER.getType() == photoType){
+            zipName += "还车服务凭证";
+        }
+        List<String> urls = Optional
+                .ofNullable(getCarList)
+                .orElseGet(ArrayList::new)
+                .stream().map(x -> aliyunOssUrl + x.getPath())
+                .collect(Collectors.toList());
+        compressToZip(urls,zipName,orderNo,response);
+    }
 
+    /*
+     * @Author ZhangBin
+     * @Date 2020/8/11 11:28 
+     * @Description:
+     * filesUrl：需要压缩的图片地址集合
+     * zipName: 压缩文件的名称
+     * prefixName：单个文件的文件名
+     **/
+    public void compressToZip(List<String> filesUrl ,String zipName,String prefixName,HttpServletResponse response) throws IOException {
+        String[] files = new String[filesUrl.size()];
+        filesUrl.toArray(files);
+        //2.开始批量下载功能
+        try {
+            String downloadFilename = zipName+".zip";//文件的名称
+            downloadFilename = URLEncoder.encode(downloadFilename, "UTF-8");//转换中文否则可能会产生乱码
+            response.setContentType("application/octet-stream");// 指明response的返回对象是文件流
+            response.setHeader("Content-Disposition", "attachment;filename=" + downloadFilename);// 设置在下载框默认显示的文件名
+            ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
+            for (int i = 0; i < files.length; i++) {
+                try{
+                    String suffixType = files[i].substring(files[i].lastIndexOf("."));
+                    URL url = new URL(files[i]);
 
-
+                    zos.putNextEntry(new ZipEntry(prefixName+"-"+i+suffixType));
+                    InputStream fis = url.openConnection().getInputStream();
+                    byte[] buffer = new byte[1024];
+                    int r = 0;
+                    while ((r = fis.read(buffer)) != -1) {
+                        zos.write(buffer, 0, r);
+                    }
+                    fis.close();
+                }catch (Exception e){
+                    logger.error("图片异常,跳过文件-files={}",files,e);
+                }
+            }
+            zos.flush();
+            zos.close();
+        } catch (Exception e) {
+            logger.error("图片批量下载异常",e);
+            throw e;
+        }
+    }
 }
