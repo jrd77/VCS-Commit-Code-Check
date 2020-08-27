@@ -155,10 +155,6 @@ public class RenterCommodityService {
             LocalDateTime belongGroup = belongGroup(dbRevertTimeGroup,revertTime);
             //判断new_revert_time跟哪一个一天一价是临界点，移除当前组不需要的数据
             List<RenterGoodsPriceDetailDTO> filterList = criticalCarDay(dbRevertTimeGroup,revertTime,belongGroup);
-            /*filterList = filterList.stream()
-                    .sorted((y,x)->y.getRevertTime().compareTo(x.getRevertTime()))
-                    .sorted((y,x)->y.getCarDay().compareTo(x.getCarDay()))
-                    .collect(Collectors.toList());*/
             newRenterGoodsPriceList.addAll(filterList);
             log.info("一天一价列表实践提前filterList={}",JSON.toJSONString(filterList));
             renterGoodsDetailDTO.setRenterGoodsPriceDetailDTOList(newRenterGoodsPriceList);
