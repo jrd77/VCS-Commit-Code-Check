@@ -12,8 +12,11 @@ public class QuZhiHuanZhunshiVO {
 	private String realRentTime;
 	@AutoDocProperty(value = "租客实际取车时间/车主实际送达时间 yyyy-MM-dd HH:mm")
 	private String realRevertTime;
-	@AutoDocProperty(value = "取车提前时间（使用取车服务时），单位为分钟(车主)")
+	@AutoDocProperty(value = "取车提前时间，单位为分钟(车主)")
 	private Integer getCarBeforeTime;
+    @AutoDocProperty(value = "还车延后时间，单位为分钟(车主)")
+    private Integer returnCarAfterTime;
+
 	@AutoDocProperty(value = "精准取车服务费单价")
 	private Integer accurateGetSrvUnit;
 	/**
@@ -63,5 +66,12 @@ public class QuZhiHuanZhunshiVO {
 	public void setAccurateGetSrvUnit(Integer accurateGetSrvUnit) {
 		this.accurateGetSrvUnit = accurateGetSrvUnit;
 	}
-	
+
+    public Integer getReturnCarAfterTime() {
+        return returnCarAfterTime;
+    }
+
+    public void setReturnCarAfterTime(Integer returnCarAfterTime) {
+        this.returnCarAfterTime = returnCarAfterTime;
+    }
 }

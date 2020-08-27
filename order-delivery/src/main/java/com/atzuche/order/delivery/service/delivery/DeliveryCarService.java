@@ -3,15 +3,22 @@ package com.atzuche.order.delivery.service.delivery;
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.commons.OrderReqContext;
 import com.atzuche.order.commons.constant.OrderConstant;
-import com.atzuche.order.commons.entity.dto.*;
+import com.atzuche.order.commons.entity.dto.OwnerGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
 import com.atzuche.order.commons.enums.CarOwnerTypeEnum;
+import com.atzuche.order.commons.enums.SrvGetReturnEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.delivery.common.DeliveryCarTask;
 import com.atzuche.order.delivery.common.DeliveryErrorCode;
 import com.atzuche.order.delivery.entity.OrderDeliveryFlowEntity;
 import com.atzuche.order.delivery.entity.RenterDeliveryAddrEntity;
 import com.atzuche.order.delivery.entity.RenterOrderDeliveryEntity;
-import com.atzuche.order.delivery.enums.*;
+import com.atzuche.order.delivery.enums.DeliveryTypeEnum;
+import com.atzuche.order.delivery.enums.ServiceTypeEnum;
+import com.atzuche.order.delivery.enums.UsedDeliveryTypeEnum;
+import com.atzuche.order.delivery.enums.UserTypeEnum;
 import com.atzuche.order.delivery.exception.DeliveryOrderException;
 import com.atzuche.order.delivery.service.OrderDeliveryFlowService;
 import com.atzuche.order.delivery.service.RenterOrderDeliveryService;
@@ -24,12 +31,12 @@ import com.atzuche.order.delivery.vo.handover.HandoverCarInfoDTO;
 import com.atzuche.order.delivery.vo.handover.HandoverCarVO;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercommodity.service.RenterGoodsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +65,8 @@ public class DeliveryCarService {
     OrderDeliveryFlowService deliveryFlowService;
     @Autowired
     OrderStatusService orderStatusService;
+    @Autowired
+    RenterGoodsService renterGoodsService;
 
     /**
      * 添加配送相关信息(是否下单，是否推送仁云)
@@ -77,8 +86,8 @@ public class DeliveryCarService {
 
         log.info("新增配送订单数据------>>>>> 租客地址信息 入参数：【{}】",
                 orderReqContext.getOrderReqVO().getSrvGetAddr());
-        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue().intValue());
-        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue().intValue());
+        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.OWNER_TYPE.getValue());
+        addRenYunFlowOrderInfo(getMinute, returnMinute, orderReqContext, UserTypeEnum.RENTER_TYPE.getValue());
     }
 
     /**
@@ -89,7 +98,7 @@ public class DeliveryCarService {
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
-        insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue().intValue());
+        insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.ADD_TYPE.getValue());
         log.info(orderDeliveryVO.getOrderDeliveryDTO().toString());
     }
 
@@ -101,27 +110,45 @@ public class DeliveryCarService {
      * @param orderReqContext
      * @param orderType
      */
-    public void updateRenYunFlowOrderCarInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext, Integer orderType)
+    public void updateRenYunFlowOrderCarInfo(Integer getMinutes, Integer returnMinutes, OrderReqContext orderReqContext, Integer orderType, Boolean allowAddFlag)
     {
         OrderDeliveryVO orderDeliveryVO = createOrderDeliveryParams(getMinutes,returnMinutes,orderReqContext, orderType);
         if (null == orderDeliveryVO) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
         }
+        RenterGoodsDetailDTO goodsDto = orderDeliveryVO.getRenterGoodsDetailDTO();
+        int carAddrIndex = Objects.nonNull(goodsDto) && Objects.nonNull(goodsDto.getCarAddrIndex()) ? goodsDto.getCarAddrIndex() : OrderConstant.ZERO;
+        OrderReqVO orderReqVO = orderReqContext.getOrderReqVO();
+        Integer getAndReturnSrvFlag = null;
+        if (orderType != null && orderType.intValue() == SrvGetReturnEnum.SRV_GET_TYPE.getCode()) {
+        	getAndReturnSrvFlag = orderReqVO == null ? null:orderReqVO.getSrvGetFlag();
+        } else if (orderType != null && orderType.intValue() == SrvGetReturnEnum.SRV_RETURN_TYPE.getCode()) {
+        	getAndReturnSrvFlag = orderReqVO == null ? null:orderReqVO.getSrvReturnFlag();
+        }
+        int noticeRenYunFlag = deliveryCarTask.getNoticeRenYunFlag(null, getAndReturnSrvFlag, carAddrIndex);
+        int type = OrderConstant.ZERO == noticeRenYunFlag ? OrderConstant.ONE:OrderConstant.TWO;
         //开始取消仁云订单数据
         Future<Boolean> result = cancelRenYunFlowOrderInfo(new CancelOrderDeliveryVO().setRenterOrderNo(orderDeliveryVO.getOrderDeliveryDTO().getRenterOrderNo())
-                .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())),2);
-        if (result.isDone()) {
+                .setCancelFlowOrderDTO(new CancelFlowOrderDTO().setOrdernumber(orderDeliveryVO.getOrderDeliveryDTO().getOrderNo()).setServicetype(orderDeliveryVO.getOrderDeliveryFlowEntity().getServiceType())),type);
+        if (OrderConstant.ZERO == noticeRenYunFlag) {
+        	return;
+        }
+        if (result.isDone() && allowAddFlag != null && allowAddFlag) {
             //开始新增数据并发送仁云
-            //insertRenterDeliveryInfoAndDeliveryAddressInfo(getMinutes, returnMinutes, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
             RenYunFlowOrderDTO renYunFlowOrderDTO = createRenYunDTO(orderDeliveryVO.getOrderDeliveryFlowEntity());
-            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
+            renYunFlowOrderDTO.setPickUpCarSrvFlag(getAndReturnSrvFlag == null ? null:String.valueOf(getAndReturnSrvFlag));
+            
+            renYunFlowOrderDTO.setUseVirtualAddrFlag(carAddrIndex > OrderConstant.ZERO ?
+                    String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
+            deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, noticeRenYunFlag, orderDeliveryVO.getRenterGoodsDetailDTO());
         }
     }
 
 
     /**
      * 发送配送订单到仁云 提供给外层回调
-     * @param renterOrderNo
+     *
+     * @param renterOrderNo 租客订单号
      */
     public void sendDataMessageToRenYun(String renterOrderNo) {
         List<RenterOrderDeliveryEntity> renterOrderDeliveryEntities = renterOrderDeliveryService.listRenterOrderDeliveryByRenterOrderNo(renterOrderNo);
@@ -130,9 +157,20 @@ public class DeliveryCarService {
             log.info("没有找到当前子订单的仁云配送订单信息：renterOrderNo：{}", renterOrderNo);
             return;
         }
+
+        RenterGoodsDetailDTO goodsDto = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
+        int carAddrIndex = Objects.nonNull(goodsDto) && Objects.nonNull(goodsDto.getCarAddrIndex()) ?
+                goodsDto.getCarAddrIndex() : OrderConstant.ZERO;
+
         for (RenterOrderDeliveryEntity renterOrderDeliveryEntity : renterOrderDeliveryEntities) {
-            if (renterOrderDeliveryEntity.getIsNotifyRenyun().intValue() == 1) {
-                OrderDeliveryFlowEntity orderDeliveryFlowEntity = deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(), renterOrderDeliveryEntity.getType().intValue() == 1 ? "take" : "back");
+            int noticeRenYunFlag = deliveryCarTask.getNoticeRenYunFlag(renterOrderDeliveryEntity.getIsNotifyRenyun(),
+                    null,
+                    carAddrIndex);
+            log.info("DeliveryCarService.getNoticeRenYunFlag. result is, noticeRenYunFlag:[{}]", noticeRenYunFlag);
+            if(noticeRenYunFlag > OrderConstant.ZERO) {
+                OrderDeliveryFlowEntity orderDeliveryFlowEntity =
+                        deliveryFlowService.selectOrderDeliveryFlowByOrderNo(renterOrderDeliveryEntity.getOrderNo(),
+                                renterOrderDeliveryEntity.getType() == OrderConstant.ONE ? "take" : "back");
                 if (Objects.isNull(orderDeliveryFlowEntity)) {
                     continue;
                 }
@@ -141,9 +179,12 @@ public class DeliveryCarService {
                 if (Objects.isNull(renYunFlowOrderDTO)) {
                     continue;
                 }
-                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO);
-            }
+                renYunFlowOrderDTO.setPickUpCarSrvFlag(noticeRenYunFlag == OrderConstant.ONE ? String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
+                renYunFlowOrderDTO.setUseVirtualAddrFlag(carAddrIndex > OrderConstant.ZERO ?
+                        String.valueOf(OrderConstant.YES) : String.valueOf(OrderConstant.NO));
 
+                deliveryCarTask.addRenYunFlowOrderInfo(renYunFlowOrderDTO, noticeRenYunFlag, goodsDto);
+            }
         }
     }
 
@@ -157,7 +198,7 @@ public class DeliveryCarService {
         OrderDeliveryVO orderDeliveryVO = new OrderDeliveryVO();
         orderDeliveryVO.setOrderDeliveryDTO(updateFlowOrderVO.getOrderDeliveryDTO());
         orderDeliveryVO.setRenterDeliveryAddrDTO(updateFlowOrderVO.getRenterDeliveryAddrDTO());
-        insertRenterDeliveryInfoAndDeliveryAddressInfo(0, 0, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue().intValue());
+        insertRenterDeliveryInfoAndDeliveryAddressInfo(0, 0, orderDeliveryVO, DeliveryTypeEnum.UPDATE_TYPE.getValue());
     }
 
     /**
@@ -173,7 +214,6 @@ public class DeliveryCarService {
     /**
      * 取消配送订单到仁云流程系统
      */
-    @Transactional(rollbackFor = Exception.class)
     public Future<Boolean> cancelRenYunFlowOrderInfo(CancelOrderDeliveryVO cancelOrderDeliveryVO,Integer type) {
         if (null == cancelOrderDeliveryVO || cancelOrderDeliveryVO.getCancelFlowOrderDTO() == null || StringUtils.isBlank(cancelOrderDeliveryVO.getRenterOrderNo())) {
             throw new DeliveryOrderException(DeliveryErrorCode.DELIVERY_PARAMS_ERROR);
@@ -214,8 +254,8 @@ public class DeliveryCarService {
                 orderDeliveryEntity.setStatus(1);
                 orderDeliveryEntity.setIsDelete(0);
                 renterOrderDeliveryService.insert(orderDeliveryEntity);
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.RENTER_TYPE.getValue());
+                addHandoverCarInfo(orderDeliveryEntity, getMinutes, returnMinutes, UserTypeEnum.OWNER_TYPE.getValue());
             } else {
                 RenterOrderDeliveryEntity lastOrderDeliveryEntity = renterOrderDeliveryService.findRenterOrderByrOrderNo(orderDeliveryEntity.getOrderNo(), orderDeliveryEntity.getType());
                 if (null == lastOrderDeliveryEntity) {
@@ -232,11 +272,12 @@ public class DeliveryCarService {
                 lastOrderDeliveryEntity.setIsDelete(0);
                 lastOrderDeliveryEntity.setStatus(2);
                 renterOrderDeliveryService.insert(lastOrderDeliveryEntity);
-                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue().intValue());
-                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue().intValue());
+
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.RENTER_TYPE.getValue());
+                addHandoverCarInfo(lastOrderDeliveryEntity, 0, 0, UserTypeEnum.OWNER_TYPE.getValue());
                 OrderDeliveryFlowEntity orderDeliveryFlowEntity = createUpdateFlow(lastOrderDeliveryEntity,lastOrderDeliveryEntity.getType(),orderDeliveryVO.getOrderDeliveryDTO());
                 if (orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime() != null) {
-                	if (orderDeliveryVO.getOrderDeliveryDTO().getType() != null && orderDeliveryVO.getOrderDeliveryDTO().getType().intValue() == 1) {
+                	if (orderDeliveryVO.getOrderDeliveryDTO().getType() != null && orderDeliveryVO.getOrderDeliveryDTO().getType() == 1) {
                 		orderDeliveryFlowEntity.setBeforeTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
                 	} else {
                 		orderDeliveryFlowEntity.setAfterTime(DateUtils.formate(orderDeliveryVO.getOrderDeliveryDTO().getAheadOrDelayLocalDateTime(), DateUtils.DATE_DEFAUTE_1));
@@ -354,7 +395,7 @@ public class DeliveryCarService {
         orderDeliveryDTO.setRenterPhone(renterMemberDTO.getPhone());
         orderDeliveryDTO.setOrderNo(renterGoodsDetailDTO.getOrderNo());
         orderDeliveryDTO.setRenterDealCount(renterMemberDTO.getOrderSuccessCount());
-        orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue().intValue());
+        orderDeliveryDTO.setIsNotifyRenyun(UsedDeliveryTypeEnum.NO_USED.getValue());
         orderDeliveryDTO.setOwnerGetReturnAddr(ownerGoodsDetailDTO.getCarRealAddr());
         orderDeliveryDTO.setOwnerGetReturnAddrLat(ownerGoodsDetailDTO.getCarRealLat());
         orderDeliveryDTO.setOwnerGetReturnAddrLon(ownerGoodsDetailDTO.getCarRealLon());
@@ -385,7 +426,7 @@ public class DeliveryCarService {
         orderDeliveryFlowEntity.setTenantName(renterMemberDTO.getRealName());
         orderDeliveryFlowEntity.setTenantPhone(renterMemberDTO.getPhone());
         orderDeliveryFlowEntity.setTenantTurnoverNo(String.valueOf(renterMemberDTO.getOrderSuccessCount()));
-        orderDeliveryFlowEntity.setOwnerType(Integer.valueOf(ownerGoodsDetailDTO.getCarOwnerType()));
+        orderDeliveryFlowEntity.setOwnerType(ownerGoodsDetailDTO.getCarOwnerType());
         //需要订单来源场景名称20200525
         orderDeliveryFlowEntity.setSceneName(orderReqVO.getSceneCode());
 
@@ -396,10 +437,8 @@ public class DeliveryCarService {
         //内部分类 1:普通,2:套餐,3:长租
         String renyunOrderType = "0";
         if (StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "1".equals(orderReqVO.getOrderCategory())) {
-//            orderDeliveryFlowEntity.setOrderType("0");
         	renyunOrderType = "0";
         } else if(StringUtils.isNotBlank(orderReqVO.getOrderCategory()) && "3".equals(orderReqVO.getOrderCategory())) {
-//        	orderDeliveryFlowEntity.setOrderType("8");
         	renyunOrderType = "8";
         }
         orderDeliveryFlowEntity.setOrderType(renyunOrderType);
@@ -477,7 +516,6 @@ public class DeliveryCarService {
      * @param serviceType
      * @param cancelOrderDeliveryVO
      */
-    @Transactional(rollbackFor = Exception.class)
     public void addHandoverInfo(String renterOrderNo, Integer serviceType,CancelOrderDeliveryVO cancelOrderDeliveryVO,Integer type) {
         RenterOrderDeliveryEntity orderDelivery = renterOrderDeliveryService.findRenterOrderByrOrderNo(cancelOrderDeliveryVO.getCancelFlowOrderDTO().getOrdernumber(), serviceType);
 
@@ -507,5 +545,6 @@ public class DeliveryCarService {
         changeOrderInfoDTO.setIsPayDeposit(orderStatusEntity.getDepositPayStatus()==null?"0":String.valueOf(orderStatusEntity.getDepositPayStatus()));
         deliveryCarTask.changeRenYunFlowOrderInfo(changeOrderInfoDTO);
     }
+
 
 }

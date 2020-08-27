@@ -1,6 +1,7 @@
 package com.atzuche.order.coreapi.service;
 
 import com.atzuche.order.car.CarProxyService;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.enums.OrderStatusEnum;
 import com.atzuche.order.commons.enums.RenterChildStatusEnum;
@@ -571,6 +572,24 @@ public class ModifyOrderForOwnerService {
 		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
 	}
 	
+	
+	/**
+	 * 计算提前延后时间(车辆只用虚拟地址自取或自还)
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeResVO
+	 */
+	public CarRentTimeRangeDTO getVirtualCarRentTimeRangeResVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = getVirtualCarRentTimeRangeReqVO(modifyOrderDTO);
+		if (carRentTimeRangeReqVO == null) {
+			return null;
+		}
+		return carRentalTimeApiService.getCarRentTimeRange(carRentTimeRangeReqVO);
+	}
+	
+	
 	/**
 	 * 封装获取提前延后的对象
 	 * @param modifyOrderDTO
@@ -597,6 +616,36 @@ public class ModifyOrderForOwnerService {
 		carRentTimeRangeReqVO.setSrvReturnFlag(modifyOrderDTO.getSrvReturnFlag());
 		carRentTimeRangeReqVO.setSrvReturnLat(modifyOrderDTO.getRevertCarLat());
 		carRentTimeRangeReqVO.setSrvReturnLon(modifyOrderDTO.getRevertCarLon());
+		return carRentTimeRangeReqVO;
+	}
+	
+	
+	/**
+	 * 封装获取提前延后的对象(车辆只用虚拟地址自取或自还)
+	 * @param modifyOrderDTO
+	 * @return CarRentTimeRangeReqVO
+	 */
+	public CarRentTimeRangeReqVO getVirtualCarRentTimeRangeReqVO(ModifyOrderOwnerDTO modifyOrderDTO) {
+		if (modifyOrderDTO == null) {
+			return null;
+		}
+		OwnerGoodsDetailDTO ownerGoodsDetailDTO = modifyOrderDTO.getOwnerGoodsDetailDTO();
+		if (ownerGoodsDetailDTO == null || ownerGoodsDetailDTO.getCarNo() == null) {
+			return null;
+		}
+		CarRentTimeRangeReqVO carRentTimeRangeReqVO = new CarRentTimeRangeReqVO();
+		carRentTimeRangeReqVO.setCarNo(String.valueOf(ownerGoodsDetailDTO.getCarNo()));
+		carRentTimeRangeReqVO.setCityCode(modifyOrderDTO.getCityCode()+"");
+		carRentTimeRangeReqVO.setRentTime(modifyOrderDTO.getRentTime());
+		carRentTimeRangeReqVO.setRevertTime(modifyOrderDTO.getRevertTime());
+		carRentTimeRangeReqVO.setSrvGetAddr(ownerGoodsDetailDTO.getCarShowAddr());
+		carRentTimeRangeReqVO.setSrvGetFlag(OrderConstant.ONE);
+		carRentTimeRangeReqVO.setSrvGetLat(ownerGoodsDetailDTO.getCarShowLat());
+		carRentTimeRangeReqVO.setSrvGetLon(ownerGoodsDetailDTO.getCarShowLon());
+		carRentTimeRangeReqVO.setSrvReturnAddr(ownerGoodsDetailDTO.getCarShowAddr());
+		carRentTimeRangeReqVO.setSrvReturnFlag(OrderConstant.ONE);
+		carRentTimeRangeReqVO.setSrvReturnLat(ownerGoodsDetailDTO.getCarShowLat());
+		carRentTimeRangeReqVO.setSrvReturnLon(ownerGoodsDetailDTO.getCarShowLon());
 		return carRentTimeRangeReqVO;
 	}
 	

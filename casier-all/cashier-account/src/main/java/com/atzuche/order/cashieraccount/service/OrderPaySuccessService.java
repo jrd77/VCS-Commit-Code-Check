@@ -63,14 +63,17 @@ public class OrderPaySuccessService {
         		// 加锁
         		OrderStatusEntity orderStatus = orderStatusService.getOrderStatusForUpdate(vo.getOrderNo());
         		if (orderStatus != null && orderStatus.getStatus() != null) {
-        			if(OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus().intValue()) {
+        			if(OrderStatusEnum.CLOSED.getStatus() == orderStatus.getStatus()) {
         				log.info("当前订单状态=[{}]，无需重复修改订单状态，orderNo=[{}]",orderStatus.getStatus(),vo.getOrderNo());
         				return;
         			}
-        		}
-        		
-        		
-        		if(OrderStatusEnum.TO_GET_CAR.getStatus() > orderStatus.getStatus().intValue()) {
+        		} else {
+                    log.warn("Not found order status data.");
+        		    return ;
+                }
+
+
+        		if(OrderStatusEnum.TO_GET_CAR.getStatus() > orderStatus.getStatus()) {
 	            	// 获取车主子订单状态
 	            	OwnerOrderEntity ownerOrder = ownerOrderService.getOwnerOrderByOrderNoAndIsEffective(vo.getOrderNo());
 	            	int ownerStatus = ownerOrder.getOwnerStatus() == null ? 0:ownerOrder.getOwnerStatus();
@@ -103,7 +106,7 @@ public class OrderPaySuccessService {
 	                deliveryCarService.changeRenYunFlowOrderInfo(new ChangeOrderInfoDTO().setOrderNo(vo.getOrderNo()));
 	                log.info("payOrderCallBackSuccess saveOrderStatusInfo :[{}]", GsonUtils.toJson(orderStatusDTO));
         		}
-        		
+
 	            //更新配送 订单补付等信息 只有订单状态为已支付
 	            //callback
         		/**
@@ -115,7 +118,7 @@ public class OrderPaySuccessService {
 	            	callBack.callBack(vo.getMemNo(),vo.getOrderNo(),vo.getRenterOrderNo(),vo.getIsPayAgain(),vo.getIsGetCar());
 	                
 	            }
-	            
+
         	}
         }
     }

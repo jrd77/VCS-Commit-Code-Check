@@ -33,7 +33,6 @@ public class SecondaryEmailTaskTest {
 		try {
 			secondaryEmailTask.execute("");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

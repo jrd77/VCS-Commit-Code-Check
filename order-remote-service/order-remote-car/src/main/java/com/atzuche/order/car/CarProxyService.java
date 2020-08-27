@@ -252,7 +252,7 @@ public class CarProxyService {
         renterGoodsDetailDto.setRentTime(reqVO.getRentTime());
         renterGoodsDetailDto.setRevertTime(reqVO.getRevertTime());
 
-        renterGoodsDetailDto.setCarAddrIndex(Integer.valueOf(reqVO.getAddrIndex()));
+        renterGoodsDetailDto.setCarAddrIndex(reqVO.getAddrIndex());
 
         renterGoodsDetailDto.setCarStewardPhone(carSteward==null||carSteward.getStewardPhone()==null ? "" : String.valueOf(carSteward.getStewardPhone()));
         renterGoodsDetailDto.setCarCheckStatus(carDetect == null ? null : carDetect.getDetectStatus());

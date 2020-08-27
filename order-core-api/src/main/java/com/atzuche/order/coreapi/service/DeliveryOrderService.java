@@ -5,6 +5,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.atzuche.order.car.CarRentTimeRangeReqDTO;
+import com.atzuche.order.car.CarRentalTimeProxyService;
+import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.entity.dto.CarRentTimeRangeDTO;
+import com.atzuche.order.commons.vo.res.QuZhiHuanZhunshiVO;
+import com.atzuche.order.commons.vo.res.SummarySectionDeliveryVO;
+import com.atzuche.order.commons.vo.res.ZhiquZhihuanVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,11 +92,14 @@ public class DeliveryOrderService {
 	private RenterOrderDeliveryModeService renterOrderDeliveryModeService;
 	@Autowired
 	private RenterGoodsService renterGoodsService;
- 
-	/**
+	@Autowired
+    private CarRentalTimeProxyService carRentalTimeProxyService;
+
+    /**
      * 获取配送相关信息
-     * @param deliveryCarDTO
-     * @return
+     *
+     * @param deliveryCarDTO 请求参数
+     * @return DeliveryCarVO
      */
     public DeliveryCarVO findDeliveryListByOrderNo(DeliveryCarRepVO deliveryCarDTO) {
         log.info("入参deliveryCarDTO：[{}]", deliveryCarDTO.toString());
@@ -97,30 +108,69 @@ public class DeliveryOrderService {
         RenterGoodsDetailDTO renterGoodsDetailDTO = renterCommodityService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
         OwnerGetAndReturnCarDTO ownerGetAndReturnCarDTO = OwnerGetAndReturnCarDTO.builder().build();
         ownerGetAndReturnCarDTO.setRanLiao(String.valueOf(OilCostTypeEnum.getOilCostType(renterGoodsDetailDTO.getCarEngineType())));
-        String daykM = renterGoodsDetailDTO.getCarDayMileage().intValue() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
+        String daykM = renterGoodsDetailDTO.getCarDayMileage() == 0 ? "不限" : String.valueOf(renterGoodsDetailDTO.getCarDayMileage());
         ownerGetAndReturnCarDTO.setDayKM(daykM);
-        ownerGetAndReturnCarDTO.setOilContainer(String.valueOf(renterGoodsDetailDTO.getCarOilVolume()) + "L");
-        //boolean isEscrowCar = CarTypeEnum.isCarType(renterGoodsDetailDTO.getCarType());
+        ownerGetAndReturnCarDTO.setOilContainer(renterGoodsDetailDTO.getCarOilVolume() + "L");
         int carType = renterGoodsDetailDTO.getCarType();
         int oilTotalCalibration = renterGoodsDetailDTO.getOilTotalCalibration() == null ? 16 : renterGoodsDetailDTO.getOilTotalCalibration();
         DeliveryCarVO deliveryCarVO = deliveryCarInfoService.findDeliveryListByOrderNo(renterOrderEntity.getRenterOrderNo(), deliveryCarDTO, ownerGetAndReturnCarDTO, renterGoodsDetailDTO.getCarEngineType(), carType, renterGoodsDetailDTO);
         deliveryCarVO.setMaxOilNumber(String.valueOf(oilTotalCalibration));
         // 获取区间配送信息
         RenterOwnerSummarySectionDeliveryVO summary = getRenterOwnerSummarySectionDeliveryVO(renterOrderEntity, deliveryCarVO);
-        deliveryCarVO.setSectionDelivery(summary);
         // 获取商品信息
-        //RenterGoodsDetailDTO carInfo = renterGoodsService.getRenterGoodsDetail(renterOrderEntity.getRenterOrderNo(), false);
-        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex().intValue() == 0) {
-        	// 非虚拟地址
-        	deliveryCarVO.setGetCarShowAddr("非虚拟地址");
-        	deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
-            deliveryCarVO.setUseVirtualAddrFlag(0);
+        if (renterGoodsDetailDTO.getCarAddrIndex() == null || renterGoodsDetailDTO.getCarAddrIndex() == 0) {
+            // 非虚拟地址
+            deliveryCarVO.setGetCarShowAddr("非虚拟地址");
+            deliveryCarVO.setReturnCarShowAddr("非虚拟地址");
+            deliveryCarVO.setUseVirtualAddrFlag(OrderConstant.NO);
         } else {
-        	// 虚拟地址
-        	deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
-        	deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
-            deliveryCarVO.setUseVirtualAddrFlag(1);
+            // 虚拟地址
+            deliveryCarVO.setGetCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+            deliveryCarVO.setReturnCarShowAddr(renterGoodsDetailDTO.getCarShowAddr());
+            deliveryCarVO.setUseVirtualAddrFlag(OrderConstant.YES);
+
+            OrderEntity orderEntity = orderService.getOrderEntity(deliveryCarDTO.getOrderNo());
+            // 自取自还并使用了虚拟地址 特殊处理
+            boolean srvGetFlag =
+                    Objects.nonNull(renterOrderEntity.getIsGetCar()) && renterOrderEntity.getIsGetCar() == OrderConstant.YES;
+            boolean srvReturnFlag =
+                    Objects.nonNull(renterOrderEntity.getIsReturnCar()) && renterOrderEntity.getIsReturnCar() == OrderConstant.YES;
+            // 计算提前延后时间
+            CarRentTimeRangeReqDTO reqDTO = new CarRentTimeRangeReqDTO();
+            reqDTO.setCarNo(renterGoodsDetailDTO.getCarNo().toString());
+            reqDTO.setCityCode(orderEntity.getCityCode());
+            reqDTO.setRentTime(orderEntity.getExpRentTime());
+            reqDTO.setRevertTime(orderEntity.getExpRevertTime());
+            reqDTO.setSrvGetFlag(OrderConstant.YES);
+            reqDTO.setSrvGetAddr(renterGoodsDetailDTO.getCarShowAddr());
+            reqDTO.setSrvGetLat(renterGoodsDetailDTO.getCarShowLat());
+            reqDTO.setSrvGetLon(renterGoodsDetailDTO.getCarShowLon());
+            reqDTO.setSrvReturnFlag(OrderConstant.YES);
+            reqDTO.setSrvReturnAddr(renterGoodsDetailDTO.getCarShowAddr());
+            reqDTO.setSrvReturnLat(renterGoodsDetailDTO.getCarShowLat());
+            reqDTO.setSrvReturnLon(renterGoodsDetailDTO.getCarShowLon());
+            CarRentTimeRangeDTO dto = carRentalTimeProxyService.getCarRentTimeRange(reqDTO);
+            SummarySectionDeliveryVO owner = summary.getOwner();
+            if (!srvGetFlag && !srvReturnFlag) {
+                // 自取自还并使用了虚拟地址 特殊处理
+                summary.setDistributionMode(OrderConstant.YES);
+                ZhiquZhihuanVO zhiquZhihuanVO = owner.getZhiquZhihuanVO();
+                if(Objects.nonNull(dto)) {
+                    zhiquZhihuanVO.setExpectRentTime(LocalDateTimeUtils.formatDateTime(dto.getAdvanceStartDate()));
+                    zhiquZhihuanVO.setExpectRevertTime(LocalDateTimeUtils.formatDateTime(dto.getDelayEndDate()));
+                    zhiquZhihuanVO.setGetCarBeforeTime(dto.getGetMinutes());
+                    zhiquZhihuanVO.setReturnCarAfterTime(dto.getReturnMinutes());
+                }
+            } else if (srvGetFlag && !srvReturnFlag && summary.getDistributionMode() == OrderConstant.ONE) {
+                // 自还使用虚拟地址 特殊处理
+                QuZhiHuanZhunshiVO quZhiHuanZhunshiVO = owner.getQuZhiHuanZhunshiVO();
+                if(Objects.nonNull(dto)) {
+                    quZhiHuanZhunshiVO.setExpectRevertTime(LocalDateTimeUtils.formatDateTime(dto.getDelayEndDate()));
+                    quZhiHuanZhunshiVO.setReturnCarAfterTime(dto.getReturnMinutes());
+                }
+            }
         }
+        deliveryCarVO.setSectionDelivery(summary);
         return deliveryCarVO;
     }
     

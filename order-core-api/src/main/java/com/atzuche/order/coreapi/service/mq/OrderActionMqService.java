@@ -1,12 +1,9 @@
 package com.atzuche.order.coreapi.service.mq;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.atzuche.order.accountrenterrentcost.entity.AccountRenterCostDetailEntity;
 import com.atzuche.order.accountrenterrentcost.service.AccountRenterCostSettleService;
 import com.atzuche.order.commons.LocalDateTimeUtils;
 import com.atzuche.order.commons.enums.CancelSourceEnum;
-import com.atzuche.order.commons.enums.cashcode.RenterCashCodeEnum;
 import com.atzuche.order.commons.vo.req.OrderReqVO;
 import com.atzuche.order.coreapi.service.MqBuildService;
 import com.atzuche.order.coreapi.service.OrderCostService;
@@ -14,11 +11,9 @@ import com.atzuche.order.coreapi.service.RenterCostFacadeService;
 import com.atzuche.order.mq.common.base.BaseProducer;
 import com.atzuche.order.mq.common.base.OrderMessage;
 import com.atzuche.order.parentorder.service.OrderService;
-import com.atzuche.order.rentercost.entity.RenterOrderCostDetailEntity;
 import com.atzuche.order.rentercost.service.RenterOrderCostDetailService;
 import com.atzuche.order.search.dto.OrderInfoDTO;
 import com.autoyol.event.rabbit.neworder.*;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +25,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class OrderActionMqService {
@@ -128,7 +122,7 @@ public class OrderActionMqService {
      *
      * @param orderNo          订单号
      * @param cancelSourceEnum 取消来源
-     * @param actionEventEnum
+     * @param actionEventEnum  MQ事件
      */
     public void sendCancelOrderSuccess(String orderNo, CancelSourceEnum cancelSourceEnum, NewOrderMQActionEventEnum actionEventEnum, Map map) {
         OrderBaseDataMq orderBaseDataMq = mqBuildService.buildOrderBaseDataMq(orderNo);
@@ -329,9 +323,9 @@ public class OrderActionMqService {
         }
 
         List<String> orderNos = new ArrayList<>();
-        orderList.forEach(order -> {
+        for (OrderInfoDTO order : orderList) {
             orderNos.add(order.getOrderNo());
-        });
+        }
 
         OrderAgreeConflictMq orderAgreeConflictMq = new OrderAgreeConflictMq();
         orderAgreeConflictMq.setOrderNos(orderNos);
