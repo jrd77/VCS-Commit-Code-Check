@@ -118,7 +118,7 @@ public class SubmitOrderRiskAuditService {
         createOrderRiskCheckRequestVO.setRenterReturnAddrLat(submitOrderRiskCheckReqVO.getSrvReturnLat());
         createOrderRiskCheckRequestVO.setRenterReturnAddrLon(submitOrderRiskCheckReqVO.getSrvReturnLon());
 
-        createOrderRiskCheckRequestVO.setRenterGpsAddr(BizAreaUtil.getReqAddrFromLonLat(submitOrderRiskCheckReqVO.getPublicLatitude(), submitOrderRiskCheckReqVO.getPublicLongitude()));
+        createOrderRiskCheckRequestVO.setRenterGpsAddr(BizAreaUtil.getReqAddrFromLonLat(submitOrderRiskCheckReqVO.getPublicLongitude(), submitOrderRiskCheckReqVO.getPublicLatitude()));
         createOrderRiskCheckRequestVO.setRenterGpsAddrLat(submitOrderRiskCheckReqVO.getPublicLatitude());
         createOrderRiskCheckRequestVO.setRenterGpsAddrLon(submitOrderRiskCheckReqVO.getPublicLongitude());
 
