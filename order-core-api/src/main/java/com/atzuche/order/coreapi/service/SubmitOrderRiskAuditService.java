@@ -42,7 +42,7 @@ public class SubmitOrderRiskAuditService {
     /**
      * 风控审核
      *
-     * @param submitOrderRiskCheckReqVO 请求参数
+     * @param context 请求参数
      * @return Integer riskAuditId
      */
     public String check(OrderReqContext context) {
