@@ -56,7 +56,9 @@ public class DeliveryAsyncProxy {
      */
     public void sendMailByType(String serviceType, String actionType, String url, String orderNumber) {
         try {
-            String typeName = ServiceTypeEnum.TAKE_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_TAKE_TEXT : ServiceTypeEnum.BACK_TYPE.equals(serviceType) ? DeliveryConstants.SERVICE_BACK_TEXT : serviceType;
+            String typeName = ServiceTypeEnum.TAKE_TYPE.getValue().equals(serviceType) ?
+                    DeliveryConstants.SERVICE_TAKE_TEXT :
+                    ServiceTypeEnum.BACK_TYPE.getValue().equals(serviceType) ? DeliveryConstants.SERVICE_BACK_TEXT : serviceType;
             String interfaceName = "";
             switch (actionType) {
                 case DeliveryConstants.ADD_TYPE:
@@ -77,7 +79,7 @@ public class DeliveryAsyncProxy {
                 mailSendService.sendSimpleEmail(toEmails, EmailConstants.PROCESS_SYSTEM_NOTICE_SUBJECT, content);
             }
         } catch (Exception e) {
-            log.info("发送邮件失败---->>>>{}:", e);
+            log.info("发送邮件失败---->>>>", e);
         }
     }
 }

@@ -9,6 +9,8 @@ import com.atzuche.order.commons.exceptions.CommercialInsuranceAuditFailExceptio
 import com.atzuche.order.commons.exceptions.NotSupportLongRentException;
 import com.atzuche.order.commons.exceptions.NotSupportShortRentException;
 import com.atzuche.order.coreapi.service.remote.StockProxyService;
+import com.atzuche.order.delivery.common.DeliveryCarTask;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.constant.OrderConstant;
 import com.atzuche.order.commons.entity.dto.RenterGoodsDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterGoodsPriceDetailDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
@@ -67,6 +70,8 @@ public class ModifyOrderCheckService {
 	private OrderStatusService orderStatusService;
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private DeliveryCarTask deliveryCarTask;
 	
 	@Value("${auto.cost.configHours}")
     private Integer configHours;
@@ -102,6 +107,7 @@ public class ModifyOrderCheckService {
 		orderInfoDTO.setCityCode(modifyOrderDTO.getCityCode() != null ? Integer.valueOf(modifyOrderDTO.getCityCode()):null);
 		// 商品信息
 		RenterGoodsDetailDTO renterGoodsDetailDTO = modifyOrderDTO.getRenterGoodsDetailDTO();
+		int carAddrIndex = renterGoodsDetailDTO.getCarAddrIndex() == null ? 0:renterGoodsDetailDTO.getCarAddrIndex();
 		orderInfoDTO.setCarNo(renterGoodsDetailDTO.getCarNo());
 		orderInfoDTO.setStartDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderDTO.getRentTime()));
 		orderInfoDTO.setEndDate(LocalDateTimeUtils.localDateTimeToDate(modifyOrderDTO.getRevertTime()));
@@ -110,12 +116,27 @@ public class ModifyOrderCheckService {
 		getCarAddress.setFlag(modifyOrderDTO.getSrvGetFlag());
 		getCarAddress.setLat(modifyOrderDTO.getGetCarLat() != null ? Double.valueOf(modifyOrderDTO.getGetCarLat()):null);
 		getCarAddress.setLon(modifyOrderDTO.getGetCarLon() != null ? Double.valueOf(modifyOrderDTO.getGetCarLon()):null);
+		int getNoticeFlag = deliveryCarTask.getNoticeRenYunFlag(null, modifyOrderDTO.getSrvGetFlag(), carAddrIndex);
+		if (getNoticeFlag == OrderConstant.TWO) {
+			getCarAddress.setCarAddress(renterGoodsDetailDTO.getCarShowAddr());
+			getCarAddress.setFlag(OrderConstant.ONE);
+			getCarAddress.setLat(renterGoodsDetailDTO.getCarShowLat() != null ? Double.valueOf(renterGoodsDetailDTO.getCarShowLat()):null);
+			getCarAddress.setLon(renterGoodsDetailDTO.getCarShowLon() != null ? Double.valueOf(renterGoodsDetailDTO.getCarShowLon()):null);
+		}
 		orderInfoDTO.setGetCarAddress(getCarAddress);
 		LocationDTO returnCarAddress = new LocationDTO();
 		returnCarAddress.setCarAddress(modifyOrderDTO.getRevertCarAddress());
 		returnCarAddress.setFlag(modifyOrderDTO.getSrvReturnFlag());
 		returnCarAddress.setLat(modifyOrderDTO.getRevertCarLat() != null ? Double.valueOf(modifyOrderDTO.getRevertCarLat()):null);
 		returnCarAddress.setLon(modifyOrderDTO.getRevertCarLon() != null ? Double.valueOf(modifyOrderDTO.getRevertCarLon()):null);
+		int returnNoticeFlag = deliveryCarTask.getNoticeRenYunFlag(null, modifyOrderDTO.getSrvReturnFlag(), carAddrIndex);
+		if (returnNoticeFlag == OrderConstant.TWO) {
+			returnCarAddress.setCarAddress(renterGoodsDetailDTO.getCarShowAddr());
+			returnCarAddress.setFlag(OrderConstant.ONE);
+			returnCarAddress.setLat(renterGoodsDetailDTO.getCarShowLat() != null ? Double.valueOf(renterGoodsDetailDTO.getCarShowLat()):null);
+			returnCarAddress.setLon(renterGoodsDetailDTO.getCarShowLon() != null ? Double.valueOf(renterGoodsDetailDTO.getCarShowLon()):null);
+		}
+		
 		orderInfoDTO.setReturnCarAddress(returnCarAddress);
 		orderInfoDTO.setOperationType(OrderOperationTypeEnum.DDXGZQ.getType());
 		orderInfoDTO.setLongRent(0);

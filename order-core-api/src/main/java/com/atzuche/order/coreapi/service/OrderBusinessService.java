@@ -9,6 +9,7 @@ import com.atzuche.order.accountownerincome.utils.AccountOwnerIncomeExamineUtil;
 import com.atzuche.order.commons.entity.dto.*;
 import com.atzuche.order.commons.entity.orderDetailDto.OwnerOrderSubsidyDetailDTO;
 import com.atzuche.order.commons.entity.orderDetailDto.RenterDepositDetailDTO;
+import com.atzuche.order.commons.entity.wz.RenterOrderWzDetailLogEntity;
 import com.atzuche.order.commons.enums.CloseEnum;
 import com.atzuche.order.commons.enums.ExamineStatusEnum;
 import com.atzuche.order.commons.enums.NoticeSourceCodeEnum;
@@ -19,8 +20,11 @@ import com.atzuche.order.commons.exceptions.NoticeSourceNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderNotFoundException;
 import com.atzuche.order.commons.exceptions.OrderStatusNotFoundException;
 import com.atzuche.order.commons.exceptions.OwnerIncomeExamineNotFoundException;
+import com.atzuche.order.commons.vo.UserInvoiceOrdersParamsVO;
+import com.atzuche.order.commons.vo.UserInvoiceOrdersVO;
 import com.atzuche.order.commons.vo.req.OwnerUpdateSeeVO;
 import com.atzuche.order.commons.vo.req.RenterAndOwnerSeeOrderVO;
+import com.atzuche.order.commons.vo.res.RenterCostVO;
 import com.atzuche.order.owner.mem.service.OwnerMemberService;
 import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
 import com.atzuche.order.ownercost.entity.OwnerOrderSubsidyDetailEntity;
@@ -28,6 +32,7 @@ import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.ownercost.service.OwnerOrderSubsidyDetailService;
 import com.atzuche.order.parentorder.entity.OrderNoticeEntity;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
+import com.atzuche.order.parentorder.mapper.OrderMapper;
 import com.atzuche.order.parentorder.service.OrderNoticeService;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentermem.service.RenterMemberService;
@@ -37,6 +42,9 @@ import com.atzuche.order.renterorder.service.RenterDepositDetailService;
 import com.atzuche.order.renterorder.service.RenterOrderService;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.OwnerCosts;
+import com.atzuche.order.settle.vo.req.RentCosts;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +79,8 @@ public class OrderBusinessService {
     private OwnerOrderSubsidyDetailService ownerOrderSubsidyDetailService;
     @Autowired
     private AddIncomeExamineMapper addIncomeExamineMapper;
+    @Autowired
+    private OrderMapper orderMapper;
 
     public void renterAndOwnerSeeOrder(RenterAndOwnerSeeOrderVO renterAndOwnerSeeOrderVO) {
         String orderNo = renterAndOwnerSeeOrderVO.getOrderNo();
@@ -251,5 +261,29 @@ public class OrderBusinessService {
             ownerOrderSubsidyDetailDTOS.add(ownerOrderSubsidyDetailDTO);
         });
         return ownerOrderSubsidyDetailDTOS;
+    }
+
+    public List<UserInvoiceOrdersVO> getInvoiceOrderInfo(UserInvoiceOrdersParamsVO userInvoiceOrdersParamsVO) {
+        PageHelper.startPage(userInvoiceOrdersParamsVO.getPageNum(),userInvoiceOrdersParamsVO.getPageSize());
+        userInvoiceOrdersParamsVO.setInOrders(userInvoiceOrdersParamsVO.getIn());
+        List<UserInvoiceOrdersVO> userInvoiceOrdersVOS = orderMapper.getInvoiceOrderInfo(userInvoiceOrdersParamsVO);
+        if(userInvoiceOrdersVOS == null || userInvoiceOrdersVOS.size()<=0){
+            return new ArrayList<>();
+        }
+        userInvoiceOrdersVOS.forEach(x->{
+            String orderNo = x.getOrderNo();
+            String renterOrderNo = x.getRenterOrderNo();
+            RentCosts rentCost = orderSettleService.preRenterSettleOrder(orderNo, renterOrderNo);
+            RenterCostVO renterCostVO = orderSettleService.getRenterCostByOrderNo(orderNo, renterOrderNo,x.getRenterMemNo(),rentCost.getRenterCostAmtFinal());
+            int renterCostFeeYingkou = renterCostVO.getRenterCostFeeYingkou();
+            x.setInvoiceAmountGross(String.valueOf(renterCostFeeYingkou));
+            x.setOrderMoney(String.valueOf(renterCostFeeYingkou));
+            x.setVehicleName(x.getVehicleType()==null?"":x.getVehicleType() + x.getVehicleSeries()==null?"":x.getVehicleSeries());
+            x.setOrderType("0");//普通
+        });
+
+        PageInfo<UserInvoiceOrdersVO> pageInfo = new PageInfo<>(userInvoiceOrdersVOS);
+        List<UserInvoiceOrdersVO> list = pageInfo.getList();
+        return list;
     }
 }

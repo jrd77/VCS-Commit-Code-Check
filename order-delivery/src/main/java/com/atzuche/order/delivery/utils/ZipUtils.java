@@ -31,7 +31,6 @@ public class ZipUtils {
 			gzip.write(str.getBytes(StandardCharsets.UTF_8));
 			result = out.toString("UTF-8"); 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			IOUtils.closeQuietly(gzip);
@@ -63,7 +62,6 @@ public class ZipUtils {
 			}
 			result = out.toString("UTF-8");   
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally{
 			IOUtils.closeQuietly(gunzip);

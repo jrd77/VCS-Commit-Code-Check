@@ -205,7 +205,13 @@ public class PaymentService {
                 }
             }
         }
+        CashierRefundApplyDTO cashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.DEPOSIT, PayTypeEnum.PRE_FINISH, null, null);
+        PaymentResponseVO voFailure = convertPaymentFromCashierRefundApply(cashierRefundApplyDTOFailure);
+        if(voFailure != null)violationDepositSettlementPaymentList.add(voFailure);
 
+        CashierRefundApplyDTO rentcashierRefundApplyDTOFailure = filterCashierRefoundFailure(cashierRefundApplyDTOList, DataPayKindConstant.RENT, PayTypeEnum.PRE_FINISH, null, null);
+        PaymentResponseVO rentvoFailure = convertPaymentFromCashierRefundApply(rentcashierRefundApplyDTOFailure);
+        if(rentvoFailure != null)violationDepositSettlementPaymentList.add(rentvoFailure);
 		/**
 		 * 数据封装
 		 */
@@ -214,6 +220,32 @@ public class PaymentService {
 		respVo.setViolationDepositSettlementPaymentList(violationDepositSettlementPaymentList);
 		return respVo;
 	}
+
+    /*
+     * @Author ZhangBin
+     * @Date 2020/4/23 19:23
+     * @Description: 查询退款申请表 预授权完成失败的 --- 有可能租客余额不足
+     *
+     **/
+    public static CashierRefundApplyDTO filterCashierRefoundFailure(List<CashierRefundApplyDTO> list,
+                                                                    String dataPayKindConstant,
+                                                                    PayTypeEnum payTypeEnum,
+                                                                    LocalDateTime startTime,
+                                                                    LocalDateTime endTime){
+        Optional<CashierRefundApplyDTO> first = Optional.ofNullable(list)
+                .orElseGet(ArrayList::new)
+                .stream()
+                .filter(x ->dataPayKindConstant==null?true:dataPayKindConstant.equals(x.getPayKind()))
+                .filter(x->payTypeEnum.getCode().equals(x.getPayType()))
+                .filter(x->"01".equals(x.getStatus()))
+                .filter(x->startTime==null?true:(x.getCreateTime().isAfter(startTime) || x.getCreateTime().isEqual(startTime)))
+                .filter(x->endTime==null?true:x.getCreateTime().isBefore(endTime) || x.getCreateTime().isEqual(endTime))
+                .findFirst();
+        if(first.isPresent()){
+            return first.get();
+        }
+        return null;
+    }
     /**
      * 对象转换
      * @param OfflineRefundApplyEntity

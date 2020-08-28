@@ -378,10 +378,20 @@ public class RenYunFlowOrderDTO implements Serializable {
      */
     private String carRegNo;
 
-    /*
+    /**
      * 是否支付车辆押金
      * */
     private String isPayDeposit;
+
+    /**
+     * 是否使用取送车服务:0-否 1-是
+     */
+    private String pickUpCarSrvFlag;
+
+    /**
+     * 是否使用虚拟地址：0-否 1-是
+     */
+    private String useVirtualAddrFlag;
     
     public void setServiceTypeInfo(OrderDeliveryFlowEntity orderDeliveryFlowEntity) {
         if (orderDeliveryFlowEntity.getServiceType().equals(ServiceTypeEnum.TAKE_TYPE.getValue())) {
