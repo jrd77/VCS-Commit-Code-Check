@@ -42,7 +42,7 @@ public class SubmitOrderRiskAuditService {
     /**
      * 风控审核
      *
-     * @param submitOrderRiskCheckReqVO 请求参数
+     * @param context 请求参数
      * @return Integer riskAuditId
      */
     public String check(OrderReqContext context) {
@@ -118,7 +118,7 @@ public class SubmitOrderRiskAuditService {
         createOrderRiskCheckRequestVO.setRenterReturnAddrLat(submitOrderRiskCheckReqVO.getSrvReturnLat());
         createOrderRiskCheckRequestVO.setRenterReturnAddrLon(submitOrderRiskCheckReqVO.getSrvReturnLon());
 
-        createOrderRiskCheckRequestVO.setRenterGpsAddr(BizAreaUtil.getReqAddrFromLonLat(submitOrderRiskCheckReqVO.getPublicLatitude(), submitOrderRiskCheckReqVO.getPublicLongitude()));
+        createOrderRiskCheckRequestVO.setRenterGpsAddr(BizAreaUtil.getReqAddrFromLonLat(submitOrderRiskCheckReqVO.getPublicLongitude(), submitOrderRiskCheckReqVO.getPublicLatitude()));
         createOrderRiskCheckRequestVO.setRenterGpsAddrLat(submitOrderRiskCheckReqVO.getPublicLatitude());
         createOrderRiskCheckRequestVO.setRenterGpsAddrLon(submitOrderRiskCheckReqVO.getPublicLongitude());
 

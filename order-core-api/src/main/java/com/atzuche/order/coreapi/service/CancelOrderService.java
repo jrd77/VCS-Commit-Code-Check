@@ -246,7 +246,9 @@ public class CancelOrderService {
         CancelOrderJudgeDutyResDTO cancelOrderJudgeDutyRes = holidayService.isSubsidyFineAmt(reqContext, Integer.valueOf(reqVO.getWrongdoer()));
         //责任判定
         boolean isDispatch =
-                reqContext.getOrderStatusEntity().getIsDispatch() == OrderConstant.YES && reqContext.getOrderStatusEntity().getDispatchStatus() != 3;
+                reqContext.getOrderStatusEntity().getIsDispatch() == OrderConstant.YES
+                        && reqContext.getOrderStatusEntity().getDispatchStatus() != OrderConstant.THREE
+                        && reqContext.getOrderStatusEntity().getStatus() != OrderStatusEnum.CLOSED.getStatus();
         JudgeDutyResDTO judgeDutyResDTO = cancelOrderJudgeDutyService.judgeDuty(Integer.valueOf(reqVO.getWrongdoer()),
                 isDispatch,
                 cancelOrderJudgeDutyRes.getIsSubsidyFineAmt(), orderCancelReasonEntity.getCancelReqTime(), reqContext);
