@@ -26,4 +26,5 @@ public class OrderPhotoResponseVO {
 
     @AutoDocProperty(value = "违章缴纳凭证照片列表")
     private OrderViolationPhotoResponseVO OrderViolationPhotoResponseVO;
+
 }

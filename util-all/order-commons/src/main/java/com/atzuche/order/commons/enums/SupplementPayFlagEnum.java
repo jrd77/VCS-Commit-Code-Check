@@ -54,8 +54,15 @@ public enum SupplementPayFlagEnum {
     /**
      * 补付记录支付状态:30,违章押金结算转欠款
      */
-    PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT(30, "违章押金结算转欠款");
-
+    PAY_FLAG_VIOLATION_DEPOSIT_SETTLE_INTO_DEBT(30, "违章押金结算转欠款"),
+	
+	/**
+     * 补付记录支付状态:40,租车押金结算转欠款
+     */
+    PAY_FLAG_ZUCHE_DEPOSIT_SETTLE_INTO_DEBT(40, "租车押金结算转欠款"),
+    
+	PAY_FLAG_ZUCHEFEE_DEPOSIT_SETTLE_DEDUCT(50, "租车费用结算抵扣"),
+	PAY_FLAG_ZUCHEFEE_DEPOSIT_SETTLE_INTO_DEBT(60, "租车费用结算转欠款");
 
     /**
      * 支付状态编码

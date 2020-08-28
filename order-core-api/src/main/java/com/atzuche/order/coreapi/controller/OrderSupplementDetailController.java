@@ -27,6 +27,7 @@ import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
 import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.entity.vo.PayableVO;
+import com.atzuche.order.rentercost.service.OrderConsoleSubsidyDetailService;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.rentercost.service.RenterOrderCostCombineService;
 import com.atzuche.order.renterorder.entity.RenterOrderEntity;
@@ -56,6 +57,8 @@ public class OrderSupplementDetailController {
 	private AccountRenterCostSettleService accountRenterCostSettleService;
 	@Autowired
 	private OrderStatusService orderStatusService;
+	@Autowired
+	private OrderConsoleSubsidyDetailService orderConsoleSubsidyDetailService;
 	
 	//参考CashierBatchPayService
 	@AutoDocMethod(description = "查询补付记录", value = "查询补付记录", response = OrderSupplementDetailEntity.class)
@@ -172,7 +175,9 @@ public class OrderSupplementDetailController {
 			        
 			        //应付租车费用（已经求和）
 			        int rentAmtAfter = cashierNoTService.sumRentOrderCost(payableVOs);
-			        
+			        // 平台给租客的补贴总额
+					int platformToRenterAmt = orderConsoleSubsidyDetailService.getPlatformToRenterSubsidyAmt(orderNo, memNo);
+					rentAmtAfter = rentAmtAfter + platformToRenterAmt;
 			        //已付租车费用(shifu  租车费用的实付)
 			        int rentAmtPayed = accountRenterCostSettleService.getCostPaidRent(orderNo,memNo);
 			        log.info("租客[orderNo={},memNo={}]正常实收:[toPay={}]",orderNo,memNo,rentAmtPayed);
@@ -183,7 +188,7 @@ public class OrderSupplementDetailController {
 			                //判断是租车费用、还是补付 租车费用 并记录 详情
 			                RenterCashCodeEnum type = RenterCashCodeEnum.ACCOUNT_RENTER_RENT_COST_AFTER;	                    
 			                //数据封装,正负号取反,需要加上已经实付金额 rentAmtPayed
-			                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-(payableVO.getAmt()+rentAmtPayed), type, memNo, orderNo);
+			                OrderSupplementDetailEntity entity = orderSupplementDetailService.handleConsoleData(-(platformToRenterAmt+payableVO.getAmt()+rentAmtPayed), type, memNo, orderNo);
 			                if(entity != null) {
 			            		lsEntity.add(entity);
 			            		log.info("当前实收和应付之间的差额订单信息:需补付 entity=[{}]",entity.toString());

@@ -373,9 +373,16 @@ public class MemProxyService {
         renterMemberDto.setRenterCheck(memberAuthInfo.getRenterCheck());
         renterMemberDto.setRegTime(memberCoreInfo.getRegTime()==null ? null: LocalDateTimeUtils.dateToLocalDateTime(memberCoreInfo.getRegTime()));
         renterMemberDto.setOuterSource(memberBaseInfo.getOuterSource());
-
+        List<RenterMemberRightDTO> rights = renterMemberRightProxy(memberRoleInfo, memberTotalInfo);
+        renterMemberDto.setRenterMemberRightDTOList(rights);
+        log.info("ownerMemberDto.setOwnerMemberRightDTOList={}",JSON.toJSONString(rights));
+        return renterMemberDto;
+    }
+    /*
+    * 权益转换
+    * */
+    public List<RenterMemberRightDTO> renterMemberRightProxy(MemberRoleInfo memberRoleInfo,MemberTotalInfo memberTotalInfo){
         List<RenterMemberRightDTO> rights = new ArrayList<>();
-
         if(memberRoleInfo != null){
             if(memberRoleInfo.getInternalStaff()!=null){
                 RenterMemberRightDTO internalStaff = new RenterMemberRightDTO();
@@ -449,10 +456,9 @@ public class MemProxyService {
                 rights.add(internalStaff);
             }
         }
-        renterMemberDto.setRenterMemberRightDTOList(rights);
-        log.info("ownerMemberDto.setOwnerMemberRightDTOList={}",JSON.toJSONString(rights));
-        return renterMemberDto;
+        return rights;
     }
+
 
     /**
      * @Author ZhangBin

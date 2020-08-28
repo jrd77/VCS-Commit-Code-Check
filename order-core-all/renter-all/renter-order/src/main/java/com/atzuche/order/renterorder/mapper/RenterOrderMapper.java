@@ -30,6 +30,13 @@ public interface RenterOrderMapper{
     List<RenterOrderEntity> listAgreeRenterOrderByOrderNo(@Param("orderNo") String orderNo);
 
     RenterOrderEntity getRenterOrderByOrderNoAndIsEffective(@Param("orderNo") String orderNo);
+    /**
+     * 根据订单号修改是否使用钱包标记
+     * @param orderNo
+     * @return
+     */
+    int updateRenterOrderUseWalletByOrderNo(@Param("orderNo") String orderNo);
+    
     List<RenterOrderEntity> queryRenterOrderByOrderNo(@Param("orderNo")String orderNo);
     
     RenterOrderEntity getRenterOrderByRenterOrderNo(@Param("renterOrderNo") String renterOrderNo);

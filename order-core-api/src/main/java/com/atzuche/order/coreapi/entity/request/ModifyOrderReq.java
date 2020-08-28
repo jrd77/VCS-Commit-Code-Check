@@ -117,4 +117,7 @@ public class ModifyOrderReq {
     private Integer distributionMode;
 	@AutoDocProperty(value="是否超级权限，可以跳过校验：0-否，1-是")
 	private Integer superPowerFlag;
+	
+	@AutoDocProperty(value="管理后台是否使用钱包：0-否，1-是")
+	private Integer useWalletFlag;
 }

@@ -6,10 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.atzuche.order.delivery.vo.delivery.ChangeOrderInfoDTO;
-import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
-import com.atzuche.order.ownercost.service.OwnerOrderService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +15,11 @@ import com.atzuche.order.commons.enums.YesNoEnum;
 import com.atzuche.order.commons.service.OrderPayCallBack;
 import com.atzuche.order.coreapi.service.mq.OrderStatusMqService;
 import com.atzuche.order.delivery.service.delivery.DeliveryCarService;
+import com.atzuche.order.ownercost.entity.OwnerOrderEntity;
+import com.atzuche.order.ownercost.service.OwnerOrderService;
 import com.atzuche.order.parentorder.entity.OrderStatusEntity;
 import com.atzuche.order.parentorder.service.OrderStatusService;
+import com.atzuche.order.rentercost.entity.OrderSupplementDetailEntity;
 import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.service.AccountDebtProxyService;
 import com.autoyol.autopay.gateway.vo.req.NotifyDataVo;
@@ -113,8 +112,21 @@ public class PayCallbackService implements OrderPayCallBack {
 				String settleAmt = vo.getSettleAmount();
 				String memNo = vo.getMemNo();
 				String qn = vo.getQn();
-				int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), 3, new Date(), (-Integer.valueOf(settleAmt)));  //order_supplement_detail正负号 取反，根据金额来修改。
-				log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
+				//负数，累加型的处理
+				Integer realAmt = -Integer.valueOf(settleAmt);
+				OrderSupplementDetailEntity entity = orderSupplementDetailService.getById(Integer.valueOf(id));
+				if(entity != null) {
+					if(entity.getRealAmt() == null) {
+						entity.setRealAmt(0); //默认值处理
+					}
+					realAmt = realAmt + entity.getRealAmt();
+					int payFlag = entity.getPayFlag();
+					if(Math.abs(realAmt) >= Math.abs(entity.getAmt())) {
+						payFlag = 3;
+					}
+					int i = orderSupplementDetailService.updatePayFlagById(Integer.valueOf(id), payFlag, new Date(), realAmt);  //order_supplement_detail正负号 取反，根据金额来修改。
+					log.info("抵扣补付 result=[{}],params id=[{}],amt=[{}],memNo=[{}],qn=[{}]",i,id, (-Integer.valueOf(settleAmt)), memNo, qn);
+				}
 			}
 		}
 		

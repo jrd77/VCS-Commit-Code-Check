@@ -181,7 +181,7 @@
 
     </select>
     <select id="getPayAmtByPayKind" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind} order by id desc limit 1
+        select <include refid="Base_Column_List" /> from cashier where order_no = #{orderNo} and mem_no = #{memNo} and pay_kind = #{payKind}
 
     </select>
     
@@ -203,5 +203,25 @@
          select <include refid="Base_Column_List" /> from cashier where pay_trans_no = #{payTransNo} and order_no = #{orderNo}
     </select>
 
+	<select id="getWalletDeductAmt" resultType="java.lang.Integer">
+		SELECT IFNULL(SUM(pay_amt),0) FROM cashier WHERE  pay_source = '00' 
+		AND order_no = #{orderNo} AND pay_kind IN 
+		<foreach item="item" collection="payKind" separator="," open="(" close=")" index="">    
+	      #{item}
+	    </foreach> 
+	</select>
 
+
+    <select id="selectWalletPayRentCarCostByOrderNoAndMemNo" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+        from
+            `cashier`
+        where
+            `order_no` = #{orderNo}
+            and `mem_no` = #{memNo}
+            and `pay_kind` in ('03','08','12','11')
+            and `pay_source` = '00'
+            and `is_delete` = 0
+    </select>
 </mapper>

@@ -1,5 +1,17 @@
 package com.atzuche.order.settle.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.atzuche.order.accountrenterwzdepost.entity.AccountRenterWzDepositCostSettleDetailEntity;
 import com.atzuche.order.accountrenterwzdepost.service.AccountRenterWzDepositService;
@@ -17,16 +29,6 @@ import com.atzuche.order.rentercost.service.OrderSupplementDetailService;
 import com.atzuche.order.settle.vo.req.AccountInsertDebtReqVO;
 import com.atzuche.order.settle.vo.req.SettleOrdersAccount;
 import com.atzuche.order.settle.vo.req.SettleOrdersWz;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 违章押金结算,补付记录处理
@@ -116,12 +118,28 @@ public class OrderWzSettleSupplementHandleService {
                                        List<OrderSupplementDetailEntity> debtList,
                                        List<OrderSupplementDetailEntity> deductList,
                                        SettleOrdersAccount settleOrdersAccount) {
+    	//无需支付
         List<OrderSupplementDetailEntity> noNeedPayList =
                 entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() == OrderConstant.ZERO).collect(Collectors.toList());
+        //补付未支付
         List<OrderSupplementDetailEntity> noPayList =
                 entityList.stream().filter(d -> null != d.getPayFlag() && d.getPayFlag() != OrderConstant.ZERO).collect(Collectors.toList());
-        int noNeedPayAmt = noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
-        int noPayAmt = noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+        
+//        int noNeedPayAmt = 0;//noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+//        if(!CollectionUtils.isEmpty(noNeedPayList)) {
+//        	noNeedPayAmt = noNeedPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+//        }
+        //无需支付
+        int noNeedPayAmt = Optional.ofNullable(noNeedPayList).orElseGet(ArrayList::new).stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+        
+//        int noPayAmt = 0; //noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+//        if(!CollectionUtils.isEmpty(noNeedPayList)) {
+//        	noPayAmt = noPayList.stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+//        }
+        //未支付
+        int noPayAmt = Optional.ofNullable(noPayList).orElseGet(ArrayList::new).stream().mapToInt(OrderSupplementDetailEntity::getAmt).sum();
+        
+        
         if (Math.abs(noNeedPayAmt) >= Math.abs(noPayAmt)) {
             logger.warn("No need handle.noNeedPayAmt:[{}],noPayAmt:[{}]", noNeedPayAmt, noPayAmt);
             entityList.forEach(entity ->

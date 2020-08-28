@@ -59,7 +59,7 @@ public class RabbitConfiguration {
 
     @Bean
     public Queue renYunDeliveryCarPhotoQueue() {
-        return new Queue("ren_yun_delivery_car_photo_queue2", true);
+        return new Queue("ren_yun_delivery_car_photo_queue1", true);
     }
 
 //    @Bean

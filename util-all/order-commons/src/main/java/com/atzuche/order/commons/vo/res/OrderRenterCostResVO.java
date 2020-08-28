@@ -133,4 +133,8 @@ public class OrderRenterCostResVO {
     * 租客商品信息
     * */
     private RenterGoodsDetailDTO renterGoodsDetailDTO;
+    /*
+    * 平台给租客的实际补贴
+    * */
+    private Integer realConsoleSubsidyAmt;
 }

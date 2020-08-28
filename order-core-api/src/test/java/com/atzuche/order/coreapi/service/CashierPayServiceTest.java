@@ -102,7 +102,9 @@ public class CashierPayServiceTest {
 		vo.setReqOs("IOS");
 		//需要转换
 		String paySource = "06";
-		vo.setPaySource(paySource);
+		List<String> paySources = new ArrayList<String>();
+		paySources.add(paySource);
+		vo.setPaySources(paySources);
 		
 		String result = cashierPayService.getPaySignStr(vo,payCallbackService);
 		System.out.println("result="+result);

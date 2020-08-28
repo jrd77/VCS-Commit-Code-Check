@@ -4,15 +4,22 @@ import com.alibaba.fastjson.JSON;
 import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
+import com.atzuche.order.commons.constant.OrderConstant;
+import com.atzuche.order.commons.enums.cashier.TransStatusEnum;
 import com.atzuche.order.commons.enums.sys.Env;
 import com.atzuche.order.settle.service.OrderSettleService;
 import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
+import com.autoyol.autopay.gateway.vo.res.AutoPayResultVo;
 import com.autoyol.commons.web.ResponseData;
 import com.autoyol.doc.annotation.AutoDocMethod;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -38,9 +45,21 @@ public class SettleCancelController {
         //测试环境执行
         if(Env.test.getCode().equals(sysEnv)) {
             log.info("OrderSettleController cashierRefundApply start param orderNo=[{}],payKind={}", orderNo,payKind);
-            CashierRefundApplyEntity cashierRefundApply = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
-            cashierPayService.refundOrderPay(cashierRefundApply);
-            log.info("CashierController cashierRefundApply end param [{}],result [{}]");
+            List<CashierRefundApplyEntity> list = cashierRefundApplyNoTService.selectorderNo(orderNo,payKind);
+            int sum = 0;
+            String memNo = "";
+            for (CashierRefundApplyEntity cashierRefundApplyEntity : list) {
+                AutoPayResultVo result = cashierPayService.orderRefundHandle(cashierRefundApplyEntity);
+                if (StringUtils.isBlank(memNo)) {
+                    memNo = result.getMemNo();
+                }
+                if (Objects.nonNull(result) && StringUtils.equals(result.getTransStatus(), TransStatusEnum.PAY_SUCCESS.getCode())) {
+                    sum = sum + OrderConstant.ONE;
+                }
+            }
+            if (list.size() == sum && sum > OrderConstant.ZERO) {
+                cashierPayService.refundResultHandle(orderNo+":"+payKind, memNo);
+            }
             return ResponseData.success();
         }else {
             //访问受限

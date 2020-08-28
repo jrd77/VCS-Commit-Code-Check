@@ -31,5 +31,7 @@ public class PlatformSubsidyDTO {
     public Integer otherSubsidy = 0;
     @AutoDocProperty(value = "长租-取还车费用补贴")
     public Integer longGetReturnCarCostSubsidy;
+    @AutoDocProperty("平台给租客的真实补贴")
+    public Integer platformSubsidyRealAmt;
 
 }

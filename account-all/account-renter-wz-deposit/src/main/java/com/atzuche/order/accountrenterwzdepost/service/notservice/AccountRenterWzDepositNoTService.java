@@ -50,13 +50,12 @@ public class AccountRenterWzDepositNoTService {
 
     /**
      * 查询违章信息
-     * @param orderNo
-     * @param memNo
-     * @return
+     * @param orderNo 订单号
+     * @param memNo 会员号
+     * @return AccountRenterWzDepositEntity 租客订单违章押金信息
      */
     public AccountRenterWzDepositEntity getAccountRenterWZDeposit(String orderNo, String memNo) {
-        AccountRenterWzDepositEntity accountRenterDepositEntity = accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
-        return accountRenterDepositEntity;
+        return accountRenterWzDepositMapper.selectByOrderAndMemNo(orderNo,memNo);
     }
     /**
      * 查询违章信息
@@ -97,6 +96,8 @@ public class AccountRenterWzDepositNoTService {
         }
         
         BeanUtils.copyProperties(payedOrderWZRenterDeposit,accountRenterDepositEntity);
+        //更新实收
+        accountRenterDepositEntity.setShishouDeposit(accountRenterDepositEntity.getShishouDeposit() + payedOrderWZRenterDeposit.getShishouDeposit());
         int result = accountRenterWzDepositMapper.updateByPrimaryKeySelective(accountRenterDepositEntity);
         if(result==0){
             throw new PayOrderRenterWZDepositException();

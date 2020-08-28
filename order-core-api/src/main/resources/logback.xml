@@ -35,10 +35,11 @@
 
 	<logger name="com.autoyol" level="INFO" additivity="false">
         <appender-ref ref="fileLog" />
+        <appender-ref ref="consoleLog"/>
 	</logger>
 	<root level="INFO">
         <appender-ref ref="fileLog" />
-        <!--<appender-ref ref="consoleLog"/>-->
+        <appender-ref ref="consoleLog"/>
     </root>
 
 </configuration>

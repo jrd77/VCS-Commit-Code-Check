@@ -25,6 +25,11 @@ public class OrderSupplementDetailService{
     @Autowired
     private OrderSupplementDetailMapper orderSupplementDetailMapper;
 
+    //根据ID对象查询
+    public OrderSupplementDetailEntity getById(Integer id) {
+    	return orderSupplementDetailMapper.selectByPrimaryKey(id);
+    }
+    
     /**
      * 获取租客补付记录
      * @param orderNo 主订单号
@@ -142,8 +147,8 @@ public class OrderSupplementDetailService{
      * @param payFlag   3 支付成功
      * @return Integer
      */
-    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime, Integer amt) {
-    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime,amt);
+    public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime, Integer realAmt) {
+    	return orderSupplementDetailMapper.updatePayFlagById(id, payFlag, payTime,realAmt);
     }
     
     public Integer updatePayFlagById(Integer id, Integer payFlag, Date payTime) {

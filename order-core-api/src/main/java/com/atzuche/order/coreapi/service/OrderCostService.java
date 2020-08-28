@@ -157,6 +157,8 @@ public class OrderCostService {
     private AccountOwnerCostSettleDetailNoTService accountOwnerCostSettleDetailNoTService;
     @Autowired
     private OwnerRenterAdjustReasonService ownerRenterAdjustReasonService;
+    @Autowired
+    private OrderCostService orderCostService;
 
 
 	public OrderRenterCostResVO orderCostRenterGet(OrderCostReqVO req){
@@ -463,6 +465,9 @@ public class OrderCostService {
         RenterGoodsDetailDTO renterGoodsDetail = renterGoodsService.getRenterGoodsDetail(renterOrderNo, false);
         resVo.setRenterGoodsDetailDTO(renterGoodsDetail);
 
+        //平台给租客的实际补贴
+        int realConsoleSubsidyAmt = orderCostService.getRealConsoleSubsidyList(orderNo, renterOrderNo);
+        resVo.setRealConsoleSubsidyAmt(realConsoleSubsidyAmt);
         return resVo;
 	}
 
@@ -771,6 +776,39 @@ public class OrderCostService {
         renterAndConsoleSubsidyVO.setOwnerRenterAdjustReasonDTOS(ownerRenterAdjustReasonByChildNo);
         return renterAndConsoleSubsidyVO;
 	}
+	
+	/**
+	 * 获取平台给租客的补贴  优化成真实补贴  BASIC-1576
+	 * @param orderNo
+	 * @return
+	 */
+	public int getRealConsoleSubsidyList(String orderNo,String renterOrderNo) {
+		int platformToRentSubsidy = 0;
+		
+		//主订单
+        OrderEntity orderEntity = orderService.getOrderEntity(orderNo);
+		// 管理后台补贴
+        List<OrderConsoleSubsidyDetailEntity> consoleSubsidyList = orderConsoleSubsidyDetailService.listOrderConsoleSubsidyDetailByOrderNoAndMemNo(orderNo, orderEntity.getMemNoRenter());
+        //补贴来源方 1、租客 2、车主 3、平台
+		//补贴方名称 1、租客 2、车主 3、平台
+        int totalPlatformToRentSubsidy = Optional.ofNullable(consoleSubsidyList).orElseGet(ArrayList::new).stream().filter(
+        		x -> ("3".equals(x.getSubsidySourceCode()) && "1".equals(x.getSubsidyTargetCode()))
+        		).mapToInt(OrderConsoleSubsidyDetailEntity::getSubsidyAmount).sum();
+        
+        
+        RentCosts rentCosts = orderSettleService.preRenterSettleOrderPlatformSubsidy(orderNo, renterOrderNo);
+        int renterCostAmtFinalPlatformSubsidy = rentCosts.getRenterCostAmtFinalPlatformSubsidy();
+        
+        if(renterCostAmtFinalPlatformSubsidy > totalPlatformToRentSubsidy) {
+        	platformToRentSubsidy = totalPlatformToRentSubsidy;
+        }else {
+        	platformToRentSubsidy = renterCostAmtFinalPlatformSubsidy;
+        }
+        return platformToRentSubsidy;
+	}
+	
+	
+	
 	
 	
 	/**

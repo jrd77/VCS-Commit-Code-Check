@@ -757,6 +757,7 @@ public class RenterOrderCostCombineService {
 	
 	/**
 	 * 	APP修改订单费用支付
+	 *    补付列表的动态补付记录，保持不变。200819
 	 * @param orderNo
 	 * @param renterOrderNo
 	 * @param memNo
@@ -769,6 +770,7 @@ public class RenterOrderCostCombineService {
 		}
 		return payableList;
 	}
+
 	
 	/**
 	 * 
@@ -784,7 +786,11 @@ public class RenterOrderCostCombineService {
 			//支付状态:0.无需支付 1.未支付 2.已取消 3.已支付 4.支付中，5.支付失败 10.租车押金结算抵扣  20.违章押金结算抵扣
 			//op_status  操作状态:0,待提交 1,已生效 2,已失效 3,已撤回
 			//该条件SQL中已经包含。
-			List<PayableVO> suppList = supplementList.stream().filter(x -> x.getOpStatus().intValue() == 1 && (x.getPayFlag().intValue() == 1 || x.getPayFlag().intValue() == 4 || x.getPayFlag().intValue() == 5))
+			/**
+			 * 【新交易】新交易补付板块增加调价与撤销功能 200819 加上0.无需支付
+			 */
+			List<PayableVO> suppList = supplementList.stream().filter(x -> x.getOpStatus().intValue() == 1 
+					&& (x.getPayFlag().intValue() == 0 || x.getPayFlag().intValue() == 1 || x.getPayFlag().intValue() == 4 || x.getPayFlag().intValue() == 5))
 					.map(supplement -> {
 				PayableVO payableVO = new PayableVO();
 				payableVO.setAmt(supplement.getAmt());

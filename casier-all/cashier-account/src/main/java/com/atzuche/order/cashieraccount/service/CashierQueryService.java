@@ -36,6 +36,7 @@ import com.atzuche.order.commons.vo.res.account.income.AccountOwnerIncomeRealRes
 import com.atzuche.order.commons.vo.res.account.income.AccountOwnerSettleCostDetailResVO;
 import com.autoyol.autopay.gateway.constant.DataPayKindConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -125,8 +127,16 @@ public class CashierQueryService {
         result.setReductionAmt(0);
         result.setMemNo(entity.getMemNo());
         result.setYingshouWzDepositAmt(entity.getYingshouDeposit());
-        CashierEntity cashierEntity = cashierNoTService.getCashierEntity(orderNo,entity.getMemNo(), DataPayKindConstant.DEPOSIT);
-        
+
+        List<CashierEntity> records = cashierNoTService.getCashierEntity(orderNo,
+                entity.getMemNo(), DataPayKindConstant.DEPOSIT);
+        Optional<CashierEntity> cashierEntityOptional =
+                records.stream().filter(c -> !StringUtils.equalsIgnoreCase(c.getPaySource(),
+                        PaySourceEnum.WALLET_PAY.getCode())).findFirst();
+        CashierEntity cashierEntity = null;
+        if(cashierEntityOptional.isPresent()) {
+            cashierEntity = cashierEntityOptional.get();
+        }
         //加上成功标识
         if(Objects.nonNull(cashierEntity) && "00".equals(cashierEntity.getTransStatus())){  //00 
             result.setPayStatus("支付成功");

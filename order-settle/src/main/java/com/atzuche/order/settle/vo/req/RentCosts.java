@@ -56,10 +56,24 @@ public class RentCosts {
               * 租客最终收益金额（应收）
      */
     private int renterCostAmtFinal;
+    /**
+	     * 租客收益金额（应收-除开平台给租客的补贴）
+	*/
+    private int renterCostAmtFinalPlatformSubsidy;
+    
+    
     //租客会员号
     private String renterNo;
     
     
+	public int getRenterCostAmtFinalPlatformSubsidy() {
+		return renterCostAmtFinalPlatformSubsidy;
+	}
+
+	public void setRenterCostAmtFinalPlatformSubsidy(int renterCostAmtFinalPlatformSubsidy) {
+		this.renterCostAmtFinalPlatformSubsidy = renterCostAmtFinalPlatformSubsidy;
+	}
+
 	public String getRenterNo() {
 		return renterNo;
 	}

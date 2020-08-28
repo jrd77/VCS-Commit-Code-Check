@@ -40,7 +40,9 @@ public interface CashierMapper{
      * @param payKind (押金、违章押金、租车费用)
      * @return
      */
-    CashierEntity getPayAmtByPayKind(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
+    List<CashierEntity> getPayAmtByPayKind(@Param("orderNo") String orderNo, @Param("memNo")String memNo,
+                                      @Param("payKind")String payKind);
+
     CashierEntity getPayAmtByPayKindNoWallet(@Param("orderNo") String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
 
     /**
@@ -79,4 +81,18 @@ public interface CashierMapper{
     List<CashierEntity> getPayAmtByPayKinds(@Param("orderNo")String orderNo, @Param("memNo")String memNo, @Param("payKind")String payKind);
 
     CashierEntity getCashierBypayTransNo(@Param("orderNo")String orderNo,@Param("payTransNo")String payTransNo);
+
+	int getWalletDeductAmt(@Param("orderNo")String orderNo, @Param("payKind")List<String> payKind);
+
+
+    /**
+     * 查询会员订单使用钱包支付的租车费用收银记录
+     *
+     * @param orderNo 订单号
+     * @param memNo 会员号
+     * @return List<CashierEntity>
+     */
+	List<CashierEntity> selectWalletPayRentCarCostByOrderNoAndMemNo(@Param("orderNo")String orderNo,
+                                                           @Param("memNo")String memNo);
+
 }

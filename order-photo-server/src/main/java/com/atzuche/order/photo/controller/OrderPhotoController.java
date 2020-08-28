@@ -72,10 +72,10 @@ public class OrderPhotoController{
 	public ResponseData list(@Valid OrderRequestVO orderRequestVO, BindingResult bindingResult){
         validateParameter(bindingResult);
 		String orderNo = orderRequestVO.getOrderNo();
-	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.GET_CAR.getType()));
-	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.RETURN_CAR.getType()));
-        List<OrderPhotoDTO> getCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.GET_CAR_SERVICE_VOUCHER.getType()));
-        List<OrderPhotoDTO> returnCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, String.valueOf(PhotoTypeEnum.RETURN_CAR_SERVICE_VOUCHER.getType()));
+	    List<OrderPhotoDTO> getCarList =orderPhotoService.queryGetSrvCarList(orderNo, Arrays.asList(PhotoTypeEnum.GET_CAR.getType(),PhotoTypeEnum.GET_HAND_CAR_LIST.getType()));
+	    List<OrderPhotoDTO> srvCarList =orderPhotoService.queryGetSrvCarList(orderNo, Arrays.asList(PhotoTypeEnum.RETURN_CAR.getType(),PhotoTypeEnum.RETURN_HAND_CAR_LIST.getType()));
+        List<OrderPhotoDTO> getCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, Arrays.asList(PhotoTypeEnum.GET_CAR_SERVICE_VOUCHER.getType()));
+        List<OrderPhotoDTO> returnCarServiceVoucherList =orderPhotoService.queryGetSrvCarList(orderNo, Arrays.asList(PhotoTypeEnum.RETURN_CAR_SERVICE_VOUCHER.getType()));
 		OrderViolationPhotoResponseVO orderViolationPhotoResponseVO =orderPhotoService.queryViolationPhotoList(orderNo);
 		OrderPhotoResponseVO orderPhotoResponseVO = new OrderPhotoResponseVO();
 		orderPhotoResponseVO.setGetCarPhotoList(getCarList);
@@ -97,7 +97,7 @@ public class OrderPhotoController{
     public ResponseData<OrderPhotoTypeResponseVO> listContainsOils(@Valid @RequestBody OrderOilRequestVO orderRequestVO, BindingResult bindingResult) {
         validateParameter(bindingResult);
         String orderNo = orderRequestVO.getOrderNo();
-        List<OrderPhotoDTO> orderPhotoDTOS = orderPhotoService.queryGetSrvCarList(orderNo, orderRequestVO.getType() == null ? null : orderRequestVO.getType());
+        List<OrderPhotoDTO> orderPhotoDTOS = orderPhotoService.queryGetSrvCarList(orderNo, Arrays.asList(orderRequestVO.getType() == null ? null : Integer.valueOf(orderRequestVO.getType())));
         OrderPhotoTypeResponseVO orderPhotoTypeResponseVO = new OrderPhotoTypeResponseVO();
         orderPhotoTypeResponseVO.setGetPhotoList(orderPhotoDTOS);
         return ResponseData.success(orderPhotoTypeResponseVO);

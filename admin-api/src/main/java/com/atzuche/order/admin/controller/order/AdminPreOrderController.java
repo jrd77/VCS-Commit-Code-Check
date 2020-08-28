@@ -2,18 +2,19 @@ package com.atzuche.order.admin.controller.order;
 
 import com.atzuche.order.admin.PreOrderReqVO;
 import com.atzuche.order.admin.service.AdminOrderService;
+import com.atzuche.order.admin.service.RemoteFeignService;
 import com.atzuche.order.admin.vo.req.order.PreOrderAdminRequestVO;
 import com.atzuche.order.admin.vo.resp.MemAvailableCouponVO;
 import com.atzuche.order.admin.vo.resp.order.PreOrderAdminResponseVO;
 import com.atzuche.order.car.CarProxyService;
 import com.atzuche.order.coin.service.AutoCoinProxyService;
-import com.atzuche.order.commons.BindingResultUtil;
-import com.atzuche.order.commons.DateUtils;
-import com.atzuche.order.commons.GlobalConstant;
-import com.atzuche.order.commons.LocalDateTimeUtils;
+import com.atzuche.order.commons.*;
 import com.atzuche.order.commons.entity.dto.OwnerMemberDTO;
 import com.atzuche.order.commons.entity.dto.RenterMemberDTO;
+import com.atzuche.order.commons.entity.dto.RenterMemberRightDTO;
 import com.atzuche.order.commons.enums.HolidayTypeEnum;
+import com.atzuche.order.commons.enums.MemberFlagEnum;
+import com.atzuche.order.commons.enums.RightTypeEnum;
 import com.atzuche.order.commons.exceptions.InputErrorException;
 import com.atzuche.order.commons.vo.AccurateGetReturnSrvVO;
 import com.atzuche.order.commons.vo.req.NormalOrderCostCalculateReqVO;
@@ -39,10 +40,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 下单前管理后台页面展示
@@ -168,8 +167,8 @@ public class AdminPreOrderController {
 
         responseVO.setCarSpecialDayPrices(carDayPrices);
 
-
-        responseVO.setTotalWallet(walletProxyService.getWalletByMemNo(memNo));
+        int totalWallet = walletProxyService.getWalletByMemNo(memNo);
+        responseVO.setTotalWallet(totalWallet);
         responseVO.setTotalAutoCoin(coinProxyService.getCrmCustPoint(memNo));
 
         NormalOrderCostCalculateReqVO normalOrderCostCalculateReqVO = new NormalOrderCostCalculateReqVO();
@@ -201,10 +200,20 @@ public class AdminPreOrderController {
         	responseVO.setAccurateGetSrvAmt(accurateGetReturnSrvVO.getAccurateGetSrvAmt());
         	responseVO.setAccurateReturnSrvAmt(accurateGetReturnSrvVO.getAccurateReturnSrvAmt());
         }
+
+        if(totalWallet > 0){
+            responseVO.setUserWalletStatus(3);
+            List<RenterMemberRightDTO> renterMemberRightDTOList = renterMember.getRenterMemberRightDTOList();
+            if(RenterMemUtils.isEnterpriseByRenterMemberRight(renterMemberRightDTOList)){
+                responseVO.setUserWalletStatus(1);
+            }
+        }else{
+            responseVO.setUserWalletStatus(2);
+        }
         return ResponseData.success(responseVO);
 
     }
-
+   
     private int isDriverInsure(CarProxyService.CarPriceDetail carPriceDetail) {
         if(carPriceDetail == null || carPriceDetail.getSeatNum() == null){
             return 0;

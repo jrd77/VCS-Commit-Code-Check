@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OrderPhotoMapper {
 
-	List<OrderPhotoEntity> queryGetSrvCarList(@Param("orderNo") String orderNo, @Param("type") String type);
+	List<OrderPhotoEntity> queryGetSrvCarList(@Param("orderNo") String orderNo, @Param("typeList") List<Integer> type);
 
 	void addUploadOrderPhoto(@Param("orderNo") String orderNo, @Param("path") String path, @Param("photoType") String photoType, @Param("userType") String userType, @Param("operator") String operator, @Param("carPlateNum") String carPlateNum);
 

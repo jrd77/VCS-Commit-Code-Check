@@ -2,13 +2,9 @@ package com.atzuche.order.coreapi.controller;
 
 import javax.validation.Valid;
 
-import com.alibaba.fastjson.JSON;
-import com.atzuche.order.settle.service.OrderSettleService;
-import com.atzuche.order.settle.vo.req.CancelOrderReqDTO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atzuche.order.cashieraccount.entity.CashierRefundApplyEntity;
 import com.atzuche.order.cashieraccount.service.CashierPayService;
 import com.atzuche.order.cashieraccount.service.notservice.CashierRefundApplyNoTService;
 import com.atzuche.order.cashieraccount.service.remote.PayRemoteService;
@@ -26,8 +21,9 @@ import com.atzuche.order.cashieraccount.vo.req.pay.OrderPaySignReqVO;
 import com.atzuche.order.cashieraccount.vo.res.OrderPayableAmountResVO;
 import com.atzuche.order.commons.BindingResultUtil;
 import com.atzuche.order.commons.enums.ErrorCode;
-import com.atzuche.order.commons.enums.sys.Env;
+import com.atzuche.order.commons.vo.res.wallet.WalletBalanceVO;
 import com.atzuche.order.coreapi.service.PayCallbackService;
+import com.atzuche.order.wallet.WalletProxyService;
 import com.autoyol.autopay.gateway.vo.req.PrePlatformRequest;
 import com.autoyol.autopay.gateway.vo.res.PayResVo;
 import com.autoyol.commons.utils.GsonUtils;
@@ -48,7 +44,8 @@ public class CashierController {
     PayRemoteService payRemoteService;
     @Autowired
     CashierRefundApplyNoTService cashierRefundApplyNoTService;
-
+    @Autowired
+    WalletProxyService walletProxyService;
 
 
     /**
@@ -69,7 +66,7 @@ public class CashierController {
         /**
          * 拉取收银台配置信息。
          */
-        if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId())) {  //带支付 为负数
+        if(StringUtils.isNotBlank(orderPayReqVO.getPayType()) && StringUtils.isNotBlank(orderPayReqVO.getAtappId())) {  //带支付 为负数，仅仅判断条件。
         	//AppServer端调用，小程序没有收银台。
 //        	if(result.getAmtTotal() < 0) {
         	if(result.getAmt() < 0) {
@@ -82,6 +79,13 @@ public class CashierController {
 		        if(payResVo != null) {
 		        	BeanUtils.copyProperties(payResVo, result);
 		        }
+		        ///增加钱包抵扣的金额 "可抵扣XX元"，真实需要支付的金额 200701
+		        int walletBalance = walletProxyService.getWalletByMemNo(orderPayReqVO.getMenNo());
+		        result.setWalletBalance(walletBalance);
+		        //根据payKind来查询
+		        int walletDeductAmt = cashierPayService.getWalletDeductAmt(orderPayReqVO.getOrderNo(),orderPayReqVO.getPayKind());
+		        result.setWalletDeductAmt(walletDeductAmt);
+		        
         	}else {
 //        		if(result.isEnterpriseUserOrder() && result.getAmt() == 0) {
 //        			log.info("企业用户订单钱包全部抵扣，正常返回，参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
@@ -120,6 +124,7 @@ public class CashierController {
         	log.info("无需收银台参数的请求:params=[{}]",GsonUtils.toJson(orderPayReqVO));
         }
         
+        log.info("getOrderPayableAmount result=[{}]",GsonUtils.toJson(result));
         return ResponseData.success(result);
     }
 
@@ -151,6 +156,16 @@ public class CashierController {
         return ResponseData.success(result);
 	}
     
+    
+    @AutoDocMethod(description = "获取钱包余额", value = "获取钱包余额", response = WalletBalanceVO.class)
+	@GetMapping("/wallet/balance")
+	public ResponseData walletBalance(@RequestParam("memNo") String  memNo) {
+        int left = walletProxyService.getWalletByMemNo(memNo);
+        WalletBalanceVO walletResponseVO = new WalletBalanceVO();
+        walletResponseVO.setBalance(left);
+        walletResponseVO.setMemNo(memNo);
+		return ResponseData.success(walletResponseVO);
+	}
     
 
 }

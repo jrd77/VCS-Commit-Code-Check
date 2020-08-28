@@ -141,15 +141,13 @@ public class OrderOwnerSettleNoTService {
         settleOrders.setOwnerOrderNo(ownerOrderNo);
         settleOrders.setOwnerMemNo(ownerMemNo);
         settleOrders.setOwnerOrder(ownerOrder);
-        // 2 校验订单状态 以及是否存在 理赔暂扣 存在不能进行结算 并CAT告警
-//        this.check(renterOrder,settleOrders);
         return settleOrders;
     }
 	
 	
 	public void settleOrderFirstSeparateOwner(SettleOrders settleOrders, SettleOrdersDefinition settleOrdersDefinition){
-        //3 查询所有车主费用明细 TODO 暂不支持 多个车主
-        this.getOwnerCostSettleDetail(settleOrders,"settle");//pre 预算 settle 结算
+        //3 查询所有车主费用明细
+        this.getOwnerCostSettleDetail(settleOrders,"settle");
         Cat.logEvent("getOwnerCostSettleDetail",GsonUtils.toJson(settleOrders));
         log.info("OrderSettleService getOwnerCostSettleDetail settleOrders [{}]", GsonUtils.toJson(settleOrders));
 
@@ -161,8 +159,6 @@ public class OrderOwnerSettleNoTService {
         //5 费用明细先落库
         this.insertSettleOrdersSeparateOwner(settleOrdersDefinition);
 
-
-//        return settleOrdersDefinition;
     }
 	
 	@Transactional(rollbackFor=Exception.class)
