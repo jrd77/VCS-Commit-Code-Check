@@ -39,18 +39,18 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return this;
     }
 
-//    public static void initCheckFileTypeList() {
-//        AppSettingsState instance = getInstance();
-//        instance.ignoreList.add(".java$");
-//        instance.ignoreList.add(".properties$");
-//        instance.ignoreList.add(".yml$");
-//        instance.ignoreList.add(".xml$");
-//    }
-
     @Override
     public void loadState(@NotNull AppSettingsState state) {
 
 
         XmlSerializerUtil.copyBean(state, this);
+    }
+
+    public static void initCheckFileTypeList() {
+        AppSettingsState instance = getInstance();
+        instance.ignoreList.add(".java$");
+        instance.ignoreList.add(".properties$");
+        instance.ignoreList.add(".yml$");
+        instance.ignoreList.add(".xml$");
     }
 }

@@ -1,17 +1,27 @@
 <idea-plugin>
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>com.github.jrd77.codecheck.id</id>
+  <name>Vcs Commit Code Check</name>
+  <version>1.1</version>
+  <vendor email="jrd77@qq.com" url="https://github.com/jrd77/VcsCommitCodeCheck">jrd77</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      check pre-commit code.check this commit code<br>
+      <em>check code <br>
+      support JAVA/YAML/PROPERTIES/XML type file code <br>
+      you can define your own Check_Rule (Regular Expression) in Settings->Tools->Vcs Commit Code Check <br>
+      <br>
+      then at IDEA VCS commit Window   you'll see option  named '特征检查', press commit button check your code like 'Check TODO' option
+      <br>
+      the source code at https://github.com/jrd77/VcsCommitCodeCheck
+      </em>
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      检查需要提交代码 <br>
+      <em>支持java,yml,properties和xml格式文件 <br>
+       在 Settings->Tools->Vcs Commit Code Check 里面自定义规则
+       提交的时候选中'特征检查'(和TODO选项并列)开启代码检查,
+       </em>
     ]]>
   </change-notes>
 
@@ -27,6 +37,7 @@
     <toolWindow id="预提交代码检查配置" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
     <applicationService serviceImplementation="com.github.jrd77.codecheck.data.AppSettingsState"/>
+    <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>
 
   <actions>

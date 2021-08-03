@@ -6,8 +6,10 @@ import com.github.jrd77.codecheck.data.RuleTypeEnum;
 import com.github.jrd77.codecheck.window.rule.VCSCheckWindow;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.impl.CheckUtil;
+import com.intellij.ui.ScreenUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.Logger;
 
@@ -23,6 +25,15 @@ public class AddDialog extends JDialog {
     private JRadioButton strMatchRadio;
 
     public AddDialog() {
+        final Rectangle rectangle = ScreenUtil.getAllScreensRectangle();
+        final double width = rectangle.getWidth();
+        final double height = rectangle.getHeight();
+        final double x = width * 0.5 - 0.1 * width;
+        final double y = height * 0.5 - 0.1 * height;
+        this.setLocation(Double.valueOf(x).intValue(),Double.valueOf(y).intValue());
+        final int widthDialog = Double.valueOf(0.2 * width).intValue();
+        final int heightDialog = Double.valueOf(0.2 * height).intValue();
+        this.setSize(widthDialog,heightDialog);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);

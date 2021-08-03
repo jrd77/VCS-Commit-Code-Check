@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 
 import javax.swing.*;
+import javax.swing.table.TableColumnModel;
 import java.util.logging.Logger;
 
 public class VCSCheckWindow {
@@ -47,7 +48,15 @@ public class VCSCheckWindow {
 
         this.tableRule.setModel(WindowSetting.TABLE_MODEL_RULE);
         this.tableRule.setEnabled(true);
-
+        final TableColumnModel columnModel = tableRule.getColumnModel();
+        int index=0;
+        final int width = columnModel.getColumn(index).getPreferredWidth();
+        final int globalWidth = columnModel.getColumnCount() * width;
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
+        Double contentWidth=globalWidth-(globalWidth*0.3);
+        columnModel.getColumn(index++).setPreferredWidth(contentWidth.intValue());
+        columnModel.getColumn(index).setPreferredWidth(globalWidth/10);
         CheckDataUtil.refreshData();
     }
 }

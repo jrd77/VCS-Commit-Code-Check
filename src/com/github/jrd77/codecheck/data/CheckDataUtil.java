@@ -44,23 +44,25 @@ public class CheckDataUtil {
 
         final int size = ruleList.size();
         Vector<Vector<String>> data = new Vector<Vector<String>>();
+        int index=0;
         for (MatchRule matchRule : ruleList) {
-            data.add(covertData(matchRule));
+            final Vector<String> strings = covertData(matchRule,++index);
+            data.add(strings);
         }
         return data;
     }
 
-    private static Vector<String> covertData(MatchRule matchRule) {
+    private static Vector<String> covertData(MatchRule matchRule, int index) {
 
         Vector<String> vector = new Vector<String>();
-        vector.add("111");
+        vector.add(String.valueOf(index));
         vector.add(matchRule.getRule());
         vector.add(matchRule.getComment());
         vector.add(matchRule.getRuleType().name());
         return vector;
     }
 
-    private static List<MatchRule> convertMatchRuleList(List<String> strs) {
+    public static List<MatchRule> convertMatchRuleList(List<String> strs) {
 
         MatchRule matchRule;
         List<MatchRule> matchRuleList = new ArrayList<>();
@@ -72,6 +74,7 @@ public class CheckDataUtil {
     }
 
     private static MatchRule convertMatchRule(String str) {
-        return new MatchRule(str, RuleTypeEnum.REGEXP, null);
+        Gson gson = new Gson();
+        return gson.fromJson(str, MatchRule.class);
     }
 }
