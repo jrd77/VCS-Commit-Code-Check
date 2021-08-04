@@ -1,5 +1,7 @@
 package com.github.jrd77.codecheck.data;
 
+import com.intellij.openapi.vfs.VirtualFile;
+
 public class GitDiffCmd {
 
     String filePath;
@@ -15,6 +17,8 @@ public class GitDiffCmd {
     String readLine;
 
     private String errorMatch;
+
+    private VirtualFile file;
 
     public String getErrorMatch() {
         return errorMatch;
@@ -72,6 +76,14 @@ public class GitDiffCmd {
         this.fileName = fileName;
     }
 
+    public VirtualFile getFile() {
+        return file;
+    }
+
+    public void setFile(VirtualFile file) {
+        this.file = file;
+    }
+
     @Override
     public String toString() {
         return "GitDiffCmd{" +
@@ -80,7 +92,9 @@ public class GitDiffCmd {
                 ", ext='" + ext + '\'' +
                 ", errorLineStr='" + errorLineStr + '\'' +
                 ", errorLineNumber=" + errorLineNumber +
-                ", readLine=" + readLine +
+                ", readLine='" + readLine + '\'' +
+                ", errorMatch='" + errorMatch + '\'' +
+                ", file=" + file +
                 '}';
     }
 }

@@ -88,10 +88,7 @@ public class VcsCheckinHandler extends CheckinHandler {
                 logger.info("change file type is null");
                 continue;
             }
-           PsiFile psiFile = PsiManager.getInstance(project).findFile(changeFile);
-//            psiFile.get
-//            new OpenFileDescriptor(project, file, line, column).navigate(...)
-            new OpenFileDescriptor(project, changeFile).navigate(true);
+
             final Change.Type type = change.getType();
             final FileType fileType = changeFile.getFileType();
             final String fileTypeName = fileType.getName();
@@ -131,6 +128,7 @@ public class VcsCheckinHandler extends CheckinHandler {
                             diff.setErrorLineStr(lineStr);
                             diff.setErrorMatch(matchRule.getRule());
                             diff.setErrorLineNumber(i + 1);
+                            diff.setFile(changeFile);
                             System.out.println(++count + "-----------------------------");
                             resultList.add(diff);
                         }
@@ -188,6 +186,13 @@ public class VcsCheckinHandler extends CheckinHandler {
             int yesOrNo = Messages.showYesNoDialog(html,
                     "特征检查",
                     UIUtil.getErrorIcon());
+            String errorLineStr = cmdList.get(0).getErrorLineStr();
+            String trim = errorLineStr.trim();
+            int column = errorLineStr.length() - trim.length();
+            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, cmdList.get(0).getFile(), cmdList.get(0).getErrorLineNumber(), column);
+//            .navigate(...)
+//            new OpenFileDescriptor(project, changeFile).navigate(true);
+            descriptor.navigate(true);
             return yesOrNo == 0 ? ReturnResult.COMMIT : ReturnResult.CANCEL;
         }
         return ReturnResult.COMMIT;
