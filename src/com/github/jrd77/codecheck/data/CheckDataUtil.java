@@ -39,7 +39,8 @@ public class CheckDataUtil {
             return;
         }
         //刷新tableRule
-        WindowSetting.reFreshTableIgnore(rebuildTableRuleData(instance));
+        WindowSetting.reFreshTableIgnore(rebuildTableIgnoreData(instance));
+        WindowSetting.reFreshTableRule(rebuildTableRuleData(instance));
     }
 
     /**
@@ -52,6 +53,14 @@ public class CheckDataUtil {
     }
 
 
+    /**
+     * 重新构造表格数据
+     * @return
+     */
+    private static Vector<Vector<String>> rebuildTableIgnoreData(AppSettingsState instance) {
+
+        return ConvertUtil.convertIgnore(instance.ignoreList);
+    }
 
     /**
      * 初始化过滤规则和匹配规则
@@ -62,10 +71,10 @@ public class CheckDataUtil {
             logger.severe("PersistentState failed,持久化失败");
             return;
         }
-        instance.ignoreList.add(".java$");
-        instance.ignoreList.add(".properties$");
-        instance.ignoreList.add(".yml$");
-        instance.ignoreList.add(".xml$");
+        addIgnore(".java$");
+        addIgnore(".properties$");
+        addIgnore(".yml$");
+        addIgnore(".xml$");
         MatchRule matchRuleExample=new MatchRule("localhost",RuleTypeEnum.REGEXP,"匹配示例");
         MatchRule matchRuleExample2=new MatchRule("127.0.0.1",RuleTypeEnum.REGEXP,"匹配示例2");
         addRule(matchRuleExample);
