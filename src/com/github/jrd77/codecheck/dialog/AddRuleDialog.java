@@ -4,9 +4,7 @@ import com.github.jrd77.codecheck.data.CheckDataUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.StringUtils;
-import com.github.jrd77.codecheck.window.rule.VCSCheckWindow;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.psi.impl.CheckUtil;
 import com.intellij.ui.ScreenUtil;
 
 import javax.swing.*;
@@ -14,9 +12,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.Logger;
 
-public class AddDialog extends JDialog {
+public class AddRuleDialog extends JDialog {
 
-    private static final Logger logger = Logger.getLogger(AddDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(AddRuleDialog.class.getName());
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -25,27 +23,19 @@ public class AddDialog extends JDialog {
     private JRadioButton regexpRadio;
     private JRadioButton strMatchRadio;
 
-    public AddDialog() {
+    public AddRuleDialog() {
 
         initDialogSize();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
 
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
+        regexpRadio.addChangeListener(e->selected());
+        strMatchRadio.addChangeListener(e->selected());
 
         // 单击十字时调用 onCancel()
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -97,7 +87,7 @@ public class AddDialog extends JDialog {
     }
 
     public static void main(String[] args) {
-        AddDialog dialog = new AddDialog();
+        AddRuleDialog dialog = new AddRuleDialog();
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
@@ -113,5 +103,13 @@ public class AddDialog extends JDialog {
         final int widthDialog = Double.valueOf(0.2 * width).intValue();
         final int heightDialog = Double.valueOf(0.2 * height).intValue();
         this.setSize(widthDialog,heightDialog);
+    }
+
+    private void selected(){
+
+        boolean selected = this.regexpRadio.isSelected();
+        logger.info("regexpRadio selected is"+selected);
+        this.strMatchRadio.setSelected(!selected);
+        logger.info("strMatchRadio setSelected is"+!selected);
     }
 }

@@ -2,6 +2,7 @@ package com.github.jrd77.codecheck.handler;
 
 import com.github.jrd77.codecheck.data.*;
 import com.github.jrd77.codecheck.util.BooleanUtil;
+import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.IoUtil;
 import com.intellij.ide.util.PropertiesComponent;
@@ -164,7 +165,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             logger.warning("没有配置文件匹配规则");
             return super.beforeCheckin();
         }
-        final List<MatchRule> matchRuleList = CheckDataUtil.convertMatchRuleList(instance.ruleList);
+        final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(instance.ruleList);
         final List<String> ignoreList = instance.ignoreList;
 
         Project project = panel.getProject();

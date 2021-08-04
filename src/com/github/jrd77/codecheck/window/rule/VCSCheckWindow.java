@@ -2,7 +2,7 @@ package com.github.jrd77.codecheck.window.rule;
 
 import com.github.jrd77.codecheck.data.AppSettingsState;
 import com.github.jrd77.codecheck.data.CheckDataUtil;
-import com.github.jrd77.codecheck.dialog.AddDialog;
+import com.github.jrd77.codecheck.dialog.AddRuleDialog;
 import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -31,7 +31,7 @@ public class VCSCheckWindow {
 
         init();
         btnNewRule.addActionListener(e->{
-            AddDialog addDialog=new AddDialog();
+            AddRuleDialog addDialog=new AddRuleDialog();
             addDialog.setVisible(true);
             addDialog.show(true);
         });

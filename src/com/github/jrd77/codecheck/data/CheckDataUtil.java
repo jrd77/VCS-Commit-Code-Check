@@ -25,6 +25,13 @@ public class CheckDataUtil {
         return AppSettingsState.getInstance().ruleList.add(jsonStr);
     }
 
+    public static boolean addIgnore(String ignoreRule){
+
+        if(AppSettingsState.getInstance().ignoreList.contains(ignoreRule)){
+            return false;
+        }
+        return AppSettingsState.getInstance().ignoreList.add(ignoreRule);
+    }
     public static void refreshData() {
         AppSettingsState instance = AppSettingsState.getInstance();
         if(instance==null){
