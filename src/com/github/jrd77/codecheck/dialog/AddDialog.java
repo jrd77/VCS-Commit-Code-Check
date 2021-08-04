@@ -3,6 +3,7 @@ package com.github.jrd77.codecheck.dialog;
 import com.github.jrd77.codecheck.data.CheckDataUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
+import com.github.jrd77.codecheck.util.StringUtils;
 import com.github.jrd77.codecheck.window.rule.VCSCheckWindow;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.impl.CheckUtil;
@@ -25,15 +26,8 @@ public class AddDialog extends JDialog {
     private JRadioButton strMatchRadio;
 
     public AddDialog() {
-        final Rectangle rectangle = ScreenUtil.getAllScreensRectangle();
-        final double width = rectangle.getWidth();
-        final double height = rectangle.getHeight();
-        final double x = width * 0.5 - 0.1 * width;
-        final double y = height * 0.5 - 0.1 * height;
-        this.setLocation(Double.valueOf(x).intValue(),Double.valueOf(y).intValue());
-        final int widthDialog = Double.valueOf(0.2 * width).intValue();
-        final int heightDialog = Double.valueOf(0.2 * height).intValue();
-        this.setSize(widthDialog,heightDialog);
+
+        initDialogSize();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -76,6 +70,15 @@ public class AddDialog extends JDialog {
         // 在此处添加代码
         logger.info("参数:ruleText"+ruleText.getText()+",regexpRadio type:"+regexpRadio.isSelected());
 
+        if(StringUtils.isBlank(ruleText.getText())){
+            Messages.showErrorDialog("添加失败,不能为空","添加失败");
+        }
+        if(!strMatchRadio.isSelected() && !regexpRadio.isSelected()){
+            Messages.showErrorDialog("添加失败,必须选择类型","添加失败");
+        }
+        if(strMatchRadio.isSelected() && regexpRadio.isSelected()){
+            Messages.showErrorDialog("添加失败,不能全选","添加失败");
+        }
         MatchRule matchRule=new MatchRule();
         matchRule.setRule(ruleText.getText());
         matchRule.setRuleType(RuleTypeEnum.REGEXP);
@@ -98,5 +101,17 @@ public class AddDialog extends JDialog {
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
+    }
+
+    private void initDialogSize(){
+        final Rectangle rectangle = ScreenUtil.getAllScreensRectangle();
+        final double width = rectangle.getWidth();
+        final double height = rectangle.getHeight();
+        final double x = width * 0.5 - 0.1 * width;
+        final double y = height * 0.5 - 0.1 * height;
+        this.setLocation(Double.valueOf(x).intValue(),Double.valueOf(y).intValue());
+        final int widthDialog = Double.valueOf(0.2 * width).intValue();
+        final int heightDialog = Double.valueOf(0.2 * height).intValue();
+        this.setSize(widthDialog,heightDialog);
     }
 }

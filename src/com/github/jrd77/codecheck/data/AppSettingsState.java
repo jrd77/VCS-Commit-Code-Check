@@ -6,7 +6,6 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import com.intellij.util.xmlb.annotations.CollectionBean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +26,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public List<String> ignoreList=new LinkedList<>();;
 
-    public Boolean openCheck=Boolean.TRUE;
+    public Boolean openCheck=Boolean.FALSE;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -44,13 +43,5 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
 
         XmlSerializerUtil.copyBean(state, this);
-    }
-
-    public static void initCheckFileTypeList() {
-        AppSettingsState instance = getInstance();
-        instance.ignoreList.add(".java$");
-        instance.ignoreList.add(".properties$");
-        instance.ignoreList.add(".yml$");
-        instance.ignoreList.add(".xml$");
     }
 }

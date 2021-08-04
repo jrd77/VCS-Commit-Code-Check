@@ -1,9 +1,11 @@
 package com.github.jrd77.codecheck.handler;
 
 import com.github.jrd77.codecheck.data.*;
+import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.IoUtil;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -16,8 +18,9 @@ import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.UIUtil;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,7 +77,7 @@ public class VcsCheckinHandler extends CheckinHandler {
         };
     }
 
-    private static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList) throws VcsException, IOException {
+    private static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
 
         int count = 0;
         List<GitDiffCmd> resultList = new ArrayList<>();
@@ -84,6 +87,10 @@ public class VcsCheckinHandler extends CheckinHandler {
                 logger.info("change file type is null");
                 continue;
             }
+           PsiFile psiFile = PsiManager.getInstance(project).findFile(changeFile);
+//            psiFile.get
+//            new OpenFileDescriptor(project, file, line, column).navigate(...)
+            new OpenFileDescriptor(project, changeFile).navigate(true);
             final Change.Type type = change.getType();
             final FileType fileType = changeFile.getFileType();
             final String fileTypeName = fileType.getName();
@@ -153,17 +160,20 @@ public class VcsCheckinHandler extends CheckinHandler {
             logger.warning("没有配置匹配规则");
             return super.beforeCheckin();
         }
+        if (instance.ignoreList.size() == 0) {
+            logger.warning("没有配置文件匹配规则");
+            return super.beforeCheckin();
+        }
         final List<MatchRule> matchRuleList = CheckDataUtil.convertMatchRuleList(instance.ruleList);
         final List<String> ignoreList = instance.ignoreList;
-        if (CollectionUtils.isEmpty(ignoreList)) {
-            AppSettingsState.initCheckFileTypeList();
-        }
+
         Project project = panel.getProject();
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
+
         final LocalChangeList defaultChangeList = changeListManager.getDefaultChangeList();
         List<GitDiffCmd> cmdList = null;
         try {
-            cmdList = getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList);
+            cmdList = getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList,project);
         } catch (VcsException | IOException e) {
             e.printStackTrace();
         }

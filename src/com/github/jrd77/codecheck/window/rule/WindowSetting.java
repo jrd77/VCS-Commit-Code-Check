@@ -31,4 +31,10 @@ public class WindowSetting {
         logger.info("刷新检查规则列表");
         TABLE_MODEL_RULE.setDataVector(dataVector,COLUMN_NAME_RULE);
     }
+
+    public static void reFreshTableIgnore(Vector<Vector<String>> dataVector){
+
+        logger.info("刷新文件过滤规则列表");
+        TABLE_MODEL_IGNORE.setDataVector(dataVector,COLUMN_NAME_IGNORE);
+    }
 }

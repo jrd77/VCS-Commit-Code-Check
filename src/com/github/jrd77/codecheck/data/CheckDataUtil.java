@@ -1,16 +1,15 @@
 package com.github.jrd77.codecheck.data;
 
+import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.window.rule.WindowSetting;
 import com.google.gson.Gson;
-import com.intellij.xml.util.HtmlUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 public class CheckDataUtil {
 
+    private static final Logger logger = Logger.getLogger(CheckDataUtil.class.getName());
 
     public static AppSettingsState getInstance(){
         return AppSettingsState.getInstance();
@@ -27,54 +26,42 @@ public class CheckDataUtil {
     }
 
     public static void refreshData() {
-        //刷新table
-        WindowSetting.reFreshTableRule(getTableData());
-    }
-
-    private static Vector<Vector<String>> getTableData() {
-
         AppSettingsState instance = AppSettingsState.getInstance();
         if(instance==null){
-            return null;
+            logger.warning("");
+            return;
         }
-        return convert(convertMatchRuleList(instance.ruleList));
+        //刷新tableRule
+        WindowSetting.reFreshTableIgnore(rebuildTableRuleData(instance));
     }
 
-    private static Vector<Vector<String>> convert(List<MatchRule> ruleList) {
+    /**
+     * 重新构造表格数据
+     * @return
+     */
+    private static Vector<Vector<String>> rebuildTableRuleData(AppSettingsState instance) {
 
-        final int size = ruleList.size();
-        Vector<Vector<String>> data = new Vector<Vector<String>>();
-        int index=0;
-        for (MatchRule matchRule : ruleList) {
-            final Vector<String> strings = covertData(matchRule,++index);
-            data.add(strings);
+        return ConvertUtil.convertRule(instance.ruleList);
+    }
+
+
+
+    /**
+     * 初始化过滤规则和匹配规则
+     */
+    public static void initCheckFileTypeList() {
+        AppSettingsState instance = getInstance();
+        if(instance==null){
+            logger.severe("PersistentState failed,持久化失败");
+            return;
         }
-        return data;
-    }
-
-    private static Vector<String> covertData(MatchRule matchRule, int index) {
-
-        Vector<String> vector = new Vector<String>();
-        vector.add(String.valueOf(index));
-        vector.add(matchRule.getRule());
-        vector.add(matchRule.getComment());
-        vector.add(matchRule.getRuleType().name());
-        return vector;
-    }
-
-    public static List<MatchRule> convertMatchRuleList(List<String> strs) {
-
-        MatchRule matchRule;
-        List<MatchRule> matchRuleList = new ArrayList<>();
-        for (String str : strs) {
-            matchRule = convertMatchRule(str);
-            matchRuleList.add(matchRule);
-        }
-        return matchRuleList;
-    }
-
-    private static MatchRule convertMatchRule(String str) {
-        Gson gson = new Gson();
-        return gson.fromJson(str, MatchRule.class);
+        instance.ignoreList.add(".java$");
+        instance.ignoreList.add(".properties$");
+        instance.ignoreList.add(".yml$");
+        instance.ignoreList.add(".xml$");
+        MatchRule matchRuleExample=new MatchRule("localhost",RuleTypeEnum.REGEXP,"匹配示例");
+        MatchRule matchRuleExample2=new MatchRule("127.0.0.1",RuleTypeEnum.REGEXP,"匹配示例2");
+        addRule(matchRuleExample);
+        addRule(matchRuleExample2);
     }
 }
