@@ -4,6 +4,7 @@ import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.window.rule.WindowSetting;
 import com.google.gson.Gson;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -35,12 +36,18 @@ public class CheckDataUtil {
     public static void refreshData() {
         AppSettingsState instance = AppSettingsState.getInstance();
         if(instance==null){
-            logger.warning("");
+            logger.warning("刷新表格数据");
             return;
         }
         //刷新tableRule
         WindowSetting.reFreshTableIgnore(rebuildTableIgnoreData(instance));
         WindowSetting.reFreshTableRule(rebuildTableRuleData(instance));
+    }
+    public static void refreshResultData(List<GitDiffCmd> cmdList) {
+        logger.warning("刷新结果");
+        //刷新tableRule
+
+        WindowSetting.reFreshTableResult(ConvertUtil.convertGitDiffList(cmdList));
     }
 
     /**

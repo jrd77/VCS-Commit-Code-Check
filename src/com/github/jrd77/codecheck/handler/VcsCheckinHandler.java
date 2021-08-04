@@ -177,6 +177,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             e.printStackTrace();
         }
         if (cmdList != null && cmdList.size() > 0) {
+            CheckDataUtil.refreshResultData(cmdList);
             final String htmlTable = HtmlUtil.buildHtmlTable(cmdList);
             String html = "<html><head>" + UIUtil.getCssFontDeclaration(UIUtil.getLabelFont()) + "</head><body>" +
                     "<br><h3>检测到命中特征的代码，是否继续提交</h3>" +
@@ -192,7 +193,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, cmdList.get(0).getFile(), cmdList.get(0).getErrorLineNumber(), column);
 //            .navigate(...)
 //            new OpenFileDescriptor(project, changeFile).navigate(true);
-            descriptor.navigate(true);
+//            descriptor.navigate(true);
             return yesOrNo == 0 ? ReturnResult.COMMIT : ReturnResult.CANCEL;
         }
         return ReturnResult.COMMIT;

@@ -1,7 +1,13 @@
 package com.github.jrd77.codecheck.util;
 
+import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.google.gson.Gson;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.workspace.api.VirtualFileUrlManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +67,22 @@ public class ConvertUtil {
             vector.add(String.valueOf(++index));
             vector.add(s);
             vector.add("文件名正则匹配");
+            data.add(vector);
+        }
+        return data;
+    }
+
+    public static Vector<Vector<String>> convertGitDiffList(List<GitDiffCmd> cmdList) {
+
+        Vector<Vector<String>> data = new Vector<Vector<String>>();
+        int index=0;
+        for (GitDiffCmd gitDiffCmd : cmdList) {
+            Vector<String> vector=new Vector<>();
+            vector.add(String.valueOf(++index));
+            vector.add(gitDiffCmd.getErrorLineStr());
+            vector.add(String.valueOf(gitDiffCmd.getErrorLineNumber()));
+            vector.add(gitDiffCmd.getErrorMatch());
+            vector.add(gitDiffCmd.getFilePath());
             data.add(vector);
         }
         return data;
