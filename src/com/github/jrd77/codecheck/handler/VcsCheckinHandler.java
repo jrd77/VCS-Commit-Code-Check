@@ -6,6 +6,8 @@ import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.IoUtil;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
@@ -187,10 +189,23 @@ public class VcsCheckinHandler extends CheckinHandler {
             int yesOrNo = Messages.showYesNoDialog(html,
                     "特征检查",
                     UIUtil.getErrorIcon());
-            String errorLineStr = cmdList.get(0).getErrorLineStr();
+            GitDiffCmd gitDiffCmd = cmdList.get(0);
+            String errorLineStr = gitDiffCmd.getErrorLineStr();
             String trim = errorLineStr.trim();
             int column = errorLineStr.length() - trim.length();
-            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, cmdList.get(0).getFile(), cmdList.get(0).getErrorLineNumber(), column);
+            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber(), column);
+            descriptor.navigate(true);
+            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if(editor==null){
+                logger.warning("editor为空");
+            }else{
+                editor.getSelectionModel();
+                logger.info("打印选中");
+                String selectedText = editor.getSelectionModel().getSelectedText();
+                System.out.println(selectedText);
+                editor.getSelectionModel().setSelection(0,2);
+            }
+
 //            .navigate(...)
 //            new OpenFileDescriptor(project, changeFile).navigate(true);
 //            descriptor.navigate(true);

@@ -3,11 +3,8 @@ package com.github.jrd77.codecheck.util;
 import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.google.gson.Gson;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.workspace.api.VirtualFileUrlManager;
+import com.intellij.ide.highlighter.JavaFileHighlighter;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +12,7 @@ import java.util.Vector;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 转换工具
  * @date 2021/8/4 15:20
  */
 public class ConvertUtil {
@@ -38,7 +35,7 @@ public class ConvertUtil {
         vector.add(String.valueOf(index));
         vector.add(matchRule.getRule());
         vector.add(matchRule.getComment());
-        vector.add(matchRule.getRuleType().name());
+        vector.add(matchRule.getRuleType()==null?null:matchRule.getRuleType().name());
         return vector;
     }
 
@@ -85,6 +82,9 @@ public class ConvertUtil {
             vector.add(gitDiffCmd.getFilePath());
             data.add(vector);
         }
+//        TextAttributesKey.createTextAttributesKey("").
+
+
         return data;
     }
 }
