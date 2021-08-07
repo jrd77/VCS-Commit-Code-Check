@@ -20,7 +20,7 @@ import java.util.*;
         name = "org.intellij.sdk.settings.AppSettingsState",
         storages = {@Storage("SdkVcsCheckPlugin.xml")}
 )
-public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
+public class VcsCheckSettingsState implements PersistentStateComponent<VcsCheckSettingsState> {
 
     public List<String> ruleList=new LinkedList<>();
 
@@ -28,18 +28,18 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     public Boolean openCheck=Boolean.FALSE;
 
-    public static AppSettingsState getInstance() {
-        return ApplicationManager.getApplication().getService(AppSettingsState.class);
+    public static VcsCheckSettingsState getInstance() {
+        return ApplicationManager.getApplication().getService(VcsCheckSettingsState.class);
     }
 
     @Nullable
     @Override
-    public AppSettingsState getState() {
+    public VcsCheckSettingsState getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull AppSettingsState state) {
+    public void loadState(@NotNull VcsCheckSettingsState state) {
 
 
         XmlSerializerUtil.copyBean(state, this);

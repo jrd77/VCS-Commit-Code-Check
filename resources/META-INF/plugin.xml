@@ -31,12 +31,12 @@
   <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
   <depends>com.intellij.modules.platform</depends>
-
+  <depends>com.intellij.modules.java</depends>
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
     <toolWindow id="预提交代码检查配置" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
-    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.AppSettingsState"/>
+    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.VcsCheckSettingsState"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>
 

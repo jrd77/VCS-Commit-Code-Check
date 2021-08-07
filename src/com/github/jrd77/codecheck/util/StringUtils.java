@@ -12,7 +12,7 @@ public class StringUtils {
         if(str==null||EMPTY.equals(str)){
             return true;
         }
-        if(str.trim().equals(str)){
+        if(EMPTY.equals(str.trim())){
             return true;
         }
         return false;

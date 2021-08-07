@@ -23,6 +23,8 @@ public class AddRuleDialog extends JDialog {
     private JRadioButton regexpRadio;
     private JRadioButton strMatchRadio;
 
+
+
     public AddRuleDialog() {
 
         initDialogSize();
@@ -34,26 +36,27 @@ public class AddRuleDialog extends JDialog {
 
 
         buttonCancel.addActionListener(e -> onCancel());
-        regexpRadio.addChangeListener(e->selected());
-        strMatchRadio.addChangeListener(e->selected());
+        regexpRadio.setSelected(true);
+        regexpRadio.addChangeListener(e->selectedRegexpRadio());
+        strMatchRadio.addChangeListener(e->selectedStrMatchRadio());
 
         // 单击十字时调用 onCancel()
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
+//        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+//        addWindowListener(new WindowAdapter() {
+//
+//            @Override
+//            public void windowClosing(WindowEvent e) {
+//                onCancel();
+//            }
+//        });
 
         // 遇到 ESCAPE 时调用 onCancel()
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+//        contentPane.registerKeyboardAction(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                onCancel();
+//            }
+//        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
@@ -62,12 +65,15 @@ public class AddRuleDialog extends JDialog {
 
         if(StringUtils.isBlank(ruleText.getText())){
             Messages.showErrorDialog("添加失败,不能为空","添加失败");
+            return;
         }
         if(!strMatchRadio.isSelected() && !regexpRadio.isSelected()){
             Messages.showErrorDialog("添加失败,必须选择类型","添加失败");
+            return;
         }
         if(strMatchRadio.isSelected() && regexpRadio.isSelected()){
             Messages.showErrorDialog("添加失败,不能全选","添加失败");
+            return;
         }
         MatchRule matchRule=new MatchRule();
         matchRule.setRule(ruleText.getText());
@@ -75,6 +81,7 @@ public class AddRuleDialog extends JDialog {
         final boolean b = CheckDataUtil.addRule(matchRule);
         if(!b){
             Messages.showErrorDialog("添加失败,请检查是否重复或者有特殊格式","添加失败");
+            return;
         }else{
             CheckDataUtil.refreshData();
         }
@@ -105,9 +112,16 @@ public class AddRuleDialog extends JDialog {
         this.setSize(widthDialog,heightDialog);
     }
 
-    private void selected(){
+    private void selectedRegexpRadio(){
 
         boolean selected = this.regexpRadio.isSelected();
+        logger.info("regexpRadio selected is"+selected);
+        this.strMatchRadio.setSelected(!selected);
+        logger.info("strMatchRadio setSelected is"+!selected);
+    }
+    private void selectedStrMatchRadio(){
+
+        boolean selected = this.strMatchRadio.isSelected();
         logger.info("regexpRadio selected is"+selected);
         this.strMatchRadio.setSelected(!selected);
         logger.info("strMatchRadio setSelected is"+!selected);

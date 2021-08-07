@@ -1,14 +1,10 @@
 package com.github.jrd77.codecheck.handler;
 
 import com.github.jrd77.codecheck.data.*;
-import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.IoUtil;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -21,8 +17,6 @@ import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
@@ -33,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class VcsCheckinHandler extends CheckinHandler {
@@ -156,7 +149,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             return super.beforeCheckin();
         }
         logger.info("commit file content check start");
-        AppSettingsState instance = AppSettingsState.getInstance();
+        VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         if (instance.ruleList.size() == 0) {
             logger.warning("没有配置匹配规则");
             return super.beforeCheckin();
@@ -189,22 +182,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             int yesOrNo = Messages.showYesNoDialog(html,
                     "特征检查",
                     UIUtil.getErrorIcon());
-            GitDiffCmd gitDiffCmd = cmdList.get(0);
-            String errorLineStr = gitDiffCmd.getErrorLineStr();
-            String trim = errorLineStr.trim();
-            int column = errorLineStr.length() - trim.length();
-            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber(), column);
-            descriptor.navigate(true);
-            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-            if(editor==null){
-                logger.warning("editor为空");
-            }else{
-                editor.getSelectionModel();
-                logger.info("打印选中");
-                String selectedText = editor.getSelectionModel().getSelectedText();
-                System.out.println(selectedText);
-                editor.getSelectionModel().setSelection(0,2);
-            }
+
 
 //            .navigate(...)
 //            new OpenFileDescriptor(project, changeFile).navigate(true);

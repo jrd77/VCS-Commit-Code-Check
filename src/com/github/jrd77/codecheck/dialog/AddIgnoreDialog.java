@@ -5,10 +5,12 @@ import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.StringUtils;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.ScreenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class AddIgnoreDialog extends JDialog {
@@ -18,10 +20,12 @@ public class AddIgnoreDialog extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField textFieldContent;
-    private JTextPane 过滤规则默认使用文件名过滤最好使用正则表达式像Java$TextPane;
+    private JTextPane textPaneTip;
 //    private JTextField textFieldComment;
 
     public AddIgnoreDialog() {
+
+        initDialogSize();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -39,11 +43,11 @@ public class AddIgnoreDialog extends JDialog {
         });
 
         // 遇到 ESCAPE 时调用 onCancel()
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+//        contentPane.registerKeyboardAction(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                onCancel();
+//            }
+//        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
@@ -53,11 +57,13 @@ public class AddIgnoreDialog extends JDialog {
 
         if(StringUtils.isBlank(textFieldContent.getText())){
             Messages.showErrorDialog("添加失败,不能为空","添加失败");
+            return;
         }
         String contentText = textFieldContent.getText();
         final boolean b = CheckDataUtil.addIgnore(contentText);
         if(!b){
             Messages.showErrorDialog("添加失败,请检查是否重复或者有特殊格式","添加失败");
+            return;
         }else{
             CheckDataUtil.refreshData();
         }
@@ -74,5 +80,17 @@ public class AddIgnoreDialog extends JDialog {
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
+    }
+
+    private void initDialogSize(){
+        final Rectangle rectangle = ScreenUtil.getAllScreensRectangle();
+        final double width = rectangle.getWidth();
+        final double height = rectangle.getHeight();
+        final double x = width * 0.5 - 0.1 * width;
+        final double y = height * 0.5 - 0.1 * height;
+        this.setLocation(Double.valueOf(x).intValue(),Double.valueOf(y).intValue());
+        final int widthDialog = Double.valueOf(0.2 * width).intValue();
+        final int heightDialog = Double.valueOf(0.2 * height).intValue();
+        this.setSize(widthDialog,heightDialog);
     }
 }
