@@ -1,4 +1,4 @@
-package com.github.jrd77.codecheck;
+package com.github.jrd77.codecheck.intellij.compoent;
 
 import javax.swing.*;
 

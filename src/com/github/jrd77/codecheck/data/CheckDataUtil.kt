@@ -60,6 +60,9 @@ object CheckDataUtil {
 
     @JvmStatic
     fun refreshResultData(cmdList: List<GitDiffCmd?>?) {
+        if(cmdList==null||cmdList.size==0){
+            return;
+        }
         logger.warning("刷新结果")
         //刷新tableRule
         WindowSetting.reFreshTableResult(ConvertUtil.convertGitDiffList(cmdList))
@@ -95,8 +98,8 @@ object CheckDataUtil {
         addIgnore(".properties$")
         addIgnore(".yml$")
         addIgnore(".xml$")
-         val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, "匹配示例")
-         val matchRuleExample2 = MatchRule("127.0.0.1", RuleTypeEnum.REGEXP, "匹配示例2")
+        val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, "匹配示例")
+        val matchRuleExample2 = MatchRule("127.0.0.1", RuleTypeEnum.REGEXP, "匹配示例2")
         addRule(matchRuleExample)
         addRule(matchRuleExample2)
     }

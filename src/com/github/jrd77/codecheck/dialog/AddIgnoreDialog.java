@@ -32,7 +32,12 @@ public class AddIgnoreDialog extends JDialog {
 
         buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(e -> onCancel());
+        buttonCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
 
         // 单击 X 时调用 onCancel()
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

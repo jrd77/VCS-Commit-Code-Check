@@ -35,28 +35,33 @@ public class AddRuleDialog extends JDialog {
         buttonOK.addActionListener(e -> onOK());
 
 
-        buttonCancel.addActionListener(e -> onCancel());
+        buttonCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
         regexpRadio.setSelected(true);
         regexpRadio.addChangeListener(e->selectedRegexpRadio());
         strMatchRadio.addChangeListener(e->selectedStrMatchRadio());
 
         // 单击十字时调用 onCancel()
-//        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-//        addWindowListener(new WindowAdapter() {
-//
-//            @Override
-//            public void windowClosing(WindowEvent e) {
-//                onCancel();
-//            }
-//        });
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
 
         // 遇到 ESCAPE 时调用 onCancel()
-//        contentPane.registerKeyboardAction(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                onCancel();
-//            }
-//        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
@@ -90,7 +95,8 @@ public class AddRuleDialog extends JDialog {
 
     private void onCancel() {
         // 必要时在此处添加您的代码
-        dispose();
+//        dispose();
+        this.setVisible(false);
     }
 
     public static void main(String[] args) {
@@ -122,8 +128,8 @@ public class AddRuleDialog extends JDialog {
     private void selectedStrMatchRadio(){
 
         boolean selected = this.strMatchRadio.isSelected();
-        logger.info("regexpRadio selected is"+selected);
-        this.strMatchRadio.setSelected(!selected);
-        logger.info("strMatchRadio setSelected is"+!selected);
+        logger.info("strMatchRadio selected is"+selected);
+        this.regexpRadio.setSelected(!selected);
+        logger.info("regexpRadio setSelected is"+!selected);
     }
 }

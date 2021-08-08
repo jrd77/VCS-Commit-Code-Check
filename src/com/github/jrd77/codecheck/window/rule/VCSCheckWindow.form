@@ -63,7 +63,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="d6236" class="javax.swing.JButton" binding="btnNewRule">
+                      <component id="d6236" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnNewRule">
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -71,12 +71,12 @@
                           <text value="添加新规则"/>
                         </properties>
                       </component>
-                      <component id="277bf" class="javax.swing.JButton" binding="btnResetRule">
+                      <component id="277bf" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnResetRule">
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <text value="重置"/>
+                          <text value="清空"/>
                         </properties>
                       </component>
                     </children>
@@ -90,7 +90,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="3bd8e" class="com.github.jrd77.codecheck.MyTable" binding="tableRule">
+                  <component id="3bd8e" class="com.github.jrd77.codecheck.intellij.compoent.MyTable" binding="tableRule">
                     <constraints/>
                     <properties/>
                   </component>
@@ -140,7 +140,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="5a58b" class="javax.swing.JButton" binding="btnNewIgnore">
+                      <component id="5a58b" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnNewIgnore">
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -148,12 +148,12 @@
                           <text value="添加新规则"/>
                         </properties>
                       </component>
-                      <component id="ad5ec" class="javax.swing.JButton" binding="btnResetIgnore">
+                      <component id="ad5ec" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnResetIgnore">
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <text value="重置"/>
+                          <text value="清空"/>
                         </properties>
                       </component>
                     </children>
@@ -167,7 +167,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="fcfc6" class="com.github.jrd77.codecheck.MyTable" binding="tableIgnore">
+                  <component id="fcfc6" class="com.github.jrd77.codecheck.intellij.compoent.MyTable" binding="tableIgnore">
                     <constraints/>
                     <properties/>
                   </component>
@@ -225,19 +225,57 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="7c3d0" class="javax.swing.JButton" binding="btnResetResult">
+                      <grid id="f93" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
-                        <properties>
-                          <text value="重置"/>
-                        </properties>
-                      </component>
-                      <hspacer id="a932e">
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <hspacer id="87ae6">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                          </hspacer>
+                        </children>
+                      </grid>
+                      <grid id="520d8" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
-                      </hspacer>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="6ad0c" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnCheck">
+                            <constraints>
+                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="重新检查"/>
+                            </properties>
+                          </component>
+                          <grid id="78ba6" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                            <margin top="0" left="0" bottom="0" right="0"/>
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="65e29" class="com.github.jrd77.codecheck.intellij.compoent.MyButton" binding="btnResetResult">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties>
+                                  <text value="清空"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
+                        </children>
+                      </grid>
                     </children>
                   </grid>
                 </children>
@@ -254,7 +292,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="e784f" class="com.github.jrd77.codecheck.MyTable" binding="tableResult">
+                      <component id="e784f" class="com.github.jrd77.codecheck.intellij.compoent.MyTable" binding="tableResult">
                         <constraints/>
                         <properties/>
                       </component>
