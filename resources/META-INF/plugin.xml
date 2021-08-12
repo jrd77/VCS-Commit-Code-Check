@@ -8,7 +8,7 @@
       check pre-commit code.check this commit code<br>
       <em>check code <br>
       support JAVA/YAML/PROPERTIES/XML type file code <br>
-      you can define your own Check_Rule (Regular Expression) in Settings->Tools->Vcs Commit Code Check <br>
+      you can define your own Check_Rule (Regular Expression) in key 'ctrl I'->'检查规则-》添加新规则' <br>
       <br>
       then at IDEA VCS commit Window   you'll see option  named '特征检查', press commit button check your code like 'Check TODO' option
       <br>
@@ -31,7 +31,6 @@
   <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
   <depends>com.intellij.modules.platform</depends>
-  <depends>com.intellij.modules.java</depends>
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
     <toolWindow id="预提交代码检查配置" secondary="true" icon="AllIcons.General.Modified" anchor="right"
@@ -41,10 +40,10 @@
   </extensions>
 
   <actions>
-    <!-- Add your actions here -->
-    <action id="ShowCheckWindowID" class="com.github.jrd77.codecheck.action.ShowCheckWindow" text="ShowCheckWindow"
-            description="Show Code Check Window">
-      <add-to-group group-id="VcsGlobalGroup" anchor="first"/>
+    <action id="ShowCodeCheckWindowId" class="com.github.jrd77.codecheck.action.ShowCodeCheckWindow"
+            text="Show Code Check Window " description="Show Code Check Window ">
+      <add-to-group group-id="WindowMenu" anchor="first"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl I"/>
     </action>
   </actions>
 
