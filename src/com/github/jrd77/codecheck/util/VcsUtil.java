@@ -5,22 +5,28 @@ import com.github.jrd77.codecheck.handler.CheckCommitFilter;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.ui.UIUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VcsUtil {
     private static final Logger logger = Logger.getLogger(VcsUtil.class.getName());
@@ -41,18 +47,19 @@ public class VcsUtil {
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(instance.ruleList);
         final List<String> ignoreList = instance.ignoreList;
+//        PsiManager.getInstance(project).findFile(changeFile).
         //获取变更文件
         final LocalChangeList defaultChangeList = VcsUtil.getChangeFileListFromProject(project);
         List<GitDiffCmd> cmdList = null;
         try {
-            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList);
+            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList,project);
         } catch (VcsException | IOException e) {
             e.printStackTrace();
         }
         CheckDataUtil.refreshResultData(cmdList);
         return cmdList;
     }
-    public static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList) throws VcsException, IOException {
+    public static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
 
         int count = 0;
         List<GitDiffCmd> resultList = new ArrayList<>();
@@ -70,6 +77,7 @@ public class VcsUtil {
                 logger.info(String.format("change file [%s]  is%s ,no need check", fileName, type.name()));
                 continue;
             }
+
             final ContentRevision afterRevision = change.getAfterRevision();
             if (afterRevision == null) {
                 logger.info(String.format("change file [%s] afterRevision is null  ,no need check", fileName));
@@ -82,11 +90,16 @@ public class VcsUtil {
                 continue;
             }
             final String changeContent = afterRevision.getContent();
+            System.out.println(changeContent);
             //修改/新增内容是否违规内容
             final List<MatchRule> matchRules = matchError(matchRuleList, changeContent);
             if (matchRules.size() > 0) {
-                final InputStream inputStream = changeFile.getInputStream();
-                final List<String> readLines = IoUtil.readLines(inputStream, StandardCharsets.UTF_8, new ArrayList<>());
+                PsiFile file = PsiManager.getInstance(project).findFile(changeFile);
+                if(file==null){
+                    logger.warning("the psiFile is null of the change file ");
+                    continue;
+                }
+                List<String> readLines = Arrays.stream(file.getText().split("\\r?\\n")).collect(Collectors.toList());
                 if(readLines==null){
                     continue;
                 }
@@ -110,7 +123,6 @@ public class VcsUtil {
                         }
                     }
                 }
-                IoUtil.close(inputStream);
             }
         }
         return resultList;

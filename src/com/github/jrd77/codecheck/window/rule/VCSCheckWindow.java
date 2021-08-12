@@ -133,7 +133,7 @@ public class VCSCheckWindow {
                     }
                 }
             }catch (Exception ex){
-                logger.severe("打开文件失败"+tableResult.getModel().getValueAt(selectedRow, 4));
+                logger.severe("打开文件失败"+tableResult.getModel());
                 ex.printStackTrace();
             }
         });

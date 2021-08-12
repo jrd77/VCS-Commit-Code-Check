@@ -98,6 +98,7 @@ object CheckDataUtil {
         addIgnore(".properties$")
         addIgnore(".yml$")
         addIgnore(".xml$")
+        addIgnore(".kt$")
         val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, "匹配示例")
         val matchRuleExample2 = MatchRule("127.0.0.1", RuleTypeEnum.REGEXP, "匹配示例2")
         addRule(matchRuleExample)
