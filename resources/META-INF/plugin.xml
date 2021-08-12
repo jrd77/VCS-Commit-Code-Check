@@ -13,22 +13,17 @@
 
     可以在 **检查规则->添加检查规则** 添加检查规则（,默认正则），在**文件匹配规则->添加文件匹配规则**添加检查文件规则()，
 
-    在提交的时候自动勾选检查选项'特征检查'，会自动检查符合规则的代码行
+    在提交的时候自动勾选检查选项'特征检查'，会自动检查符合规则的代码行.
 
     同样也可以使用窗口'**预提交代码检查配置**'下面'**重新检查**'按钮，预览检查结果，点击检查结果表格行，自动跳转有问题的代码
-
-      you can define your own Check_Rule (Regular Expression) in key 'ctrl I'->'检查规则-》添加新规则' <br>
-      <br>
-      then at IDEA VCS commit Window   you'll see option  named '特征检查', press commit button check your code like 'Check TODO' option
-      <br>
-      the source code at https://github.com/jrd77/Vcs-Commit-Code-Check
+    详见 https://github.com/jrd77/Vcs-Commit-Code-Check
       </em>
     ]]></description>
 
   <change-notes><![CDATA[
       检查需要提交代码 <br>
       <em>支持java,kt,yml,properties和xml格式文件 <br>
-       在 Settings->Tools->Vcs Commit Code Check 里面自定义规则
+       可以在 **检查规则->添加检查规则** 添加检查规则（,默认正则），在**文件匹配规则->添加文件匹配规则**添加检查文件规则()，
        提交的时候选中'特征检查'(和TODO选项并列)开启代码检查,
        </em>
     ]]>
