@@ -2,7 +2,7 @@
   <id>com.github.jrd77.codecheck.id</id>
   <name>Vcs Commit Code Check</name>
   <version>1.1</version>
-  <vendor email="jrd77@qq.com" url="https://github.com/jrd77/VcsCommitCodeCheck">jrd77</vendor>
+  <vendor email="jrd77@qq.com" url="https://github.com/jrd77/Vcs-Commit-Code-Check">jrd77</vendor>
 
   <description><![CDATA[
       检查需要提交的代码<br>
@@ -21,7 +21,7 @@
       <br>
       then at IDEA VCS commit Window   you'll see option  named '特征检查', press commit button check your code like 'Check TODO' option
       <br>
-      the source code at https://github.com/jrd77/VcsCommitCodeCheck
+      the source code at https://github.com/jrd77/Vcs-Commit-Code-Check
       </em>
     ]]></description>
 
