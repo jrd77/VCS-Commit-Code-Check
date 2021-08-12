@@ -7,10 +7,16 @@
   <description><![CDATA[
       检查需要提交的代码<br>
       <em>check code <br>
-      支持 JAVA/YAML/PROPERTIES/XML/kt type 文件 <br>
-      在'Window'->'Show Code Check Window'打开窗口（快捷键 Ctrl + I）
-      可以添加检查规则（检查规则->添加新规则,默认正则）和检查文件规则(忽略规则->添加新规则)，默认在提交的时候自动勾选检查选项'特征检查'
-      也可以使用窗口下面'重新检查'按钮，预览检查结果，点击检查结果表格，自动跳转有问题的代码行
+    默认检查 JAVA/YAML/PROPERTIES/XML/kt  文件
+
+    在'*Window*'->'*Show Code Check Window*'打开窗口'**预提交代码检查配置**'（快捷键 Ctrl + I）
+
+    可以在 **检查规则->添加检查规则** 添加检查规则（,默认正则），在**文件匹配规则->添加文件匹配规则**添加检查文件规则()，
+
+    在提交的时候自动勾选检查选项'特征检查'，会自动检查符合规则的代码行
+
+    同样也可以使用窗口'**预提交代码检查配置**'下面'**重新检查**'按钮，预览检查结果，点击检查结果表格行，自动跳转有问题的代码
+
       you can define your own Check_Rule (Regular Expression) in key 'ctrl I'->'检查规则-》添加新规则' <br>
       <br>
       then at IDEA VCS commit Window   you'll see option  named '特征检查', press commit button check your code like 'Check TODO' option
