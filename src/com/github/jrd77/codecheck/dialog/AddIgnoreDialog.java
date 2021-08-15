@@ -1,6 +1,7 @@
 package com.github.jrd77.codecheck.dialog;
 
 import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ScreenUtil;
@@ -56,16 +57,16 @@ public class AddIgnoreDialog extends JDialog {
     private void onOK() {
         // 在此处添加您的代码
         // 在此处添加代码
-        logger.info("参数:ignoreText"+textFieldContent.getText());
+        logger.info(InterUtil.getValue("logs.param")+textFieldContent.getText());
 
         if(StrUtil.isBlank(textFieldContent.getText())){
-            Messages.showErrorDialog("添加失败,不能为空","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }
         String contentText = textFieldContent.getText();
         final boolean b = CheckDataUtil.addIgnore(contentText);
         if(!b){
-            Messages.showErrorDialog("添加失败,请检查是否重复或者有特殊格式","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }else{
             CheckDataUtil.refreshData();

@@ -15,16 +15,16 @@ public class InterUtil {
     private static Logger logger = Logger.getLogger(InterUtil.class.getName());
 
     private static final String DEFAULT_LANGUAGE_ZH ="language/zh.properties";
-    private static final String DEFAULT_LANGUAGE_EN ="language/zh.properties";
+    private static final String DEFAULT_LANGUAGE_EN ="language/en.properties";
     private static final String DEFAULT_LANGUAGE ="zh";
     private static PropsUtil.Props INTERNATIONAL_PROPS =null;
     static {
         Locale aDefault = Locale.getDefault();
         String pluginPath = getPluginPath();
         if(aDefault.getLanguage().equals(DEFAULT_LANGUAGE)){
-            INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_ZH);
-        }else{
             INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_EN);
+        }else{
+            INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_ZH);
         }
     }
 
@@ -39,11 +39,6 @@ public class InterUtil {
         return INTERNATIONAL_PROPS.getProperty(name);
     }
 
-    public static void main(String[] args) {
-
-        String value = getValue("logs.common.countCompare");
-        System.out.println(value);
-    }
 
     private static String getPluginPath(){
 

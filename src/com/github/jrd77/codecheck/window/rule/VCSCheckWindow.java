@@ -64,14 +64,14 @@ public class VCSCheckWindow {
             int yesNoDialog=DIALOG_HIDDEN;
             final int columnCount = tableResult.getRowCount();
             if(columnCount!=0){
-                yesNoDialog = Messages.showYesNoDialog("是否清空检查结果,重新检查", "重新检查", UIUtil.getWarningIcon());
+                yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnCheck.dialog.message"), InterUtil.getValue("show.content.window.btnCheck.dialog.title"), UIUtil.getWarningIcon());
             }
             if(yesNoDialog==0||columnCount==0){
                 CheckDataUtil.resultClear();
                 //其他检查
                 ResultObject resultObject = CheckCommitFilter.checkCommitPre();
                 if(resultObject.getOk()!=0){
-                    Messages.showMessageDialog(resultObject.getMsg(),"重新检查失败", UIUtil.getWarningIcon());
+                    Messages.showMessageDialog(resultObject.getMsg(),InterUtil.getValue("show.content.window.otherCheck.dialog.message"), UIUtil.getWarningIcon());
                     return;
                 }
                 //开始检查
@@ -83,7 +83,7 @@ public class VCSCheckWindow {
             int yesNoDialog=DIALOG_HIDDEN;
             final int columnCount = tableIgnore.getRowCount();
             if(columnCount!=0){
-                yesNoDialog = Messages.showYesNoDialog("是否清空忽略规则(需要另外添加,如不添加将导致不能检查)", "清空检查文件规则", UIUtil.getWarningIcon());
+                yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetIgnore.dialog.message"), InterUtil.getValue("show.content.window.btnResetIgnore.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
             if(yesNoDialog==0){
@@ -96,7 +96,7 @@ public class VCSCheckWindow {
             int showDialog=DIALOG_HIDDEN;
             final int columnCount = tableRule.getRowCount();
             if(columnCount!=0){
-                showDialog = Messages.showYesNoDialog("是否清空检查规则(需要另外添加,如不添加将导致不能检查)", "清空检查规则", UIUtil.getWarningIcon());
+                showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetRule.dialog.message"), InterUtil.getValue("show.content.window.btnResetRule.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
             if(showDialog==0){
@@ -109,7 +109,7 @@ public class VCSCheckWindow {
             int showDialog=DIALOG_HIDDEN;
             final int columnCount = tableResult.getRowCount();
             if(columnCount!=0){
-                showDialog = Messages.showYesNoDialog("是否清空检查结果", "清空检查结果", UIUtil.getWarningIcon());
+                showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetResult.dialog.message"), InterUtil.getValue("show.content.window.btnResetResult.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
             if(showDialog==0){
@@ -129,17 +129,17 @@ public class VCSCheckWindow {
                     descriptor.navigate(true);
                     Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
                     if(editor==null){
-                        logger.warning("editor为空");
+                        logger.warning(InterUtil.getValue("logs.validate.editorIsNull"));
                     }else{
                         //选中检查内容
                         editor.getSelectionModel().selectLineAtCaret();
                         final String selectedText = editor.getSelectionModel().getSelectedText();
-                        logger.info(String.format("打印选中:%s",selectedText));
+                        logger.info(String.format(InterUtil.getValue("logs.common.printSelected"),selectedText));
 
                     }
                 }
             }catch (Exception ex){
-                logger.severe(String.format("打开文件失败s%s"+tableResult.getModel()));
+                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName")+tableResult.getModel()));
                 ex.printStackTrace();
             }
         });

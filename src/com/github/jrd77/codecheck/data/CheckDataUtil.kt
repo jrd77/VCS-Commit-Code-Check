@@ -91,7 +91,7 @@ object CheckDataUtil {
     fun initCheckFileTypeList() {
         val instance = instance
         if (instance == null) {
-            logger.severe("logs.save.failed")
+            logger.severe(InterUtil.getValue("logs.save.failed"))
             return
         }
         addIgnore(".java$")
@@ -99,8 +99,8 @@ object CheckDataUtil {
         addIgnore(".yml$")
         addIgnore(".xml$")
         addIgnore(".kt$")
-        val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, "匹配示例")
-        val matchRuleExample2 = MatchRule("127.0.0.1", RuleTypeEnum.REGEXP, "匹配示例2")
+        val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, InterUtil.getValue("show.content.tableData.matchRule.example1"))
+        val matchRuleExample2 = MatchRule("127.0.0.1", RuleTypeEnum.REGEXP, InterUtil.getValue("show.content.tableData.matchRule.example2"))
         addRule(matchRuleExample)
         addRule(matchRuleExample2)
     }

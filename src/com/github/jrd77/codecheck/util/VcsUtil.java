@@ -43,7 +43,7 @@ public class VcsUtil {
      */
     public static List<GitDiffCmd> checkMainFlow(Project project){
 
-        logger.info("checkMainFlow 进入检查流程");
+        logger.info("logs.common.checkMainFlow");
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(instance.ruleList);
         final List<String> ignoreList = instance.ignoreList;
@@ -66,7 +66,7 @@ public class VcsUtil {
         for (Change change : defaultChangeList.getChanges()) {
             final VirtualFile changeFile = change.getVirtualFile();
             if (Objects.isNull(changeFile)) {
-                logger.info("change file type is null");
+                logger.info("logs.validate.changetypeisnull");
                 continue;
             }
             final Change.Type type = change.getType();
@@ -74,19 +74,19 @@ public class VcsUtil {
             final String fileTypeName = fileType.getName();
             final String fileName = changeFile.getName();
             if (type.equals(Change.Type.DELETED) || type.equals(Change.Type.MOVED)) {
-                logger.info(String.format("change file [%s]  is%s ,no need check", fileName, type.name()));
+                logger.info(String.format("logs.validate.noNeedCheck", fileName, type.name()));
                 continue;
             }
 
             final ContentRevision afterRevision = change.getAfterRevision();
             if (afterRevision == null) {
-                logger.info(String.format("change file [%s] afterRevision is null  ,no need check", fileName));
+                logger.info(String.format("logs.validate.changeContentIsNull", fileName));
                 continue;
             }
 
             final boolean contains = ignoreList.stream().anyMatch(x -> matchs(x, fileName));
             if (!contains) {
-                logger.info(String.format("this change file [%s] match fileType fail ,no need check", fileName));
+                logger.info(String.format("logs.validate.matchTypeFailed", fileName));
                 continue;
             }
             final String changeContent = afterRevision.getContent();
@@ -96,7 +96,7 @@ public class VcsUtil {
             if (matchRules.size() > 0) {
                 PsiFile file = PsiManager.getInstance(project).findFile(changeFile);
                 if(file==null){
-                    logger.warning("the psiFile is null of the change file ");
+                    logger.warning("logs.validate.PsiFileIsNull");
                     continue;
                 }
                 List<String> readLines = Arrays.stream(file.getText().split("\\r?\\n")).collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class VcsUtil {
                             diff.setErrorMatch(matchRule.getRule());
                             diff.setErrorLineNumber(i + 1);
                             diff.setFile(changeFile);
-                            logger.info(++count + "-----------------------------");
+                            logger.info(++count + "logs.common.countCompare");
                             resultList.add(diff);
                         }
                     }

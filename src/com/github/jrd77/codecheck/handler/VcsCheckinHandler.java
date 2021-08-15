@@ -44,7 +44,7 @@ public class VcsCheckinHandler extends CheckinHandler {
 
     @Override
     public RefreshableOnComponent getBeforeCheckinConfigurationPanel() {
-        final JCheckBox checkBox = new JCheckBox("特征检查");
+        final JCheckBox checkBox = new JCheckBox(InterUtil.getValue("show.content.vcs.checkinhandler.name"));
 
         return new RefreshableOnComponent() {
 
@@ -81,9 +81,9 @@ public class VcsCheckinHandler extends CheckinHandler {
     @Override
     public ReturnResult beforeCheckin() {
 
-        logger.info("commit file content check start");
+        logger.info(InterUtil.getValue("logs.common.startcheck"));
         if (!isCheckMessageEnabled()) {
-            logger.warning("未开启违规检查");
+            logger.warning(InterUtil.getValue("logs.validate.notopencheck"));
             return super.beforeCheckin();
         }
         //其他检查
@@ -96,12 +96,12 @@ public class VcsCheckinHandler extends CheckinHandler {
         if (cmdList != null && cmdList.size() > 0) {
             final String htmlTable = HtmlUtil.buildHtmlTable(cmdList);
             String html = "<html><head>" + UIUtil.getCssFontDeclaration(UIUtil.getLabelFont()) + "</head><body>" +
-                    "<br><h3>检测到命中特征的代码，是否继续提交</h3>" +
+                    "<br><h3>"+InterUtil.getValue("show.content.vcs.checkinhandler.message.whether")+"</h3>" +
                     "<br>" +
                     htmlTable +
                     "</body></html>";
             int yesOrNo = Messages.showYesNoDialog(html,
-                    "特征检查",
+                    InterUtil.getValue("show.content.vcs.checkinhandler.message.title"),
                     UIUtil.getErrorIcon());
             return yesOrNo == 0 ? ReturnResult.COMMIT : ReturnResult.CANCEL;
         }

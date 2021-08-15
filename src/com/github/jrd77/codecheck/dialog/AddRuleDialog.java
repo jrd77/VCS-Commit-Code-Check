@@ -1,6 +1,7 @@
 package com.github.jrd77.codecheck.dialog;
 
 import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.StrUtil;
@@ -66,10 +67,10 @@ public class AddRuleDialog extends JDialog {
 
     private void onOK() {
         // 在此处添加代码
-        logger.info("参数:ruleText"+ruleText.getText()+",regexpRadio type:"+regexpRadio.isSelected());
+        logger.info(InterUtil.getValue("logs.param")+ruleText.getText()+",regexpRadio type:"+regexpRadio.isSelected());
 
         if(StrUtil.isBlank(ruleText.getText())){
-            Messages.showErrorDialog("添加失败,不能为空","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"),"添加失败");
             return;
         }
         if(!strMatchRadio.isSelected() && !regexpRadio.isSelected()){
