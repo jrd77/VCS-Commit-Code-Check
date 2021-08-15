@@ -43,7 +43,7 @@ object CheckDataUtil {
     fun refreshData() {
         val instance = VcsCheckSettingsState.getInstance()
         if (instance == null) {
-            logger.warning("刷新表格数据")
+            logger.warning(InterUtil.getValue("logs.refresh.tabledata"))
             return
         }
         //刷新tableRule
@@ -53,7 +53,7 @@ object CheckDataUtil {
 
     @JvmStatic
     fun resultClear() {
-        logger.warning("刷新结果")
+        logger.warning(InterUtil.getValue("logs.refresh.result"))
         //刷新tableRule
         WindowSetting.reFreshTableResult(null)
     }
@@ -63,7 +63,7 @@ object CheckDataUtil {
         if(cmdList==null||cmdList.size==0){
             return;
         }
-        logger.warning("刷新结果")
+        logger.warning(InterUtil.getValue("logs.refresh.result"))
         //刷新tableRule
         WindowSetting.reFreshTableResult(ConvertUtil.convertGitDiffList(cmdList))
     }
@@ -91,7 +91,7 @@ object CheckDataUtil {
     fun initCheckFileTypeList() {
         val instance = instance
         if (instance == null) {
-            logger.severe("PersistentState failed,持久化失败")
+            logger.severe("logs.save.failed")
             return
         }
         addIgnore(".java$")

@@ -1,9 +1,7 @@
 package com.github.jrd77.codecheck.dialog;
 
 import com.github.jrd77.codecheck.data.CheckDataUtil;
-import com.github.jrd77.codecheck.data.MatchRule;
-import com.github.jrd77.codecheck.data.RuleTypeEnum;
-import com.github.jrd77.codecheck.util.StringUtils;
+import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ScreenUtil;
 import org.slf4j.Logger;
@@ -58,9 +56,9 @@ public class AddIgnoreDialog extends JDialog {
     private void onOK() {
         // 在此处添加您的代码
         // 在此处添加代码
-        logger.info("参数:ruleText"+textFieldContent.getText());
+        logger.info("参数:ignoreText"+textFieldContent.getText());
 
-        if(StringUtils.isBlank(textFieldContent.getText())){
+        if(StrUtil.isBlank(textFieldContent.getText())){
             Messages.showErrorDialog("添加失败,不能为空","添加失败");
             return;
         }

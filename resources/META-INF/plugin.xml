@@ -37,7 +37,7 @@
   <depends>com.intellij.modules.platform</depends>
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <toolWindow id="预提交代码检查配置" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+    <toolWindow id="PreCommitCodeWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
     <applicationService serviceImplementation="com.github.jrd77.codecheck.data.VcsCheckSettingsState"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>

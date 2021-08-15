@@ -40,7 +40,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="a4524" class="javax.swing.JLabel">
+                      <component id="a4524" class="javax.swing.JLabel" binding="tableRuleTitle">
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -122,7 +122,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="1a42" class="javax.swing.JLabel">
+                      <component id="1a42" class="javax.swing.JLabel" binding="tableFileTitle">
                         <constraints>
                           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -209,7 +209,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="b0b6d" class="javax.swing.JLabel">
+                  <component id="b0b6d" class="javax.swing.JLabel" binding="tableResultTitle">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>

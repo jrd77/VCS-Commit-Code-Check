@@ -118,7 +118,7 @@ public class VcsUtil {
                             diff.setErrorMatch(matchRule.getRule());
                             diff.setErrorLineNumber(i + 1);
                             diff.setFile(changeFile);
-                            System.out.println(++count + "-----------------------------");
+                            logger.info(++count + "-----------------------------");
                             resultList.add(diff);
                         }
                     }

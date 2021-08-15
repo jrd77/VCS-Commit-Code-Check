@@ -1,5 +1,6 @@
 package com.github.jrd77.codecheck.window.rule;
 
+import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.handler.CheckCommitFilter;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
 import com.github.jrd77.codecheck.intellij.compoent.MyTable;
@@ -48,11 +49,16 @@ public class VCSCheckWindow {
     private MyTable tableResult;
     private MyButton btnCheck;
     private MyButton btnResetResult;
+    private JLabel tableRuleTitle;
+    private JLabel tableFileTitle;
+    private JLabel tableResultTitle;
 
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
         init();
+        //国际化显示
+        initComponentText();
 
         btnCheck.addActionListener(e->{
             int yesNoDialog=DIALOG_HIDDEN;
@@ -125,15 +131,15 @@ public class VCSCheckWindow {
                     if(editor==null){
                         logger.warning("editor为空");
                     }else{
-                        logger.info("打印选中");
                         //选中检查内容
                         editor.getSelectionModel().selectLineAtCaret();
                         final String selectedText = editor.getSelectionModel().getSelectedText();
-                        logger.info("打印选中:{"+selectedText+"}");
+                        logger.info(String.format("打印选中:%s",selectedText));
+
                     }
                 }
             }catch (Exception ex){
-                logger.severe("打开文件失败"+tableResult.getModel());
+                logger.severe(String.format("打开文件失败s%s"+tableResult.getModel()));
                 ex.printStackTrace();
             }
         });
@@ -219,5 +225,18 @@ public class VCSCheckWindow {
         double contentWidth=globalWidth-(globalWidth*0.1);
         columnModel.getColumn(index++).setPreferredWidth((int) contentWidth /2);
         columnModel.getColumn(index).setPreferredWidth((int) contentWidth /2);
+    }
+
+    private void initComponentText(){
+
+        btnNewRule.setText(InterUtil.getValue("show.component.btnNewRule.text"));
+        btnResetRule.setText(InterUtil.getValue("show.component.btnResetRule.text"));
+        btnNewIgnore.setText(InterUtil.getValue("show.component.btnNewIgnore.text"));
+        btnResetIgnore.setText(InterUtil.getValue("show.component.btnResetIgnore.text"));
+        btnCheck.setText(InterUtil.getValue("show.component.btnCheck.text"));
+        btnResetResult.setText(InterUtil.getValue("show.component.btnResetResult.text"));
+        tableRuleTitle.setText(InterUtil.getValue("show.component.tableRuleTitle.text"));
+        tableFileTitle.setText(InterUtil.getValue("show.component.tableFileTitle.text"));
+        tableResultTitle.setText(InterUtil.getValue("show.component.tableResultTitle.text"));
     }
 }

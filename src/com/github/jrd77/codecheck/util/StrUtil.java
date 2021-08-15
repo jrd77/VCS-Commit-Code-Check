@@ -5,7 +5,7 @@ package com.github.jrd77.codecheck.util;
  * @description localhost
  * @date 2021/7/29 10:12
  */
-public class StringUtils {
+public class StrUtil {
     private static final String EMPTY="";
     public static boolean isBlank(String str){
 

@@ -10,9 +10,9 @@ public class ShowCodeCheckWindow extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        // TODO: insert action logic here
-        ToolWindowManager.getInstance(Objects.requireNonNull(e.getProject())).getToolWindow("预提交代码检查配置").show(()->{
-            System.out.println("打开vcsCheck");
+
+        ToolWindowManager.getInstance(Objects.requireNonNull(e.getProject())).getToolWindow("PreCommitCodeWindow").show(()->{
+            System.out.println("open VcsCheck");
         });
     }
 }

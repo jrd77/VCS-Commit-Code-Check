@@ -3,7 +3,7 @@ package com.github.jrd77.codecheck.dialog;
 import com.github.jrd77.codecheck.data.CheckDataUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
-import com.github.jrd77.codecheck.util.StringUtils;
+import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ScreenUtil;
 
@@ -68,7 +68,7 @@ public class AddRuleDialog extends JDialog {
         // 在此处添加代码
         logger.info("参数:ruleText"+ruleText.getText()+",regexpRadio type:"+regexpRadio.isSelected());
 
-        if(StringUtils.isBlank(ruleText.getText())){
+        if(StrUtil.isBlank(ruleText.getText())){
             Messages.showErrorDialog("添加失败,不能为空","添加失败");
             return;
         }
