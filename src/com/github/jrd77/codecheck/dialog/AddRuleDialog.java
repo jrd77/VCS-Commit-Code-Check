@@ -23,7 +23,7 @@ public class AddRuleDialog extends JDialog {
     private JTextField ruleText;
     private JRadioButton regexpRadio;
     private JRadioButton strMatchRadio;
-
+    private JLabel addDialogTitle;
 
 
     public AddRuleDialog() {
@@ -70,15 +70,15 @@ public class AddRuleDialog extends JDialog {
         logger.info(InterUtil.getValue("logs.param")+ruleText.getText()+",regexpRadio type:"+regexpRadio.isSelected());
 
         if(StrUtil.isBlank(ruleText.getText())){
-            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"),"添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }
         if(!strMatchRadio.isSelected() && !regexpRadio.isSelected()){
-            Messages.showErrorDialog("添加失败,必须选择类型","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.mustBeSelectedType"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }
         if(strMatchRadio.isSelected() && regexpRadio.isSelected()){
-            Messages.showErrorDialog("添加失败,不能全选","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.mustBeNotSelectAll"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }
         MatchRule matchRule=new MatchRule();
@@ -86,7 +86,7 @@ public class AddRuleDialog extends JDialog {
         matchRule.setRuleType(RuleTypeEnum.REGEXP);
         final boolean b = CheckDataUtil.addRule(matchRule);
         if(!b){
-            Messages.showErrorDialog("添加失败,请检查是否重复或者有特殊格式","添加失败");
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }else{
             CheckDataUtil.refreshData();
@@ -122,15 +122,11 @@ public class AddRuleDialog extends JDialog {
     private void selectedRegexpRadio(){
 
         boolean selected = this.regexpRadio.isSelected();
-        logger.info("regexpRadio selected is"+selected);
         this.strMatchRadio.setSelected(!selected);
-        logger.info("strMatchRadio setSelected is"+!selected);
     }
     private void selectedStrMatchRadio(){
 
         boolean selected = this.strMatchRadio.isSelected();
-        logger.info("strMatchRadio selected is"+selected);
         this.regexpRadio.setSelected(!selected);
-        logger.info("regexpRadio setSelected is"+!selected);
     }
 }

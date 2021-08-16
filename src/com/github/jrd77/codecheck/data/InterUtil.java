@@ -35,7 +35,7 @@ public class InterUtil {
      */
     public static String getValue(String name){
 
-        Assert.notNull(INTERNATIONAL_PROPS,"can't get language file");
+        Assert.notNull(INTERNATIONAL_PROPS,"can't get language tips file");
         return INTERNATIONAL_PROPS.getProperty(name);
     }
 
