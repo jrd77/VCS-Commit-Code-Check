@@ -97,6 +97,7 @@ object CheckDataUtil {
         addIgnore(".java$")
         addIgnore(".properties$")
         addIgnore(".yml$")
+        addIgnore(".yaml$")
         addIgnore(".xml$")
         addIgnore(".kt$")
         val matchRuleExample = MatchRule("localhost", RuleTypeEnum.REGEXP, InterUtil.getValue("show.content.tableData.matchRule.example1"))

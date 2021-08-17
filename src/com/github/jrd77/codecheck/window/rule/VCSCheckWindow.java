@@ -119,6 +119,9 @@ public class VCSCheckWindow {
         //列表选中事件
         tableResult.getSelectionModel().addListSelectionListener(e -> {
             final int selectedRow = tableResult.getSelectedRow();
+            if(selectedRow<0){
+                return;
+            }
             try {
                 final TableModel resultModel = tableResult.getModel();
                 //组装数据实体
@@ -139,7 +142,7 @@ public class VCSCheckWindow {
                     }
                 }
             }catch (Exception ex){
-                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName")+tableResult.getModel()));
+                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"),tableResult.getModel()));
                 ex.printStackTrace();
             }
         });

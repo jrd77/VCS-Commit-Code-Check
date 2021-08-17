@@ -20,6 +20,8 @@ public class AddIgnoreDialog extends JDialog {
     private JButton buttonCancel;
     private JTextField textFieldContent;
     private JTextPane textPaneTip;
+    private JLabel addDialogTitle;
+    private JLabel descLabel;
 //    private JTextField textFieldComment;
 
     public AddIgnoreDialog() {
@@ -28,6 +30,7 @@ public class AddIgnoreDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        initComponentText();
 
         buttonOK.addActionListener(e -> onOK());
 
@@ -96,5 +99,13 @@ public class AddIgnoreDialog extends JDialog {
         final int widthDialog = Double.valueOf(0.2 * width).intValue();
         final int heightDialog = Double.valueOf(0.2 * height).intValue();
         this.setSize(widthDialog,heightDialog);
+    }
+
+    private void initComponentText(){
+
+        textFieldContent.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textFieldContent.text"));
+        textPaneTip.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textPaneTip.text"));
+        addDialogTitle.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.addContentLabel.text"));
+        descLabel.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.descLabel.text"));
     }
 }

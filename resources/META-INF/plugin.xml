@@ -5,27 +5,45 @@
   <vendor email="jrd77@qq.com" url="https://github.com/jrd77/Vcs-Commit-Code-Check">jrd77</vendor>
 
   <description><![CDATA[
-      检查需要提交的代码<br>
-      <em>check code <br>
-    默认检查 JAVA/YAML/PROPERTIES/XML/kt  文件
+    <h3>Check Vcs change File like 'check TODO' in commit-change window</h3>
+    <p>
+    <br>
+    In commit-change window,select the 'Code check' option to start checking
+    <br>
+    <br>
+     <strong><em>OPEN the check window</em></strong><br>
+    <strong>'Window'->'Show Code Check Window'</strong> <br>
+    you can define your own match rule and preview check result in the window.
+    <br>
+    <br>
+    see more detail in https://github.com/jrd77/Vcs-Commit-Code-Check">github
+    </p>
+    <hr/>
+    <br>
+      <em>检查需要提交的代码</em><br>
+      check code <br>
 
-    在'*Window*'->'*Show Code Check Window*'打开窗口'**预提交代码检查配置**'（快捷键 Ctrl + I）
-
+    在'*Window*'->'*Show Code Check Window*'打开窗口'**PreCommitCodeWindow**'（快捷键 Ctrl + I）
+ <br>
     可以在 **检查规则->添加检查规则** 添加检查规则（,默认正则），在**文件匹配规则->添加文件匹配规则**添加检查文件规则()，
-
+ <br>
     在提交的时候自动勾选检查选项'特征检查'，会自动检查符合规则的代码行.
-
-    同样也可以使用窗口'**预提交代码检查配置**'下面'**重新检查**'按钮，预览检查结果，点击检查结果表格行，自动跳转有问题的代码
+ <br>
+    同样也可以使用窗口'**PreCommitCodeWindow**'下面'**重新检查**'按钮，预览检查结果，点击检查结果表格行，自动跳转有问题的代码
+     <br>
     详见 https://github.com/jrd77/Vcs-Commit-Code-Check
-      </em>
+       <br>
     ]]></description>
 
   <change-notes><![CDATA[
-      检查需要提交代码 <br>
-      <em>支持java,kt,yml,properties和xml格式文件 <br>
-       可以在 **检查规则->添加检查规则** 添加检查规则（,默认正则），在**文件匹配规则->添加文件匹配规则**添加检查文件规则()，
-       提交的时候选中'特征检查'(和TODO选项并列)开启代码检查,
-       </em>
+    <<em><strong>Check Vcs change File like 'check TODO' in commit-change window</strong></em></em>
+
+<br>
+<ul>
+<li>add english version</li>
+<li>check 'yaml$' file</li>
+</ul>
+
     ]]>
   </change-notes>
 

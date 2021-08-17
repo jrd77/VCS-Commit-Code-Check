@@ -90,7 +90,7 @@ public class VcsUtil {
                 continue;
             }
             final String changeContent = afterRevision.getContent();
-            System.out.println(changeContent);
+
             //修改/新增内容是否违规内容
             final List<MatchRule> matchRules = matchError(matchRuleList, changeContent);
             if (matchRules.size() > 0) {

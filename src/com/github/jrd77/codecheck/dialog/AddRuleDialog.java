@@ -24,6 +24,8 @@ public class AddRuleDialog extends JDialog {
     private JRadioButton regexpRadio;
     private JRadioButton strMatchRadio;
     private JLabel addDialogTitle;
+    private JLabel contentLabel;
+    private JLabel typeLabel;
 
 
     public AddRuleDialog() {
@@ -32,7 +34,8 @@ public class AddRuleDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
+        //国际化
+        initComponentText();
         buttonOK.addActionListener(e -> onOK());
 
 
@@ -128,5 +131,15 @@ public class AddRuleDialog extends JDialog {
 
         boolean selected = this.strMatchRadio.isSelected();
         this.regexpRadio.setSelected(!selected);
+    }
+
+    private void initComponentText(){
+
+        ruleText.setToolTipText(InterUtil.getValue("show.content.dialog.btnAddRule.ruleText.text"));
+        regexpRadio.setText(InterUtil.getValue("show.content.dialog.btnAddRule.regexpRadio.text"));
+        strMatchRadio.setText(InterUtil.getValue("show.content.dialog.btnAddRule.strMatchRadio.text"));
+        addDialogTitle.setText(InterUtil.getValue("show.content.dialog.btnAddRule.addDialogTitle.text"));
+        contentLabel.setText(InterUtil.getValue("show.content.dialog.btnAddRule.contentLabel.text"));
+        typeLabel.setText(InterUtil.getValue("show.content.dialog.btnAddRule.typeLabel.text"));
     }
 }

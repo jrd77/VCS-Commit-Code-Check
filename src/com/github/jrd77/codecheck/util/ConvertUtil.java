@@ -1,6 +1,7 @@
 package com.github.jrd77.codecheck.util;
 
 import com.github.jrd77.codecheck.data.GitDiffCmd;
+import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.google.gson.Gson;
 import com.intellij.ide.highlighter.JavaFileHighlighter;
@@ -63,7 +64,7 @@ public class ConvertUtil {
             Vector<String> vector=new Vector<>();
             vector.add(String.valueOf(++index));
             vector.add(s);
-            vector.add("文件名正则匹配");
+            vector.add(InterUtil.getValue("show.content.tableData.matchIgnoreRule.remark"));
             data.add(vector);
         }
         return data;
