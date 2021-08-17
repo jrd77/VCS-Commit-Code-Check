@@ -1,6 +1,6 @@
 <idea-plugin>
   <id>com.github.jrd77.codecheck.id</id>
-  <name>Vcs Commit Code Check</name>
+  <name>VCS Commit Code Check</name>
   <version>1.1</version>
   <vendor email="jrd77@qq.com" url="https://github.com/jrd77/Vcs-Commit-Code-Check">jrd77</vendor>
 
@@ -16,7 +16,7 @@
     you can define your own match rule and preview check result in the window.
     <br>
     <br>
-    see more detail in https://github.com/jrd77/Vcs-Commit-Code-Check">github
+    see more detail in https://github.com/jrd77/Vcs-Commit-Code-Check
     </p>
     <hr/>
     <br>
@@ -57,7 +57,7 @@
     <!-- Add your extensions here -->
     <toolWindow id="PreCommitCodeWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
-    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.VcsCheckSettingsState"/>
+    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>
 

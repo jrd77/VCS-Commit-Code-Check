@@ -22,9 +22,9 @@ public class InterUtil {
         Locale aDefault = Locale.getDefault();
         String pluginPath = getPluginPath();
         if(aDefault.getLanguage().equals(DEFAULT_LANGUAGE)){
-            INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_EN);
-        }else{
             INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_ZH);
+        }else{
+            INTERNATIONAL_PROPS=PropsUtil.getProperties(pluginPath+DEFAULT_LANGUAGE_EN);
         }
     }
 
