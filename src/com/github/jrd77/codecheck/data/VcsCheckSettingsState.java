@@ -17,7 +17,7 @@ import java.util.*;
  * these persistent application settings are stored.
  */
 @State(
-        name = "org.intellij.sdk.settings.AppSettingsState",
+        name = "com.github.jrd77.codecheck.data.VcsCheckSettingsState",
         storages = {@Storage("SdkVcsCheckPlugin.xml")}
 )
 public class VcsCheckSettingsState implements PersistentStateComponent<VcsCheckSettingsState> {
