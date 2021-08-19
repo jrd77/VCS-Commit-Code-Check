@@ -3,8 +3,8 @@ package com.github.jrd77.codecheck.data;
 import com.github.jrd77.codecheck.data.save.DataCenter;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.util.ConvertUtil;
+import com.github.jrd77.codecheck.util.JsonUtil;
 import com.github.jrd77.codecheck.window.rule.WindowSetting;
-import com.google.gson.Gson;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +19,7 @@ public class CheckDataUtils {
 
 
     public static Boolean addCodeMatch(MatchRule rule){
-        Gson gson=new Gson();
-        String jsonStr = gson.toJson(rule);
+        String jsonStr = JsonUtil.toJson(rule);
         if(saveInterface.codeMatchContain(jsonStr)){
             return false;
         }else{

@@ -1,7 +1,6 @@
 package com.github.jrd77.codecheck.data;
 
 import com.github.jrd77.codecheck.util.Assert;
-import com.github.jrd77.codecheck.util.PropsUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -18,7 +17,6 @@ public class InterUtil {
     private static final String DEFAULT_LANGUAGE_ZH ="language/zh";
     private static final String DEFAULT_LANGUAGE_EN ="language/en";
     private static final String DEFAULT_LANGUAGE ="zh";
-    private static PropsUtil.Props INTERNATIONAL_PROPS =null;
     private static ResourceBundle bundle=null;
     static {
         Locale aDefault = Locale.getDefault();

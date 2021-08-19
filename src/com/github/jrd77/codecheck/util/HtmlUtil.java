@@ -45,49 +45,4 @@ public class HtmlUtil {
         return result.toString();
     }
 
-    public static String buildHtmlStr(List<MatchRule> matchRules) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (MatchRule matchRule : matchRules) {
-            final String rule = matchRule.getRule();
-            stringBuilder.append(rule);
-            stringBuilder.append(System.lineSeparator());
-        }
-        return stringBuilder.toString();
-    }
-
-    public static String buildStrHtml(List<String> str) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String matchRule : str) {
-            stringBuilder.append(matchRule);
-            stringBuilder.append(System.lineSeparator());
-        }
-        return stringBuilder.toString();
-    }
-
-    public static List<String> buildHtmlStrList(List<MatchRule> matchRules) {
-
-        List<String> list = new ArrayList<>();
-        for (MatchRule matchRule : matchRules) {
-            final String rule = matchRule.getRule();
-            list.add(rule);
-        }
-        return list;
-    }
-
-    public static MatchRule convertMatchRule(String str) {
-        return new MatchRule(str, RuleTypeEnum.REGEXP, null);
-    }
-
-    public static List<MatchRule> convertMatchRuleList(List<String> strs) {
-
-        MatchRule matchRule;
-        List<MatchRule> matchRuleList = new ArrayList<>();
-        for (String str : strs) {
-            matchRule = convertMatchRule(str);
-            matchRuleList.add(matchRule);
-        }
-        return matchRuleList;
-    }
 }

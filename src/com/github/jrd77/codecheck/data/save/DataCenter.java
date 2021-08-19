@@ -3,7 +3,7 @@ package com.github.jrd77.codecheck.data.save;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
-import com.google.gson.Gson;
+import com.github.jrd77.codecheck.util.JsonUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,8 +20,7 @@ public class DataCenter {
 
     public static String[] getDefaultCodeMatchType(){
         List<MatchRule> entityList = getDefaultCodeMatchTypeEntityList();
-        Gson gson=new Gson();
-        List<String> stringList = entityList.stream().map(gson::toJson).collect(Collectors.toList());
+        List<String> stringList = entityList.stream().map(JsonUtil::toJson).collect(Collectors.toList());
         return stringList.toArray(new String[]{});
     }
 
