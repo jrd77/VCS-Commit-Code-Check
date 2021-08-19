@@ -49,7 +49,7 @@ public class VcsUtil {
         } catch (VcsException | IOException e) {
             e.printStackTrace();
         }
-        CheckDataUtil.refreshResultData(cmdList);
+        CheckDataUtils.refreshResultData(cmdList);
         return cmdList;
     }
     public static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {

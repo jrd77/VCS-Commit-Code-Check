@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  */
 public class Assert {
 
-    public Assert() {
+    private Assert() {
     }
 
     public static <X extends Throwable> void isTrue(boolean expression, Supplier<? extends X> supplier) throws X {

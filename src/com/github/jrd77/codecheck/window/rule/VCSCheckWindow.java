@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.window.rule;
 
-import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
@@ -64,7 +64,7 @@ public class VCSCheckWindow {
                 yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnCheck.dialog.message"), InterUtil.getValue("show.content.window.btnCheck.dialog.title"), UIUtil.getWarningIcon());
             }
             if(yesNoDialog==0||columnCount==0){
-                CheckDataUtil.resultClear();
+                CheckDataUtils.resultClear();
                 //其他检查
                 ResultObject resultObject = CheckCommitFilter.checkCommitPre();
                 if(resultObject.getOk()!=0){
@@ -84,8 +84,8 @@ public class VCSCheckWindow {
             }
             //yes
             if(yesNoDialog==0){
-                CheckDataUtil.ignoreClear();
-                CheckDataUtil.refreshData();
+                CheckDataUtils.clearFileMatch();
+                CheckDataUtils.refreshData();
             }
         });
         btnResetRule.addActionListener(e->{
@@ -97,8 +97,8 @@ public class VCSCheckWindow {
             }
             //yes
             if(showDialog==0){
-                CheckDataUtil.ruleClear();
-                CheckDataUtil.refreshData();
+                CheckDataUtils.clearCodeMatch();
+                CheckDataUtils.refreshData();
             }
         });
         btnResetResult.addActionListener(e->{
@@ -110,7 +110,7 @@ public class VCSCheckWindow {
             }
             //yes
             if(showDialog==0){
-                CheckDataUtil.resultClear();
+                CheckDataUtils.resultClear();
             }
         });
         //列表选中事件
@@ -167,13 +167,13 @@ public class VCSCheckWindow {
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         //是否init,否 进行初始化
         if(BooleanUtil.isNotTrue(instance.openCheck)){
-            CheckDataUtil.initCheckFileTypeList();
+            CheckDataUtils.initCheckFileTypeList();
             instance.openCheck=Boolean.TRUE;
         }
         initIgnoreTable();
         initRuleTable();
         initResultTable();
-        CheckDataUtil.refreshData();
+        CheckDataUtils.refreshData();
     }
 
 

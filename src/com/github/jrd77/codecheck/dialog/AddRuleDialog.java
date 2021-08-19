@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.dialog;
 
-import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.github.jrd77.codecheck.data.RuleTypeEnum;
@@ -87,12 +87,12 @@ public class AddRuleDialog extends JDialog {
         MatchRule matchRule=new MatchRule();
         matchRule.setRule(ruleText.getText());
         matchRule.setRuleType(RuleTypeEnum.REGEXP);
-        final boolean b = CheckDataUtil.addRule(matchRule);
+        final boolean b = CheckDataUtils.addCodeMatch(matchRule);
         if(!b){
             Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }else{
-            CheckDataUtil.refreshData();
+            CheckDataUtils.refreshData();
         }
         dispose();
     }

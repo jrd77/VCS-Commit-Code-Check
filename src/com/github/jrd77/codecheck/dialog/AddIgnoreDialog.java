@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.dialog;
 
-import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
@@ -70,12 +70,12 @@ public class AddIgnoreDialog extends JDialog {
             return;
         }
         String contentText = textFieldContent.getText();
-        final boolean b = CheckDataUtil.addIgnore(contentText);
+        final boolean b = CheckDataUtils.addFileMatch(contentText);
         if(!b){
             Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }else{
-            CheckDataUtil.refreshData();
+            CheckDataUtils.refreshData();
         }
         dispose();
     }
