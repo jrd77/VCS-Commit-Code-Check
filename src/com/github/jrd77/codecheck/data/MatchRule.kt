@@ -1,6 +1,5 @@
 package com.github.jrd77.codecheck.data
 
-import com.github.jrd77.codecheck.data.RuleTypeEnum
 import java.util.*
 
 /**

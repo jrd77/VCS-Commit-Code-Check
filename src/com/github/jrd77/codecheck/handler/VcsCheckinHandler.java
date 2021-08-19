@@ -1,31 +1,20 @@
 package com.github.jrd77.codecheck.handler;
 
-import com.github.jrd77.codecheck.data.*;
-import com.github.jrd77.codecheck.util.*;
+import com.github.jrd77.codecheck.data.GitDiffCmd;
+import com.github.jrd77.codecheck.data.InterUtil;
+import com.github.jrd77.codecheck.util.HtmlUtil;
+import com.github.jrd77.codecheck.util.ResultObject;
+import com.github.jrd77.codecheck.util.VcsUtil;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vcs.CheckinProjectPanel;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
-import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class VcsCheckinHandler extends CheckinHandler {
 

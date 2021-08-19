@@ -4,8 +4,6 @@ import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.MatchRule;
 import com.google.gson.Gson;
-import com.intellij.ide.highlighter.JavaFileHighlighter;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
 
 import java.util.ArrayList;
 import java.util.List;

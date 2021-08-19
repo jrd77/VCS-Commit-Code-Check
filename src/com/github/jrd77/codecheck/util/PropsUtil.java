@@ -1,17 +1,11 @@
 package com.github.jrd77.codecheck.util;
 
 
-
-import com.intellij.openapi.module.ResourceFileUtil;
-import com.intellij.util.ResourceUtil;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
