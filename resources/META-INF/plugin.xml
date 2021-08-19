@@ -2,7 +2,7 @@
   <id>com.github.jrd77.codecheck.id</id>
   <name>VCS Commit Code Check</name>
   <version>1.1</version>
-  <vendor email="jrd77@qq.com" url="https://github.com/jrd77/Vcs-Commit-Code-Check">jrd77</vendor>
+  <vendor email="jrd77@qq.com" url="https://gitee.com/jrd77/vcs-commit-code-check.git">jrd77</vendor>
 
   <description><![CDATA[
     <h3>Check Vcs change File like 'check TODO' in commit-change window</h3>
@@ -16,7 +16,7 @@
     you can define your own match rule and preview check result in the window.
     <br>
     <br>
-    see more detail in https://github.com/jrd77/Vcs-Commit-Code-Check
+    see more detail in https://gitee.com/jrd77/vcs-commit-code-check.git
     </p>
     <hr/>
     <br>
