@@ -1,5 +1,7 @@
 package com.github.jrd77.codecheck.util;
 
+import java.util.Locale;
+
 /**
  * @author zhen.wang
  * @description localhost
@@ -16,5 +18,14 @@ public class StrUtil {
             return true;
         }
         return false;
+    }
+
+    public static String lowerFirst(String str){
+        if (isBlank(str)){
+            return str;
+        }
+        String substring = str.substring(0, 1);
+        String prefix = substring.toLowerCase(Locale.ROOT);
+        return prefix + str.substring(1);
     }
 }

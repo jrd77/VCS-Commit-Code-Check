@@ -1,8 +1,8 @@
 package com.github.jrd77.codecheck.data.save;
 
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.MatchRule;
-import com.github.jrd77.codecheck.data.RuleTypeEnum;
+import com.github.jrd77.codecheck.data.model.MatchRule;
+import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.JsonUtil;
 
 import java.util.Arrays;

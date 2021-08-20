@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.window.rule;
 
-import com.github.jrd77.codecheck.data.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.GitDiffCmd;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 

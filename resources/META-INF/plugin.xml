@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.jrd77.codecheck.id</id>
   <name>VCS Commit Code Check</name>
-  <version>1.1</version>
+  <version>1.2</version>
   <vendor email="jrd77@qq.com" url="https://gitee.com/jrd77/vcs-commit-code-check.git">jrd77</vendor>
 
   <description><![CDATA[
@@ -40,8 +40,7 @@
 
 <br>
 <ul>
-<li>add english version</li>
-<li>check 'yaml$' file</li>
+<li>Reduce plugin volume</li>
 </ul>
 
     ]]>

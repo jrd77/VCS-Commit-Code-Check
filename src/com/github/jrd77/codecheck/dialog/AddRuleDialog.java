@@ -2,8 +2,8 @@ package com.github.jrd77.codecheck.dialog;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.MatchRule;
-import com.github.jrd77.codecheck.data.RuleTypeEnum;
+import com.github.jrd77.codecheck.data.model.MatchRule;
+import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ScreenUtil;
@@ -135,7 +135,7 @@ public class AddRuleDialog extends JDialog {
 
     private void initComponentText(){
 
-        ruleText.setToolTipText(InterUtil.getValue("show.content.dialog.btnAddRule.ruleText.text"));
+//        ruleText.setToolTipText(InterUtil.getValue("show.content.dialog.btnAddRule.ruleText.text"));
         regexpRadio.setText(InterUtil.getValue("show.content.dialog.btnAddRule.regexpRadio.text"));
         strMatchRadio.setText(InterUtil.getValue("show.content.dialog.btnAddRule.strMatchRadio.text"));
         addDialogTitle.setText(InterUtil.getValue("show.content.dialog.btnAddRule.addDialogTitle.text"));

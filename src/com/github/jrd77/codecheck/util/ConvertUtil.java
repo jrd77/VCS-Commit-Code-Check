@@ -1,8 +1,8 @@
 package com.github.jrd77.codecheck.util;
 
-import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.MatchRule;
+import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.MatchRule;
 
 import java.util.ArrayList;
 import java.util.List;

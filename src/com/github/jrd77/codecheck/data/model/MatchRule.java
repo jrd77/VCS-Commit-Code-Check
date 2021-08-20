@@ -1,11 +1,13 @@
-package com.github.jrd77.codecheck.data;
+package com.github.jrd77.codecheck.data.model;
+
+import java.util.Map;
 
 /**
  * @author zhen.wang
  * @description TODO
  * @date 2021/8/19 14:44
  */
-public class MatchRule {
+public class MatchRule implements ModelJsonParser {
 
     private String rule;
     private RuleTypeEnum ruleType;
@@ -23,7 +25,7 @@ public class MatchRule {
 
     @Override
     public String toString() {
-        return "MatchRule{" +
+        return "MatchRule:ToString{" +
                 "rule='" + rule + '\'' +
                 ", ruleType='" + ruleType + '\'' +
                 ", comment='" + comment + '\'' +
@@ -52,5 +54,11 @@ public class MatchRule {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    @Override
+    public MatchRule mapToBean(Map<String, Object> map) {
+
+        return null;
     }
 }

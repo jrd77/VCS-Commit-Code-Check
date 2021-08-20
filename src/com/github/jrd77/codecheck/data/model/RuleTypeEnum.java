@@ -1,4 +1,4 @@
-package com.github.jrd77.codecheck.data;
+package com.github.jrd77.codecheck.data.model;
 
 /**
  * @Classname RuleTypeEnum

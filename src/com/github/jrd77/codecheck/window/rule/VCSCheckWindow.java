@@ -1,9 +1,11 @@
 package com.github.jrd77.codecheck.window.rule;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
-import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.save.DataCenter;
+import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
 import com.github.jrd77.codecheck.handler.CheckCommitFilter;
@@ -170,10 +172,19 @@ public class VCSCheckWindow {
             CheckDataUtils.initCheckFileTypeList();
             instance.openCheck=Boolean.TRUE;
         }
-        initIgnoreTable();
-        initRuleTable();
-        initResultTable();
-        CheckDataUtils.refreshData();
+        try{
+            initIgnoreTable();
+            initRuleTable();
+            initResultTable();
+            CheckDataUtils.refreshData();
+        }catch (Exception e){
+            logger.severe("发生异常,开始初始化");
+            e.printStackTrace();
+            SaveInterface saveInterface= DataCenter.getInstance;
+            saveInterface.clearCodeMatch();
+            saveInterface.clearFileMatch();
+            CheckDataUtils.refreshData();
+        }
     }
 
 
