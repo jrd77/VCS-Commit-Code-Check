@@ -86,7 +86,7 @@ public class AddRuleDialog extends JDialog {
         }
         MatchRule matchRule=new MatchRule();
         matchRule.setRule(ruleText.getText());
-        matchRule.setRuleType(RuleTypeEnum.REGEXP);
+        matchRule.setRuleType(regexpRadio.isSelected()?RuleTypeEnum.REGEXP:RuleTypeEnum.STR_MATCH);
         final boolean b = CheckDataUtils.addCodeMatch(matchRule);
         if(!b){
             Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));

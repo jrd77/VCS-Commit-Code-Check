@@ -35,10 +35,10 @@ public class CheckDataUtils {
     }
 
     public static Boolean addFileMatch(String fileMatch){
-        if(saveInterface.codeMatchContain(fileMatch)){
+        if(saveInterface.fileMatchContain(fileMatch)){
             return false;
         }else{
-            return saveInterface.addCodeMatch(fileMatch);
+            return saveInterface.addFileMatch(fileMatch);
         }
     }
 

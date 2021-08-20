@@ -37,12 +37,7 @@ public class AddIgnoreDialog extends JDialog {
 
         buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // 单击 X 时调用 onCancel()
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -100,7 +95,7 @@ public class AddIgnoreDialog extends JDialog {
 
     private void initComponentText(){
 
-        textFieldContent.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textFieldContent.text"));
+//        textFieldContent.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textFieldContent.text"));
         textPaneTip.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textPaneTip.text"));
         addDialogTitle.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.addContentLabel.text"));
         descLabel.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.descLabel.text"));

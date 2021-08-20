@@ -14,10 +14,16 @@ import com.github.jrd77.codecheck.intellij.compoent.MyTable;
 import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
 import com.github.jrd77.codecheck.util.VcsUtil;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.Notifications;
+import com.intellij.notification.impl.ui.NotificationsUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.ui.UIUtil;
@@ -25,6 +31,7 @@ import com.intellij.util.ui.UIUtil;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -74,7 +81,16 @@ public class VCSCheckWindow {
                     return;
                 }
                 //开始检查
-                VcsUtil.checkMainFlow(project);
+                List<GitDiffCmd> gitDiffCmds = VcsUtil.checkMainFlow(project);
+                if(gitDiffCmds==null||gitDiffCmds.size()==0){
+                    NotificationGroup notificationGroup = new NotificationGroup("testid", NotificationDisplayType.BALLOON, false);
+                    /**
+                     * content :  通知内容
+                     * type  ：通知的类型，warning,info,error
+                     */
+                    Notification notification = notificationGroup.createNotification("测试通知", MessageType.INFO);
+                    Notifications.Bus.notify(notification);
+                }
             }
         });
         btnResetIgnore.addActionListener(e->{
