@@ -1,9 +1,11 @@
 package com.github.jrd77.codecheck.window.rule;
 
-import com.github.jrd77.codecheck.data.CheckDataUtil;
-import com.github.jrd77.codecheck.data.GitDiffCmd;
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.save.DataCenter;
+import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
 import com.github.jrd77.codecheck.handler.CheckCommitFilter;
@@ -12,10 +14,14 @@ import com.github.jrd77.codecheck.intellij.compoent.MyTable;
 import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
 import com.github.jrd77.codecheck.util.VcsUtil;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.ui.UIUtil;
@@ -23,6 +29,7 @@ import com.intellij.util.ui.UIUtil;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -49,7 +56,7 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
-
+    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId","PreCommitCodeWindow");
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
@@ -64,7 +71,7 @@ public class VCSCheckWindow {
                 yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnCheck.dialog.message"), InterUtil.getValue("show.content.window.btnCheck.dialog.title"), UIUtil.getWarningIcon());
             }
             if(yesNoDialog==0||columnCount==0){
-                CheckDataUtil.resultClear();
+                CheckDataUtils.resultClear();
                 //其他检查
                 ResultObject resultObject = CheckCommitFilter.checkCommitPre();
                 if(resultObject.getOk()!=0){
@@ -72,7 +79,12 @@ public class VCSCheckWindow {
                     return;
                 }
                 //开始检查
-                VcsUtil.checkMainFlow(project);
+                List<GitDiffCmd> gitDiffCmds = VcsUtil.checkMainFlow(project);
+                if(gitDiffCmds==null||gitDiffCmds.size()==0){
+
+                    Notification notification = notificationGroup.createNotification(InterUtil.getValue("show.component.notification.checkNotificationId.content"), MessageType.WARNING);
+                    Notifications.Bus.notify(notification);
+                }
             }
         });
         btnResetIgnore.addActionListener(e->{
@@ -84,8 +96,8 @@ public class VCSCheckWindow {
             }
             //yes
             if(yesNoDialog==0){
-                CheckDataUtil.ignoreClear();
-                CheckDataUtil.refreshData();
+                CheckDataUtils.clearFileMatch();
+                CheckDataUtils.refreshData();
             }
         });
         btnResetRule.addActionListener(e->{
@@ -97,8 +109,8 @@ public class VCSCheckWindow {
             }
             //yes
             if(showDialog==0){
-                CheckDataUtil.ruleClear();
-                CheckDataUtil.refreshData();
+                CheckDataUtils.clearCodeMatch();
+                CheckDataUtils.refreshData();
             }
         });
         btnResetResult.addActionListener(e->{
@@ -110,7 +122,7 @@ public class VCSCheckWindow {
             }
             //yes
             if(showDialog==0){
-                CheckDataUtil.resultClear();
+                CheckDataUtils.resultClear();
             }
         });
         //列表选中事件
@@ -167,13 +179,22 @@ public class VCSCheckWindow {
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         //是否init,否 进行初始化
         if(BooleanUtil.isNotTrue(instance.openCheck)){
-            CheckDataUtil.initCheckFileTypeList();
+            CheckDataUtils.initCheckFileTypeList();
             instance.openCheck=Boolean.TRUE;
         }
-        initIgnoreTable();
-        initRuleTable();
-        initResultTable();
-        CheckDataUtil.refreshData();
+        try{
+            initIgnoreTable();
+            initRuleTable();
+            initResultTable();
+            CheckDataUtils.refreshData();
+        }catch (Exception e){
+            logger.severe("发生异常,开始初始化");
+            e.printStackTrace();
+            SaveInterface saveInterface= DataCenter.getInstance;
+            saveInterface.clearCodeMatch();
+            saveInterface.clearFileMatch();
+            CheckDataUtils.refreshData();
+        }
     }
 
 

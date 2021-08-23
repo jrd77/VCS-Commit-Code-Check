@@ -1,9 +1,8 @@
 package com.github.jrd77.codecheck.util;
 
-import com.github.jrd77.codecheck.data.GitDiffCmd;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.MatchRule;
-import com.google.gson.Gson;
+import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.MatchRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +49,7 @@ public class ConvertUtil {
     }
 
     private static MatchRule convertMatchRule(String str) {
-        Gson gson = new Gson();
-        return gson.fromJson(str, MatchRule.class);
+        return JsonUtil.fromJson(str, MatchRule.class);
     }
 
     public static Vector<Vector<String>> convertIgnore(List<String> ignoreList) {

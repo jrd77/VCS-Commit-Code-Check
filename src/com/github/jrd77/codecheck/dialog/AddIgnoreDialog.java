@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.dialog;
 
-import com.github.jrd77.codecheck.data.CheckDataUtil;
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -37,12 +35,7 @@ public class AddIgnoreDialog extends JDialog {
 
         buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // 单击 X 时调用 onCancel()
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -52,12 +45,6 @@ public class AddIgnoreDialog extends JDialog {
             }
         });
 
-        // 遇到 ESCAPE 时调用 onCancel()
-//        contentPane.registerKeyboardAction(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                onCancel();
-//            }
-//        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
@@ -70,12 +57,12 @@ public class AddIgnoreDialog extends JDialog {
             return;
         }
         String contentText = textFieldContent.getText();
-        final boolean b = CheckDataUtil.addIgnore(contentText);
+        final boolean b = CheckDataUtils.addFileMatch(contentText);
         if(!b){
             Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
             return;
         }else{
-            CheckDataUtil.refreshData();
+            CheckDataUtils.refreshData();
         }
         dispose();
     }
@@ -106,7 +93,7 @@ public class AddIgnoreDialog extends JDialog {
 
     private void initComponentText(){
 
-        textFieldContent.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textFieldContent.text"));
+//        textFieldContent.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textFieldContent.text"));
         textPaneTip.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.textPaneTip.text"));
         addDialogTitle.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.addContentLabel.text"));
         descLabel.setText(InterUtil.getValue("show.content.dialog.btnNewIgnore.descLabel.text"));
