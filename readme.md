@@ -1,3 +1,4 @@
+IDEA 插件
 VCS Commit Code Check
 
     默认检查 JAVA/YAML/PROPERTIES/XML/kt  文件 
