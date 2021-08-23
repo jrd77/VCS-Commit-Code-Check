@@ -15,10 +15,8 @@ import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
 import com.github.jrd77.codecheck.util.VcsUtil;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.Notifications;
-import com.intellij.notification.impl.ui.NotificationsUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -58,7 +56,7 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
-
+    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId","PreCommitCodeWindow");
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
@@ -83,12 +81,8 @@ public class VCSCheckWindow {
                 //开始检查
                 List<GitDiffCmd> gitDiffCmds = VcsUtil.checkMainFlow(project);
                 if(gitDiffCmds==null||gitDiffCmds.size()==0){
-                    NotificationGroup notificationGroup = new NotificationGroup("testid", NotificationDisplayType.BALLOON, false);
-                    /**
-                     * content :  通知内容
-                     * type  ：通知的类型，warning,info,error
-                     */
-                    Notification notification = notificationGroup.createNotification("测试通知", MessageType.INFO);
+
+                    Notification notification = notificationGroup.createNotification(InterUtil.getValue("show.component.notification.checkNotificationId.content"), MessageType.WARNING);
                     Notifications.Bus.notify(notification);
                 }
             }

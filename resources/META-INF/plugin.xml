@@ -40,7 +40,8 @@
 
 <br>
 <ul>
-<li>Reduce plugin volume</li>
+<li>fix bug: add code match rule failed</li>
+<li>remove some useless dependencies</li>
 </ul>
 
     ]]>
