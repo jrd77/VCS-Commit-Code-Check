@@ -37,8 +37,6 @@ public class VCSCheckWindow {
 
     private static final Logger logger = Logger.getLogger(VCSCheckWindow.class.getName());
 
-    private static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
-
     private static final int DIALOG_HIDDEN=1;
     private static final int DIALOG_SHOW=0;
 
@@ -190,10 +188,6 @@ public class VCSCheckWindow {
         }catch (Exception e){
             logger.severe("发生异常,开始初始化");
             e.printStackTrace();
-            SaveInterface saveInterface= DataCenter.getInstance;
-            saveInterface.clearCodeMatch();
-            saveInterface.clearFileMatch();
-            CheckDataUtils.refreshData();
         }
     }
 

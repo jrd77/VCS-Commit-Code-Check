@@ -4,6 +4,7 @@ import com.github.jrd77.codecheck.data.model.GitDiffCmd;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.save.DataCenter;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.util.JsonUtil;
 import com.github.jrd77.codecheck.window.rule.WindowSetting;
@@ -18,7 +19,7 @@ public class CheckDataUtils {
 
     private static Logger logger = Logger.getLogger(CheckDataUtils.class.getName());
 
-    private static SaveInterface saveInterface= DataCenter.getInstance;
+    private static SaveInterface saveInterface= XmlFileSaveImpl.getInstance();
 
 
     public static Boolean addCodeMatch(MatchRule rule){

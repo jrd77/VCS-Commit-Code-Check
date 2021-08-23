@@ -39,6 +39,7 @@ public class VcsUtil {
      * 检查主体流程
      * @param project
      */
+    @Deprecated
     public static List<GitDiffCmd> checkMainFlow(Project project){
 
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
@@ -74,6 +75,7 @@ public class VcsUtil {
                 logger.info(String.format(InterUtil.getValue("logs.validate.noNeedCheck"), fileName, type.name()));
                 continue;
             }
+            final boolean contains = ignoreList.stream().anyMatch(x -> matchs(x, fileName));
 
             final ContentRevision afterRevision = change.getAfterRevision();
             if (afterRevision == null) {
@@ -81,7 +83,6 @@ public class VcsUtil {
                 continue;
             }
 
-            final boolean contains = ignoreList.stream().anyMatch(x -> matchs(x, fileName));
             if (!contains) {
                 logger.info(String.format(InterUtil.getValue("logs.validate.matchTypeFailed"), fileName));
                 continue;

@@ -12,9 +12,21 @@ import java.util.List;
 public class XmlFileSaveImpl implements SaveInterface {
 
     private static VcsCheckSettingsState state=null;
+    private static XmlFileSaveImpl instance=null;
     static {
         state=ApplicationManager.getApplication().getService(VcsCheckSettingsState.class);
     }
+
+    public static SaveInterface getInstance() {
+        if(instance==null){
+            instance=new XmlFileSaveImpl();
+        }
+        return instance;
+    }
+    private XmlFileSaveImpl() {
+
+    }
+
     @Override
     public Boolean addCodeMatch(String str) {
 
@@ -81,4 +93,6 @@ public class XmlFileSaveImpl implements SaveInterface {
     public void setOpenCheck(boolean b) {
         state.openCheck=b;
     }
+
+
 }

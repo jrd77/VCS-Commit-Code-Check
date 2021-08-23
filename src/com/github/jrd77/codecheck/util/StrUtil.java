@@ -1,10 +1,11 @@
 package com.github.jrd77.codecheck.util;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * @author zhen.wang
- * @description localhost
+ * @description str handle tool
  * @date 2021/7/29 10:12
  */
 public class StrUtil {
@@ -28,4 +29,9 @@ public class StrUtil {
         String prefix = substring.toLowerCase(Locale.ROOT);
         return prefix + str.substring(1);
     }
+
+    public static boolean contains(String regexp, String str) {
+        return Pattern.compile(regexp).matcher(str).find();
+    }
+
 }

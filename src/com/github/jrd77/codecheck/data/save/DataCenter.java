@@ -11,13 +11,10 @@ import java.util.stream.Collectors;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 默认配置
  * @date 2021/8/19 14:36
  */
 public class DataCenter {
-
-    public static SaveInterface getInstance=new XmlFileSaveImpl();
-
     public static String[] getDefaultCodeMatchType(){
         List<MatchRule> entityList = getDefaultCodeMatchTypeEntityList();
         List<String> stringList = entityList.stream().map(JsonUtil::toJson).collect(Collectors.toList());
@@ -30,6 +27,6 @@ public class DataCenter {
     }
 
     public static String[] getDefaultFileMatchTypeList(){
-        return new String[]{".java$",".properties$",".yml$",".xml$",".kt$",".yaml$"};
+        return new String[]{".java$",".kt$",".py$",".js$",".go$",".sql$"};
     }
 }
