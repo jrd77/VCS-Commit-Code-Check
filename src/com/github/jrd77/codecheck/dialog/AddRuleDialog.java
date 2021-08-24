@@ -26,6 +26,7 @@ public class AddRuleDialog extends JDialog {
     private JLabel addDialogTitle;
     private JLabel contentLabel;
     private JLabel typeLabel;
+    private JTextField remarkContent;
 
 
     public AddRuleDialog() {
