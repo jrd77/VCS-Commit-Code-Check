@@ -15,14 +15,19 @@ public class ResultObject<T> {
         return new ResultObject<>(RESULT_OK,null,null);
     }
 
-    public static <T> ResultObject<T> ok(T t){
+    public static <T> ResultObject<T> ok(T t) {
 
-        return new ResultObject<>(RESULT_OK,null,t);
+        return new ResultObject<>(RESULT_OK, null, t);
     }
 
-    public static <T> ResultObject<T> err(String msg){
+    public static <T> ResultObject<T> err(String msg) {
 
-        return new ResultObject<>(RESULT_ERR,msg,null);
+        return new ResultObject<>(RESULT_ERR, msg, null);
+    }
+
+    public static <T> ResultObject<T> err(int code, String msg) {
+
+        return new ResultObject<>(code, msg, null);
     }
 
     public ResultObject(int ok, String msg, T data) {
@@ -53,5 +58,14 @@ public class ResultObject<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+
+    public static class ResultConstant {
+
+        public static int SHOULD_NOTIFICATION = 101;
+        public static int SHOULD_DIALOG = 102;
+        public static int WARNING_ICON = 102;
+        public static int ERROR_ICON = 102;
     }
 }

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.jrd77.codecheck.id</id>
   <name>VCS Commit Code Check</name>
-  <version>1.2</version>
+  <version>1.2.1</version>
   <vendor email="jrd77@qq.com" url="https://gitee.com/jrd77/vcs-commit-code-check.git">jrd77</vendor>
 
   <description><![CDATA[
@@ -40,7 +40,7 @@
 
 <br>
 <ul>
-<li>fix bug: add code match rule failed</li>
+<li>change default check file type</li>
 <li>remove some useless dependencies</li>
 </ul>
 

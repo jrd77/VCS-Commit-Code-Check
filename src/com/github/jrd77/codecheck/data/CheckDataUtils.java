@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.data;
 
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.save.DataCenter;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
@@ -79,8 +79,8 @@ public class CheckDataUtils {
     }
 
 
-    public static void refreshResultData(List<GitDiffCmd> cmdList) {
-        if(cmdList==null){
+    public static void refreshResultData(List<CodeMatchResult> cmdList) {
+        if (cmdList == null) {
             return;
         }
         logger.warning(InterUtil.getValue("logs.refresh.result"));

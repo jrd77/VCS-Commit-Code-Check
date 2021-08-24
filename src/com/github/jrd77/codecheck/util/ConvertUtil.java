@@ -1,7 +1,7 @@
 package com.github.jrd77.codecheck.util;
 
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 
 import java.util.ArrayList;
@@ -66,12 +66,12 @@ public class ConvertUtil {
         return data;
     }
 
-    public static Vector<Vector<String>> convertGitDiffList(List<GitDiffCmd> cmdList) {
+    public static Vector<Vector<String>> convertGitDiffList(List<CodeMatchResult> cmdList) {
 
         Vector<Vector<String>> data = new Vector<Vector<String>>();
-        int index=0;
-        for (GitDiffCmd gitDiffCmd : cmdList) {
-            Vector<String> vector=new Vector<>();
+        int index = 0;
+        for (CodeMatchResult gitDiffCmd : cmdList) {
+            Vector<String> vector = new Vector<>();
             vector.add(String.valueOf(++index));
             vector.add(gitDiffCmd.getErrorLineStr());
             vector.add(String.valueOf(gitDiffCmd.getErrorLineNumber()));

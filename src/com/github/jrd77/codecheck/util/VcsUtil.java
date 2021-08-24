@@ -3,7 +3,7 @@ package com.github.jrd77.codecheck.util;
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.intellij.openapi.fileTypes.FileType;
@@ -37,10 +37,11 @@ public class VcsUtil {
 
     /**
      * 检查主体流程
+     *
      * @param project
      */
     @Deprecated
-    public static List<GitDiffCmd> checkMainFlow(Project project){
+    public static List<CodeMatchResult> checkMainFlow(Project project) {
 
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
@@ -48,19 +49,20 @@ public class VcsUtil {
         final List<String> ignoreList = instance.ignoreList;
         //获取变更文件
         final LocalChangeList defaultChangeList = VcsUtil.getChangeFileListFromProject(project);
-        List<GitDiffCmd> cmdList = null;
+        List<CodeMatchResult> cmdList = null;
         try {
-            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList,project);
+            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList, project);
         } catch (VcsException | IOException e) {
             e.printStackTrace();
         }
         CheckDataUtils.refreshResultData(cmdList);
         return cmdList;
     }
-    public static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
+
+    public static List<CodeMatchResult> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
 
         int count = 0;
-        List<GitDiffCmd> resultList = new ArrayList<>();
+        List<CodeMatchResult> resultList = new ArrayList<>();
         for (Change change : defaultChangeList.getChanges()) {
             final VirtualFile changeFile = change.getVirtualFile();
             if (Objects.isNull(changeFile)) {
@@ -107,7 +109,7 @@ public class VcsUtil {
                     final List<MatchRule> matchRuleErrorList = matchError(matchRuleList, lineStr);
                     if (matchRuleErrorList.size() > 0) {
                         for (MatchRule matchRule : matchRuleErrorList) {
-                            GitDiffCmd diff = new GitDiffCmd();
+                            CodeMatchResult diff = new CodeMatchResult();
                             diff.setExt(fileTypeName);
                             diff.setFilePath(changeFile.getPath());
                             diff.setFileName(fileName);

@@ -1,7 +1,7 @@
 package com.github.jrd77.codecheck.util;
 
 
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 
 import java.util.List;
 
@@ -24,12 +24,12 @@ public class HtmlUtil {
             "        <td>%s</td>\n" +
             "    </tr>";
 
-    public static String buildHtmlTable(List<GitDiffCmd> diffCmdList) {
+    public static String buildHtmlTable(List<CodeMatchResult> diffCmdList) {
 
         StringBuilder result = new StringBuilder(tableStart);
         result.append(tableTh);
         int index = 0;
-        for (GitDiffCmd gitDiffCmd : diffCmdList) {
+        for (CodeMatchResult gitDiffCmd : diffCmdList) {
             ++index;
             final String format = String.format(tableTdTemplate, index,
                     gitDiffCmd.getErrorMatch(),

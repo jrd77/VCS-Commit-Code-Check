@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.window.rule;
 
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -8,7 +8,7 @@ import javax.swing.table.TableModel;
 
 public class Windowhandler {
 
-    protected static GitDiffCmd buildGitDiffCmd(TableModel resultModel,int selectedRow){
+    protected static CodeMatchResult buildGitDiffCmd(TableModel resultModel, int selectedRow) {
 
         final Integer index = Integer.valueOf((String) resultModel.getValueAt(selectedRow, 0));
         final String errorLine = (String) resultModel.getValueAt(selectedRow, 1);
@@ -16,7 +16,7 @@ public class Windowhandler {
         final String ruleMatch = (String) resultModel.getValueAt(selectedRow, 3);
         final String filePath = (String) resultModel.getValueAt(selectedRow, 4);
         final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
-        GitDiffCmd gitDiffCmd = new GitDiffCmd();
+        CodeMatchResult gitDiffCmd = new CodeMatchResult();
         gitDiffCmd.setErrorLineNumber(errorLineNumber);
         gitDiffCmd.setErrorMatch(ruleMatch);
         gitDiffCmd.setFilePath(filePath);

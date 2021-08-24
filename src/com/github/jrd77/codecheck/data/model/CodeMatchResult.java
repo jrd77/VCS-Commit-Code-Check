@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
  * @description TODO
  * @date 2021/8/19 14:43
  */
-public class GitDiffCmd {
+public class CodeMatchResult {
 
     private String filePath;
     private String fileName;

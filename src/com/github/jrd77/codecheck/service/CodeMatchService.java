@@ -1,34 +1,27 @@
 package com.github.jrd77.codecheck.service;
 
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
-import com.github.jrd77.codecheck.data.save.DataCenter;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
-import com.github.jrd77.codecheck.util.Assert;
-import com.github.jrd77.codecheck.util.ConvertUtil;
-import com.github.jrd77.codecheck.util.ResultObject;
-import com.github.jrd77.codecheck.util.StrUtil;
+import com.github.jrd77.codecheck.util.*;
 import com.github.jrd77.codecheck.vo.CodeMatchContext;
 import com.github.jrd77.codecheck.vo.CodeMatchReq;
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKey;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ui.SwingHelper;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author zhen.wang
@@ -41,57 +34,49 @@ public class CodeMatchService {
 
     private static SaveInterface saveInterface= XmlFileSaveImpl.getInstance();
 
-    public ResultObject<?> startCodeMatch(CodeMatchContext context) throws VcsException {
+    public static ResultObject<List<CodeMatchResult>> startCodeMatch(CodeMatchContext context) {
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
-        check(context);
-
-        int count = 0;
-        List<GitDiffCmd> resultList = new ArrayList<>();
-
-        LocalChangeList changeList = context.getChangeList();
-
-        for (Change change : changeList.getChanges()) {
-             VirtualFile changeFile = change.getVirtualFile();
-            if (Objects.isNull(changeFile)) {
-                logger.info(InterUtil.getValue("logs.validate.changetypeisnull"));
+        //check param
+        ResultObject<List<Change>> resultCheck = checkContext(context);
+        //if has err ,should show notification in right below window
+        if (resultCheck.getOk() == ResultObject.ResultConstant.SHOULD_NOTIFICATION) {
+            return ResultObject.err(resultCheck.getOk(), resultCheck.getMsg());
+        }
+        List<Change> changeList = resultCheck.getData();
+        List<CodeMatchResult> resultList = new ArrayList<>();
+        for (Change changeFile : changeList) {
+            VirtualFile virtualFile = changeFile.getVirtualFile();
+            Assert.notNull(virtualFile);
+            PsiFile file = PsiManager.getInstance(context.getProject()).findFile(virtualFile);
+            if (file == null) {
+                logger.warning(InterUtil.getValue("logs.validate.PsiFileIsNull"));
                 continue;
             }
-             Change.Type type = change.getType();
-             String fileName = changeFile.getName();
-            if (type.equals(Change.Type.DELETED) || type.equals(Change.Type.MOVED)) {
-                logger.info(String.format(InterUtil.getValue("logs.validate.noNeedCheck"), fileName, type.name()));
+            //spit code by line
+            List<String> readLines = Arrays.stream(file.getText().split("\\r?\\n")).collect(Collectors.toList());
+            if (CollUtil.isEmpty(readLines)) {
                 continue;
             }
-            //change content is blank
-            final ContentRevision afterRevision = change.getAfterRevision();
-            if (afterRevision==null||StrUtil.isBlank(afterRevision.getContent())) {
-                logger.info(String.format(InterUtil.getValue("logs.validate.changeContentIsNull"), fileName));
-                continue;
+            for (int i = 0; i < readLines.size(); i++) {
+                final String lineStr = readLines.get(i);
+                //check code match line by line
+                final List<MatchRule> matchRuleErrorList = ContainUtil.matchError(context.getMatchRuleList(), lineStr);
+                if (CollUtil.isNotEmpty(matchRuleErrorList)) {
+                    //add all err match every line 添加各行检查出的所有错误
+                    List<CodeMatchResult> codeMatchResults = codeMatchResultBuild(matchRuleErrorList, virtualFile, lineStr, i);
+                    resultList.addAll(codeMatchResults);
+                }
             }
-            //TODO
-            Boolean contains=matchFileType(context.getIgnoreList(),fileName);
         }
         return ResultObject.ok(resultList);
     }
 
-    private Boolean matchFileType(List<String> ignoreList,String fileNmae) {
-        return ignoreList.stream().anyMatch(x->StrUtil.contains(x,fileNmae));
-    }
+    public static CodeMatchContext convertCodeMatchContext(CodeMatchReq req, List<MatchRule> codeMatchList, List<String> fileMatchList) {
 
-
-    public CodeMatchContext convertCodeMatchContext(CodeMatchReq req){
-
-        List<MatchRule> codeMatchList = ConvertUtil.convertMatchRuleList(saveInterface.codeMatchList());
-        return convertCodeMatchContext(req,codeMatchList,saveInterface.fileMatchList());
-    }
-    public CodeMatchContext convertCodeMatchContext(CodeMatchReq req, List<MatchRule> codeMatchList,List<String> fileMatchList){
-
-//        DataContext dataContext = DataManager.getInstance().getDataContext(SwingHelper.getComponentFromRecentMouseEvent());
-//        Project project = dataContext.getData(DataKey.create("project"));
         //param check
-        check(req);
+        checkContext(req);
         //req param copy
-        CodeMatchContext context=copyProperties(req);
+        CodeMatchContext context = copyProperties(req);
         //get changeFileList
         ChangeListManager changeListManager = ChangeListManager.getInstance(context.getProject());
         LocalChangeList defaultChangeList = changeListManager.getDefaultChangeList();
@@ -101,24 +86,99 @@ public class CodeMatchService {
         return context;
     }
 
-    private CodeMatchContext copyProperties(CodeMatchReq req) {
-        CodeMatchContext context=new CodeMatchContext();
+    public static CodeMatchContext convertCodeMatchContext(CodeMatchReq req) {
+
+        //param check
+        checkContext(req);
+        //req param copy
+        CodeMatchContext context = copyProperties(req);
+        //get changeFileList
+        ChangeListManager changeListManager = ChangeListManager.getInstance(context.getProject());
+        LocalChangeList defaultChangeList = changeListManager.getDefaultChangeList();
+        context.setChangeList(defaultChangeList);
+        if (CollUtil.isNotEmpty(saveInterface.codeMatchList())) {
+            List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(saveInterface.codeMatchList());
+            context.setMatchRuleList(matchRuleList);
+        }
+        context.setIgnoreList(saveInterface.fileMatchList());
+        return context;
+    }
+
+
+    private static List<CodeMatchResult> codeMatchResultBuild(List<MatchRule> matchRuleErrorList, VirtualFile virtualFile, String lineStr, int lineNum) {
+
+        List<CodeMatchResult> resultList = new ArrayList<>();
+        for (MatchRule matchRule : matchRuleErrorList) {
+            CodeMatchResult diff = new CodeMatchResult();
+            diff.setExt(virtualFile.getExtension());
+            diff.setFilePath(virtualFile.getPath());
+            diff.setFileName(virtualFile.getNameWithoutExtension());
+            diff.setReadLine(lineStr);
+            diff.setErrorLineStr(lineStr);
+            diff.setErrorMatch(matchRule.getRule());
+            diff.setErrorLineNumber(lineNum + 1);
+            diff.setFile(virtualFile);
+            resultList.add(diff);
+        }
+        return resultList;
+    }
+
+    private static CodeMatchContext copyProperties(CodeMatchReq req) {
+        CodeMatchContext context = new CodeMatchContext();
         context.setProject(req.getProject());
         context.setCheckSource(req.getCheckSource());
         return context;
     }
 
-    private void check(CodeMatchReq req) {
+    private static void checkContext(CodeMatchReq req) {
 
         Assert.notNull(req);
         Assert.notNull(req.getProject());
         Assert.notNull(req.getCheckSource());
     }
 
-    private void check(CodeMatchContext context) {
+    private static ResultObject<List<Change>> checkContext(CodeMatchContext context) {
 
         Assert.notNull(context);
         Assert.notNull(context.getProject());
         Assert.notNull(context.getCheckSource());
+        //check file name rule
+        if (CollUtil.isEmpty(context.getIgnoreList())) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nofilematch.content"));
+        }
+        //check code match rule
+        if (CollUtil.isEmpty(context.getMatchRuleList())) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nocodematch.content"));
+        }
+        LocalChangeList changeList = context.getChangeList();
+        if (changeList == null || changeList.getChanges() == null) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nochangefile.content"));
+        }
+        List<Change.Type> changeTypeList = changeList.getChanges().stream().map(Change::getType).collect(Collectors.toList());
+        //check type change.type add and change.type.modify
+        boolean matchChangeType = changeTypeList.stream().anyMatch(x -> x.equals(Change.Type.NEW) || x.equals(Change.Type.MODIFICATION));
+        if (!matchChangeType) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.noaddormodifychangefile.content"));
+        }
+        List<String> fileNameList = changeList.getChanges().stream().map(Change::getVirtualFile).filter(Objects::nonNull).map(VirtualFile::getName).collect(Collectors.toList());
+        boolean anyMatchFileName = fileNameList.stream().anyMatch(x -> ContainUtil.contains(context.getIgnoreList(), x));
+        //check file name
+        if (!anyMatchFileName) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nofilematchresult.content"));
+        }
+        List<Change> changes;
+        try {
+            changes = ContainUtil.codeMatch(context.getMatchRuleList(), changeList);
+        } catch (VcsException e) {
+            e.printStackTrace();
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.vcs.exception.content"));
+        }
+        //check has code-match first
+        if (CollUtil.isEmpty(changes)) {
+            return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.noresult.content"));
+        }
+        return ResultObject.ok(changes);
     }
+
+
 }

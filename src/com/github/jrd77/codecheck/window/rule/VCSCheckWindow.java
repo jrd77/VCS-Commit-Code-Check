@@ -3,17 +3,17 @@ package com.github.jrd77.codecheck.window.rule;
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
-import com.github.jrd77.codecheck.data.save.DataCenter;
-import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
-import com.github.jrd77.codecheck.handler.CheckCommitFilter;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
 import com.github.jrd77.codecheck.intellij.compoent.MyTable;
+import com.github.jrd77.codecheck.service.CodeMatchService;
 import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
-import com.github.jrd77.codecheck.util.VcsUtil;
+import com.github.jrd77.codecheck.vo.CodeMatchContext;
+import com.github.jrd77.codecheck.vo.CodeMatchReq;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.Notifications;
@@ -62,27 +62,20 @@ public class VCSCheckWindow {
         //国际化显示
         initComponentText();
 
-        btnCheck.addActionListener(e->{
-            int yesNoDialog=DIALOG_HIDDEN;
-            final int columnCount = tableResult.getRowCount();
-            if(columnCount!=0){
-                yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnCheck.dialog.message"), InterUtil.getValue("show.content.window.btnCheck.dialog.title"), UIUtil.getWarningIcon());
-            }
-            if(yesNoDialog==0||columnCount==0){
-                CheckDataUtils.resultClear();
-                //其他检查
-                ResultObject resultObject = CheckCommitFilter.checkCommitPre();
-                if(resultObject.getOk()!=0){
-                    Messages.showMessageDialog(resultObject.getMsg(),InterUtil.getValue("show.content.window.otherCheck.dialog.message"), UIUtil.getWarningIcon());
-                    return;
-                }
-                //开始检查
-                List<GitDiffCmd> gitDiffCmds = VcsUtil.checkMainFlow(project);
-                if(gitDiffCmds==null||gitDiffCmds.size()==0){
-
-                    Notification notification = notificationGroup.createNotification(InterUtil.getValue("show.component.notification.checkNotificationId.content"), MessageType.WARNING);
-                    Notifications.Bus.notify(notification);
-                }
+        btnCheck.addActionListener(e-> {
+            //检查流程发起
+            CodeMatchReq codeMatchReq = new CodeMatchReq();
+            codeMatchReq.setCheckSource(CheckSourceEnum.TOOL_WINDOW);
+            codeMatchReq.setProject(project);
+            //配置参数
+            CodeMatchContext context = CodeMatchService.convertCodeMatchContext(codeMatchReq);
+            //检查
+            ResultObject<List<CodeMatchResult>> resultObject = CodeMatchService.startCodeMatch(context);
+            if (resultObject.getOk() != ResultObject.ok().getOk()) {
+                Notification notification = notificationGroup.createNotification(resultObject.getMsg(), MessageType.WARNING);
+                Notifications.Bus.notify(notification);
+            } else {
+                CheckDataUtils.refreshResultData(resultObject.getData());
             }
         });
         btnResetIgnore.addActionListener(e->{
@@ -132,7 +125,7 @@ public class VCSCheckWindow {
             try {
                 final TableModel resultModel = tableResult.getModel();
                 //组装数据实体
-                final GitDiffCmd gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
+                final CodeMatchResult gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
                 //跳转
                 if(Objects.nonNull(gitDiffCmd.getFile())){
                     OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber()-1, 0);
@@ -143,9 +136,6 @@ public class VCSCheckWindow {
                     }else{
                         //选中检查内容
                         editor.getSelectionModel().selectLineAtCaret();
-                        final String selectedText = editor.getSelectionModel().getSelectedText();
-                        logger.info(String.format(InterUtil.getValue("logs.common.printSelected"),selectedText));
-
                     }
                 }
             }catch (Exception ex){
