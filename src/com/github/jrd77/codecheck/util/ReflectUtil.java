@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 public class ReflectUtil {
     private static Logger logger = Logger.getLogger(ReflectUtil.class.getName());
 
-    private static List<Class> BASE_CLASSES =Arrays.asList(String.class,
-            Short.class,Byte.class,Integer.class,Long.class,
+    private static List<Class> BASE_CLASSES = Arrays.asList(String.class,
+            Short.class, Byte.class, Integer.class, Long.class,
             Boolean.class,
             Character.class,
-            Float.class,Double.class,
-            short.class,byte.class,int.class,long.class,boolean.class,char.class,float.class,double.class);
+            Float.class, Double.class,
+            short.class, byte.class, int.class, long.class, boolean.class, char.class, float.class, double.class);
 
 
     private static <T> Map<String, ? extends Class<?>> getFields(Class<T> tClass) {
@@ -119,7 +119,7 @@ public class ReflectUtil {
         CodeMatchModel matchRuleExample = new CodeMatchModel();
         matchRuleExample.setRule("TODO");
         matchRuleExample.setComment("asdasd");
-        matchRuleExample.setRuleType(RuleTypeEnum.REGEXP.getType());
+        matchRuleExample.setRuleType(RuleTypeEnum.REGEXP);
         System.out.println(matchRuleExample);
         CodeMatchModelConverter converter = new CodeMatchModelConverter();
         String s = converter.toString(matchRuleExample);

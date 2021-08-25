@@ -59,7 +59,6 @@
     <toolWindow id="PreCommitCodeWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
     <applicationService serviceImplementation="com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState"/>
-    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.persistent.VCSPersistentService"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>
 

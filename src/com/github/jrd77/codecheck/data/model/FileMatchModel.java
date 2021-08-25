@@ -8,7 +8,7 @@ package com.github.jrd77.codecheck.data.model;
 public class FileMatchModel {
 
     private String rule;
-    private Long ruleType;
+    private RuleTypeEnum ruleType;
     private String comment;
 
     public String getRule() {
@@ -19,12 +19,13 @@ public class FileMatchModel {
         this.rule = rule;
     }
 
-    public Long getRuleType() {
-        return ruleType;
+    public FileMatchModel(String rule, RuleTypeEnum ruleType, String comment) {
+        this.rule = rule;
+        this.ruleType = ruleType;
+        this.comment = comment;
     }
 
-    public void setRuleType(Long ruleType) {
-        this.ruleType = ruleType;
+    public FileMatchModel() {
     }
 
     public String getComment() {
@@ -33,6 +34,14 @@ public class FileMatchModel {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public RuleTypeEnum getRuleType() {
+        return ruleType;
+    }
+
+    public void setRuleType(RuleTypeEnum ruleType) {
+        this.ruleType = ruleType;
     }
 
     @Override

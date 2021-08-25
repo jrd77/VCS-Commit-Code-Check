@@ -16,9 +16,9 @@ public class CodeMatchContext {
 
     private Project project;
 
-    private List<MatchRule> matchRuleList;
+    private List<MatchRule> codeMatchList;
 
-    private List<String> ignoreList;
+    private List<String> fileMatchList;
 
     private CheckSourceEnum checkSource;
 
@@ -49,19 +49,19 @@ public class CodeMatchContext {
         this.project = project;
     }
 
-    public List<MatchRule> getMatchRuleList() {
-        return matchRuleList;
+    public List<MatchRule> getCodeMatchList() {
+        return codeMatchList;
     }
 
-    public void setMatchRuleList(List<MatchRule> matchRuleList) {
-        this.matchRuleList = matchRuleList;
+    public void setCodeMatchList(List<MatchRule> codeMatchList) {
+        this.codeMatchList = codeMatchList;
     }
 
-    public List<String> getIgnoreList() {
-        return ignoreList;
+    public List<String> getFileMatchList() {
+        return fileMatchList;
     }
 
-    public void setIgnoreList(List<String> ignoreList) {
-        this.ignoreList = ignoreList;
+    public void setFileMatchList(List<String> fileMatchList) {
+        this.fileMatchList = fileMatchList;
     }
 }

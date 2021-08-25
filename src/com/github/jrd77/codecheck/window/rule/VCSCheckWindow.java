@@ -4,7 +4,6 @@ import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
 import com.github.jrd77.codecheck.data.model.CodeMatchResult;
-import com.github.jrd77.codecheck.data.persistent.VCSPersistentService;
 import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
@@ -18,7 +17,6 @@ import com.github.jrd77.codecheck.vo.CodeMatchReq;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -66,8 +64,9 @@ public class VCSCheckWindow {
 
         btnCheck.addActionListener(e-> {
 
-            VCSPersistentService service = ApplicationManager.getApplication().getService(VCSPersistentService.class);
-            System.out.println(service.getState());
+            VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
+            instance.oldDataUpdated = true;
+            System.out.println(instance.getState());
 
             //检查流程发起
             CodeMatchReq codeMatchReq = new CodeMatchReq();

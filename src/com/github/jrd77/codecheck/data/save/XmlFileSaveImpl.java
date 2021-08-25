@@ -29,59 +29,58 @@ public class XmlFileSaveImpl implements SaveInterface {
 
     @Override
     public Boolean addCodeMatch(String str) {
-
-        return state.ruleList.add(str);
+        return state.codeMatchList.add(str);
     }
 
     @Override
     public Boolean addFileMatch(String str) {
-        return state.ignoreList.add(str);
+        return state.fileMatchList.add(str);
     }
 
     @Override
     public Boolean setCodeMatch(List<String> strList) {
 
-        state.ruleList=new LinkedList<>();
-        return state.ruleList.addAll(strList);
+        state.codeMatchList = new LinkedList<>();
+        return state.codeMatchList.addAll(strList);
     }
 
     @Override
     public Boolean setFileMatch(List<String> strList) {
-        state.ignoreList=new LinkedList<>();
-        return state.ignoreList.addAll(strList);
+        state.fileMatchList = new LinkedList<>();
+        return state.fileMatchList.addAll(strList);
     }
 
     @Override
     public Boolean clearCodeMatch() {
-        state.ruleList=new LinkedList<>();
+        state.codeMatchList = new LinkedList<>();
         return true;
     }
 
     @Override
     public Boolean clearFileMatch() {
 
-        state.ignoreList=new LinkedList<>();
+        state.fileMatchList = new LinkedList<>();
         return true;
     }
 
     @Override
     public Boolean codeMatchContain(String str) {
-        return state.ruleList.contains(str);
+        return state.codeMatchList.contains(str);
     }
 
     @Override
     public Boolean fileMatchContain(String str) {
-        return state.ignoreList.contains(str);
+        return state.fileMatchList.contains(str);
     }
 
     @Override
     public List<String> codeMatchList() {
-        return state.ruleList;
+        return state.codeMatchList;
     }
 
     @Override
     public List<String> fileMatchList() {
-        return state.ignoreList;
+        return state.fileMatchList;
     }
 
     @Override

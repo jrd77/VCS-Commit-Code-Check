@@ -1,6 +1,7 @@
 package com.github.jrd77.codecheck.data.save;
 
 import com.github.jrd77.codecheck.data.InterUtil;
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.JsonUtil;
@@ -21,12 +22,19 @@ public class DataCenter {
         return stringList.toArray(new String[]{});
     }
 
-    public static List<MatchRule> getDefaultCodeMatchTypeEntityList(){
-        MatchRule matchRuleExample =new MatchRule("TODO", RuleTypeEnum.REGEXP, InterUtil.getValue("show.content.tableData.matchRule.example1"));
+    public static List<MatchRule> getDefaultCodeMatchTypeEntityList() {
+        MatchRule matchRuleExample = new MatchRule("TODO", RuleTypeEnum.REGEXP, InterUtil.getValue("show.content.tableData.matchRule.example1"));
         return Arrays.asList(matchRuleExample);
     }
 
-    public static String[] getDefaultFileMatchTypeList(){
-        return new String[]{".java$",".kt$",".py$",".js$",".go$",".sql$"};
+    public static List<FileMatchModel> getDefaultFileMatchTypeList() {
+
+        FileMatchModel matchRuleExample = new FileMatchModel("java$", RuleTypeEnum.REGEXP, null);
+        FileMatchModel matchRuleExample2 = new FileMatchModel("kt$", RuleTypeEnum.REGEXP, null);
+        FileMatchModel matchRuleExample3 = new FileMatchModel("py$", RuleTypeEnum.REGEXP, null);
+        FileMatchModel matchRuleExample4 = new FileMatchModel("js$", RuleTypeEnum.REGEXP, null);
+        FileMatchModel matchRuleExample5 = new FileMatchModel("go$", RuleTypeEnum.REGEXP, null);
+        FileMatchModel matchRuleExample6 = new FileMatchModel("sql$", RuleTypeEnum.REGEXP, null);
+        return Arrays.asList(matchRuleExample, matchRuleExample2, matchRuleExample3, matchRuleExample4, matchRuleExample5, matchRuleExample6);
     }
 }

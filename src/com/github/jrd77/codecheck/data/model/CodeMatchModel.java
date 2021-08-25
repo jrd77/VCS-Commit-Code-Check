@@ -8,7 +8,7 @@ package com.github.jrd77.codecheck.data.model;
 public class CodeMatchModel {
 
     private String rule;
-    private Long ruleType;
+    private RuleTypeEnum ruleType;
     private String comment;
 
     public String getRule() {
@@ -19,11 +19,11 @@ public class CodeMatchModel {
         this.rule = rule;
     }
 
-    public Long getRuleType() {
+    public RuleTypeEnum getRuleType() {
         return ruleType;
     }
 
-    public void setRuleType(Long ruleType) {
+    public void setRuleType(RuleTypeEnum ruleType) {
         this.ruleType = ruleType;
     }
 
@@ -43,4 +43,6 @@ public class CodeMatchModel {
                 ", comment='" + comment + '\'' +
                 '}';
     }
+
+
 }

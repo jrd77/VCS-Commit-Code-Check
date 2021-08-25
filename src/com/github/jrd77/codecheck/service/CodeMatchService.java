@@ -2,6 +2,7 @@ package com.github.jrd77.codecheck.service;
 
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.model.CodeMatchResult;
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
@@ -60,7 +61,7 @@ public class CodeMatchService {
             for (int i = 0; i < readLines.size(); i++) {
                 final String lineStr = readLines.get(i);
                 //check code match line by line
-                final List<MatchRule> matchRuleErrorList = ContainUtil.matchError(context.getMatchRuleList(), lineStr);
+                final List<MatchRule> matchRuleErrorList = ContainUtil.matchError(context.getCodeMatchList(), lineStr);
                 if (CollUtil.isNotEmpty(matchRuleErrorList)) {
                     //add all err match every line 添加各行检查出的所有错误
                     List<CodeMatchResult> codeMatchResults = codeMatchResultBuild(matchRuleErrorList, virtualFile, lineStr, i);
@@ -81,8 +82,8 @@ public class CodeMatchService {
         ChangeListManager changeListManager = ChangeListManager.getInstance(context.getProject());
         LocalChangeList defaultChangeList = changeListManager.getDefaultChangeList();
         context.setChangeList(defaultChangeList);
-        context.setMatchRuleList(codeMatchList);
-        context.setIgnoreList(fileMatchList);
+        context.setCodeMatchList(codeMatchList);
+        context.setFileMatchList(fileMatchList);
         return context;
     }
 
@@ -98,9 +99,9 @@ public class CodeMatchService {
         context.setChangeList(defaultChangeList);
         if (CollUtil.isNotEmpty(saveInterface.codeMatchList())) {
             List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(saveInterface.codeMatchList());
-            context.setMatchRuleList(matchRuleList);
+            context.setCodeMatchList(matchRuleList);
         }
-        context.setIgnoreList(saveInterface.fileMatchList());
+        context.setFileMatchList(saveInterface.fileMatchList());
         return context;
     }
 
@@ -143,11 +144,11 @@ public class CodeMatchService {
         Assert.notNull(context.getProject());
         Assert.notNull(context.getCheckSource());
         //check file name rule
-        if (CollUtil.isEmpty(context.getIgnoreList())) {
+        if (CollUtil.isEmpty(context.getFileMatchList())) {
             return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nofilematch.content"));
         }
         //check code match rule
-        if (CollUtil.isEmpty(context.getMatchRuleList())) {
+        if (CollUtil.isEmpty(context.getCodeMatchList())) {
             return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nocodematch.content"));
         }
         LocalChangeList changeList = context.getChangeList();
@@ -161,14 +162,15 @@ public class CodeMatchService {
             return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.noaddormodifychangefile.content"));
         }
         List<String> fileNameList = changeList.getChanges().stream().map(Change::getVirtualFile).filter(Objects::nonNull).map(VirtualFile::getName).collect(Collectors.toList());
-        boolean anyMatchFileName = fileNameList.stream().anyMatch(x -> ContainUtil.contains(context.getIgnoreList(), x));
+        List<FileMatchModel> fileMatchModelList = context.getFileMatchList().stream().map(x -> JsonUtil.fromJson(x, FileMatchModel.class)).collect(Collectors.toList());
+        List<Change> containsFile = ContainUtil.containsFile(fileMatchModelList, changeList);
         //check file name
-        if (!anyMatchFileName) {
+        if (CollUtil.isEmpty(containsFile)) {
             return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.checkContextId.nofilematchresult.content"));
         }
         List<Change> changes;
         try {
-            changes = ContainUtil.codeMatch(context.getMatchRuleList(), changeList);
+            changes = ContainUtil.codeMatch(context.getCodeMatchList(), containsFile);
         } catch (VcsException e) {
             e.printStackTrace();
             return ResultObject.err(ResultObject.ResultConstant.SHOULD_NOTIFICATION, InterUtil.getValue("show.component.notification.vcs.exception.content"));

@@ -1,10 +1,12 @@
 package com.github.jrd77.codecheck.util;
 
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
+import com.intellij.openapi.vfs.VirtualFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,35 @@ public class ContainUtil {
         return regexps.stream().anyMatch(x -> contains(x, str));
     }
 
+    public static List<Change> containsFile(List<FileMatchModel> regexps, LocalChangeList changeList) {
+
+        List<Change> matchChanges = new ArrayList<>();
+
+        for (Change change : changeList.getChanges()) {
+            VirtualFile virtualFile = change.getVirtualFile();
+            if (virtualFile == null) {
+                continue;
+            }
+            String name = virtualFile.getName();
+            for (FileMatchModel matchRule : regexps) {
+                //regexp match
+                if (matchRule.getRuleType() == RuleTypeEnum.REGEXP) {
+                    boolean contains = contains(matchRule.getRule(), name);
+                    if (contains) {
+                        matchChanges.add(change);
+                    }
+                } else if (matchRule.getRuleType() == RuleTypeEnum.STR_MATCH) {
+                    //str match
+                    boolean contains = name.contains(matchRule.getRule());
+                    if (contains) {
+                        matchChanges.add(change);
+                    }
+                }
+            }
+        }
+        return matchChanges;
+    }
+
     /**
      * find all code match changes
      *
@@ -34,13 +65,13 @@ public class ContainUtil {
      * @return
      * @throws VcsException
      */
-    public static List<Change> codeMatch(List<MatchRule> matchRuleList, LocalChangeList changeList) throws VcsException {
+    public static List<Change> codeMatch(List<MatchRule> matchRuleList, List<Change> changeList) throws VcsException {
 
         List<Change> matchChanges = new ArrayList<>();
-        if (CollUtil.isEmpty(matchRuleList) || changeList == null || CollUtil.isEmpty(changeList.getChanges())) {
+        if (CollUtil.isEmpty(matchRuleList) || changeList == null || CollUtil.isEmpty(changeList)) {
             return matchChanges;
         }
-        for (Change change : changeList.getChanges()) {
+        for (Change change : changeList) {
             if (change == null || change.getVirtualFile() == null || change.getAfterRevision() == null || StrUtil.isBlank(change.getAfterRevision().getContent())) {
                 continue;
             }

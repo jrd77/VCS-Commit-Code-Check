@@ -11,6 +11,7 @@ public class MatchRule implements ModelJsonParser {
 
     private String rule;
     private RuleTypeEnum ruleType;
+    private String ruleTypeStr;
     private String comment;
 
 
@@ -54,6 +55,14 @@ public class MatchRule implements ModelJsonParser {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getRuleTypeStr() {
+        return ruleTypeStr;
+    }
+
+    public void setRuleTypeStr(String ruleTypeStr) {
+        this.ruleTypeStr = ruleTypeStr;
     }
 
     @Override

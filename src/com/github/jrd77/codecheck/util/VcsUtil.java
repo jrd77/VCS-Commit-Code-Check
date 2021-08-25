@@ -6,6 +6,8 @@ import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
@@ -29,7 +31,9 @@ import java.util.stream.Collectors;
 public class VcsUtil {
     private static final Logger logger = Logger.getLogger(VcsUtil.class.getName());
 
-    public static LocalChangeList getChangeFileListFromProject(Project project){
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
+
+    public static LocalChangeList getChangeFileListFromProject(Project project) {
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         return changeListManager.getDefaultChangeList();
     }
@@ -45,8 +49,8 @@ public class VcsUtil {
 
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
-        final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(instance.ruleList);
-        final List<String> ignoreList = instance.ignoreList;
+        final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(saveInterface.codeMatchList());
+        final List<String> ignoreList = saveInterface.fileMatchList();
         //获取变更文件
         final LocalChangeList defaultChangeList = VcsUtil.getChangeFileListFromProject(project);
         List<CodeMatchResult> cmdList = null;
