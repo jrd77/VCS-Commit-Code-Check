@@ -8,5 +8,15 @@ package com.github.jrd77.codecheck.data.model;
  */
 public enum RuleTypeEnum {
 
-    REGEXP, STR_MATCH;
+    REGEXP(1), STR_MATCH(2);
+
+    private final long type;
+
+    RuleTypeEnum(long type) {
+        this.type = type;
+    }
+
+    public long getType() {
+        return type;
+    }
 }

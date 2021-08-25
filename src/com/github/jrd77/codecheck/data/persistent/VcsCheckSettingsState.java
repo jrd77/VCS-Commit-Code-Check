@@ -1,4 +1,4 @@
-package com.github.jrd77.codecheck.data;
+package com.github.jrd77.codecheck.data.persistent;
 // Copyright 2000-2021 JetBrains s.r.o. and other contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,7 +18,7 @@ import java.util.List;
  * these persistent application settings are stored.
  */
 @State(
-        name = "com.github.jrd77.codecheck.data.VcsCheckSettingsState",
+        name = "com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState",
         storages = {@Storage("SdkVcsCheckPlugin.xml")}
 )
 public class VcsCheckSettingsState implements PersistentStateComponent<VcsCheckSettingsState> {

@@ -1,6 +1,6 @@
 package com.github.jrd77.codecheck.data.save;
 
-import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
 import com.intellij.openapi.application.ApplicationManager;
 
 import java.util.LinkedList;

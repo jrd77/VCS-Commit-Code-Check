@@ -1,7 +1,7 @@
 package com.github.jrd77.codecheck.handler;
 
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
 import com.github.jrd77.codecheck.util.ResultObject;
 
 public class CheckCommitFilter {

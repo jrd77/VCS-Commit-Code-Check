@@ -2,10 +2,10 @@ package com.github.jrd77.codecheck.util;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
 import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
+import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
