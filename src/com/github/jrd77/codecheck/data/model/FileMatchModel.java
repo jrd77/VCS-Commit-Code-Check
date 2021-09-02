@@ -1,8 +1,10 @@
 package com.github.jrd77.codecheck.data.model;
 
+import java.util.Objects;
+
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 文件匹配规则
  * @date 2021/8/25 10:33
  */
 public class FileMatchModel {
@@ -23,6 +25,11 @@ public class FileMatchModel {
         this.rule = rule;
         this.ruleType = ruleType;
         this.comment = comment;
+    }
+
+    public FileMatchModel(String rule, RuleTypeEnum ruleType) {
+        this.rule = rule;
+        this.ruleType = ruleType;
     }
 
     public FileMatchModel() {
@@ -51,5 +58,18 @@ public class FileMatchModel {
                 ", ruleType=" + ruleType +
                 ", comment='" + comment + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileMatchModel that = (FileMatchModel) o;
+        return rule.equals(that.rule) && ruleType == that.ruleType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rule, ruleType);
     }
 }

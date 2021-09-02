@@ -1,6 +1,9 @@
 package com.github.jrd77.codecheck.data.save;
 
+import com.github.jrd77.codecheck.data.model.CodeMatchModel;
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
 import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.util.JsonUtil;
 import com.intellij.openapi.application.ApplicationManager;
 
 import java.util.LinkedList;
@@ -35,6 +38,27 @@ public class XmlFileSaveImpl implements SaveInterface {
     @Override
     public Boolean addFileMatch(String str) {
         return state.fileMatchList.add(str);
+    }
+
+    @Override
+    public Boolean removeCodeMatch(CodeMatchModel newModel) {
+
+        List<CodeMatchModel> codeMatchModels = JsonUtil.fromJson(state.codeMatchList, CodeMatchModel.class);
+        boolean remove = codeMatchModels.remove(newModel);
+        if (remove) {
+            return setCodeMatch(JsonUtil.toJsonList(codeMatchModels));
+        }
+        return remove;
+    }
+
+    @Override
+    public Boolean removeFileMatch(FileMatchModel newModel) {
+        List<FileMatchModel> fileMatchModels = JsonUtil.fromJson(state.fileMatchList, FileMatchModel.class);
+        boolean remove = fileMatchModels.remove(newModel);
+        if (remove) {
+            return setFileMatch(JsonUtil.toJsonList(fileMatchModels));
+        }
+        return remove;
     }
 
     @Override

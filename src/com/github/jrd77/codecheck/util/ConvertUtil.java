@@ -61,7 +61,7 @@ public class ConvertUtil {
             Vector<String> vector = new Vector<>();
             vector.add(String.valueOf(++index));
             vector.add(fileMatchModel.getRule());
-            vector.add(fileMatchModel.getComment());
+            vector.add(fileMatchModel.getRuleType().name());
             data.add(vector);
         }
         return data;

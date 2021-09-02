@@ -1,8 +1,10 @@
 package com.github.jrd77.codecheck.data.model;
 
+import java.util.Objects;
+
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 代码匹配
  * @date 2021/8/25 10:33
  */
 public class CodeMatchModel {
@@ -35,6 +37,14 @@ public class CodeMatchModel {
         this.comment = comment;
     }
 
+    public CodeMatchModel(String rule, RuleTypeEnum ruleType) {
+        this.rule = rule;
+        this.ruleType = ruleType;
+    }
+
+    public CodeMatchModel() {
+    }
+
     @Override
     public String toString() {
         return "CodeMatchModel{" +
@@ -44,5 +54,16 @@ public class CodeMatchModel {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CodeMatchModel that = (CodeMatchModel) o;
+        return rule.equals(that.rule) && ruleType == that.ruleType;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(rule, ruleType);
+    }
 }

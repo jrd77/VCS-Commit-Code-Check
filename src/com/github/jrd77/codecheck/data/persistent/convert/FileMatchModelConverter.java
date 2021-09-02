@@ -4,7 +4,7 @@ import com.github.jrd77.codecheck.data.model.FileMatchModel;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 文件名规则转换器
  * @date 2021/8/25 10:31
  */
 public class FileMatchModelConverter extends AbstractEntityJsonConverter<FileMatchModel> {

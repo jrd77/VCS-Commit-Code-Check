@@ -4,7 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 代码匹配结果
  * @date 2021/8/19 14:43
  */
 public class CodeMatchResult {

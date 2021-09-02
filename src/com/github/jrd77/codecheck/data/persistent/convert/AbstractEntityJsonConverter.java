@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description entity转换器
  * @date 2021/8/25 11:34
  */
 public abstract class AbstractEntityJsonConverter<T> extends Converter<T> {
@@ -20,17 +20,17 @@ public abstract class AbstractEntityJsonConverter<T> extends Converter<T> {
      * 获取泛型类Class对象，不是泛型类则返回null
      */
     public static Class<?> getActualTypeArgument(Class<?> clazz) {
-        Class<?> entitiClass = null;
+        Class<?> entityClass = null;
         Type genericSuperclass = clazz.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass)
                     .getActualTypeArguments();
             if (actualTypeArguments != null && actualTypeArguments.length > 0) {
-                entitiClass = (Class<?>) actualTypeArguments[0];
+                entityClass = (Class<?>) actualTypeArguments[0];
             }
         }
 
-        return entitiClass;
+        return entityClass;
     }
 
     @Override

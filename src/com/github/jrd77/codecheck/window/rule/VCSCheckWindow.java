@@ -2,9 +2,10 @@ package com.github.jrd77.codecheck.window.rule;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
-import com.github.jrd77.codecheck.data.model.CodeMatchResult;
+import com.github.jrd77.codecheck.data.model.*;
 import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
@@ -54,17 +55,25 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
-    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId","PreCommitCodeWindow");
+    static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
+    JPopupMenu popupMenuCodeMatch = new JPopupMenu();
+    JPopupMenu popupMenuFileMatch = new JPopupMenu();
+    JMenuItem item = new JMenuItem("删除");
+    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId", "PreCommitCodeWindow");
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
         init();
         //国际化显示
         initComponentText();
+        createCodeMatchPopupMenu();
+        createFileMatchPopupMenu();
+        tableIgnore.setName("tableIgnore");
+        tableRule.setName("tableRule");
+        btnCheck.addActionListener(e -> {
 
-        btnCheck.addActionListener(e-> {
 
-            VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
             instance.oldDataUpdated = true;
             System.out.println(instance.getState());
 
@@ -153,16 +162,26 @@ public class VCSCheckWindow {
     public JPanel getJcontent() {
 
         //添加新扫描类型
-        btnNewRule.addActionListener(e->{
-            AddRuleDialog addDialog=new AddRuleDialog();
+        btnNewRule.addActionListener(e -> {
+            AddRuleDialog addDialog = new AddRuleDialog();
             addDialog.setVisible(true);
         });
         //添加新扫描类型
-        btnNewIgnore.addActionListener(e->{
-            AddIgnoreDialog addDialog=new AddIgnoreDialog();
+        btnNewIgnore.addActionListener(e -> {
+            AddIgnoreDialog addDialog = new AddIgnoreDialog();
             addDialog.setVisible(true);
         });
-
+        tableRule.getModel().addTableModelListener(tableRule);
+        tableRule.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt, tableRule);
+            }
+        });
+        tableIgnore.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt, tableIgnore);
+            }
+        });
         return windowPanel;
     }
 
@@ -248,5 +267,82 @@ public class VCSCheckWindow {
         tableRuleTitle.setText(InterUtil.getValue("show.component.tableRuleTitle.text"));
         tableFileTitle.setText(InterUtil.getValue("show.component.tableFileTitle.text"));
         tableResultTitle.setText(InterUtil.getValue("show.component.tableResultTitle.text"));
+    }
+
+    /**
+     * 右键菜单
+     */
+    private void createCodeMatchPopupMenu() {
+        popupMenuCodeMatch = new JPopupMenu();
+
+        JMenuItem delMenItem = new JMenuItem();
+        delMenItem.setText("  删除代码匹配  ");
+        delMenItem.addActionListener(evt -> {
+            int selectedRow = tableRule.getSelectedRow();
+            String codeMatchContent = String.valueOf(tableRule.getModel().getValueAt(selectedRow, 1));
+            String codeMatchType = String.valueOf(tableRule.getModel().getValueAt(selectedRow, 3));
+            Boolean aBoolean = saveInterface.removeCodeMatch(new CodeMatchModel(codeMatchContent, RuleTypeEnum.fromName(codeMatchType)));
+            if (aBoolean) {
+                CheckDataUtils.refreshData();
+            }
+            String msg = aBoolean ? "删除成功" : "删除失败";
+            MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
+            Notification notification = notificationGroup.createNotification(msg, messageType);
+            Notifications.Bus.notify(notification);
+        });
+        popupMenuCodeMatch.add(delMenItem);
+    }
+
+    /**
+     * 右键菜单
+     */
+    private void createFileMatchPopupMenu() {
+        popupMenuFileMatch = new JPopupMenu();
+
+        JMenuItem delMenItem = new JMenuItem();
+        delMenItem.setText("  删除文件匹配  ");
+        delMenItem.addActionListener(evt -> {
+            int selectedRow = tableIgnore.getSelectedRow();
+            String fileMatchContent = String.valueOf(tableIgnore.getModel().getValueAt(selectedRow, 1));
+            String fileMatchType = String.valueOf(tableIgnore.getModel().getValueAt(selectedRow, 2));
+            Boolean aBoolean = saveInterface.removeFileMatch(new FileMatchModel(fileMatchContent, RuleTypeEnum.fromName(fileMatchType)));
+            if (aBoolean) {
+                CheckDataUtils.refreshData();
+            }
+            String msg = aBoolean ? "删除成功" : "删除失败";
+            MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
+            Notification notification = notificationGroup.createNotification(msg, messageType);
+            Notifications.Bus.notify(notification);
+
+        });
+        popupMenuFileMatch.add(delMenItem);
+    }
+
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt, JTable table) {
+
+        mouseRightButtonClick(evt, table);
+    }
+
+    //鼠标右键点击事件
+    private void mouseRightButtonClick(java.awt.event.MouseEvent evt, JTable table) {
+        //判断是否为鼠标的BUTTON3按钮，BUTTON3为鼠标右键
+        if (evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+            //通过点击位置找到点击为表格中的行
+            int focusedRowIndex = table.rowAtPoint(evt.getPoint());
+            if (focusedRowIndex == -1) {
+                return;
+            }
+            //将表格所选项设为当前右键点击的行
+            table.setRowSelectionInterval(focusedRowIndex, focusedRowIndex);
+            evt.setSource(table);
+            //弹出菜单
+            if (table.getName().equals(tableRule.getName())) {
+                popupMenuCodeMatch.show(table, evt.getX(), evt.getY());
+            } else {
+                popupMenuFileMatch.show(table, evt.getX(), evt.getY());
+            }
+        }
+
     }
 }

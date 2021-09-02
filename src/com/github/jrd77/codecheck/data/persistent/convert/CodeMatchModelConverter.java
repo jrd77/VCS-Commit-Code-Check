@@ -4,7 +4,7 @@ import com.github.jrd77.codecheck.data.model.CodeMatchModel;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 代码匹配规则转换器
  * @date 2021/8/25 10:31
  */
 public class CodeMatchModelConverter extends AbstractEntityJsonConverter<CodeMatchModel> {

@@ -1,9 +1,5 @@
 package com.github.jrd77.codecheck.util;
 
-import com.github.jrd77.codecheck.data.model.CodeMatchModel;
-import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
-import com.github.jrd77.codecheck.data.persistent.convert.CodeMatchModelConverter;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,9 +9,10 @@ import java.util.stream.Collectors;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 反射工具
  * @date 2021/8/19 17:25
  */
+@Deprecated
 public class ReflectUtil {
     private static Logger logger = Logger.getLogger(ReflectUtil.class.getName());
 
@@ -115,17 +112,6 @@ public class ReflectUtil {
         }
         return map;
     }
-    public static void main(String[] args) {
-        CodeMatchModel matchRuleExample = new CodeMatchModel();
-        matchRuleExample.setRule("TODO");
-        matchRuleExample.setComment("asdasd");
-        matchRuleExample.setRuleType(RuleTypeEnum.REGEXP);
-        System.out.println(matchRuleExample);
-        CodeMatchModelConverter converter = new CodeMatchModelConverter();
-        String s = converter.toString(matchRuleExample);
-        System.out.println(s);
-        CodeMatchModel codeMatchModel = converter.fromString(s);
-        System.out.println(codeMatchModel);
-    }
+
 
 }

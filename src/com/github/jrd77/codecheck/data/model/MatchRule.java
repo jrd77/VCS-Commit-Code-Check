@@ -4,9 +4,10 @@ import java.util.Map;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 代码匹配规则
  * @date 2021/8/19 14:44
  */
+@Deprecated
 public class MatchRule implements ModelJsonParser {
 
     private String rule;

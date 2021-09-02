@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 集合判断工具
  * @date 2021/8/24 11:07
  */
 public class CollUtil {
