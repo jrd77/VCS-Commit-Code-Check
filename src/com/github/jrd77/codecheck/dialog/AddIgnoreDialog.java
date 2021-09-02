@@ -2,6 +2,8 @@ package com.github.jrd77.codecheck.dialog;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
+import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
 import com.github.jrd77.codecheck.util.StrUtil;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ScreenUtil;
@@ -50,18 +52,21 @@ public class AddIgnoreDialog extends JDialog {
     private void onOK() {
         // 在此处添加您的代码
         // 在此处添加代码
-        logger.info(InterUtil.getValue("logs.param")+textFieldContent.getText());
+        logger.info(InterUtil.getValue("logs.param") + textFieldContent.getText());
 
-        if(StrUtil.isBlank(textFieldContent.getText())){
-            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"),InterUtil.getValue("logs.validate.addfailed"));
+        if (StrUtil.isBlank(textFieldContent.getText())) {
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.blank"), InterUtil.getValue("logs.validate.addfailed"));
             return;
         }
         String contentText = textFieldContent.getText();
-        final boolean b = CheckDataUtils.addFileMatch(contentText);
-        if(!b){
-            Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"),InterUtil.getValue("logs.validate.addfailed"));
+        FileMatchModel fileMatchModel = new FileMatchModel();
+        fileMatchModel.setRule(contentText);
+        fileMatchModel.setRuleType(RuleTypeEnum.REGEXP);
+        final boolean b = CheckDataUtils.addFileMatch(fileMatchModel);
+        if (!b) {
+            Messages.showErrorDialog(InterUtil.getValue("logs.validate.formatfailed"), InterUtil.getValue("logs.validate.addfailed"));
             return;
-        }else{
+        } else {
             CheckDataUtils.refreshData();
         }
         dispose();

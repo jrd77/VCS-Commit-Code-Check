@@ -2,18 +2,19 @@ package com.github.jrd77.codecheck.window.rule;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
-import com.github.jrd77.codecheck.data.save.DataCenter;
+import com.github.jrd77.codecheck.data.model.*;
+import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
 import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
-import com.github.jrd77.codecheck.handler.CheckCommitFilter;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
 import com.github.jrd77.codecheck.intellij.compoent.MyTable;
+import com.github.jrd77.codecheck.service.CodeMatchService;
 import com.github.jrd77.codecheck.util.BooleanUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
-import com.github.jrd77.codecheck.util.VcsUtil;
+import com.github.jrd77.codecheck.vo.CodeMatchContext;
+import com.github.jrd77.codecheck.vo.CodeMatchReq;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.Notifications;
@@ -37,8 +38,6 @@ public class VCSCheckWindow {
 
     private static final Logger logger = Logger.getLogger(VCSCheckWindow.class.getName());
 
-    private static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
-
     private static final int DIALOG_HIDDEN=1;
     private static final int DIALOG_SHOW=0;
 
@@ -56,35 +55,41 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
-    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId","PreCommitCodeWindow");
+    static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
+    JPopupMenu popupMenuCodeMatch = new JPopupMenu();
+    JPopupMenu popupMenuFileMatch = new JPopupMenu();
+    JMenuItem item = new JMenuItem("删除");
+    private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId", "PreCommitCodeWindow");
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
         init();
         //国际化显示
         initComponentText();
+        createCodeMatchPopupMenu();
+        createFileMatchPopupMenu();
+        tableIgnore.setName("tableIgnore");
+        tableRule.setName("tableRule");
+        btnCheck.addActionListener(e -> {
 
-        btnCheck.addActionListener(e->{
-            int yesNoDialog=DIALOG_HIDDEN;
-            final int columnCount = tableResult.getRowCount();
-            if(columnCount!=0){
-                yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnCheck.dialog.message"), InterUtil.getValue("show.content.window.btnCheck.dialog.title"), UIUtil.getWarningIcon());
-            }
-            if(yesNoDialog==0||columnCount==0){
-                CheckDataUtils.resultClear();
-                //其他检查
-                ResultObject resultObject = CheckCommitFilter.checkCommitPre();
-                if(resultObject.getOk()!=0){
-                    Messages.showMessageDialog(resultObject.getMsg(),InterUtil.getValue("show.content.window.otherCheck.dialog.message"), UIUtil.getWarningIcon());
-                    return;
-                }
-                //开始检查
-                List<GitDiffCmd> gitDiffCmds = VcsUtil.checkMainFlow(project);
-                if(gitDiffCmds==null||gitDiffCmds.size()==0){
 
-                    Notification notification = notificationGroup.createNotification(InterUtil.getValue("show.component.notification.checkNotificationId.content"), MessageType.WARNING);
-                    Notifications.Bus.notify(notification);
-                }
+            instance.oldDataUpdated = true;
+            System.out.println(instance.getState());
+
+            //检查流程发起
+            CodeMatchReq codeMatchReq = new CodeMatchReq();
+            codeMatchReq.setCheckSource(CheckSourceEnum.TOOL_WINDOW);
+            codeMatchReq.setProject(project);
+            //配置参数
+            CodeMatchContext context = CodeMatchService.convertCodeMatchContext(codeMatchReq);
+            //检查
+            ResultObject<List<CodeMatchResult>> resultObject = CodeMatchService.startCodeMatch(context);
+            if (resultObject.getOk() != ResultObject.ok().getOk()) {
+                Notification notification = notificationGroup.createNotification(resultObject.getMsg(), MessageType.WARNING);
+                Notifications.Bus.notify(notification);
+            } else {
+                CheckDataUtils.refreshResultData(resultObject.getData());
             }
         });
         btnResetIgnore.addActionListener(e->{
@@ -134,7 +139,7 @@ public class VCSCheckWindow {
             try {
                 final TableModel resultModel = tableResult.getModel();
                 //组装数据实体
-                final GitDiffCmd gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
+                final CodeMatchResult gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
                 //跳转
                 if(Objects.nonNull(gitDiffCmd.getFile())){
                     OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber()-1, 0);
@@ -145,9 +150,6 @@ public class VCSCheckWindow {
                     }else{
                         //选中检查内容
                         editor.getSelectionModel().selectLineAtCaret();
-                        final String selectedText = editor.getSelectionModel().getSelectedText();
-                        logger.info(String.format(InterUtil.getValue("logs.common.printSelected"),selectedText));
-
                     }
                 }
             }catch (Exception ex){
@@ -160,16 +162,26 @@ public class VCSCheckWindow {
     public JPanel getJcontent() {
 
         //添加新扫描类型
-        btnNewRule.addActionListener(e->{
-            AddRuleDialog addDialog=new AddRuleDialog();
+        btnNewRule.addActionListener(e -> {
+            AddRuleDialog addDialog = new AddRuleDialog();
             addDialog.setVisible(true);
         });
         //添加新扫描类型
-        btnNewIgnore.addActionListener(e->{
-            AddIgnoreDialog addDialog=new AddIgnoreDialog();
+        btnNewIgnore.addActionListener(e -> {
+            AddIgnoreDialog addDialog = new AddIgnoreDialog();
             addDialog.setVisible(true);
         });
-
+        tableRule.getModel().addTableModelListener(tableRule);
+        tableRule.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt, tableRule);
+            }
+        });
+        tableIgnore.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt, tableIgnore);
+            }
+        });
         return windowPanel;
     }
 
@@ -190,10 +202,6 @@ public class VCSCheckWindow {
         }catch (Exception e){
             logger.severe("发生异常,开始初始化");
             e.printStackTrace();
-            SaveInterface saveInterface= DataCenter.getInstance;
-            saveInterface.clearCodeMatch();
-            saveInterface.clearFileMatch();
-            CheckDataUtils.refreshData();
         }
     }
 
@@ -259,5 +267,82 @@ public class VCSCheckWindow {
         tableRuleTitle.setText(InterUtil.getValue("show.component.tableRuleTitle.text"));
         tableFileTitle.setText(InterUtil.getValue("show.component.tableFileTitle.text"));
         tableResultTitle.setText(InterUtil.getValue("show.component.tableResultTitle.text"));
+    }
+
+    /**
+     * 右键菜单
+     */
+    private void createCodeMatchPopupMenu() {
+        popupMenuCodeMatch = new JPopupMenu();
+
+        JMenuItem delMenItem = new JMenuItem();
+        delMenItem.setText("  删除代码匹配  ");
+        delMenItem.addActionListener(evt -> {
+            int selectedRow = tableRule.getSelectedRow();
+            String codeMatchContent = String.valueOf(tableRule.getModel().getValueAt(selectedRow, 1));
+            String codeMatchType = String.valueOf(tableRule.getModel().getValueAt(selectedRow, 3));
+            Boolean aBoolean = saveInterface.removeCodeMatch(new CodeMatchModel(codeMatchContent, RuleTypeEnum.fromName(codeMatchType)));
+            if (aBoolean) {
+                CheckDataUtils.refreshData();
+            }
+            String msg = aBoolean ? "删除成功" : "删除失败";
+            MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
+            Notification notification = notificationGroup.createNotification(msg, messageType);
+            Notifications.Bus.notify(notification);
+        });
+        popupMenuCodeMatch.add(delMenItem);
+    }
+
+    /**
+     * 右键菜单
+     */
+    private void createFileMatchPopupMenu() {
+        popupMenuFileMatch = new JPopupMenu();
+
+        JMenuItem delMenItem = new JMenuItem();
+        delMenItem.setText("  删除文件匹配  ");
+        delMenItem.addActionListener(evt -> {
+            int selectedRow = tableIgnore.getSelectedRow();
+            String fileMatchContent = String.valueOf(tableIgnore.getModel().getValueAt(selectedRow, 1));
+            String fileMatchType = String.valueOf(tableIgnore.getModel().getValueAt(selectedRow, 2));
+            Boolean aBoolean = saveInterface.removeFileMatch(new FileMatchModel(fileMatchContent, RuleTypeEnum.fromName(fileMatchType)));
+            if (aBoolean) {
+                CheckDataUtils.refreshData();
+            }
+            String msg = aBoolean ? "删除成功" : "删除失败";
+            MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
+            Notification notification = notificationGroup.createNotification(msg, messageType);
+            Notifications.Bus.notify(notification);
+
+        });
+        popupMenuFileMatch.add(delMenItem);
+    }
+
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt, JTable table) {
+
+        mouseRightButtonClick(evt, table);
+    }
+
+    //鼠标右键点击事件
+    private void mouseRightButtonClick(java.awt.event.MouseEvent evt, JTable table) {
+        //判断是否为鼠标的BUTTON3按钮，BUTTON3为鼠标右键
+        if (evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+            //通过点击位置找到点击为表格中的行
+            int focusedRowIndex = table.rowAtPoint(evt.getPoint());
+            if (focusedRowIndex == -1) {
+                return;
+            }
+            //将表格所选项设为当前右键点击的行
+            table.setRowSelectionInterval(focusedRowIndex, focusedRowIndex);
+            evt.setSource(table);
+            //弹出菜单
+            if (table.getName().equals(tableRule.getName())) {
+                popupMenuCodeMatch.show(table, evt.getX(), evt.getY());
+            } else {
+                popupMenuFileMatch.show(table, evt.getX(), evt.getY());
+            }
+        }
+
     }
 }

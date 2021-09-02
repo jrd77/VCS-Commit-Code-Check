@@ -1,10 +1,15 @@
 package com.github.jrd77.codecheck.handler;
 
+import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
+import com.github.jrd77.codecheck.service.CodeMatchService;
+import com.github.jrd77.codecheck.util.CollUtil;
 import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
-import com.github.jrd77.codecheck.util.VcsUtil;
+import com.github.jrd77.codecheck.vo.CodeMatchContext;
+import com.github.jrd77.codecheck.vo.CodeMatchReq;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vcs.CheckinProjectPanel;
@@ -75,17 +80,25 @@ public class VcsCheckinHandler extends CheckinHandler {
             logger.warning(InterUtil.getValue("logs.validate.notopencheck"));
             return super.beforeCheckin();
         }
-        //其他检查
-        ResultObject resultObject = CheckCommitFilter.checkCommitPre();
-        if(resultObject.getOk()!=0){
+        //检查流程发起
+        CodeMatchReq codeMatchReq = new CodeMatchReq();
+        codeMatchReq.setCheckSource(CheckSourceEnum.TOOL_WINDOW);
+        codeMatchReq.setProject(panel.getProject());
+        //配置参数
+        CodeMatchContext context = CodeMatchService.convertCodeMatchContext(codeMatchReq);
+        //检查
+        ResultObject<List<CodeMatchResult>> resultObject = CodeMatchService.startCodeMatch(context);
+        if (resultObject.getOk() != 0 || CollUtil.isEmpty(resultObject.getData())) {
             return super.beforeCheckin();
         }
+        //刷新tool_window
+        CheckDataUtils.refreshResultData(resultObject.getData());
         //检查项目中是否有符合规则的提交内容
-        final List<GitDiffCmd> cmdList = VcsUtil.checkMainFlow(panel.getProject());
+        final List<CodeMatchResult> cmdList = resultObject.getData();
         if (cmdList != null && cmdList.size() > 0) {
             final String htmlTable = HtmlUtil.buildHtmlTable(cmdList);
             String html = "<html><head>" + UIUtil.getCssFontDeclaration(UIUtil.getLabelFont()) + "</head><body>" +
-                    "<br><h3>"+InterUtil.getValue("show.content.vcs.checkinhandler.message.whether")+"</h3>" +
+                    "<br><h3>" + InterUtil.getValue("show.content.vcs.checkinhandler.message.whether") + "</h3>" +
                     "<br>" +
                     htmlTable +
                     "</body></html>";

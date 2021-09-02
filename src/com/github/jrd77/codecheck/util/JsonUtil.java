@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author zhen.wang
@@ -15,25 +16,34 @@ public class JsonUtil {
 
     private static Logger logger = Logger.getLogger(JsonUtil.class.getName());
 
-    public static String toJson(Object obj){
+    public static String toJson(Object obj) {
 
         return new Gson().toJson(obj);
     }
 
-    public static <T> T fromJson(String jsonStr,Class<T> tClass){
+    public static <T> List<String> toJsonList(List<T> obj) {
 
-        return new Gson().fromJson(jsonStr,tClass);
+        Gson gson = new Gson();
+        return obj.stream().map(gson::toJson).collect(Collectors.toList());
+    }
+
+    public static <T> T fromJson(String jsonStr, Class<T> tClass) {
+
+        return new Gson().fromJson(jsonStr, tClass);
+    }
+
+    public static <T> List<T> fromJson(List<String> jsonStrs, Class<T> tClass) {
+        Gson gson = new Gson();
+        return jsonStrs.stream().map(x -> gson.fromJson(x, tClass)).collect(Collectors.toList());
     }
 
 
-
-
-    private static List<Class> BASE_CLASSES =Arrays.asList(String.class,
-                                        Short.class,Byte.class,Integer.class,Long.class,
-                                        Boolean.class,
-                                        Character.class,
-                                        Float.class,Double.class,
-                                        short.class,byte.class,int.class,long.class,boolean.class,char.class,float.class,double.class);
+    private static List<Class> BASE_CLASSES = Arrays.asList(String.class,
+            Short.class, Byte.class, Integer.class, Long.class,
+            Boolean.class,
+            Character.class,
+            Float.class, Double.class,
+            short.class, byte.class, int.class, long.class, boolean.class, char.class, float.class, double.class);
 
 
 

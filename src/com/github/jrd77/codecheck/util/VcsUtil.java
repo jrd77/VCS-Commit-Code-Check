@@ -2,10 +2,12 @@ package com.github.jrd77.codecheck.util;
 
 import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.VcsCheckSettingsState;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 import com.github.jrd77.codecheck.data.model.RuleTypeEnum;
+import com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState;
+import com.github.jrd77.codecheck.data.save.SaveInterface;
+import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
@@ -29,7 +31,9 @@ import java.util.stream.Collectors;
 public class VcsUtil {
     private static final Logger logger = Logger.getLogger(VcsUtil.class.getName());
 
-    public static LocalChangeList getChangeFileListFromProject(Project project){
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
+
+    public static LocalChangeList getChangeFileListFromProject(Project project) {
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         return changeListManager.getDefaultChangeList();
     }
@@ -37,29 +41,32 @@ public class VcsUtil {
 
     /**
      * 检查主体流程
+     *
      * @param project
      */
-    public static List<GitDiffCmd> checkMainFlow(Project project){
+    @Deprecated
+    public static List<CodeMatchResult> checkMainFlow(Project project) {
 
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
-        final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(instance.ruleList);
-        final List<String> ignoreList = instance.ignoreList;
+        final List<MatchRule> matchRuleList = ConvertUtil.convertMatchRuleList(saveInterface.codeMatchList());
+        final List<String> ignoreList = saveInterface.fileMatchList();
         //获取变更文件
         final LocalChangeList defaultChangeList = VcsUtil.getChangeFileListFromProject(project);
-        List<GitDiffCmd> cmdList = null;
+        List<CodeMatchResult> cmdList = null;
         try {
-            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList,project);
+            cmdList = VcsUtil.getCheckErrorListFromChange(defaultChangeList, matchRuleList, ignoreList, project);
         } catch (VcsException | IOException e) {
             e.printStackTrace();
         }
         CheckDataUtils.refreshResultData(cmdList);
         return cmdList;
     }
-    public static List<GitDiffCmd> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
+
+    public static List<CodeMatchResult> getCheckErrorListFromChange(LocalChangeList defaultChangeList, List<MatchRule> matchRuleList, List<String> ignoreList, Project project) throws VcsException, IOException {
 
         int count = 0;
-        List<GitDiffCmd> resultList = new ArrayList<>();
+        List<CodeMatchResult> resultList = new ArrayList<>();
         for (Change change : defaultChangeList.getChanges()) {
             final VirtualFile changeFile = change.getVirtualFile();
             if (Objects.isNull(changeFile)) {
@@ -74,6 +81,7 @@ public class VcsUtil {
                 logger.info(String.format(InterUtil.getValue("logs.validate.noNeedCheck"), fileName, type.name()));
                 continue;
             }
+            final boolean contains = ignoreList.stream().anyMatch(x -> matchs(x, fileName));
 
             final ContentRevision afterRevision = change.getAfterRevision();
             if (afterRevision == null) {
@@ -81,7 +89,6 @@ public class VcsUtil {
                 continue;
             }
 
-            final boolean contains = ignoreList.stream().anyMatch(x -> matchs(x, fileName));
             if (!contains) {
                 logger.info(String.format(InterUtil.getValue("logs.validate.matchTypeFailed"), fileName));
                 continue;
@@ -106,7 +113,7 @@ public class VcsUtil {
                     final List<MatchRule> matchRuleErrorList = matchError(matchRuleList, lineStr);
                     if (matchRuleErrorList.size() > 0) {
                         for (MatchRule matchRule : matchRuleErrorList) {
-                            GitDiffCmd diff = new GitDiffCmd();
+                            CodeMatchResult diff = new CodeMatchResult();
                             diff.setExt(fileTypeName);
                             diff.setFilePath(changeFile.getPath());
                             diff.setFileName(fileName);

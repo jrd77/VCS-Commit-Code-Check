@@ -4,7 +4,7 @@ import java.util.Locale;
 
 /**
  * @author zhen.wang
- * @description localhost
+ * @description str handle tool
  * @date 2021/7/29 10:12
  */
 public class StrUtil {

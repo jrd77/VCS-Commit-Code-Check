@@ -15,7 +15,7 @@ public class VcsCheckToolWindowFactory implements ToolWindowFactory {
 
         VCSCheckWindow myToolWindow = new VCSCheckWindow(project,toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(myToolWindow.getJcontent(), "", false);
+        Content content = contentFactory.createContent(myToolWindow.getJcontent(), "Code Commit Check Window", false);
         toolWindow.getContentManager().addContent(content);
     }
 }

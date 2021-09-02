@@ -1,7 +1,7 @@
 package com.github.jrd77.codecheck.util;
 
-import com.github.jrd77.codecheck.data.InterUtil;
-import com.github.jrd77.codecheck.data.model.GitDiffCmd;
+import com.github.jrd77.codecheck.data.model.CodeMatchResult;
+import com.github.jrd77.codecheck.data.model.FileMatchModel;
 import com.github.jrd77.codecheck.data.model.MatchRule;
 
 import java.util.ArrayList;
@@ -52,26 +52,27 @@ public class ConvertUtil {
         return JsonUtil.fromJson(str, MatchRule.class);
     }
 
-    public static Vector<Vector<String>> convertIgnore(List<String> ignoreList) {
+    public static Vector<Vector<String>> convertFileMatchList(List<String> fileMatchList) {
 
         Vector<Vector<String>> data = new Vector<Vector<String>>();
-        int index=0;
-        for (String s : ignoreList) {
-            Vector<String> vector=new Vector<>();
+        int index = 0;
+        for (String s : fileMatchList) {
+            FileMatchModel fileMatchModel = JsonUtil.fromJson(s, FileMatchModel.class);
+            Vector<String> vector = new Vector<>();
             vector.add(String.valueOf(++index));
-            vector.add(s);
-            vector.add(InterUtil.getValue("show.content.tableData.matchIgnoreRule.remark"));
+            vector.add(fileMatchModel.getRule());
+            vector.add(fileMatchModel.getRuleType().name());
             data.add(vector);
         }
         return data;
     }
 
-    public static Vector<Vector<String>> convertGitDiffList(List<GitDiffCmd> cmdList) {
+    public static Vector<Vector<String>> convertGitDiffList(List<CodeMatchResult> cmdList) {
 
         Vector<Vector<String>> data = new Vector<Vector<String>>();
-        int index=0;
-        for (GitDiffCmd gitDiffCmd : cmdList) {
-            Vector<String> vector=new Vector<>();
+        int index = 0;
+        for (CodeMatchResult gitDiffCmd : cmdList) {
+            Vector<String> vector = new Vector<>();
             vector.add(String.valueOf(++index));
             vector.add(gitDiffCmd.getErrorLineStr());
             vector.add(String.valueOf(gitDiffCmd.getErrorLineNumber()));

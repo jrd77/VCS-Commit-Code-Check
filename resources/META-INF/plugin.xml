@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.github.jrd77.codecheck.id</id>
   <name>VCS Commit Code Check</name>
-  <version>1.2</version>
+  <version>1.2.1</version>
   <vendor email="jrd77@qq.com" url="https://gitee.com/jrd77/vcs-commit-code-check.git">jrd77</vendor>
 
   <description><![CDATA[
@@ -31,7 +31,7 @@
  <br>
     同样也可以使用窗口'**PreCommitCodeWindow**'下面'**重新检查**'按钮，预览检查结果，点击检查结果表格行，自动跳转有问题的代码
      <br>
-    详见 https://github.com/jrd77/Vcs-Commit-Code-Check
+    详见 https://gitee.com/jrd77/vcs-commit-code-check.git
        <br>
     ]]></description>
 
@@ -40,8 +40,9 @@
 
 <br>
 <ul>
-<li>fix bug: add code match rule failed</li>
+<li>change default check file type</li>
 <li>remove some useless dependencies</li>
+
 </ul>
 
     ]]>
@@ -57,7 +58,7 @@
     <!-- Add your extensions here -->
     <toolWindow id="PreCommitCodeWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                 factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
-    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.VcsCheckSettingsState"/>
+    <applicationService serviceImplementation="com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>
 

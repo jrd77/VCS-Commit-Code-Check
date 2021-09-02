@@ -26,6 +26,7 @@ public class AddRuleDialog extends JDialog {
     private JLabel addDialogTitle;
     private JLabel contentLabel;
     private JLabel typeLabel;
+    private JTextField remarkContent;
 
 
     public AddRuleDialog() {
@@ -116,10 +117,13 @@ public class AddRuleDialog extends JDialog {
         final double height = rectangle.getHeight();
         final double x = width * 0.5 - 0.1 * width;
         final double y = height * 0.5 - 0.1 * height;
-        this.setLocation(Double.valueOf(x).intValue(),Double.valueOf(y).intValue());
+        this.setLocation(Double.valueOf(x).intValue(), Double.valueOf(y).intValue());
         final int widthDialog = Double.valueOf(0.2 * width).intValue();
         final int heightDialog = Double.valueOf(0.2 * height).intValue();
-        this.setSize(widthDialog,heightDialog);
+        this.setSize(widthDialog, heightDialog);
+        int heightRemark = this.remarkContent.getHeight();
+        int widthRemark = this.remarkContent.getWidth();
+        this.remarkContent.setSize(heightRemark, widthRemark / 2);
     }
 
     private void selectedRegexpRadio(){

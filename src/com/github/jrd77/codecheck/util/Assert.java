@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 断言类
  * @date 2021/7/20 20:26
  */
 public class Assert {

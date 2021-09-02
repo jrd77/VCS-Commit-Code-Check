@@ -2,7 +2,7 @@ package com.github.jrd77.codecheck.util;
 
 /**
  * @author zhen.wang
- * @description TODO
+ * @description 布尔值判断工具
  * @date 2021/8/4 14:57
  */
 public class BooleanUtil {
