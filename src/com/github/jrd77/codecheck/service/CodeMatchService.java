@@ -33,7 +33,9 @@ public class CodeMatchService {
 
     private static Logger logger = Logger.getLogger(CodeMatchService.class.getName());
 
-    private static SaveInterface saveInterface= XmlFileSaveImpl.getInstance();
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
+
+    public static List<CodeMatchResult> resultList = null;
 
     public static ResultObject<List<CodeMatchResult>> startCodeMatch(CodeMatchContext context) {
         logger.info(InterUtil.getValue("logs.common.checkMainFlow"));
@@ -69,6 +71,7 @@ public class CodeMatchService {
                 }
             }
         }
+        CodeMatchService.resultList = resultList;
         return ResultObject.ok(resultList);
     }
 

@@ -38,8 +38,8 @@ public class VCSCheckWindow {
 
     private static final Logger logger = Logger.getLogger(VCSCheckWindow.class.getName());
 
-    private static final int DIALOG_HIDDEN=1;
-    private static final int DIALOG_SHOW=0;
+    private static final int DIALOG_HIDDEN = 1;
+    private static final int DIALOG_SHOW = 0;
 
     private JPanel checkWindow;
     private MyButton btnNewRule;
@@ -55,12 +55,11 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
-    static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
-    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
-    JPopupMenu popupMenuCodeMatch = new JPopupMenu();
-    JPopupMenu popupMenuFileMatch = new JPopupMenu();
-    JMenuItem item = new JMenuItem("删除");
+    private static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
+    private JPopupMenu popupMenuCodeMatch;
+    private JPopupMenu popupMenuFileMatch;
     private NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("checkNotificationId", "PreCommitCodeWindow");
+    private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
 
@@ -72,7 +71,6 @@ public class VCSCheckWindow {
         tableIgnore.setName("tableIgnore");
         tableRule.setName("tableRule");
         btnCheck.addActionListener(e -> {
-
 
             instance.oldDataUpdated = true;
             System.out.println(instance.getState());
@@ -92,48 +90,48 @@ public class VCSCheckWindow {
                 CheckDataUtils.refreshResultData(resultObject.getData());
             }
         });
-        btnResetIgnore.addActionListener(e->{
+        btnResetIgnore.addActionListener(e -> {
 
-            int yesNoDialog=DIALOG_HIDDEN;
+            int yesNoDialog = DIALOG_HIDDEN;
             final int columnCount = tableIgnore.getRowCount();
-            if(columnCount!=0){
+            if (columnCount != 0) {
                 yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetIgnore.dialog.message"), InterUtil.getValue("show.content.window.btnResetIgnore.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
-            if(yesNoDialog==0){
+            if (yesNoDialog == 0) {
                 CheckDataUtils.clearFileMatch();
                 CheckDataUtils.refreshData();
             }
         });
-        btnResetRule.addActionListener(e->{
+        btnResetRule.addActionListener(e -> {
 
-            int showDialog=DIALOG_HIDDEN;
+            int showDialog = DIALOG_HIDDEN;
             final int columnCount = tableRule.getRowCount();
-            if(columnCount!=0){
+            if (columnCount != 0) {
                 showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetRule.dialog.message"), InterUtil.getValue("show.content.window.btnResetRule.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
-            if(showDialog==0){
+            if (showDialog == 0) {
                 CheckDataUtils.clearCodeMatch();
                 CheckDataUtils.refreshData();
             }
         });
-        btnResetResult.addActionListener(e->{
+        btnResetResult.addActionListener(e -> {
 
-            int showDialog=DIALOG_HIDDEN;
+            int showDialog = DIALOG_HIDDEN;
             final int columnCount = tableResult.getRowCount();
-            if(columnCount!=0){
+            if (columnCount != 0) {
                 showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetResult.dialog.message"), InterUtil.getValue("show.content.window.btnResetResult.dialog.title"), UIUtil.getWarningIcon());
             }
             //yes
-            if(showDialog==0){
+            if (showDialog == 0) {
                 CheckDataUtils.resultClear();
             }
         });
         //列表选中事件
         tableResult.getSelectionModel().addListSelectionListener(e -> {
             final int selectedRow = tableResult.getSelectedRow();
-            if(selectedRow<0){
+            if (selectedRow < 0) {
                 return;
             }
             try {
@@ -141,19 +139,19 @@ public class VCSCheckWindow {
                 //组装数据实体
                 final CodeMatchResult gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
                 //跳转
-                if(Objects.nonNull(gitDiffCmd.getFile())){
-                    OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber()-1, 0);
+                if (Objects.nonNull(gitDiffCmd.getFile())) {
+                    OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber() - 1, 0);
                     descriptor.navigate(true);
                     Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                    if(editor==null){
+                    if (editor == null) {
                         logger.warning(InterUtil.getValue("logs.validate.editorIsNull"));
-                    }else{
+                    } else {
                         //选中检查内容
                         editor.getSelectionModel().selectLineAtCaret();
                     }
                 }
-            }catch (Exception ex){
-                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"),tableResult.getModel()));
+            } catch (Exception ex) {
+                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"), tableResult.getModel()));
                 ex.printStackTrace();
             }
         });
@@ -186,20 +184,20 @@ public class VCSCheckWindow {
     }
 
 
-    private void init(){
+    private void init() {
 
         VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
         //是否init,否 进行初始化
-        if(BooleanUtil.isNotTrue(instance.openCheck)){
+        if (BooleanUtil.isNotTrue(instance.openCheck)) {
             CheckDataUtils.initCheckFileTypeList();
-            instance.openCheck=Boolean.TRUE;
+            instance.openCheck = Boolean.TRUE;
         }
-        try{
+        try {
             initIgnoreTable();
             initRuleTable();
-            initResultTable();
+            initResultTable(tableResult);
             CheckDataUtils.refreshData();
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.severe("发生异常,开始初始化");
             e.printStackTrace();
         }
@@ -209,54 +207,53 @@ public class VCSCheckWindow {
     /**
      * 初始化忽略规则表格
      */
-    private void initIgnoreTable(){
+    private void initIgnoreTable() {
         this.tableIgnore.setModel(WindowSetting.TABLE_MODEL_IGNORE);
         this.tableIgnore.setEnabled(true);
         final TableColumnModel columnModel = tableIgnore.getColumnModel();
-        int index=0;
+        int index = 0;
         final int width = columnModel.getColumn(index).getPreferredWidth();
         final int globalWidth = columnModel.getColumnCount() * width;
-        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
-        double contentWidth=globalWidth-(globalWidth*0.1);
-        columnModel.getColumn(index++).setPreferredWidth((int) contentWidth /2);
-        columnModel.getColumn(index).setPreferredWidth((int) contentWidth /2);
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
+        double contentWidth = globalWidth - (globalWidth * 0.1);
+        columnModel.getColumn(index++).setPreferredWidth((int) contentWidth / 2);
+        columnModel.getColumn(index).setPreferredWidth((int) contentWidth / 2);
     }
 
     /**
      * 初始化匹配规则表格
      */
-    private void initRuleTable(){
+    private void initRuleTable() {
         this.tableRule.setModel(WindowSetting.TABLE_MODEL_RULE);
         this.tableRule.setEnabled(true);
         final TableColumnModel columnModel = tableRule.getColumnModel();
-        int index=0;
+        int index = 0;
         final int width = columnModel.getColumn(index).getPreferredWidth();
         final int globalWidth = columnModel.getColumnCount() * width;
-        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
-        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
-        double contentWidth=globalWidth-(globalWidth*0.3);
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
+        double contentWidth = globalWidth - (globalWidth * 0.3);
         columnModel.getColumn(index++).setPreferredWidth((int) contentWidth);
-        columnModel.getColumn(index).setPreferredWidth(globalWidth/10);
+        columnModel.getColumn(index).setPreferredWidth(globalWidth / 10);
     }
 
     /**
      * 初始化忽略规则表格
      */
-    private void initResultTable(){
-        this.tableResult.setModel(WindowSetting.TABLE_MODEL_RESULT);
-        this.tableResult.setEnabled(true);
-//        this.tableResult.seted(false);
-        final TableColumnModel columnModel = tableIgnore.getColumnModel();
-        int index=0;
+    private void initResultTable(JTable jTable) {
+        jTable.setModel(WindowSetting.TABLE_MODEL_RESULT);
+        jTable.setEnabled(true);
+        final TableColumnModel columnModel = jTable.getColumnModel();
+        int index = 0;
         final int width = columnModel.getColumn(index).getPreferredWidth();
         final int globalWidth = columnModel.getColumnCount() * width;
-        columnModel.getColumn(index++).setPreferredWidth(globalWidth/10);
-        double contentWidth=globalWidth-(globalWidth*0.1);
-        columnModel.getColumn(index++).setPreferredWidth((int) contentWidth /2);
-        columnModel.getColumn(index).setPreferredWidth((int) contentWidth /2);
+        columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
+        double contentWidth = globalWidth - (globalWidth * 0.1);
+        columnModel.getColumn(index++).setPreferredWidth((int) contentWidth / 2);
+        columnModel.getColumn(index).setPreferredWidth((int) contentWidth / 2);
     }
 
-    private void initComponentText(){
+    private void initComponentText() {
 
         btnNewRule.setText(InterUtil.getValue("show.component.btnNewRule.text"));
         btnResetRule.setText(InterUtil.getValue("show.component.btnResetRule.text"));
@@ -276,7 +273,7 @@ public class VCSCheckWindow {
         popupMenuCodeMatch = new JPopupMenu();
 
         JMenuItem delMenItem = new JMenuItem();
-        delMenItem.setText("  删除代码匹配  ");
+        delMenItem.setText(InterUtil.getValue("show.component.popupMenuCodeMatch.name"));
         delMenItem.addActionListener(evt -> {
             int selectedRow = tableRule.getSelectedRow();
             String codeMatchContent = String.valueOf(tableRule.getModel().getValueAt(selectedRow, 1));
@@ -285,7 +282,7 @@ public class VCSCheckWindow {
             if (aBoolean) {
                 CheckDataUtils.refreshData();
             }
-            String msg = aBoolean ? "删除成功" : "删除失败";
+            String msg = aBoolean ? InterUtil.getValue("show.component.notification.del.ok") : InterUtil.getValue("show.component.notification.del.failed");
             MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
             Notification notification = notificationGroup.createNotification(msg, messageType);
             Notifications.Bus.notify(notification);
@@ -300,7 +297,7 @@ public class VCSCheckWindow {
         popupMenuFileMatch = new JPopupMenu();
 
         JMenuItem delMenItem = new JMenuItem();
-        delMenItem.setText("  删除文件匹配  ");
+        delMenItem.setText(InterUtil.getValue("show.component.popupMenuFileMatch.name"));
         delMenItem.addActionListener(evt -> {
             int selectedRow = tableIgnore.getSelectedRow();
             String fileMatchContent = String.valueOf(tableIgnore.getModel().getValueAt(selectedRow, 1));
@@ -309,7 +306,7 @@ public class VCSCheckWindow {
             if (aBoolean) {
                 CheckDataUtils.refreshData();
             }
-            String msg = aBoolean ? "删除成功" : "删除失败";
+            String msg = aBoolean ? InterUtil.getValue("show.component.notification.del.ok") : InterUtil.getValue("show.component.notification.del.failed");
             MessageType messageType = aBoolean ? MessageType.INFO : MessageType.WARNING;
             Notification notification = notificationGroup.createNotification(msg, messageType);
             Notifications.Bus.notify(notification);

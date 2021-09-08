@@ -38,7 +38,6 @@ public class VcsCheckSettingsState implements PersistentStateComponent<VcsCheckS
 
     @Deprecated
     public List<String> ruleList = new LinkedList<>();
-    ;
     @Deprecated
     public List<String> ignoreList = new LinkedList<>();
     public List<String> codeMatchList = new LinkedList<>();

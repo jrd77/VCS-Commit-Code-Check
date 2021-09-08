@@ -15,9 +15,9 @@ public class InterUtil {
     private static Logger logger = Logger.getLogger(InterUtil.class.getName());
 
     private static final String DEFAULT_LANGUAGE_ZH ="language/zh";
-    private static final String DEFAULT_LANGUAGE_EN ="language/en";
-    private static final String DEFAULT_LANGUAGE ="zh";
-    private static ResourceBundle bundle=null;
+    private static final String DEFAULT_LANGUAGE_EN = "language/en";
+    private static final String DEFAULT_LANGUAGE = "zhsss";
+    private static ResourceBundle bundle = null;
     static {
         Locale aDefault = Locale.getDefault();
         if(aDefault.getLanguage().equals(DEFAULT_LANGUAGE)){

@@ -10,6 +10,7 @@ import com.github.jrd77.codecheck.util.ConvertUtil;
 import com.github.jrd77.codecheck.util.JsonUtil;
 import com.github.jrd77.codecheck.window.rule.WindowSetting;
 
+import javax.swing.table.TableModel;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -80,13 +81,13 @@ public class CheckDataUtils {
     }
 
 
-    public static void refreshResultData(List<CodeMatchResult> cmdList) {
+    public static TableModel refreshResultData(List<CodeMatchResult> cmdList) {
         if (cmdList == null) {
-            return;
+            return WindowSetting.TABLE_MODEL_RESULT;
         }
         logger.warning(InterUtil.getValue("logs.refresh.result"));
         //刷新tableRule
-        WindowSetting.reFreshTableResult(ConvertUtil.convertGitDiffList(cmdList));
+        return WindowSetting.reFreshTableResult(ConvertUtil.convertGitDiffList(cmdList));
     }
 
     /**

@@ -18,6 +18,7 @@ import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             return super.beforeCheckin();
         }
         //刷新tool_window
-        CheckDataUtils.refreshResultData(resultObject.getData());
+        TableModel tableModel = CheckDataUtils.refreshResultData(resultObject.getData());
         //检查项目中是否有符合规则的提交内容
         final List<CodeMatchResult> cmdList = resultObject.getData();
         if (cmdList != null && cmdList.size() > 0) {
@@ -105,6 +106,7 @@ public class VcsCheckinHandler extends CheckinHandler {
             int yesOrNo = Messages.showYesNoDialog(html,
                     InterUtil.getValue("show.content.vcs.checkinhandler.message.title"),
                     UIUtil.getErrorIcon());
+
             return yesOrNo == 0 ? ReturnResult.COMMIT : ReturnResult.CANCEL;
         }
         return ReturnResult.COMMIT;

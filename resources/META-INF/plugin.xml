@@ -56,8 +56,12 @@
   <depends>com.intellij.modules.platform</depends>
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <toolWindow id="PreCommitCodeWindow" secondary="true" icon="AllIcons.General.Modified" anchor="right"
-                factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"/>
+    <!--    icon="AllIcons.General.Modified" -->
+    <toolWindow id="PreCommitCodeWindow" secondary="true"
+                icon="/img/icon-blue.svg"
+                anchor="right"
+                factoryClass="com.github.jrd77.codecheck.window.rule.VcsCheckToolWindowFactory"
+                doNotActivateOnStart="true"/>
     <applicationService serviceImplementation="com.github.jrd77.codecheck.data.persistent.VcsCheckSettingsState"/>
     <checkinHandlerFactory implementation="com.github.jrd77.codecheck.handler.CommitCheckCheckinHandlerFactory"/>
   </extensions>

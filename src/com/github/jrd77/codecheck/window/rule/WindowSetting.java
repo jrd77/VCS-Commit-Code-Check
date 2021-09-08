@@ -3,6 +3,7 @@ package com.github.jrd77.codecheck.window.rule;
 import com.github.jrd77.codecheck.data.InterUtil;
 
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -43,14 +44,16 @@ public class WindowSetting {
         TABLE_MODEL_RULE.setDataVector(dataVector,COLUMN_NAME_RULE);
     }
 
-    public static void reFreshTableIgnore(Vector<Vector<String>> dataVector){
+    public static void reFreshTableIgnore(Vector<Vector<String>> dataVector) {
 
         logger.info(InterUtil.getValue("logs.refresh.refreshTableFileMatch"));
-        TABLE_MODEL_IGNORE.setDataVector(dataVector,COLUMN_NAME_IGNORE);
+        TABLE_MODEL_IGNORE.setDataVector(dataVector, COLUMN_NAME_IGNORE);
     }
-    public static void reFreshTableResult(Vector<Vector<String>> dataVector){
+
+    public static TableModel reFreshTableResult(Vector<Vector<String>> dataVector) {
 
         logger.info(InterUtil.getValue("logs.refresh.refreshTableFileMatch"));
-        TABLE_MODEL_RESULT.setDataVector(dataVector,COLUMN_NAME_RESULT);
+        TABLE_MODEL_RESULT.setDataVector(dataVector, COLUMN_NAME_RESULT);
+        return TABLE_MODEL_RESULT;
     }
 }
