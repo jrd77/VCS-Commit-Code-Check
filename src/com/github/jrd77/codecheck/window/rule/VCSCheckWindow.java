@@ -8,6 +8,7 @@ import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
+import com.github.jrd77.codecheck.dialog.CheckinDialog;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
 import com.github.jrd77.codecheck.intellij.compoent.MyTable;
 import com.github.jrd77.codecheck.service.CodeMatchService;
@@ -55,6 +56,7 @@ public class VCSCheckWindow {
     private JLabel tableRuleTitle;
     private JLabel tableFileTitle;
     private JLabel tableResultTitle;
+    private JScrollPane resultPane;
     private static VcsCheckSettingsState instance = VcsCheckSettingsState.getInstance();
     private JPopupMenu popupMenuCodeMatch;
     private JPopupMenu popupMenuFileMatch;
@@ -62,7 +64,15 @@ public class VCSCheckWindow {
     private static SaveInterface saveInterface = XmlFileSaveImpl.getInstance();
 
     public VCSCheckWindow(Project project, ToolWindow toolWindow) {
+        getInstance(project);
+    }
 
+    public VCSCheckWindow(Project project) {
+
+        getInstance(project);
+    }
+
+    public VCSCheckWindow getInstance(Project project) {
         init();
         //国际化显示
         initComponentText();
@@ -71,92 +81,28 @@ public class VCSCheckWindow {
         tableIgnore.setName("tableIgnore");
         tableRule.setName("tableRule");
         btnCheck.addActionListener(e -> {
-
-            instance.oldDataUpdated = true;
-            System.out.println(instance.getState());
-
-            //检查流程发起
-            CodeMatchReq codeMatchReq = new CodeMatchReq();
-            codeMatchReq.setCheckSource(CheckSourceEnum.TOOL_WINDOW);
-            codeMatchReq.setProject(project);
-            //配置参数
-            CodeMatchContext context = CodeMatchService.convertCodeMatchContext(codeMatchReq);
-            //检查
-            ResultObject<List<CodeMatchResult>> resultObject = CodeMatchService.startCodeMatch(context);
-            if (resultObject.getOk() != ResultObject.ok().getOk()) {
-                Notification notification = notificationGroup.createNotification(resultObject.getMsg(), MessageType.WARNING);
-                Notifications.Bus.notify(notification);
-            } else {
-                CheckDataUtils.refreshResultData(resultObject.getData());
-            }
+            //重新检查
+            this.btnCheckPress(project);
         });
         btnResetIgnore.addActionListener(e -> {
 
-            int yesNoDialog = DIALOG_HIDDEN;
-            final int columnCount = tableIgnore.getRowCount();
-            if (columnCount != 0) {
-                yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetIgnore.dialog.message"), InterUtil.getValue("show.content.window.btnResetIgnore.dialog.title"), UIUtil.getWarningIcon());
-            }
-            //yes
-            if (yesNoDialog == 0) {
-                CheckDataUtils.clearFileMatch();
-                CheckDataUtils.refreshData();
-            }
+            btnResetIgnorePress();
         });
         btnResetRule.addActionListener(e -> {
 
-            int showDialog = DIALOG_HIDDEN;
-            final int columnCount = tableRule.getRowCount();
-            if (columnCount != 0) {
-                showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetRule.dialog.message"), InterUtil.getValue("show.content.window.btnResetRule.dialog.title"), UIUtil.getWarningIcon());
-            }
-            //yes
-            if (showDialog == 0) {
-                CheckDataUtils.clearCodeMatch();
-                CheckDataUtils.refreshData();
-            }
+            btnResetRule();
         });
         btnResetResult.addActionListener(e -> {
 
-            int showDialog = DIALOG_HIDDEN;
-            final int columnCount = tableResult.getRowCount();
-            if (columnCount != 0) {
-                showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetResult.dialog.message"), InterUtil.getValue("show.content.window.btnResetResult.dialog.title"), UIUtil.getWarningIcon());
-            }
-            //yes
-            if (showDialog == 0) {
-                CheckDataUtils.resultClear();
-            }
+            btnResetResultPress();
+//            btnNewRuleTemp();
         });
         //列表选中事件
         tableResult.getSelectionModel().addListSelectionListener(e -> {
-            final int selectedRow = tableResult.getSelectedRow();
-            if (selectedRow < 0) {
-                return;
-            }
-            try {
-                final TableModel resultModel = tableResult.getModel();
-                //组装数据实体
-                final CodeMatchResult gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
-                //跳转
-                if (Objects.nonNull(gitDiffCmd.getFile())) {
-                    OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber() - 1, 0);
-                    descriptor.navigate(true);
-                    Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                    if (editor == null) {
-                        logger.warning(InterUtil.getValue("logs.validate.editorIsNull"));
-                    } else {
-                        //选中检查内容
-                        editor.getSelectionModel().selectLineAtCaret();
-                    }
-                }
-            } catch (Exception ex) {
-                logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"), tableResult.getModel()));
-                ex.printStackTrace();
-            }
+            btnTableResultRightClick(project);
         });
+        return this;
     }
-
     public JPanel getJcontent() {
 
         //添加新扫描类型
@@ -340,6 +286,110 @@ public class VCSCheckWindow {
                 popupMenuFileMatch.show(table, evt.getX(), evt.getY());
             }
         }
+    }
 
+    public JScrollPane getResultPane() {
+        this.resultPane.setViewportView(tableResult);
+        this.resultPane.setVisible(true);
+        return this.resultPane;
+    }
+
+    public void btnNewRuleTemp() {
+
+        CheckinDialog dialog = new CheckinDialog();
+        dialog.setContentPane(this.getResultPane());
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+
+    /**
+     * 重新检查
+     *
+     * @param project
+     */
+    public void btnCheckPress(Project project) {
+        instance.oldDataUpdated = true;
+        logger.info("" + instance.getState());
+        System.out.println(instance.getState());
+
+        //检查流程发起
+        CodeMatchReq codeMatchReq = new CodeMatchReq();
+        codeMatchReq.setCheckSource(CheckSourceEnum.TOOL_WINDOW);
+        codeMatchReq.setProject(project);
+        //配置参数
+        CodeMatchContext context = CodeMatchService.convertCodeMatchContext(codeMatchReq);
+        //检查
+        ResultObject<List<CodeMatchResult>> resultObject = CodeMatchService.startCodeMatch(context);
+        if (resultObject.getOk() != ResultObject.ok().getOk()) {
+            Notification notification = notificationGroup.createNotification(resultObject.getMsg(), MessageType.WARNING);
+            Notifications.Bus.notify(notification);
+        } else {
+            CheckDataUtils.refreshResultData(resultObject.getData());
+        }
+    }
+
+    public void btnResetIgnorePress() {
+        int yesNoDialog = DIALOG_HIDDEN;
+        final int columnCount = tableIgnore.getRowCount();
+        if (columnCount != 0) {
+            yesNoDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetIgnore.dialog.message"), InterUtil.getValue("show.content.window.btnResetIgnore.dialog.title"), UIUtil.getWarningIcon());
+        }
+        //yes
+        if (yesNoDialog == 0) {
+            CheckDataUtils.clearFileMatch();
+            CheckDataUtils.refreshData();
+        }
+    }
+
+    private void btnResetRule() {
+        int showDialog = DIALOG_HIDDEN;
+        final int columnCount = tableRule.getRowCount();
+        if (columnCount != 0) {
+            showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetRule.dialog.message"), InterUtil.getValue("show.content.window.btnResetRule.dialog.title"), UIUtil.getWarningIcon());
+        }
+        //yes
+        if (showDialog == 0) {
+            CheckDataUtils.clearCodeMatch();
+            CheckDataUtils.refreshData();
+        }
+    }
+
+    private void btnResetResultPress() {
+        int showDialog = DIALOG_HIDDEN;
+        final int columnCount = tableResult.getRowCount();
+        if (columnCount != 0) {
+            showDialog = Messages.showYesNoDialog(InterUtil.getValue("show.content.window.btnResetResult.dialog.message"), InterUtil.getValue("show.content.window.btnResetResult.dialog.title"), UIUtil.getWarningIcon());
+        }
+        //yes
+        if (showDialog == 0) {
+            CheckDataUtils.resultClear();
+        }
+    }
+
+    private void btnTableResultRightClick(Project project) {
+        final int selectedRow = tableResult.getSelectedRow();
+        if (selectedRow < 0) {
+            return;
+        }
+        try {
+            final TableModel resultModel = tableResult.getModel();
+            //组装数据实体
+            final CodeMatchResult gitDiffCmd = Windowhandler.buildGitDiffCmd(resultModel, selectedRow);
+            //跳转
+            if (Objects.nonNull(gitDiffCmd.getFile())) {
+                OpenFileDescriptor descriptor = new OpenFileDescriptor(project, Objects.requireNonNull(gitDiffCmd.getFile()), gitDiffCmd.getErrorLineNumber() - 1, 0);
+                descriptor.navigate(true);
+                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+                if (editor == null) {
+                    logger.warning(InterUtil.getValue("logs.validate.editorIsNull"));
+                } else {
+                    //选中检查内容
+                    editor.getSelectionModel().selectLineAtCaret();
+                }
+            }
+        } catch (Exception ex) {
+            logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"), tableResult.getModel()));
+            ex.printStackTrace();
+        }
     }
 }

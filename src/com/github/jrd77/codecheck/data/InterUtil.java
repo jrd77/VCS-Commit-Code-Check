@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 /**
  * InternationalUtil
- * 国际化语言工具 localhost
+ * 国际化语言工具
  */
 public class InterUtil {
 

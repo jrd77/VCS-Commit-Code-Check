@@ -280,7 +280,7 @@
                   </grid>
                 </children>
               </grid>
-              <scrollpane id="2d542">
+              <scrollpane id="2d542" binding="resultPane">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>

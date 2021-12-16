@@ -4,18 +4,17 @@ import com.github.jrd77.codecheck.data.CheckDataUtils;
 import com.github.jrd77.codecheck.data.InterUtil;
 import com.github.jrd77.codecheck.data.model.CheckSourceEnum;
 import com.github.jrd77.codecheck.data.model.CodeMatchResult;
+import com.github.jrd77.codecheck.dialog.CheckinDialog;
 import com.github.jrd77.codecheck.service.CodeMatchService;
 import com.github.jrd77.codecheck.util.CollUtil;
-import com.github.jrd77.codecheck.util.HtmlUtil;
 import com.github.jrd77.codecheck.util.ResultObject;
 import com.github.jrd77.codecheck.vo.CodeMatchContext;
 import com.github.jrd77.codecheck.vo.CodeMatchReq;
+import com.github.jrd77.codecheck.window.rule.VCSCheckWindow;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vcs.CheckinProjectPanel;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
-import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -97,18 +96,15 @@ public class VcsCheckinHandler extends CheckinHandler {
         //检查项目中是否有符合规则的提交内容
         final List<CodeMatchResult> cmdList = resultObject.getData();
         if (cmdList != null && cmdList.size() > 0) {
-            final String htmlTable = HtmlUtil.buildHtmlTable(cmdList);
-            String html = "<html><head>" + UIUtil.getCssFontDeclaration(UIUtil.getLabelFont()) + "</head><body>" +
-                    "<br><h3>" + InterUtil.getValue("show.content.vcs.checkinhandler.message.whether") + "</h3>" +
-                    "<br>" +
-                    htmlTable +
-                    "</body></html>";
-            int yesOrNo = Messages.showYesNoDialog(html,
-                    InterUtil.getValue("show.content.vcs.checkinhandler.message.title"),
-                    UIUtil.getErrorIcon());
-
-            return yesOrNo == 0 ? ReturnResult.COMMIT : ReturnResult.CANCEL;
+            VCSCheckWindow vcsCheckWindow = new VCSCheckWindow(codeMatchReq.getProject());
+            CheckinDialog dialog = new CheckinDialog();
+            dialog.setContentPane(vcsCheckWindow.getResultPane());
+            dialog.pack();
+            dialog.setVisible(true);
+            //添加一个dialog
+            return ReturnResult.CANCEL;
         }
-        return ReturnResult.COMMIT;
+        //TODO
+        return ReturnResult.CANCEL;
     }
 }
