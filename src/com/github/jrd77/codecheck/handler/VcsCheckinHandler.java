@@ -98,11 +98,12 @@ public class VcsCheckinHandler extends CheckinHandler {
         if (cmdList != null && cmdList.size() > 0) {
             VCSCheckWindow vcsCheckWindow = new VCSCheckWindow(codeMatchReq.getProject());
             CheckinDialog dialog = new CheckinDialog();
-            dialog.setContentPane(vcsCheckWindow.getResultPane());
+            dialog.getResultJane().setViewportView(vcsCheckWindow.getTableResult());
             dialog.pack();
             dialog.setVisible(true);
+            int yesOrNo = dialog.getYesOrNo();
             //添加一个dialog
-            return ReturnResult.CANCEL;
+            return yesOrNo == 0 ? ReturnResult.CANCEL : ReturnResult.COMMIT;
         }
         //TODO
         return ReturnResult.CANCEL;

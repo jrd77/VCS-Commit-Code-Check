@@ -36,15 +36,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-    <<em><strong>Check Vcs change File like 'check TODO' in commit-change window</strong></em></em>
-
-<br>
-<ul>
-<li>change default check file type</li>
-<li>remove some useless dependencies</li>
-
-</ul>
-
+    <<em><strong>update the Checkin-Window vcs check show style</strong></em></em>
     ]]>
   </change-notes>
 

@@ -8,7 +8,6 @@ import com.github.jrd77.codecheck.data.save.SaveInterface;
 import com.github.jrd77.codecheck.data.save.XmlFileSaveImpl;
 import com.github.jrd77.codecheck.dialog.AddIgnoreDialog;
 import com.github.jrd77.codecheck.dialog.AddRuleDialog;
-import com.github.jrd77.codecheck.dialog.CheckinDialog;
 import com.github.jrd77.codecheck.intellij.compoent.MyButton;
 import com.github.jrd77.codecheck.intellij.compoent.MyTable;
 import com.github.jrd77.codecheck.service.CodeMatchService;
@@ -95,7 +94,6 @@ public class VCSCheckWindow {
         btnResetResult.addActionListener(e -> {
 
             btnResetResultPress();
-//            btnNewRuleTemp();
         });
         //列表选中事件
         tableResult.getSelectionModel().addListSelectionListener(e -> {
@@ -158,12 +156,12 @@ public class VCSCheckWindow {
         this.tableIgnore.setEnabled(true);
         final TableColumnModel columnModel = tableIgnore.getColumnModel();
         int index = 0;
-        final int width = columnModel.getColumn(index).getPreferredWidth();
-        final int globalWidth = columnModel.getColumnCount() * width;
+        final int globalWidth = columnModel.getTotalColumnWidth();
         columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
         double contentWidth = globalWidth - (globalWidth * 0.1);
         columnModel.getColumn(index++).setPreferredWidth((int) contentWidth / 2);
         columnModel.getColumn(index).setPreferredWidth((int) contentWidth / 2);
+        tableIgnore.doLayout();
     }
 
     /**
@@ -174,13 +172,13 @@ public class VCSCheckWindow {
         this.tableRule.setEnabled(true);
         final TableColumnModel columnModel = tableRule.getColumnModel();
         int index = 0;
-        final int width = columnModel.getColumn(index).getPreferredWidth();
-        final int globalWidth = columnModel.getColumnCount() * width;
+        final int globalWidth = columnModel.getTotalColumnWidth();
         columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
         columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
         double contentWidth = globalWidth - (globalWidth * 0.3);
         columnModel.getColumn(index++).setPreferredWidth((int) contentWidth);
         columnModel.getColumn(index).setPreferredWidth(globalWidth / 10);
+        tableRule.doLayout();
     }
 
     /**
@@ -191,12 +189,12 @@ public class VCSCheckWindow {
         jTable.setEnabled(true);
         final TableColumnModel columnModel = jTable.getColumnModel();
         int index = 0;
-        final int width = columnModel.getColumn(index).getPreferredWidth();
-        final int globalWidth = columnModel.getColumnCount() * width;
+        final int globalWidth = columnModel.getTotalColumnWidth();
         columnModel.getColumn(index++).setPreferredWidth(globalWidth / 10);
         double contentWidth = globalWidth - (globalWidth * 0.1);
         columnModel.getColumn(index++).setPreferredWidth((int) contentWidth / 2);
         columnModel.getColumn(index).setPreferredWidth((int) contentWidth / 2);
+        jTable.doLayout();
     }
 
     private void initComponentText() {
@@ -294,14 +292,6 @@ public class VCSCheckWindow {
         return this.resultPane;
     }
 
-    public void btnNewRuleTemp() {
-
-        CheckinDialog dialog = new CheckinDialog();
-        dialog.setContentPane(this.getResultPane());
-        dialog.pack();
-        dialog.setVisible(true);
-    }
-
     /**
      * 重新检查
      *
@@ -391,5 +381,9 @@ public class VCSCheckWindow {
             logger.severe(String.format(InterUtil.getValue("logs.validate.openFileFaliedPrintFileName"), tableResult.getModel()));
             ex.printStackTrace();
         }
+    }
+
+    public MyTable getTableResult() {
+        return tableResult;
     }
 }

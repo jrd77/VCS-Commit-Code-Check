@@ -55,17 +55,10 @@ public class CheckinDialog extends JDialog {
 
     private void initComponentText() {
 
-//        ruleText.setToolTipText(InterUtil.getValue("show.content.dialog.btnAddRule.ruleText.text"));
         buttonOK.setText(InterUtil.getValue("show.component.btn.ok"));
         buttonCancel.setText(InterUtil.getValue("show.component.btn.cancel"));
     }
 
-    public static void main(String[] args) {
-        CheckinDialog dialog = new CheckinDialog();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
 
     public int getYesOrNo() {
         return yesOrNo;
@@ -86,7 +79,7 @@ public class CheckinDialog extends JDialog {
         this.contentPane.setSize(widthRemark / 2, heightRemark);
     }
 
-    public void setResultJane(JScrollPane pane) {
-        contentPane.add(pane);
+    public JScrollPane getResultJane() {
+        return resultJane;
     }
 }
