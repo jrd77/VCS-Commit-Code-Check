@@ -19,7 +19,7 @@ public class CheckinDialog extends JDialog {
 
     public CheckinDialog() {
 
-        initDialogSize();
+        initDialog();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -64,7 +64,9 @@ public class CheckinDialog extends JDialog {
         return yesOrNo;
     }
 
-    private void initDialogSize() {
+    private void initDialog() {
+
+        this.setTitle(InterUtil.getValue("show.component.tips.title"));
         final Rectangle rectangle = ScreenUtil.getAllScreensRectangle();
         final double width = rectangle.getWidth();
         final double height = rectangle.getHeight();
